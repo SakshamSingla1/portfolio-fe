@@ -1,6 +1,7 @@
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
+import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 export const AUTH_URLS = {
     GET_ALL: "/contact-us",
@@ -17,17 +18,20 @@ export interface ContactUs {
 }
 
 export const useContactUsService = () => {
+    const { user } = useAuthenticatedUser();
     const getAll = () => {
-        return request(API_METHOD.GET, AUTH_URLS.GET_ALL);
+        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+        return request(API_METHOD.GET, url, user, null, null, null)
     };
 
     const getByEmail = (email: string) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_EMAIL, { email });
-        return request(API_METHOD.GET, url);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const create = (contactUs: ContactUs) => {
-        return request(API_METHOD.POST, AUTH_URLS.GET_ALL, contactUs);
+        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+        return request(API_METHOD.POST, url, user, contactUs);
     };
 
     return {
