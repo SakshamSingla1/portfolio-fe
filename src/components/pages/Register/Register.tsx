@@ -10,6 +10,7 @@ import { useAuthService } from '../../../services/useAuthService';
 import { HTTP_STATUS } from '../../../utils/constant';
 import { useAuthenticatedUser } from '../../../hooks/useAuthenticatedUser';
 import { ADMIN_ROUTES } from '../../../utils/constant';
+import { createUseStyles } from 'react-jss';
 
 const validationSchema = Yup.object().shape({
     fullName: Yup.string()
@@ -26,13 +27,24 @@ const validationSchema = Yup.object().shape({
         .required('Please confirm your password'),
 });
 
+const useStyles = createUseStyles((theme:any)=>{
+    return {
+        links: {
+            color: theme.palette.background.primary.primary500,
+            '&:hover': {
+                color: theme.palette.background.primary.primary600,
+            }
+        }
+    }
+})
+
 const Register = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const authService = useAuthService();
     const { user } = useAuthenticatedUser();
-
+    const classes = useStyles();
     const formik = useFormik({
         initialValues: {
             fullName: '',
@@ -58,7 +70,7 @@ const Register = () => {
     });
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#D1F2EB] via-[#E8F8F5] to-[#1ABC9C] p-4">
             {/* Decorative elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -96,7 +108,6 @@ const Register = () => {
                                 onBlur={formik.handleBlur}
                                 error={formik.touched.fullName && Boolean(formik.errors.fullName)}
                                 helperText={formik.touched.fullName && formik.errors.fullName}
-                                className="pl-10 w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                             />
                         </div>
                     </div>
@@ -152,13 +163,12 @@ const Register = () => {
                         </div>
                     </div>
 
-                    <div className="pt-2">
+                    <div className="flex justify-center">
                         <Button
                             label={loading ? 'Creating account...' : 'Sign up'}
                             type="submit"
                             variant="primaryContained"
                             disabled={loading}
-                            className="w-full"
                             onClick={()=>formik.handleSubmit()}
                         />
                     </div>
@@ -174,25 +184,23 @@ const Register = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                    <button
-                        type="button"
-                        className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                    >
-                        <FaGoogle className="h-5 w-5 text-red-500" />
-                        <span className="ml-2">Google</span>
-                    </button>
-                    <button
-                        type="button"
-                        className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                    >
-                        <FaGithub className="h-5 w-5 text-gray-800" />
-                        <span className="ml-2">GitHub</span>
-                    </button>
+                    <Button
+                        label="Google"
+                        variant='tertiaryContained'
+                        startIcon={<FaGoogle />}
+                        onClick={()=>formik.handleSubmit()}
+                    />
+                    <Button
+                        label="GitHub"
+                        variant='tertiaryContained'
+                        startIcon={<FaGithub />}
+                        onClick={()=>formik.handleSubmit()}
+                    />
                 </div>
 
                 <div className="text-center text-sm text-gray-600">
                     Already have an account?{' '}
-                    <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                    <Link to="/login" className={classes.links}>
                         Sign in
                     </Link>
                 </div>

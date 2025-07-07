@@ -8,11 +8,17 @@ interface AuthenticatedUserProviderType {
 export interface AuthenticatedUserType {
     email: string;
     id: string;
-    mobileNumber: string;
     token: string;
     password: boolean | null; 
     role?: string;
     fullName: string;
+    title: string;
+    aboutMe: string;
+    phone: string;
+    location: string;
+    githubUrl: string;
+    linkedinUrl: string;
+    websiteUrl: string;
 }
 
 export interface AuthenticatedUserContextType {

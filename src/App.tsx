@@ -97,6 +97,7 @@ const App = () => {
                 <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
 
                 <Route path="/" element={<Navigate to={ADMIN_ROUTES.EDUCATION} replace />} />
+                <Route path="/" element={<Navigate to={ADMIN_ROUTES.PROFILE} replace />} />
               </Route>
             </Route>
             
