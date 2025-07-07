@@ -16,18 +16,18 @@ export const defaultTheme: CustomTheme = {
     palette: {
         background: {
             primary: {
-                primary50: '#E7F6FE',
-                primary100: '#D6DDF5',
-                primary200: '#ADBBEB',
-                primary300: '#849AE1',
-                primary400: '#5B78D7',
-                primary500: '#2743A0',
-                primary600: '#2845A4',
-                primary700: '#1E347B',
-                primary800: '#142252',
-                primary900: '#0A1129',
-                primary950: '#050915',
-                primary960: '#F2F2F2',
+                primary50: '#E8F8F5',   // Lightest Teal
+                primary100: '#D1F2EB',  // Very Light Teal
+                primary200: '#A3E4D7',  // Light Teal
+                primary300: '#76D7C4',  // Teal 200
+                primary400: '#48C9B0',  // Teal 300
+                primary500: '#1ABC9C',  // Base Teal
+                primary600: '#17A589',  // Teal 600
+                primary700: '#148F77',  // Darker Teal
+                primary800: '#0E6655',  // Dark Teal
+                primary900: '#0B5345',  // Very Dark Teal
+                primary950: '#073B32',  // Deepest Teal
+                primary960: '#E8F8F5',  // Matching Lightest Teal
             },
             secondary: {
                 secondary50: '#FCE9EA',
