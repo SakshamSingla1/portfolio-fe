@@ -81,7 +81,7 @@ const SkillFormTemplate = ({ formik, mode, onClose }: SkillFormProps) => {
                 {mode !== MODE.VIEW && (
                     <Button
                         label={
-                            mode === MODE.ADD ? "Add Project" : "Update Project"
+                            mode === MODE.ADD ? "Add Skill" : "Update Skill"
                         }
                         variant="primaryContained"
                         onClick={() => formik.handleSubmit()}

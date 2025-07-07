@@ -22,6 +22,8 @@ export const API_METHOD = {
 }
 
 export const ADMIN_ROUTES = {
+    REGISTER: '/admin/register',
+    LOGIN: '/admin/login',
     EDUCATION: '/admin/education',
     EDUCATION_ADD: '/admin/education/add',
     EDUCATION_EDIT: '/admin/education/:degree/edit',
@@ -39,6 +41,7 @@ export const ADMIN_ROUTES = {
     SKILL_ADD: '/admin/skill/add',
     SKILL_EDIT: '/admin/skill/:id/edit',
     SKILL_VIEW: '/admin/skill/:id',
+    PROFILE: '/admin/profile',
 }
 
 export const MAIN_ROUTES = {
@@ -73,9 +76,9 @@ export const DEGREE_OPTIONS : DegreeType[] = [
 ];
 
 export const SKILL_LEVEL_OPTIONS : DegreeType[] = [
-    { value: 'BEGINNER', label: 'Beginner' },
-    { value: 'INTERMEDIATE', label: 'Intermediate' },
-    { value: 'ADVANCED', label: 'Advanced' },
+    { value: 'Beginner', label: 'Beginner' },
+    { value: 'Intermediate', label: 'Intermediate' },
+    { value: 'Advanced', label: 'Advanced' },
 ];
 
 export const SKILL_CATEGORY_OPTIONS : DegreeType[] = [

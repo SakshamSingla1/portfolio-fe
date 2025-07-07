@@ -1,6 +1,7 @@
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
+import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 export const AUTH_URLS = {
     GET_ALL: "/skill",
@@ -15,21 +16,24 @@ export interface Skill {
 }
 
 export const useSkillService = () => {
+    const { user } = useAuthenticatedUser();
     const getAll = () => {
-        return request(API_METHOD.GET, AUTH_URLS.GET_ALL);
+        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+        return request(API_METHOD.GET, url, user, null, null, null)
     };
 
     const getById = (id: string) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
-        return request(API_METHOD.GET, url);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
     const create = (skill: Skill) => {
-        return request(API_METHOD.POST, AUTH_URLS.GET_ALL, skill);
+        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+        return request(API_METHOD.POST, url, user, skill);
     };
 
     const update = (id: string, skill: Skill) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
-        return request(API_METHOD.PUT, url, skill);
+        return request(API_METHOD.PUT, url, user, skill);
     };
 
     return {

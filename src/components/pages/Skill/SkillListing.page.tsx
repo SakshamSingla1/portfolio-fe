@@ -5,8 +5,18 @@ import SkillListTemplate from '../../templates/Skill/SkillList.template';
 import Button from '../../atoms/Button/Button';
 import { ADMIN_ROUTES } from '../../../utils/constant';
 import { useNavigate } from 'react-router-dom';
+import { createUseStyles } from 'react-jss';
+
+const useStyles = createUseStyles((theme:any)=>{
+    return {
+        title: {
+            color: theme.palette.background.primary.primary50,
+        }
+    }
+})
 
 const SkillListingPage: React.FC = () => {
+    const classes = useStyles();
     const skillService = useSkillService();
     const navigate = useNavigate();
     const [skills, setSkills] = useState<Skill[]>([]);
@@ -50,21 +60,8 @@ const SkillListingPage: React.FC = () => {
         }));
     };
 
-    const handleAddNew = () => {
-        navigate(ADMIN_ROUTES.SKILL_ADD);
-    };
-
     return (
         <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">Skills</h1>
-                <Button
-                    label="+ Add New"
-                    variant="primaryContained"
-                    onClick={handleAddNew}
-                    className="px-4 py-2"
-                />
-            </div>
 
             <SkillListTemplate
                 skills={skills}

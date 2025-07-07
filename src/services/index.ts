@@ -1,40 +1,44 @@
-import axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { AuthenticatedUserType } from '../contexts/AuthenticatedUserContext';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_V1_URL;
 
-const axiosInstance = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+const setAuthHeader = (userContext: AuthenticatedUserType | null): void => {
+
+    if (userContext?.token) {
+        axios.defaults.headers.common['Authorization'] = userContext.token;
+    } else {
+        delete axios.defaults.headers.common['Authorization'];
+    }
+
+};
 
 export const request = async (
     method: AxiosRequestConfig['method'],
     url: string,
+    userContext: AuthenticatedUserType | null,
     data?: any,
-    options?: { params?: { [key: string]: any } },
-    onUploadProgress?: AxiosRequestConfig['onUploadProgress'],
-    headers?: { [key: string]: string },
-    baseUrl: string = API_BASE_URL
+    options?: { params: { [key: string]: any } } | null,
+    onUploadProgress?: any,
+    baseUrl = API_BASE_URL,
+    headers?: { [key: string]: string }
 ): Promise<any> => {
+
+    setAuthHeader(userContext);
+
     try {
-        const response = await axiosInstance({
+        const response = await axios({
             method,
+            baseURL: baseUrl,
             url,
             data,
-            baseURL: baseUrl,
-            ...(options || {}),
+            ...(options ? options : {}),
             onUploadProgress,
-            headers,
+            headers
         });
-
         return response;
     } catch (error) {
-        const err = error as AxiosError;
-
-        console.error(`[HTTP ERROR] ${method?.toUpperCase()} ${url}:`, err.message);
-
-        return err.response ?? null;
+        return (error as AxiosError)?.response ?? null;
     }
-};
+
+}

@@ -1,6 +1,7 @@
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
+import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 export const AUTH_URLS = {
     GET_ALL: "/education",
@@ -18,30 +19,26 @@ export interface Education {
     location: string;
 }
 
-export interface ApiResponse<T> {
-    data: T;
-    message: string;
-    status: number;
-    success: boolean;
-}
-
 export const useEducationService = () => {
+    const { user } = useAuthenticatedUser();
     const getAll = () => {
-        return request(API_METHOD.GET, AUTH_URLS.GET_ALL);
+        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+        return request(API_METHOD.GET, url, user, null, null, null)
     };
 
     const getByDegree = (degree: string) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_DEGREE, { degree });
-        return request(API_METHOD.GET, url);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const create = (education: Education) => {
-        return request(API_METHOD.POST, AUTH_URLS.GET_ALL, education);
+        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+        return request(API_METHOD.POST, url, user, education);
     };
 
     const update = (degree: string, education: Education) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_DEGREE, { degree });
-        return request(API_METHOD.PUT, url, education);
+        return request(API_METHOD.PUT, url, user, education);
     };
 
     return {
