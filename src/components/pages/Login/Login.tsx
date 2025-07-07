@@ -11,11 +11,23 @@ import * as Yup from 'yup';
 import { FaLock, FaEnvelope, FaGoogle, FaGithub } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { createUseStyles } from 'react-jss';
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Email is required'),
     password: Yup.string().required('Password is required'),
 });
+
+const useStyles = createUseStyles((theme:any)=>{
+    return {
+        links: {
+            color: theme.palette.background.primary.primary500,
+            '&:hover': {
+                color: theme.palette.background.primary.primary600,
+            }
+        }
+    }
+})
 
 interface Login {
     email: string;
@@ -28,6 +40,7 @@ const Login = () => {
     const authService = useAuthService();
     const { user, setAuthenticatedUser } = useAuthenticatedUser();
     const [loading, setLoading] = useState(false);
+    const classes = useStyles();
     const [error, setError] = useState('');
 
     // If user is already logged in, redirect to admin dashboard or the intended URL
@@ -60,8 +73,14 @@ const Login = () => {
                         fullName: userData.fullName,
                         token: token,
                         role: userData.role,
-                        mobileNumber: userData.mobileNumber || '',
-                        password: null
+                        phone: userData.phone,
+                        password: null,
+                        title: userData.title,
+                        aboutMe: userData.aboutMe,
+                        location: userData.location,
+                        githubUrl: userData.githubUrl,
+                        linkedinUrl: userData.linkedinUrl,
+                        websiteUrl: userData.websiteUrl
                     });
                     
                     // Navigate to the intended URL or default admin dashboard
@@ -79,7 +98,7 @@ const Login = () => {
     });
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#D1F2EB] via-[#E8F8F5] to-[#1ABC9C] p-4">
             {/* Decorative elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -106,7 +125,7 @@ const Login = () => {
                                 name="email"
                                 type="email"
                                 autoComplete="email"
-                                placeholder="you@example.com"
+                                placeholder="admin@example.com"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -130,14 +149,14 @@ const Login = () => {
                                 />
                             </div>
                             <div className="flex items-center justify-end mb-1">
-                                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500 font-medium">
+                                <Link to="/forgot-password" className={classes.links}>
                                     Forgot password?
                                 </Link>
                             </div>
                         </div>
                     </div>
 
-                    <div>
+                    <div className='flex justify-center'>
                         <Button
                             label={loading ? 'Signing in...' : 'Sign in'}
                             type="submit"
@@ -158,25 +177,23 @@ const Login = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                    <button
-                        type="button"
-                        className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                    >
-                        <FaGoogle className="h-5 w-5 text-red-500" />
-                        <span className="ml-2">Google</span>
-                    </button>
-                    <button
-                        type="button"
-                        className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                    >
-                        <FaGithub className="h-5 w-5 text-gray-800" />
-                        <span className="ml-2">GitHub</span>
-                    </button>
+                    <Button
+                        label="Google"
+                        variant='tertiaryContained'
+                        startIcon={<FaGoogle />}
+                        onClick={()=>formik.handleSubmit()}
+                    />
+                    <Button
+                        label="GitHub"
+                        variant='tertiaryContained'
+                        startIcon={<FaGithub />}
+                        onClick={()=>formik.handleSubmit()}
+                    />
                 </div>
 
                 <div className="text-center text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link to={ADMIN_ROUTES.REGISTER} className="font-medium text-blue-600 hover:text-blue-500">
+                    <Link to={ADMIN_ROUTES.REGISTER} className={classes.links}>
                         Sign up
                     </Link>
                 </div>
