@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import ProjectFormTemplate from "../../templates/Project/ProjectForm.template";
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     projectName: Yup.string()
@@ -32,6 +33,7 @@ const ProjectViewDetailsPage = () => {
     const projectService = useProjectService();
     const navigate = useNavigate();
     const { id } = useParams();
+    const { showSnackbar } = useSnackbar();
     const formik = useFormik({
         initialValues: {
             projectName: "",
@@ -59,11 +61,10 @@ const ProjectViewDetailsPage = () => {
                     projectStartDate: response.data.data.projectStartDate || new Date(),
                     projectEndDate: response.data.data.projectEndDate || new Date(),
                 });
-                console.log(response.data);
+                showSnackbar('success','Project fetched successfully');
             }
         } catch (error) {
-            console.error("Error fetching education data:", error);
-            alert("Failed to load education data");
+            showSnackbar('error',`${error}`);
         }
     }
 

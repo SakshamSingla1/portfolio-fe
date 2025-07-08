@@ -5,10 +5,12 @@ import Button from '../../../atoms/Button/Button';
 import EducationListTemplate from '../../templates/Education/EducationList.template';
 import { useState, useEffect } from 'react';
 import { Education } from '../../../../services/useEducationService';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const EducationDetailsListingPage: React.FC = () => {
     const educationService = useEducationService();
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
     const [educations, setEducations] = useState<Education[]>([]);
     const [pagination, setPagination] = useState({
         pageSize: 10,
@@ -26,9 +28,10 @@ const EducationDetailsListingPage: React.FC = () => {
                     ...prev,
                     totalRecords: response.data.total || 0
                 }));
+                showSnackbar('success',`${response?.data?.message}`);
             }
         } catch (error) {
-            console.error('Error fetching education records:', error);
+            showSnackbar('error',`${error}`);
         }
     };
 

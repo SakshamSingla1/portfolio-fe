@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate } from "react-router-dom";
 import SkillFormTemplate from "../../templates/Skill/SkillForm.template";
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -20,6 +21,7 @@ const validationSchema = Yup.object().shape({
 const SkillAddDetailsPage = () => {
     const skillService = useSkillService();
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
 
     const onClose = () => navigate(ADMIN_ROUTES.SKILL);
 
@@ -34,13 +36,14 @@ const SkillAddDetailsPage = () => {
             try {
                 const response = await skillService.create(values);
                 if (response?.status === HTTP_STATUS.OK) {
+                    showSnackbar('success',`${response?.data?.message}`);
                     onClose();
                     navigate(ADMIN_ROUTES.SKILL);
                 } else {
-                    alert(response?.message);
+                    showSnackbar('error',`${response?.data?.message}`);
                 }
             } catch (error) {
-                alert(error);
+                showSnackbar('error',`${error}`);
             }
         }
     });

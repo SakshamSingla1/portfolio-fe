@@ -30,10 +30,11 @@ import Login from './components/admin/pages/Login/Login';
 import AdminLayout from './layouts/AdminLayout';
 import Register from './components/admin/pages/Register/Register';
 import ProfilePage from './components/admin/pages/Profile/Profile.page';
+import { SnackbarProvider } from './contexts/SnackbarContext';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  
+
   const hideLayout = [
     ADMIN_ROUTES.LOGIN,
     ADMIN_ROUTES.REGISTER,
@@ -60,56 +61,57 @@ const App = () => {
   return (
     <ThemeProvider theme={defaultTheme}>
       <AuthenticatedUserProvider>
-        <MainLayout>
-          <Routes>
-            <Route path={ADMIN_ROUTES.REGISTER} element={<Register />} />
-            <Route path={ADMIN_ROUTES.LOGIN} element={<Login />} />
-            <Route path={ADMIN_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
-            <Route path={ADMIN_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
-            <Route element={<ProtectedRoute />}>
-              <Route element={<AdminLayout />}>
-                <Route path={ADMIN_ROUTES.EDUCATION}>
-                  <Route index element={<EducationDetailsListingPage />} />
-                  <Route path="add" element={<EducationAddDetailsPage />} />
-                  <Route path=":degree/edit" element={<EducationEditDetailsPage />} />
-                  <Route path=":degree" element={<EducationDetailsViewPage />} />
+        <SnackbarProvider>
+          <MainLayout>
+            <Routes>
+              <Route path={ADMIN_ROUTES.REGISTER} element={<Register />} />
+              <Route path={ADMIN_ROUTES.LOGIN} element={<Login />} />
+              <Route path={ADMIN_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+              <Route path={ADMIN_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<AdminLayout />}>
+                  <Route path={ADMIN_ROUTES.EDUCATION}>
+                    <Route index element={<EducationDetailsListingPage />} />
+                    <Route path="add" element={<EducationAddDetailsPage />} />
+                    <Route path=":degree/edit" element={<EducationEditDetailsPage />} />
+                    <Route path=":degree" element={<EducationDetailsViewPage />} />
+                  </Route>
+
+                  <Route path={ADMIN_ROUTES.CONTACT_US} element={<ContactUsListingPage />} />
+
+                  <Route path={ADMIN_ROUTES.PROJECTS}>
+                    <Route index element={<ProjectListingPage />} />
+                    <Route path="add" element={<ProjectDetailsAddPage />} />
+                    <Route path=":id/edit" element={<ProjectDetailsEditPage />} />
+                    <Route path=":id" element={<ProjectDetailsViewPage />} />
+                  </Route>
+
+                  <Route path={ADMIN_ROUTES.EXPERIENCE}>
+                    <Route index element={<ExperienceListingPage />} />
+                    <Route path="add" element={<ExperienceAddDetailsPage />} />
+                    <Route path=":id/edit" element={<ExperienceEditDetailsPage />} />
+                    <Route path=":id" element={<ExperienceDetailsViewPage />} />
+                  </Route>
+
+                  <Route path={ADMIN_ROUTES.SKILL}>
+                    <Route index element={<SkillListingPage />} />
+                    <Route path="add" element={<SkillAddDetailsPage />} />
+                    <Route path=":id/edit" element={<SkillEditDetailsPage />} />
+                    <Route path=":id" element={<SkillViewDetailsPage />} />
+                  </Route>
+
+                  <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
+
+                  <Route path="/" element={<Navigate to={ADMIN_ROUTES.PROFILE} replace />} />
                 </Route>
-
-                <Route path={ADMIN_ROUTES.CONTACT_US} element={<ContactUsListingPage />} />
-
-                <Route path={ADMIN_ROUTES.PROJECTS}>
-                  <Route index element={<ProjectListingPage />} />
-                  <Route path="add" element={<ProjectDetailsAddPage />} />
-                  <Route path=":id/edit" element={<ProjectDetailsEditPage />} />
-                  <Route path=":id" element={<ProjectDetailsViewPage />} />
-                </Route>
-
-                <Route path={ADMIN_ROUTES.EXPERIENCE}>
-                  <Route index element={<ExperienceListingPage />} />
-                  <Route path="add" element={<ExperienceAddDetailsPage />} />
-                  <Route path=":id/edit" element={<ExperienceEditDetailsPage />} />
-                  <Route path=":id" element={<ExperienceDetailsViewPage />} />
-                </Route>
-
-                <Route path={ADMIN_ROUTES.SKILL}>
-                  <Route index element={<SkillListingPage />} />
-                  <Route path="add" element={<SkillAddDetailsPage />} />
-                  <Route path=":id/edit" element={<SkillEditDetailsPage />} />
-                  <Route path=":id" element={<SkillViewDetailsPage />} />
-                </Route>
-
-                <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
-
-                <Route path="/" element={<Navigate to={ADMIN_ROUTES.EDUCATION} replace />} />
-                <Route path="/" element={<Navigate to={ADMIN_ROUTES.PROFILE} replace />} />
               </Route>
-            </Route>
-            
-            {/* Public routes */}
-            <Route path="/" element={<div>Home Page</div>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </MainLayout>
+
+              {/* Public routes */}
+              <Route path="/" element={<div>Home Page</div>} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </MainLayout>
+        </SnackbarProvider>
       </AuthenticatedUserProvider>
     </ThemeProvider>
   );

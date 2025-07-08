@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import SkillFormTemplate from "../../templates/Skill/SkillForm.template";
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -22,6 +23,7 @@ const SkillEditDetailsPage = () => {
     const skillService = useSkillService();
     const navigate = useNavigate();
     const { id } = useParams();
+    const { showSnackbar } = useSnackbar();
 
     const onClose = () => navigate(ADMIN_ROUTES.SKILL);
 
@@ -37,13 +39,13 @@ const SkillEditDetailsPage = () => {
                 if (!id) return;
                 const response = await skillService.update(id, values);
                 if (response?.status === HTTP_STATUS.OK) {
+                    showSnackbar('success',`${response?.data?.message}`);
                     onClose();
                 } else {
-                    alert(response?.message || "Failed to update skill");
+                    showSnackbar('error',`${response?.data?.message}`);
                 }
             } catch (error) {
-                console.error("Error updating skill:", error);
-                alert("An error occurred while updating the skill");
+                showSnackbar('error',`${error}`);
             }
         }
     });
@@ -57,12 +59,12 @@ const SkillEditDetailsPage = () => {
                     level: response.data.data.level || "",
                     category: response.data.data.category || "",
                 });
+                showSnackbar('success',`${response?.data?.message}`);
             } else {
-                alert(response?.message || "Failed to fetch skill details");
+                showSnackbar('error',`${response?.data?.message}`);
             }
         } catch (error) {
-            console.error("Error fetching skill:", error);
-            alert("An error occurred while fetching skill details");
+            showSnackbar('error',`${error}`);
         }
     };
 

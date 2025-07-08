@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { createUseStyles } from 'react-jss';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Email is required'),
@@ -39,7 +40,7 @@ const Login = () => {
     const { user, setAuthenticatedUser } = useAuthenticatedUser();
     const [loading, setLoading] = useState(false);
     const classes = useStyles();
-    const [error, setError] = useState('');
+    const { showSnackbar } = useSnackbar();
 
     // If user is already logged in, redirect to admin dashboard or the intended URL
     const from = location.state?.from?.pathname || '/admin';
@@ -57,7 +58,6 @@ const Login = () => {
         onSubmit: async (values) => {
             try {
                 setLoading(true);
-                setError('');
                 
                 const response = await authService.login(values);
                 
@@ -83,12 +83,13 @@ const Login = () => {
                     
                     // Navigate to the intended URL or default admin dashboard
                     navigate(from, { replace: true });
+                    showSnackbar('success','Login successful! Redirecting to dashboard...');
                 } else {
-                    setError(response?.data?.message || 'Login failed. Please check your credentials.');
+                    showSnackbar('error',response?.data?.message || 'Login failed. Please check your credentials.');
                 }
             } catch (err: any) {
                 console.error('Login error:', err);
-                setError(err.response?.data?.message || 'An error occurred during login. Please try again.');
+                showSnackbar('error',err.response?.data?.message || 'An error occurred during login. Please try again.');
             } finally {
                 setLoading(false);
             }

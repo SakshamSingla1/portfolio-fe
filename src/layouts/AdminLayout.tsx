@@ -56,31 +56,21 @@ const AdminLayout: React.FC = () => {
   const location = useLocation();
   const { user } = useAuthenticatedUser();
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 1024; // lg breakpoint
+      const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      
-      // Auto-close sidebar on mobile when screen size changes
       if (mobile) {
         setSidebarOpen(false);
       } else {
         setSidebarOpen(true);
       }
     };
-
-    // Initial check
     handleResize();
-
-    // Add event listener
     window.addEventListener('resize', handleResize);
-    
-    // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auto-close sidebar when navigating on mobile
   useEffect(() => {
     if (isMobile) {
       setSidebarOpen(false);
@@ -92,7 +82,7 @@ const AdminLayout: React.FC = () => {
     { to: ADMIN_ROUTES.EDUCATION, icon: <FaGraduationCap />, label: 'Education' },
     { to: ADMIN_ROUTES.EXPERIENCE, icon: <FaBriefcase />, label: 'Experience' },
     { to: ADMIN_ROUTES.PROJECTS, icon: <FaCode />, label: 'Projects' },
-    { to: ADMIN_ROUTES.SKILL, icon: <FaDumbbell />, label: 'Skills' },
+    { to: ADMIN_ROUTES.SKILL, icon: <FaDumbbell />, label: 'Skill' },
     { to: ADMIN_ROUTES.CONTACT_US, icon: <FaEnvelope />, label: 'Contact Us' },
     { to: MAIN_ROUTES.HOME, icon: <FaGlobe />, label: 'Main Site' },
   ];
@@ -103,7 +93,7 @@ const AdminLayout: React.FC = () => {
   const renderAddButton = (): React.ReactNode => {
     const currentPath = location.pathname;
     const currentNav = navItems.find(item => currentPath.startsWith(item.to));
-    const showAddButton = ['Education', 'Experience', 'Projects', 'Skills']
+    const showAddButton = ['Education', 'Experience', 'Projects', 'Skill']
       .includes(currentNav?.label || '');
 
     if (!showAddButton) return null;
@@ -146,11 +136,11 @@ const AdminLayout: React.FC = () => {
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="bg-[#1ABC9C] p-4 h-16">
-            <div className="flex items-center">
+          <div className="bg-[#1ABC9C] p-4 h-16 flex items-center">
+            <div className="ml-3 flex items-center w-full">
               <FaHome className="text-2xl text-white" />
               {!collapsed && (
-                <span className="ml-2 text-xl font-bold text-white">Admin</span>
+                <span className="ml-3 text-xl font-bold text-white">Admin</span>
               )}
             </div>
           </div>
@@ -186,7 +176,7 @@ const AdminLayout: React.FC = () => {
           </div>
 
           {/* Collapse button */}
-          <button
+          { !isMobile && <button
             onClick={toggleCollapse}
             className="absolute -right-3 top-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#0E6655] shadow-md transition-colors duration-200 hover:bg-[#D1F2EB]"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -196,7 +186,7 @@ const AdminLayout: React.FC = () => {
             ) : (
               <FaChevronLeft size={12} />
             )}
-          </button>
+          </button>}
         </div>
       </aside>
 

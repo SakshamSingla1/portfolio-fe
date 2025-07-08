@@ -6,6 +6,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { HTTP_STATUS, MODE , ADMIN_ROUTES} from "../../../../utils/constant";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -33,6 +34,7 @@ const validationSchema = Yup.object().shape({
 
 const EducationDetailsViewPage = () => {
     const educationService = useEducationService();
+    const { showSnackbar } = useSnackbar();
     const navigate = useNavigate();
     const { degree } = useParams<{ degree: string }>();
     
@@ -69,9 +71,10 @@ const EducationDetailsViewPage = () => {
                         description: response.data.data.description || "",
                         location: response.data.data.location || "",
                     });
+                    showSnackbar('success',`${response?.data?.message}`);
                 }
             } catch (error) {
-                console.error("Error fetching education data:", error);
+                showSnackbar('error',`${error}`);
             }
         };
 

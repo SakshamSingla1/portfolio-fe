@@ -4,6 +4,7 @@ import { Skill, useSkillService } from '../../../../services/useSkillService';
 import SkillListTemplate from '../../templates/Skill/SkillList.template';
 import { useNavigate } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const useStyles = createUseStyles((theme:any)=>{
     return {
@@ -17,6 +18,7 @@ const SkillListingPage: React.FC = () => {
     const classes = useStyles();
     const skillService = useSkillService();
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
     const [skills, setSkills] = useState<Skill[]>([]);
     const [pagination, setPagination] = useState({
         pageSize: 10,
@@ -33,9 +35,10 @@ const SkillListingPage: React.FC = () => {
                     ...prev,
                     totalRecords: response.data.total || 0
                 }));
+                showSnackbar('success',`${response?.data?.message}`);
             }
         } catch (error) {
-            console.error('Error fetching education records:', error);
+            showSnackbar('error',`${error}`);
         }
     };
 

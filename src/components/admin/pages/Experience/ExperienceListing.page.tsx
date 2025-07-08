@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useExperienceService , Experience  } from '../../../../services/useExperienceService';
 import { HTTP_STATUS, ADMIN_ROUTES } from '../../../../utils/constant';
-import Button from '../../../atoms/Button/Button';
 import ExperienceListTemplate from '../../templates/Experience/ExperienceList.template';
 import { useState, useEffect } from 'react';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const ExperienceListingPage: React.FC = () => {
     const experienceService = useExperienceService();
@@ -14,6 +14,7 @@ const ExperienceListingPage: React.FC = () => {
         currentPage: 0,
         totalRecords: 0,
     });
+    const { showSnackbar } = useSnackbar();
 
     const fetchExperiences = async () => {
         try {
@@ -25,9 +26,10 @@ const ExperienceListingPage: React.FC = () => {
                     ...prev,
                     totalRecords: response.data.total || 0
                 }));
+                showSnackbar('success',`${response?.data?.message}`);
             }
         } catch (error) {
-            console.error('Error fetching experience records:', error);
+            showSnackbar('error',`${error}`);
         }
     };
 

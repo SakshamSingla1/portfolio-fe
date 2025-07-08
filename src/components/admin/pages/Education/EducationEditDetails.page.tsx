@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import EducationFormTemplate from "../../templates/Education/EducationForm.template";
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -35,6 +36,7 @@ const EducationEditDetailsPage = () => {
     const navigate = useNavigate();
     const { degree } = useParams();
     const formikRef = useRef<any>(null);
+    const { showSnackbar } = useSnackbar();
 
     const formik = useFormik({
         initialValues: {
@@ -56,11 +58,12 @@ const EducationEditDetailsPage = () => {
                 const response = await educationService.update(degree, values);
                 if (response?.status === HTTP_STATUS.OK) {
                     navigate(ADMIN_ROUTES.EDUCATION);
+                    showSnackbar('success',`${response?.data?.message}`);
                 } else {
-                    alert(response?.message);
+                    showSnackbar('error',`${response?.data?.message}`);
                 }
             } catch (error) {
-                alert(error);
+                showSnackbar('error',`${error}`);
             }
         }
     });
@@ -78,11 +81,10 @@ const EducationEditDetailsPage = () => {
                     description: response.data.data.description || "",
                     location: response.data.data.location || "",
                 });
-                console.log(response.data);
+                showSnackbar('success',`${response?.data?.message}`);
             }
         } catch (error) {
-            console.error("Error fetching education data:", error);
-            alert("Failed to load education data");
+            showSnackbar('error',`${error}`);
         }
     }
 

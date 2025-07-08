@@ -11,6 +11,7 @@ import TextFieldV2 from '../../../atoms/TextField/TextField';
 import Button from '../../../atoms/Button/Button';
 import { useAuthService } from '../../../../services/useAuthService';
 import { HTTP_STATUS,ADMIN_ROUTES  } from '../../../../utils/constant';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const validationSchema = Yup.object().shape({
     newPassword: Yup.string()
@@ -34,6 +35,7 @@ const ResetPassword = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const classes = useStyles();
+    const { showSnackbar } = useSnackbar();
     const [loading, setLoading] = useState(false);
     const authService = useAuthService();
     const [success, setSuccess] = useState('');
@@ -68,15 +70,13 @@ const ResetPassword = () => {
                 });
 
                 if (response?.status === HTTP_STATUS.OK) {
-                    setSuccess('Password reset successfully! Redirecting to login...');
-                    setTimeout(() => {
-                        navigate(ADMIN_ROUTES.LOGIN);
-                    }, 2000);
+                    showSnackbar('success','Password reset successfully! Redirecting to login...');
+                    navigate(ADMIN_ROUTES.LOGIN);
                 } else {
-                    setError(response?.message || 'Failed to reset password');
+                    showSnackbar('error',response?.message);
                 }
             } catch (error: any) {
-                setError(error.response?.data?.message || 'An error occurred. Please try again.');
+                showSnackbar('error',`${error}`);
             } finally {
                 setLoading(false);
             }
