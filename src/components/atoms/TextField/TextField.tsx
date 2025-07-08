@@ -1,5 +1,3 @@
-import React from "react";
-import Box from "@mui/material/Box";
 import {
     default as MuiTextField,
     TextFieldProps,
@@ -143,7 +141,7 @@ const useStyles = createUseStyles((theme: any) => ({
     },
 }));
 
-const TextFieldV2 = styled((props: TextFieldProps) => {
+const TextField = styled((props: TextFieldProps) => {
     const classes = useStyles();
     return (
         <div className={`flex flex-col gap-1 w-auto relative ${props.disabled ? 'pointer-events-none select-none': ''}`}>
@@ -157,4 +155,4 @@ const TextFieldV2 = styled((props: TextFieldProps) => {
         </div>
     );
 })();
-export default TextFieldV2;
+export default TextField;

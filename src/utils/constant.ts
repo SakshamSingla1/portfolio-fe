@@ -24,6 +24,8 @@ export const API_METHOD = {
 export const ADMIN_ROUTES = {
     REGISTER: '/admin/register',
     LOGIN: '/admin/login',
+    FORGOT_PASSWORD: '/admin/forgot-password',
+    RESET_PASSWORD: '/admin/reset-password',
     EDUCATION: '/admin/education',
     EDUCATION_ADD: '/admin/education/add',
     EDUCATION_EDIT: '/admin/education/:degree/edit',
