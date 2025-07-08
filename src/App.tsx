@@ -1,43 +1,45 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-import EducationAddDetailsPage from './components/pages/Education/EducationAddDetails.page';
-import EducationEditDetailsPage from './components/pages/Education/EducationEditDetails.page';
-import EducationDetailsListingPage from './components/pages/Education/EducationDetailsListing.page';
-import EducationDetailsViewPage from './components/pages/Education/EducationDetailsView.page';
-import ContactUsListingPage from './components/pages/ContactUs/ContactUsListing.page';
-import ProjectDetailsAddPage from './components/pages/Projects/ProjectDetailsAdd.page';
-import ProjectListingPage from './components/pages/Projects/ProjectListing.page';
-import ProjectDetailsViewPage from './components/pages/Projects/ProjectDetailsView.page';
-import ProjectDetailsEditPage from './components/pages/Projects/ProjectDetailsEdit.page';
-import ExperienceListingPage from './components/pages/Experience/ExperienceListing.page';
-import ExperienceAddDetailsPage from './components/pages/Experience/ExperienceAddDetails.page';
-import ExperienceEditDetailsPage from './components/pages/Experience/ExperienceEditDetails.page';
-import ExperienceDetailsViewPage from './components/pages/Experience/ExperienceViewDetails.page';
-import SkillListingPage from './components/pages/Skill/SkillListing.page';
-import SkillAddDetailsPage from './components/pages/Skill/SkillAddDetails.page';
-import SkillEditDetailsPage from './components/pages/Skill/SkillEditDetails.page';
-import SkillViewDetailsPage from './components/pages/Skill/SkillViewDetails.page';
+import EducationAddDetailsPage from './components/admin/pages/Education/EducationAddDetails.page';
+import EducationEditDetailsPage from './components/admin/pages/Education/EducationEditDetails.page';
+import EducationDetailsListingPage from './components/admin/pages/Education/EducationDetailsListing.page';
+import EducationDetailsViewPage from './components/admin/pages/Education/EducationDetailsView.page';
+import ContactUsListingPage from './components/admin/pages/ContactUs/ContactUsListing.page';
+import ProjectDetailsAddPage from './components/admin/pages/Projects/ProjectDetailsAdd.page';
+import ProjectListingPage from './components/admin/pages/Projects/ProjectListing.page';
+import ProjectDetailsViewPage from './components/admin/pages/Projects/ProjectDetailsView.page';
+import ProjectDetailsEditPage from './components/admin/pages/Projects/ProjectDetailsEdit.page';
+import ExperienceListingPage from './components/admin/pages/Experience/ExperienceListing.page';
+import ExperienceAddDetailsPage from './components/admin/pages/Experience/ExperienceAddDetails.page';
+import ExperienceEditDetailsPage from './components/admin/pages/Experience/ExperienceEditDetails.page';
+import ExperienceDetailsViewPage from './components/admin/pages/Experience/ExperienceViewDetails.page';
+import SkillListingPage from './components/admin/pages/Skill/SkillListing.page';
+import SkillAddDetailsPage from './components/admin/pages/Skill/SkillAddDetails.page';
+import SkillEditDetailsPage from './components/admin/pages/Skill/SkillEditDetails.page';
+import SkillViewDetailsPage from './components/admin/pages/Skill/SkillViewDetails.page';
+import ForgotPasswordPage from './components/admin/pages/ForgotPassword/ForgotPassword.page';
+import ResetPasswordPage from './components/admin/pages/ResetPassword/ResetPassword.page';
 
 import { ADMIN_ROUTES } from './utils/constant';
 import { ThemeProvider } from 'react-jss';
 import { defaultTheme } from './utils/theme';
 import { AuthenticatedUserProvider } from './contexts/AuthenticatedUserContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import Login from './components/pages/Login/Login';
+import Login from './components/admin/pages/Login/Login';
 import AdminLayout from './layouts/AdminLayout';
-import Register from './components/pages/Register/Register';
-import ProfilePage from './components/pages/Profile/Profile.page';
+import Register from './components/admin/pages/Register/Register';
+import ProfilePage from './components/admin/pages/Profile/Profile.page';
 
-// Main layout component that includes NavBar and Footer
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   
-  // Don't show NavBar and Footer on login/register pages or admin routes
   const hideLayout = [
     ADMIN_ROUTES.LOGIN,
     ADMIN_ROUTES.REGISTER,
-    ...Object.values(ADMIN_ROUTES).filter(route => route !== ADMIN_ROUTES.LOGIN && route !== ADMIN_ROUTES.REGISTER)
+    ADMIN_ROUTES.FORGOT_PASSWORD,
+    ADMIN_ROUTES.RESET_PASSWORD,
+    ...Object.values(ADMIN_ROUTES).filter(route => route !== ADMIN_ROUTES.LOGIN && route !== ADMIN_ROUTES.REGISTER && route !== ADMIN_ROUTES.FORGOT_PASSWORD && route !== ADMIN_ROUTES.RESET_PASSWORD)
   ].some(route => location.pathname.startsWith(route.split('/')[1]));
 
   if (hideLayout) {
@@ -62,6 +64,8 @@ const App = () => {
           <Routes>
             <Route path={ADMIN_ROUTES.REGISTER} element={<Register />} />
             <Route path={ADMIN_ROUTES.LOGIN} element={<Login />} />
+            <Route path={ADMIN_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+            <Route path={ADMIN_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
             <Route element={<ProtectedRoute />}>
               <Route element={<AdminLayout />}>
                 <Route path={ADMIN_ROUTES.EDUCATION}>
