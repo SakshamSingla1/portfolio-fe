@@ -10,6 +10,7 @@ import { useAuthService } from '../../../../services/useAuthService';
 import { HTTP_STATUS,ADMIN_ROUTES } from '../../../../utils/constant';
 import { useAuthenticatedUser } from '../../../../hooks/useAuthenticatedUser';
 import { createUseStyles } from 'react-jss';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const validationSchema = Yup.object().shape({
     fullName: Yup.string()
@@ -40,6 +41,7 @@ const useStyles = createUseStyles((theme:any)=>{
 const Register = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const { showSnackbar } = useSnackbar();
     const [error, setError] = useState('');
     const authService = useAuthService();
     const { user } = useAuthenticatedUser();
@@ -59,11 +61,12 @@ const Register = () => {
                 const response = await authService.signUp(values);
                 if (response?.status === HTTP_STATUS.OK) {
                     navigate(ADMIN_ROUTES.EDUCATION);
+                    showSnackbar('success','User registered successfully');
                 } else {
-                    alert(response?.message);
+                    showSnackbar('error',response?.message);
                 }
             } catch (error) {
-                alert(error);
+                showSnackbar('error',`${error}`);
             }
         },
     });

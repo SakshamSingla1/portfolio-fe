@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import ExperienceFormTemplate from '../../templates/Experience/ExperienceForm.template'
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
@@ -31,6 +32,7 @@ const ExperienceEditDetailsPage = () => {
     const experienceService = useExperienceService();
     const navigate = useNavigate();
     const { id } = useParams();
+    const { showSnackbar } = useSnackbar();
 
     const formik = useFormik({
         initialValues: {
@@ -52,11 +54,12 @@ const ExperienceEditDetailsPage = () => {
             const response = await experienceService.getById(id);
             if (response?.status === HTTP_STATUS.OK) {
                 formik.setValues(response.data.data);
+                showSnackbar('success',`${response?.data?.message}`);
             } else {
-                alert(response?.message);
+                showSnackbar('error',`${response?.data?.message}`);
             }
         } catch (error) {
-            alert(error);
+            showSnackbar('error',`${error}`);
         }
     }
 

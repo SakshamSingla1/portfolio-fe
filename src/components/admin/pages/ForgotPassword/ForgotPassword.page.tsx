@@ -10,6 +10,7 @@ import Button from '../../../atoms/Button/Button';
 import { InputAdornment } from '@mui/material';
 import { useAuthService } from '../../../../services/useAuthService';
 import { HTTP_STATUS , ADMIN_ROUTES } from '../../../../utils/constant';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Email is required'),
@@ -35,6 +36,7 @@ const ForgotPassword = () => {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
     const authService = useAuthService();
+    const { showSnackbar } = useSnackbar();
 
     const formik = useFormik<ForgotPasswordForm>({
         initialValues: {
@@ -46,9 +48,10 @@ const ForgotPassword = () => {
                 const response = await authService.forgotPassword(values);
                 if(response.status == HTTP_STATUS.OK){
                     navigate(ADMIN_ROUTES.LOGIN);
+                    showSnackbar('success',`${response?.data?.message}`);
                 }
             } catch (error:any) {
-                setError(error?.statusMessage);
+                showSnackbar('error',`${error?.statusMessage}`);
             }
         },
     });

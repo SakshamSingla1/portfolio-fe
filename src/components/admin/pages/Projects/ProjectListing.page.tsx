@@ -2,6 +2,7 @@ import { HTTP_STATUS } from '../../../../utils/constant';
 import { useState, useEffect } from 'react';
 import { Project, useProjectService } from '../../../../services/useProjectService';
 import ProjectListTemplate from '../../templates/Project/ProjectList.template';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const ProjectListingPage: React.FC = () => {
     const projectService = useProjectService();
@@ -11,6 +12,7 @@ const ProjectListingPage: React.FC = () => {
         currentPage: 0,
         totalRecords: 0,
     });
+    const { showSnackbar } = useSnackbar();
 
     const fetchProjects = async () => {
         try {
@@ -21,9 +23,10 @@ const ProjectListingPage: React.FC = () => {
                     ...prev,
                     totalRecords: response.data.total || 0
                 }));
+                showSnackbar('success','Projects fetched successfully');
             }
         } catch (error) {
-            console.error('Error fetching education records:', error);
+            showSnackbar('error',`${error}`);
         }
     };
 

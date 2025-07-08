@@ -47,7 +47,7 @@ const useStyles = createUseStyles({
         "&::before": {
             content: `''`,
             position: 'absolute',
-            left: props.iconPosition || '10px',
+            left: props.iconPosition ?? '10px',
             top: '50%',
             transform: 'translateY(-50%)',
             width: '20px',
@@ -62,7 +62,7 @@ const useStyles = createUseStyles({
             backgroundColor: props.theme.palette.background.primary.primary700,
         },
         "&:hover::before": {
-            left: props.iconPosition || '10px',
+            left: props.iconPosition ?? '10px',
             opacity: 1,
         },
         "&:disabled": {
@@ -90,7 +90,7 @@ const useStyles = createUseStyles({
         "&::before": {
             content: `''`,
             position: 'absolute',
-            left: props.iconPosition || "10px",
+            left: props.iconPosition ?? "10px",
             top: '50%',
             transform: 'translateY(-50%)',
             width: '20px',
@@ -105,7 +105,7 @@ const useStyles = createUseStyles({
             backgroundColor: props.theme.palette.background.primary.primary200
         },
         "&:hover::before": {
-            left: props.iconPosition || "10px",
+            left: props.iconPosition ?? "10px",
             opacity: 1,
         },
         "&:disabled": {
@@ -133,7 +133,7 @@ const useStyles = createUseStyles({
         "&::before": {
             content: `''`,
             position: 'absolute',
-            left: props.iconPosition || '10px',
+            left: props.iconPosition ?? '10px',
             top: '50%',
             transform: 'translateY(-50%)',
             width: '20px',
@@ -148,7 +148,7 @@ const useStyles = createUseStyles({
             backgroundColor: "white",
         },
         "&:hover::before": {
-            left: props.iconPosition || '10px',
+            left: props.iconPosition ?? '10px',
             opacity: 1,
         },
         "&:disabled": {
@@ -175,7 +175,7 @@ const useStyles = createUseStyles({
         "&::before": {
             content: `''`,
             position: 'absolute',
-            left: props.iconPosition || '40px',
+            left: props.iconPosition ?? '40px',
             top: '50%',
             transform: 'translateY(-50%)',
             width: '20px',
@@ -239,7 +239,7 @@ const useStyles = createUseStyles({
             backgroundColor: "inherit",
         },
         "&:hover::before": {
-            left: props.iconPosition || '40px',
+            left: props.iconPosition ?? '40px',
             opacity: 1,
         },
         "&:disabled": {
@@ -359,6 +359,8 @@ interface ButtonProps extends Omit<MuiButtonProps, "variant"> {
     iconButton?: string;
     size?: CustomSize;
     iconPosition?: string;
+    startIcon?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -370,6 +372,8 @@ const Button: React.FC<ButtonProps> = ({
     size = "large",
     className = '',
     disabled,
+    startIcon,
+    children,
     ...props
 }) => {
     const theme = useTheme();
@@ -387,24 +391,36 @@ const Button: React.FC<ButtonProps> = ({
         }
     };
 
-    const buttonView = useMemo(
-        () => iconButton ? (
-            <img className={getIconStyle(size)} src={iconButton} alt="" />
-        ) : (
-            label
-        ),
-        [iconButton, label, size]
-    );
+    const buttonContent = useMemo(() => {
+        if (isLoading) {
+            return <CircularProgress size={20} />;
+        }
+
+        if (iconButton) {
+            return <img className={getIconStyle(size)} src={iconButton} alt="" />;
+        }
+
+        return (
+            <span className="flex items-center gap-2">
+                {startIcon && <span className="flex-shrink-0">{startIcon}</span>}
+                {label}
+                {children}
+            </span>
+        );
+    }, [isLoading, iconButton, size, label, children, startIcon]);
 
     return (
         <MuiButton
             variant="contained"
             disabled={disabled || isLoading}
             className={`${styles[variant]} ${styles[size]} ${className} ${styles.label} font-medium`}
-            classes={{ root: styles.root }}
+            classes={{
+                root: `${styles.root}`,
+                startIcon: '!m-0'
+            }}
             {...props}
         >
-            {isLoading ? <CircularProgress size={20} /> : buttonView}
+            {buttonContent}
         </MuiButton>
     );
 };

@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProfileService } from '../../../../services/useProfileService';
 import ProfileFormTemplate from '../../templates/Profile/ProfileForm.template';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const validationSchema = Yup.object().shape({
     fullName: Yup.string()
@@ -36,6 +37,7 @@ const ProfilePage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [isEditMode, setIsEditMode] = useState(false);
     const profileService = useProfileService();
+    const { showSnackbar } = useSnackbar();
 
     useEffect(() => {
         const mode = searchParams.get('mode');
@@ -43,9 +45,14 @@ const ProfilePage: React.FC = () => {
     }, [searchParams]);
 
     const getProfileData = async () => {
-        const response = await profileService.get();
-        if (response.status === HTTP_STATUS.OK) {
-            formik.setValues(response.data.data);
+        try{
+            const response = await profileService.get();
+            if (response.status === HTTP_STATUS.OK) {
+                formik.setValues(response.data.data);
+                showSnackbar('success','Profile fetched successfully');
+            }
+        }catch(error){
+            showSnackbar('error',`${error}`);
         }
     };
 
@@ -70,8 +77,9 @@ const ProfilePage: React.FC = () => {
             const response = await profileService.update(user?.id ?? '', values);
             if (response.status === HTTP_STATUS.OK) {
                 navigate(ADMIN_ROUTES.PROFILE);
+                showSnackbar('success',`${response?.data?.message}`);
             } else {
-                alert(response?.message);
+                showSnackbar('error',`${response?.data?.message}`);
             }
         },
         enableReinitialize: true

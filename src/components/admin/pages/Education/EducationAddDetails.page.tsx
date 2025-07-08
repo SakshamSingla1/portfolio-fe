@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate } from "react-router-dom";
 import EducationFormTemplate from "../../templates/Education/EducationForm.template";
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -33,6 +34,7 @@ const validationSchema = Yup.object().shape({
 const EducationAddDetailsPage = () => {
     const educationService = useEducationService();
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
 
     const formik = useFormik({
         initialValues: {
@@ -50,11 +52,12 @@ const EducationAddDetailsPage = () => {
                 const response = await educationService.create(values);
                 if (response?.status === HTTP_STATUS.OK) {
                     navigate(ADMIN_ROUTES.EDUCATION);
+                    showSnackbar('success',`${response?.data?.message}`);
                 } else {
-                    alert(response?.message);
+                    showSnackbar('error',`${response?.data?.message}`);
                 }
             } catch (error) {
-                alert(error);
+                showSnackbar('error',`${error}`);
             }
         }
     });

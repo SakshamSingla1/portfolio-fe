@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate } from "react-router-dom";
 import ProjectFormTemplate from "../../templates/Project/ProjectForm.template";
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
     projectName: Yup.string()
@@ -31,6 +32,7 @@ const validationSchema = Yup.object().shape({
 const ProjectAddDetailsPage = () => {
     const projectService = useProjectService();
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
 
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
@@ -51,11 +53,12 @@ const ProjectAddDetailsPage = () => {
                 if (response?.status === HTTP_STATUS.OK) {
                     onClose(); // Call onClose after successful submission
                     navigate(ADMIN_ROUTES.PROJECTS);
+                    showSnackbar('success',`${response?.data?.message}`);
                 } else {
-                    alert(response?.message);
+                    showSnackbar('error',`${response?.data?.message}`);
                 }
             } catch (error) {
-                alert(error);
+                showSnackbar('error',`${error}`);
             }
         }
     });

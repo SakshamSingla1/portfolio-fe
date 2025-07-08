@@ -57,7 +57,7 @@ const HomePage = () => {
 
     return (
         <div>
-            <HomeTemplate formik={formik} />
+            <HomeTemplate />
         </div>
     )
 }

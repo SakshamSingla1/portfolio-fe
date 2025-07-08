@@ -25,7 +25,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                 )}
             </div>
 
-            <form onSubmit={formik.handleSubmit} className="p-8">
+            <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                         <h3 className="text-lg font-medium text-gray-700">Personal Information</h3>
@@ -149,7 +149,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                         </div>
 
                         <div className="space-y-4 pt-2">
-                            <div className="flex items-center w-full">
+                            <div>
                                 <TextFieldV2
                                     label="GitHub URL"
                                     name="githubUrl"
@@ -170,7 +170,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                                 />
                             </div>
 
-                            <div className="flex items-center w-full">
+                            <div>
                                 <TextFieldV2
                                     label="LinkedIn URL"
                                     name="linkedinUrl"
@@ -189,10 +189,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                                             </InputAdornment>
                                         )
                                     }}
+                                    fullWidth
                                 />
                             </div>
 
-                            <div className="flex items-center w-full">
+                            <div>
                                 <TextFieldV2
                                     label="Personal Website"
                                     name="websiteUrl"
@@ -203,7 +204,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                                     onBlur={formik.handleBlur}
                                     error={formik.touched.websiteUrl && Boolean(formik.errors.websiteUrl)}
                                     helperText={formik.touched.websiteUrl && formik.errors.websiteUrl}
-                                    className="bg-gray-50"
+                                    className="bg-gray-50 w-full"
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
@@ -230,13 +231,13 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                             label="Save Changes"
                             type="submit"
                             variant="primaryContained"
-                            disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
+                            onClick={()=> formik.handleSubmit()}
                             className="px-6 py-2.5 text-sm font-medium"
                             loading={formik.isSubmitting}
                         />
                     </div>
                 )}
-            </form>
+            </div>
         </div>
     );
 };

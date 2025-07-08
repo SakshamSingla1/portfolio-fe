@@ -2,6 +2,7 @@ import { HTTP_STATUS } from '../../../../utils/constant';
 import { useState, useEffect } from 'react';
 import { ContactUs, useContactUsService } from '../../../../services/useContactUsService';
 import ContactUsListTemplate from '../../templates/ContactUs/ContactUsList.template';
+import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const ContactUsListingPage: React.FC = () => {
     const contactUsService = useContactUsService();
@@ -11,12 +12,14 @@ const ContactUsListingPage: React.FC = () => {
         currentPage: 0,
         totalRecords: 0,
     });
+    const { showSnackbar } = useSnackbar();
 
     const fetchContactUs = async () => {
         try {
             const response = await contactUsService.getAll();
 
             if (response?.status === HTTP_STATUS.OK && response.data) {
+                showSnackbar('success', `${response?.data?.message}`);
                 setContactUss(response.data.data || []);
                 setPagination(prev => ({
                     ...prev,
@@ -24,7 +27,7 @@ const ContactUsListingPage: React.FC = () => {
                 }));
             }
         } catch (error) {
-            console.error('Error fetching education records:', error);
+            showSnackbar('error', `${error}`);
         }
     };
 
