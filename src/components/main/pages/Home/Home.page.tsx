@@ -31,6 +31,7 @@ const HomePage = () => {
             githubUrl: "",
             linkedinUrl: "",
             websiteUrl: "",
+            profileImageUrl: "",
         },
         validationSchema,
         onSubmit: ()=>{ }
@@ -41,7 +42,7 @@ const HomePage = () => {
         try {
             const response = await profileService.get();
             if (response?.status === HTTP_STATUS.OK) {
-                console.log(response?.data);
+                formik.setValues(response?.data?.data);
             } else {
                 alert(response?.message || "Failed to get profile");
             }
@@ -57,7 +58,7 @@ const HomePage = () => {
 
     return (
         <div>
-            <HomeTemplate />
+            <HomeTemplate formik={formik} />
         </div>
     )
 }

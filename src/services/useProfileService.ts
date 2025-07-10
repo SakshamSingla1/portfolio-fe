@@ -18,6 +18,7 @@ export interface ProfileRequest {
     githubUrl:string;
     linkedinUrl:string;
     websiteUrl:string;
+    profileImageUrl:string;
 }
 
 

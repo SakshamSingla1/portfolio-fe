@@ -124,7 +124,7 @@ const Login = () => {
                                 name="email"
                                 type="email"
                                 autoComplete="email"
-                                placeholder="admin@example.com"
+                                placeholder="Enter your email"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -140,6 +140,7 @@ const Login = () => {
                                     id="password"
                                     name="password"
                                     type="password"
+                                    placeholder="Enter your password"
                                     value={formik.values.password}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -165,30 +166,6 @@ const Login = () => {
                         />
                     </div>
                 </form>
-
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Or continue with</span>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                    <Button
-                        label="Google"
-                        variant='tertiaryContained'
-                        startIcon={<FaGoogle />}
-                        onClick={()=>formik.handleSubmit()}
-                    />
-                    <Button
-                        label="GitHub"
-                        variant='tertiaryContained'
-                        startIcon={<FaGithub />}
-                        onClick={()=>formik.handleSubmit()}
-                    />
-                </div>
 
                 <div className="text-center text-sm text-gray-600">
                     Don't have an account?{' '}

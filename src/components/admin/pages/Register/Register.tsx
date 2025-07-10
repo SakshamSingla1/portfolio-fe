@@ -100,11 +100,11 @@ const Register = () => {
                     <div>
                         <div className="relative">
                             <TextFieldV2
-                                label="fullName"
+                                label="Full Name"
                                 id="fullName"
                                 name="fullName"
                                 type="text"
-                                placeholder="Enter your fullName"
+                                placeholder="Enter your full name"
                                 value={formik.values.fullName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -121,7 +121,7 @@ const Register = () => {
                                 id="email"
                                 name="email"
                                 type="email"
-                                placeholder="you@example.com"
+                                placeholder="Enter your email"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -138,7 +138,7 @@ const Register = () => {
                                 id="password"
                                 name="password"
                                 type="password"
-                                placeholder="••••••••"
+                                placeholder="Enter your password"
                                 value={formik.values.password}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -155,7 +155,7 @@ const Register = () => {
                                 id="confirmPassword"
                                 name="confirmPassword"
                                 type="password"
-                                placeholder="••••••••"
+                                placeholder="Confirm your password"
                                 value={formik.values.confirmPassword}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -175,30 +175,6 @@ const Register = () => {
                         />
                     </div>
                 </form>
-
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Or sign up with</span>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                    <Button
-                        label="Google"
-                        variant='tertiaryContained'
-                        startIcon={<FaGoogle />}
-                        onClick={()=>formik.handleSubmit()}
-                    />
-                    <Button
-                        label="GitHub"
-                        variant='tertiaryContained'
-                        startIcon={<FaGithub />}
-                        onClick={()=>formik.handleSubmit()}
-                    />
-                </div>
 
                 <div className="text-center text-sm text-gray-600">
                     Already have an account?{' '}
