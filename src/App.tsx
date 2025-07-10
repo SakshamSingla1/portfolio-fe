@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useAuthenticatedUser } from './hooks/useAuthenticatedUser';
 
 import EducationAddDetailsPage from './components/admin/pages/Education/EducationAddDetails.page';
 import EducationEditDetailsPage from './components/admin/pages/Education/EducationEditDetails.page';
@@ -20,7 +21,8 @@ import SkillEditDetailsPage from './components/admin/pages/Skill/SkillEditDetail
 import SkillViewDetailsPage from './components/admin/pages/Skill/SkillViewDetails.page';
 import ForgotPasswordPage from './components/admin/pages/ForgotPassword/ForgotPassword.page';
 import ResetPasswordPage from './components/admin/pages/ResetPassword/ResetPassword.page';
-
+import UsersLayout from './layouts/UsersLayout';
+import HomePage from './components/main/pages/Home/Home.page';
 import { ADMIN_ROUTES } from './utils/constant';
 import { ThemeProvider } from 'react-jss';
 import { defaultTheme } from './utils/theme';
@@ -56,6 +58,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const AuthRedirect = () => {
+  const { user } = useAuthenticatedUser();
+  return user ? 
+    <Navigate to={ADMIN_ROUTES.PROFILE} replace /> : 
+    <Navigate to="/users" replace />;
+};
+
 // Main App component
 const App = () => {
   return (
@@ -68,6 +77,8 @@ const App = () => {
               <Route path={ADMIN_ROUTES.LOGIN} element={<Login />} />
               <Route path={ADMIN_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
               <Route path={ADMIN_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+
+              {/* Protected admin routes */}
               <Route element={<ProtectedRoute />}>
                 <Route element={<AdminLayout />}>
                   <Route path={ADMIN_ROUTES.EDUCATION}>
@@ -106,9 +117,12 @@ const App = () => {
                 </Route>
               </Route>
 
-              {/* Public routes */}
-              <Route path="/" element={<div>Home Page</div>} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/* Public user routes */}
+              <Route element={<UsersLayout />}>
+                <Route path="/users" element={<HomePage />} />
+                <Route path="/" element={<AuthRedirect />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
             </Routes>
           </MainLayout>
         </SnackbarProvider>

@@ -29,6 +29,8 @@ const validationSchema = Yup.object().shape({
         .required('Linkedin URL is required'),
     websiteUrl: Yup.string()
         .required('Website URL is required'),
+    profileImageUrl: Yup.mixed()
+        .required('Profile Image is required'),
 });
 
 const ProfilePage: React.FC = () => {
@@ -71,6 +73,7 @@ const ProfilePage: React.FC = () => {
             githubUrl: '',
             linkedinUrl: '',
             websiteUrl: '',
+            profileImageUrl: '',
         },
         validationSchema,
         onSubmit: async (values) => {

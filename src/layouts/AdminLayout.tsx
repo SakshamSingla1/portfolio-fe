@@ -9,6 +9,7 @@ import {
   FaGraduationCap,
   FaBriefcase,
   FaCode,
+  FaCog,
   FaEnvelope,
   FaUser,
   FaBars,
@@ -84,6 +85,7 @@ const AdminLayout: React.FC = () => {
     { to: ADMIN_ROUTES.PROJECTS, icon: <FaCode />, label: 'Projects' },
     { to: ADMIN_ROUTES.SKILL, icon: <FaDumbbell />, label: 'Skill' },
     { to: ADMIN_ROUTES.CONTACT_US, icon: <FaEnvelope />, label: 'Contact Us' },
+    { to: ADMIN_ROUTES.SETTINGS, icon: <FaCog />, label: 'Settings' },
     { to: MAIN_ROUTES.HOME, icon: <FaGlobe />, label: 'Main Site' },
   ];
 

@@ -44,6 +44,7 @@ export const ADMIN_ROUTES = {
     SKILL_EDIT: '/admin/skill/:id/edit',
     SKILL_VIEW: '/admin/skill/:id',
     PROFILE: '/admin/profile',
+    SETTINGS: '/admin/settings',
 }
 
 export const MAIN_ROUTES = {
