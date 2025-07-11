@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthenticatedUser } from './hooks/useAuthenticatedUser';
 
+// Admin Pages
 import EducationAddDetailsPage from './components/admin/pages/Education/EducationAddDetails.page';
 import EducationEditDetailsPage from './components/admin/pages/Education/EducationEditDetails.page';
 import EducationDetailsListingPage from './components/admin/pages/Education/EducationDetailsListing.page';
@@ -22,7 +23,6 @@ import SkillViewDetailsPage from './components/admin/pages/Skill/SkillViewDetail
 import ForgotPasswordPage from './components/admin/pages/ForgotPassword/ForgotPassword.page';
 import ResetPasswordPage from './components/admin/pages/ResetPassword/ResetPassword.page';
 import UsersLayout from './layouts/UsersLayout';
-import HomePage from './components/main/pages/Home/Home.page';
 import { ADMIN_ROUTES } from './utils/constant';
 import { ThemeProvider } from 'react-jss';
 import { defaultTheme } from './utils/theme';
@@ -33,6 +33,8 @@ import AdminLayout from './layouts/AdminLayout';
 import Register from './components/admin/pages/Register/Register';
 import ProfilePage from './components/admin/pages/Profile/Profile.page';
 import { SnackbarProvider } from './contexts/SnackbarContext';
+import SettingsPage from './components/admin/pages/Settings/Settings.page';
+import HomePage from './components/main/pages/Home/Home.page';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -73,6 +75,7 @@ const App = () => {
         <SnackbarProvider>
           <MainLayout>
             <Routes>
+              {/* Authentication Routes */}
               <Route path={ADMIN_ROUTES.REGISTER} element={<Register />} />
               <Route path={ADMIN_ROUTES.LOGIN} element={<Login />} />
               <Route path={ADMIN_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
@@ -111,8 +114,8 @@ const App = () => {
                     <Route path=":id" element={<SkillViewDetailsPage />} />
                   </Route>
 
+                  <Route path={ADMIN_ROUTES.SETTINGS} element={<SettingsPage />} />
                   <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
-
                   <Route path="/" element={<Navigate to={ADMIN_ROUTES.PROFILE} replace />} />
                 </Route>
               </Route>
