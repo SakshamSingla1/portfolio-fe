@@ -203,8 +203,8 @@ const SettingsTemplate: React.FC<SettingsTemplateProps> = ({
                     <Typography variant="h6" sx={{ mb: 2, color: '#0E6655' }}>
                         Change Email Address
                     </Typography>
-                    <div className="mb-3 border-b border-[#D1F2EB]" />
-                    <div className="flex flex-col gap-3">
+                    <div className="mb-3 border-b border-[#D1F2EB] gap-y-6" />
+                    <div className="flex flex-col gap-y-6">
                         <TextField
                             fullWidth
                             label="New Email"
@@ -243,13 +243,15 @@ const SettingsTemplate: React.FC<SettingsTemplateProps> = ({
                     <Alert severity="warning" sx={{ mb: 3 }}>
                         Warning: These actions are irreversible. Please be certain before proceeding.
                     </Alert>
-                    <Button
-                        label={propIsLoading.delete ? 'Deleting...' : 'Delete Account'}
-                        variant="primaryContained"
-                        color="error"
-                        onClick={handleDeleteClick}
-                        disabled={propIsLoading.delete}
-                    />
+                    <div className="flex justify-center">
+                        <Button
+                            label={propIsLoading.delete ? 'Deleting...' : 'Delete Account'}
+                            variant="primaryContained"
+                            color="error"
+                            onClick={handleDeleteClick}
+                            disabled={propIsLoading.delete}
+                        />
+                    </div>
                 </div>
             ),
         },
