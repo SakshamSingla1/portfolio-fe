@@ -26,7 +26,9 @@ const validationSchema = Yup.object().shape({
         .max(new Date(), 'Start date cannot be in the future'),
     projectEndDate: Yup.date()
         .min(Yup.ref('projectStartDate'), 'End date must be after start date')
-        .nullable()
+        .nullable(),
+    isCurrentlyWorking: Yup.boolean()
+        .required('Currently working is required')
 });
 
 const ProjectAddDetailsPage = () => {
@@ -43,15 +45,16 @@ const ProjectAddDetailsPage = () => {
             projectLink: "",
             projectDuration: "",
             technologiesUsed: "",
-            projectStartDate: new Date(),
-            projectEndDate: new Date(),
+            projectStartDate: new Date().toISOString(),
+            projectEndDate: new Date().toISOString(),
+            isCurrentlyWorking: false,
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
                 const response = await projectService.create(values);
                 if (response?.status === HTTP_STATUS.OK) {
-                    onClose(); // Call onClose after successful submission
+                    onClose();
                     navigate(ADMIN_ROUTES.PROJECTS);
                     showSnackbar('success',`${response?.data?.message}`);
                 } else {
@@ -68,7 +71,7 @@ const ProjectAddDetailsPage = () => {
             <ProjectFormTemplate 
                 formik={formik} 
                 mode={MODE.ADD} 
-                onClose={onClose} // Pass onClose to the template
+                onClose={onClose}
             />
         </div>
     )

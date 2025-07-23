@@ -2,6 +2,9 @@ import TextField from "../../../atoms/TextField/TextField";
 import { MODE } from "../../../../utils/constant";
 import { titleModification } from "../../../../utils/helper";
 import Button from "../../../atoms/Button/Button";
+import DatePicker from "../../../atoms/DatePicker/DatePicker";
+import dayjs from "dayjs";
+import Checkbox from "../../../atoms/Checkbox/Checkbox";
 
 interface ExperienceFormProps {
     formik: any;
@@ -15,7 +18,7 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
             <h2 className="text-2xl font-bold mb-6 text-gray-800">
                 {mode === MODE.ADD ? "Add Experience" : mode === MODE.EDIT ? "Edit Experience" : "View Experience"}
             </h2>
-            
+
             <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <TextField
@@ -23,6 +26,7 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         placeholder='Select Company Name'
                         {...formik.getFieldProps("companyName")}
                         error={formik.touched.companyName && Boolean(formik.errors.companyName)}
+                        helperText={formik.errors.companyName}
                         inputProps={{ readOnly: mode === MODE.VIEW }}
                         onBlur={(event: any) => {
                             const newValue = titleModification(event.target.value);
@@ -34,6 +38,7 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         placeholder='Select Job Title'
                         {...formik.getFieldProps("jobTitle")}
                         error={formik.touched.jobTitle && Boolean(formik.errors.jobTitle)}
+                        helperText={formik.errors.jobTitle}
                         inputProps={{ readOnly: mode === MODE.VIEW }}
                         onBlur={(event: any) => {
                             const newValue = titleModification(event.target.value);
@@ -41,7 +46,6 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         }}
                     />
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <TextField
                         name="location"
@@ -49,6 +53,7 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         placeholder='Select Location'
                         {...formik.getFieldProps("location")}
                         error={formik.touched.location && Boolean(formik.errors.location)}
+                        helperText={formik.errors.location}
                         inputProps={{ readOnly: mode === MODE.VIEW }}
                         onBlur={(event: any) => {
                             const newValue = titleModification(event.target.value);
@@ -61,6 +66,7 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         placeholder='Select Technologies Used'
                         {...formik.getFieldProps("technologiesUsed")}
                         error={formik.touched.technologiesUsed && Boolean(formik.errors.technologiesUsed)}
+                        helperText={formik.errors.technologiesUsed}
                         inputProps={{ readOnly: mode === MODE.VIEW }}
                         onBlur={(event: any) => {
                             const newValue = event.target.value;
@@ -68,37 +74,43 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         }}
                     />
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <DatePicker
+                        label="Start Date"
+                        value={formik.values.startDate ? dayjs(formik.values.startDate) : null}
+                        onChange={(newValue) =>
+                            formik.setFieldValue("startDate", newValue?.format("YYYY-MM-DD"))
+                        }
+                        error={!!formik.touched.startDate && Boolean(formik.errors.startDate)}
+                        helperText={formik.errors.startDate}
+                        fullWidth
+                        disabled={mode === MODE.VIEW}
+                    />
+                    <DatePicker
+                        label="End Date"
+                        value={formik.values.endDate ? dayjs(formik.values.endDate) : null}
+                        onChange={(newValue) =>
+                            formik.setFieldValue("endDate", newValue?.format("YYYY-MM-DD"))
+                        }
+                        error={!!formik.touched.endDate && Boolean(formik.errors.endDate)}
+                        helperText={formik.errors.endDate}
+                        fullWidth
+                        disabled={mode === MODE.VIEW || formik.values.currentlyWorking}  // This disables when currentlyWorking is true
+                    />
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TextField
-                        name="startDate"
-                        label="Start Date"
-                        placeholder='Select Start Date'
-                        {...formik.getFieldProps("startDate")}
-                        error={formik.touched.startDate && Boolean(formik.errors.startDate)}
-                        inputProps={{ 
-                            readOnly: mode === MODE.VIEW, 
+                    <Checkbox
+                        label="Currently Working"
+                        checked={formik.values.currentlyWorking || false}
+                        onChange={(checked) => {
+                            formik.setFieldValue("currentlyWorking", checked);
+                            if (checked) {
+                                formik.setFieldValue("endDate", "");
+                            }
                         }}
-                        onBlur={(event: any) => {
-                            const newValue = event.target.value;
-                            formik.setFieldValue('startDate', newValue);
-                        }}
-                    />
-                    <TextField
-                        name="endDate"
-                        label="End Date"
-                        placeholder='Select End Date'
-                        {...formik.getFieldProps("endDate")}
-                        
-                        error={formik.touched.endDate && Boolean(formik.errors.endDate)}
-                        inputProps={{ 
-                            readOnly: mode === MODE.VIEW, 
-                        }}
-                        value={formik.values.endDate}
-                        onBlur={(event: any) => {
-                            const newValue = event.target.value;
-                            formik.setFieldValue('endDate', newValue);
-                        }}
+                        disabled={mode === MODE.VIEW}
+                        labelClassName="text-[16px] font-size-4"
                     />
                 </div>
 
@@ -110,6 +122,7 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         {...formik.getFieldProps("description")}
                         value={formik.values.description}
                         error={formik.touched.description && Boolean(formik.errors.description)}
+                        helperText={formik.errors.description}
                         readOnly={mode === MODE.VIEW}
                         onBlur={(event: any) => {
                             const newValue = event.target.value;
@@ -128,7 +141,7 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                     onClick={onClose}
                 />
                 {mode !== MODE.VIEW && <Button
-                    label={mode === MODE.ADD ? "Add Education" : "Update Education"}
+                    label={mode === MODE.ADD ? "Add Experience" : "Update Experience"}
                     variant="primaryContained"
                     onClick={() => formik.handleSubmit()}
                     disabled={formik.isSubmitting}

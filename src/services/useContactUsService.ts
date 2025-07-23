@@ -31,7 +31,7 @@ export const useContactUsService = () => {
 
     const create = (contactUs: ContactUs) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.POST, url, user, contactUs);
+        return request(API_METHOD.POST, url, null, contactUs);
     };
 
     return {

@@ -23,7 +23,7 @@ export const useEducationService = () => {
     const { user } = useAuthenticatedUser();
     const getAll = () => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.GET, url, user, null, null, null)
+        return request(API_METHOD.GET, url, null, null, null, null)
     };
 
     const getByDegree = (degree: string) => {

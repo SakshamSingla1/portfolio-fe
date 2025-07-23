@@ -15,12 +15,12 @@ const useStyles = createUseStyles((theme: any) => ({
     textField: {
         "& .MuiInputBase-root": {
             border: `1px solid`,
-            borderColor: theme.palette.border.neutral.neutral200,
+            borderColor: theme.palette.background.neutral.neutral200,
             fontSize: "16px",
             fontWeight: 400,
             borderRadius: "12px",
             "&:hover": {
-                borderColor: theme.palette.border.primary.primary300,
+                borderColor: theme.palette.background.primary.primary300,
                 borderWidth: "1px",
                 outline: "none",
             },
@@ -41,22 +41,22 @@ const useStyles = createUseStyles((theme: any) => ({
             "& .MuiOutlinedInput-notchedOutline": {
                 outline: "none",
                 borderWidth: 0,
-                borderColor: theme.palette.border.primary.primary300,
+                borderColor: theme.palette.background.primary.primary300,
             },
             "&:focus-within": {
                 outline: "none",
-                borderColor: theme.palette.border.primary.primary300,
+                borderColor: theme.palette.background.primary.primary300,
                 borderWidth: 2,
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                 outline: "none",
                 borderWidth: 0,
-                borderColor: theme.palette.border.primary.primary300,
+                borderColor: theme.palette.background.primary.primary300,
             },
             "& .Mui-disabled": {
                 backgroundColor: theme.palette.background.neutral.neutral50,
                 fontWeight: 400,
-                borderColor: theme.palette.text.neutral.neutral200,
+                borderColor: theme.palette.background.neutral.neutral200,
                 borderRadius: "12px",
                 WebkitTextFillColor: theme.palette.text.neutral.neutral400,
                 fontSize: "16px"
@@ -64,7 +64,7 @@ const useStyles = createUseStyles((theme: any) => ({
         },
         "& .Mui-error": {
             border: "1px solid",
-            borderColor: theme.palette.border.secondary.secondary200,
+            borderColor: theme.palette.background.secondary.secondary200,
             fontSize: "16px",
             fontWeight: 400,
             borderRadius: "12px",
@@ -82,12 +82,12 @@ const useStyles = createUseStyles((theme: any) => ({
         textField: {
             "& .MuiInputBase-root": {
                 border: "1px solid",
-                borderColor: theme.palette.border.neutral.neutral200,
+                borderColor: theme.palette.background.neutral.neutral200,
                 fontSize: "14px",
                 fontWeight: 400,
                 borderRadius: "6px",
                 "&:hover": {
-                    borderColor: theme.palette.border.primary.primary300,
+                    borderColor: theme.palette.background.primary.primary300,
                     borderWidth: 1,
                     outline: "none",
                 },
@@ -102,22 +102,22 @@ const useStyles = createUseStyles((theme: any) => ({
                 "& .MuiOutlinedInput-notchedOutline": {
                     outline: "none",
                     borderWidth: 0,
-                    borderColor: theme.palette.border.primary.primary300,
+                    borderColor: theme.palette.background.primary.primary300,
                 },
                 "&:focus-within": {
                     outline: "none",
-                    borderColor: theme.palette.border.primary.primary300,
+                    borderColor: theme.palette.background.primary.primary300,
                     borderWidth: 2,
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                     outline: "none",
                     borderWidth: 0,
-                    borderColor: theme.palette.border.primary.primary300,
+                    borderColor: theme.palette.background.primary.primary300,
                 },
                 "& .Mui-disabled": {
                     backgroundColor: theme.palette.background.neutral.neutral50,
                     fontWeight: 400,
-                    borderColor: theme.palette.text.neutral.neutral200,
+                    borderColor: theme.palette.background.neutral.neutral200,
                     borderRadius: "6px",
                     WebkitTextFillColor: theme.palette.text.neutral.neutral400,
                     fontSize: "14px",

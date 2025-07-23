@@ -15,15 +15,16 @@ export interface Project {
     projectDuration: string;
     projectLink: string;
     technologiesUsed: string;
-    createdAt?: string;
-    updatedAt?: string;
+    projectStartDate: string;
+    projectEndDate?: string;
+    isCurrentlyWorking: boolean;
 }
 
 export const useProjectService = () => {
     const { user } = useAuthenticatedUser();
     const getAll = () => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.GET, url, user, null, null, null)
+        return request(API_METHOD.GET, url, null, null, null, null)
     };
 
     const getById = (id: string) => {
