@@ -90,3 +90,10 @@ export const SKILL_CATEGORY_OPTIONS : DegreeType[] = [
     { value:'Tool', label:'Tool' },
     { value:'Soft_Skills', label:'Soft Skills' },
 ];
+
+export const NAV_ITEMS = [
+    { id: 1 , name: "Home" , to: "/" },
+    { id: 2 , name: "About" , to: "/about" },
+    { id: 3 , name: "Projects" , to: "/projects" },
+    { id: 4 , name: "Contact" , to: "/contact" },
+]

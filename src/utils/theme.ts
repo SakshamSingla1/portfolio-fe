@@ -4,6 +4,7 @@ interface CustomPalette {
     border: Record<string, Record<string, string>>;
     button: Record<string, any>;
     status: Record<string, any>;
+    local: Record<string, any>;
 }
 
 interface CustomTheme {
@@ -360,6 +361,15 @@ export const defaultTheme: CustomTheme = {
                     primary200: '#ADBBEB',
                 }
             },
+        },
+        local: {
+            primary: {
+                primary100: '#0F103F',
+                primary200: '#1C1C65',
+                primary300: '#2F2F8A',
+                primary400: '#C961DE',
+                primary500: '#2954A3',
+            }
         },
         status: {
             draft: {

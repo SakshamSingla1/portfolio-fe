@@ -14,7 +14,7 @@ export interface Experience {
     jobTitle: string;
     location: string;
     startDate: string;
-    endDate?: string;  // This is optional
+    endDate?: string;
     currentlyWorking: boolean;
     description: string;
     technologiesUsed: string[];
@@ -24,7 +24,7 @@ export const useExperienceService = () => {
     const { user } = useAuthenticatedUser();
     const getAll = () => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.GET, url, user, null, null, null)
+        return request(API_METHOD.GET, url, null, null, null, null)
     };
 
     const getById = (id: string) => {

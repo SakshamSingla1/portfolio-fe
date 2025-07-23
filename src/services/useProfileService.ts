@@ -26,7 +26,7 @@ export const useProfileService = () => {
     const { user } = useAuthenticatedUser();
     const get = () => {
         const url = replaceUrlParams(PROFILE_URLS.GET, {});
-        return request(API_METHOD.GET, url, user, null, null, null);
+        return request(API_METHOD.GET, url, null, null, null, null);
     }
     const create = (profile: ProfileRequest) => {
         const url = replaceUrlParams(PROFILE_URLS.GET, {});
