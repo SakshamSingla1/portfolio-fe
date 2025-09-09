@@ -1,4 +1,3 @@
-import React from "react";
 import { useEducationService } from "../../../../services/useEducationService";
 import { useFormik } from "formik";
 import * as Yup from "yup";

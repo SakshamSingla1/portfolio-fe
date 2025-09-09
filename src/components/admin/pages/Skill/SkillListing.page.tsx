@@ -1,6 +1,6 @@
 import { HTTP_STATUS } from '../../../../utils/constant';
 import { useState, useEffect } from 'react';
-import { Skill, useSkillService } from '../../../../services/useSkillService';
+import { Skill, SkillResponse, useSkillService } from '../../../../services/useSkillService';
 import SkillListTemplate from '../../templates/Skill/SkillList.template';
 import { useNavigate } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
@@ -19,7 +19,7 @@ const SkillListingPage: React.FC = () => {
     const skillService = useSkillService();
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
-    const [skills, setSkills] = useState<Skill[]>([]);
+    const [skills, setSkills] = useState<SkillResponse[]>([]);
     const [pagination, setPagination] = useState({
         pageSize: 10,
         currentPage: 0,

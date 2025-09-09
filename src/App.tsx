@@ -119,13 +119,6 @@ const App = () => {
                   <Route path="/" element={<Navigate to={ADMIN_ROUTES.PROFILE} replace />} />
                 </Route>
               </Route>
-
-              {/* Public user routes */}
-              <Route element={<UsersLayout />}>
-                <Route path="/users" element={<HomePage />} />
-                <Route path="/" element={<AuthRedirect />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Route>
             </Routes>
           </MainLayout>
         </SnackbarProvider>

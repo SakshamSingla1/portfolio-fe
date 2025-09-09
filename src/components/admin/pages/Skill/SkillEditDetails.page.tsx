@@ -8,9 +8,13 @@ import SkillFormTemplate from "../../templates/Skill/SkillForm.template";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
-    name: Yup.string()
-        .required('Skill name is required')
-        .max(50, 'Skill name is too long'),
+    logoId: Yup.number()
+        .nullable()
+        .required('Skill logo is required'),
+    logoName: Yup.string()
+        .required('Skill logo is required'),
+    logoUrl: Yup.string()
+        .required('Skill logo is required'),
     level: Yup.string()
         .required('Skill level is required')
         .max(50, 'Skill level is too long'),
@@ -29,7 +33,9 @@ const SkillEditDetailsPage = () => {
 
     const formik = useFormik({
         initialValues: {
-            name: "",
+            logoId: null,
+            logoName: "",
+            logoUrl: "",
             level: "",
             category: "",
         },
@@ -55,7 +61,9 @@ const SkillEditDetailsPage = () => {
             const response = await skillService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 formik.setValues({
-                    name: response.data.data.name || "",
+                    logoId: response.data.data.id || null,
+                    logoName: response.data.data.logoName || "",
+                    logoUrl: response.data.data.logoUrl || "",
                     level: response.data.data.level || "",
                     category: response.data.data.category || "",
                 });

@@ -97,3 +97,8 @@ export const NAV_ITEMS = [
     { id: 3 , name: "Projects" , to: "/projects" },
     { id: 4 , name: "Contact" , to: "/contact" },
 ]
+
+export const DEBOUNCE_TIME = {
+    USER_STATUS_UPDATE: 2000,
+    DEFAULT: 300
+}

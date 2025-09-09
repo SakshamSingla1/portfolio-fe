@@ -102,7 +102,7 @@ const useStyles = createUseStyles((theme: any) => ({
 
 interface Option {
     value: string | number;
-    label: string;
+    label: string | React.ReactNode;
 }
 
 interface SelectProps extends Omit<MuiSelectProps, 'label' | 'onChange' | 'onBlur' | 'onFocus'> {
@@ -112,9 +112,22 @@ interface SelectProps extends Omit<MuiSelectProps, 'label' | 'onChange' | 'onBlu
     disableCapitalization?: boolean;
     disableArrow?: boolean;
     placeholder?: string;
+    onChange?: (value: number) => void;
+    onBlur?: (value: string | number | null) => void;
+    onFocus?: (value: string | number | null) => void;
 }
 
-const Select: React.FC<SelectProps> = ({ options, label, helperText, disableCapitalization = false, disableArrow = false, ...props }) => {
+const Select: React.FC<SelectProps> = ({
+    options,
+    label,
+    helperText,
+    disableCapitalization = false,
+    disableArrow = false,
+    onChange,
+    onBlur,
+    onFocus,
+    ...props
+}) => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
 
@@ -133,19 +146,19 @@ const Select: React.FC<SelectProps> = ({ options, label, helperText, disableCapi
             {label && (<div className={classes.label}>{label}</div>)}
             <MuiSelect
                 id={`select-${label}`}
-                label=""
-                defaultValue=""
-                defaultChecked={true}
                 {...props}
                 className={classes.input}
                 displayEmpty
                 renderValue={renderValue}
                 onOpen={() => setOpen(true)}
                 onClose={() => setOpen(false)}
-                IconComponent={disableArrow ? () => null : (props) => {
-                    const { className, ...otherProps } = props;
+                onChange={(e) => onChange?.(e.target.value as number)}   // ✅ map event → value
+                onBlur={(e) => onBlur?.(e.target.value as string | number)}
+                onFocus={(e) => onFocus?.(e.target.value as string | number)}
+                IconComponent={disableArrow ? () => null : (iconProps) => {
+                    const { className, ...otherProps } = iconProps;
                     return (
-                        <img 
+                        <img
                             {...otherProps}
                             className={`${className} ${classes.icon} ${open ? classes.iconOpen : ''}`}
                             src={downArrowIcon}
@@ -161,7 +174,9 @@ const Select: React.FC<SelectProps> = ({ options, label, helperText, disableCapi
                 }}
             >
                 {options.map(option => (
-                    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+                    <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                    </MenuItem>
                 ))}
             </MuiSelect>
             {props.error && <ErrorMessage message={helperText} />}

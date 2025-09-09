@@ -16,3 +16,16 @@ export const makeRoute = (route: string, params: { [key: string]: any }) => {
 export const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const useDebounce = <T extends any[]>(
+	callback: (...args: T) => void,
+	delay: number
+) => {
+	let timeoutId: ReturnType<typeof setTimeout>;
+	return (...args: T) => {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => {
+			callback(...args);
+		}, delay);
+	};
+};

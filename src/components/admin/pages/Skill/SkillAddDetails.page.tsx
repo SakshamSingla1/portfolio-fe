@@ -7,9 +7,13 @@ import SkillFormTemplate from "../../templates/Skill/SkillForm.template";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
 const validationSchema = Yup.object().shape({
-    name: Yup.string()
-        .required('Skill name is required')
-        .max(50, 'Skill name is too long'),
+    logoId: Yup.number()
+        .nullable()
+        .required('Skill logo is required'),
+    logoName: Yup.string()
+        .required('Skill logo is required'),
+    logoUrl: Yup.string()
+        .required('Skill logo is required'),
     level: Yup.string()
         .required('Skill level is required')
         .max(50, 'Skill level is too long'),
@@ -27,7 +31,9 @@ const SkillAddDetailsPage = () => {
 
     const formik = useFormik({
         initialValues: {
-            name: "",
+            logoId: null,
+            logoName: "",
+            logoUrl: "",
             level: "",
             category: "",
         },

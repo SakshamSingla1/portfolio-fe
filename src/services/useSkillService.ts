@@ -6,17 +6,44 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 export const AUTH_URLS = {
     GET_ALL: "/skill",
     GET_ALL_BY_ID: "/skill/:id",
+    DROPDOWN: "skill/dropdown"
 }
 
 export interface Skill {
     id?: number;
-    name: string;
+    logoId?: number | null;
+    logoName?: string | null;
+    logoUrl?: string | null;
     category: string;
     level: string;
 }
 
+export interface SkillDropdown {
+    id: number;
+    logoName: string;
+    logoUrl: string;
+}
+
+export interface SkillResponse {
+    id: number;
+    logoName?: string | null;
+    logoUrl?: string | null;
+    category: string;
+    level: string;
+}
+
+export interface SkillFilterParams {
+    search: string;
+}
+
 export const useSkillService = () => {
     const { user } = useAuthenticatedUser();
+
+    const getDropdown = (params: SkillFilterParams) => {
+        const url = replaceUrlParams(AUTH_URLS.DROPDOWN, {});
+        return request(API_METHOD.GET, url, null, null, { params })
+    };
+
     const getAll = () => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
         return request(API_METHOD.GET, url, null, null, null, null)
@@ -37,6 +64,7 @@ export const useSkillService = () => {
     };
 
     return {
+        getDropdown,
         getAll,
         getById,
         create,

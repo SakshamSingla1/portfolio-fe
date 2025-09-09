@@ -29,7 +29,9 @@ const SkillViewDetailsPage = () => {
 
     const formik = useFormik({
         initialValues: {
-            name: "",
+            logoId: null,
+            logoName: "",
+            logoUrl: "",
             level: "",
             category: "",
         },
@@ -42,7 +44,9 @@ const SkillViewDetailsPage = () => {
             const response = await skillService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 formik.setValues({
-                    name: response.data.data.name || "",
+                    logoId: response.data.data.id || null,
+                    logoUrl: response.data.data.logoUrl || "",
+                    logoName: response.data.data.logoName || "",
                     level: response.data.data.level || "",
                     category: response.data.data.category || "",
                 });
@@ -65,7 +69,7 @@ const SkillViewDetailsPage = () => {
         <div>
             <SkillFormTemplate
                 formik={formik}
-                mode={MODE.VIEW}  // Changed from MODE.ADD to MODE.EDIT
+                mode={MODE.VIEW}
                 onClose={onClose}
             />
         </div>
