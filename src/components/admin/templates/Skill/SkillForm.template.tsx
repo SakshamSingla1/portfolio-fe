@@ -57,112 +57,132 @@ const SkillFormTemplate = ({ formik, mode, onClose }: SkillFormProps) => {
     }));
 
     return (
-        <div className="m-10 p-6 bg-white rounded-lg shadow-2xl shadow-primary-500">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">
-                {mode === MODE.ADD
-                    ? "Add Skill"
-                    : mode === MODE.EDIT
-                        ? "Edit Skill"
-                        : "View Skill"}
-            </h2>
-
-            <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                    <AutoCompleteInput
-                        label="Skill"
-                        placeHolder="Select Skill"
-                        options={logoOptions}
-                        value={logoOptions.find(option => option.value === formik.values.logoId) || null}
-                        onSearch={search => loadLogoDropdown(search)}
-                        onChange={value => {
-                            formik.setFieldValue("logoId", value?.value ?? null);
-                            formik.setFieldValue("logoName", typeof value?.title === "string" ? value.title : "");
-                            formik.setFieldValue(
-                                "logoUrl",
-                                logos.find(l => l.id === value?.value)?.url || ""
-                            );
-                            setSelectedLogo(logos.find(l => l.id === value?.value) || null);
-                        }}
-                        error={!!formik.errors.logoId && formik.touched.logoId}
-                        helperText={formik.errors.logoId as string}
-                        isDisabled={mode !== MODE.ADD}
-                    />
-                    {formik.errors.logoId && formik.touched.logoId && (
-                        <div className={`text-red-500 text-xs mt-1`}>
-                            {formik.errors.logoId}
-                        </div>
-                    )}
-                    {/* <Select
-                        name="logoId"
-                        label="Skill Logo"
-                        placeholder="Select Skill Logo"
-                        options={logoOptions}
-                        value={selectedLogo?.name || formik.values.logoName}
-                        error={formik.touched.logoId && Boolean(formik.errors.logoId)}
-                        disabled={mode === MODE.VIEW}
-                        onChange={(value: string | number) => {
-                            const logoId = Number(value);
-                            const selected = logos.find(l => l.id === logoId) || null;
-                            setSelectedLogo(selected);
-                            formik.setFieldValue("logoId", logoId);
-                            if (selected) {
-                                formik.setFieldValue("name", titleModification(selected.name));
-                            }
-                        }}
-                    /> */}
-
-                    {(selectedLogo || formik.values.logoUrl) && (
-                        <img
-                            src={selectedLogo?.url || formik.values.logoUrl || ''}
-                            alt={selectedLogo?.name || formik.values.name || 'Logo'}
-                            className="w-20 h-20 mt-2"
-                        />
-                    )}
-
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Select
-                        name="level"
-                        label="Skill Level"
-                        placeholder="Select Skill Level"
-                        options={SKILL_LEVEL_OPTIONS}
-                        value={formik.values.level}
-                        error={formik.touched.level && Boolean(formik.errors.level)}
-                        disabled={mode === MODE.VIEW}
-                        onChange={(value: string | number) => {
-                            const newValue = typeof value === "string" ? titleModification(value) : value;
-                            formik.setFieldValue("level", newValue);
-                        }}
-                    />
-
-                    <Select
-                        name="category"
-                        label="Skill Category"
-                        placeholder="Select Skill Category"
-                        options={SKILL_CATEGORY_OPTIONS}
-                        value={formik.values.category}
-                        error={formik.touched.category && Boolean(formik.errors.category)}
-                        disabled={mode === MODE.VIEW}
-                        onChange={(value: string | number) => {
-                            const newValue = typeof value === "string" ? titleModification(value) : value;
-                            formik.setFieldValue("category", newValue);
-                        }}
-                    />
-                </div>
+        <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
+            {/* Header Section */}
+            <div className="mb-8 pb-6 border-b border-gray-200">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    {mode === MODE.ADD
+                        ? "Add New Skill"
+                        : mode === MODE.EDIT
+                            ? "Edit Skill"
+                            : "Skill Details"}
+                </h2>
+                <p className="text-gray-600">
+                    {mode === MODE.ADD
+                        ? "Add a new skill to your portfolio"
+                        : mode === MODE.EDIT
+                            ? "Update your skill information"
+                            : "View skill details"}
+                </p>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-4 gap-2">
-                <Button label="Cancel" variant="tertiaryContained" onClick={onClose} />
-                {mode !== MODE.VIEW && (
-                    <Button
-                        label={mode === MODE.ADD ? "Add Skill" : "Update Skill"}
-                        variant="primaryContained"
-                        onClick={() => formik.handleSubmit()}
-                        disabled={formik.isSubmitting}
-                    />
-                )}
+            <div className="space-y-8">
+                {/* Basic Information / Skill Picker */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                        Select Skill Logo
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <div>
+                            <AutoCompleteInput
+                                label="Skill"
+                                placeHolder="Search and select a skill (e.g., React, Node.js)"
+                                options={logoOptions}
+                                value={logoOptions.find(option => option.value === formik.values.logoId) || null}
+                                onSearch={search => loadLogoDropdown(search)}
+                                onChange={value => {
+                                    formik.setFieldValue("logoId", value?.value ?? null);
+                                    formik.setFieldValue("logoName", typeof value?.title === "string" ? value.title : "");
+                                    formik.setFieldValue(
+                                        "logoUrl",
+                                        logos.find(l => l.id === value?.value)?.url || ""
+                                    );
+                                    setSelectedLogo(logos.find(l => l.id === value?.value) || null);
+                                }}
+                                error={!!formik.errors.logoId && formik.touched.logoId}
+                                helperText={(formik.errors.logoId as string) || "Start typing to search available skills"}
+                                isDisabled={mode === MODE.VIEW}
+                            />
+                            {formik.errors.logoId && formik.touched.logoId && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formik.errors.logoId as string}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Logo Preview */}
+                        <div className="flex items-center md:justify-end">
+                            {(selectedLogo || formik.values.logoUrl) ? (
+                                <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                    <img
+                                        src={selectedLogo?.url || formik.values.logoUrl || ''}
+                                        alt={selectedLogo?.name || formik.values.name || 'Logo'}
+                                        className="w-16 h-16 rounded-md shadow-sm"
+                                    />
+                                    <div>
+                                        <p className="text-sm text-gray-600">Selected</p>
+                                        <p className="text-base font-medium text-gray-900 truncate max-w-[200px]">
+                                            {selectedLogo?.name || formik.values.logoName || '—'}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-gray-400 text-sm">No logo selected</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Classification Section */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        Classification
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Select
+                            name="level"
+                            label="Skill Level"
+                            placeholder="Select Skill Level"
+                            options={SKILL_LEVEL_OPTIONS}
+                            value={formik.values.level}
+                            error={formik.touched.level && Boolean(formik.errors.level)}
+                            disabled={mode === MODE.VIEW}
+                            onChange={(value: string | number) => {
+                                const newValue = typeof value === "string" ? titleModification(value) : value;
+                                formik.setFieldValue("level", newValue);
+                            }}
+                        />
+
+                        <Select
+                            name="category"
+                            label="Skill Category"
+                            placeholder="Select Skill Category"
+                            options={SKILL_CATEGORY_OPTIONS}
+                            value={formik.values.category}
+                            error={formik.touched.category && Boolean(formik.errors.category)}
+                            disabled={mode === MODE.VIEW}
+                            onChange={(value: string | number) => {
+                                const newValue = typeof value === "string" ? titleModification(value) : value;
+                                formik.setFieldValue("category", newValue);
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
+                    <Button label="Cancel" variant="tertiaryContained" onClick={onClose} />
+                    {mode !== MODE.VIEW && (
+                        <Button
+                            label={mode === MODE.ADD ? "Add Skill" : "Update Skill"}
+                            variant="primaryContained"
+                            onClick={() => formik.handleSubmit()}
+                            disabled={formik.isSubmitting}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

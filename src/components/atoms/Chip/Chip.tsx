@@ -1,7 +1,8 @@
 import { FaTimesCircle } from 'react-icons/fa';
+import { ReactNode } from 'react';
 
 interface ChipProps {
-  label: string;
+  label: string | ReactNode;
   onDelete: () => void;
 }
 

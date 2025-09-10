@@ -1,12 +1,12 @@
 import { HTTP_STATUS } from '../../../../utils/constant';
 import { useState, useEffect } from 'react';
-import { Project, useProjectService } from '../../../../services/useProjectService';
+import { ProjectResponse, useProjectService } from '../../../../services/useProjectService';
 import ProjectListTemplate from '../../templates/Project/ProjectList.template';
 import { useSnackbar } from '../../../../contexts/SnackbarContext';
 
 const ProjectListingPage: React.FC = () => {
     const projectService = useProjectService();
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<ProjectResponse[]>([]);
     const [pagination, setPagination] = useState({
         pageSize: 10,
         currentPage: 0,

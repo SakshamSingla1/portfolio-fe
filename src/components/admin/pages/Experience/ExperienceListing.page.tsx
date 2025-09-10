@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useExperienceService , Experience  } from '../../../../services/useExperienceService';
-import { HTTP_STATUS, ADMIN_ROUTES } from '../../../../utils/constant';
+import { useExperienceService , ExperienceResponse  } from '../../../../services/useExperienceService';
+import { HTTP_STATUS } from '../../../../utils/constant';
 import ExperienceListTemplate from '../../templates/Experience/ExperienceList.template';
 import { useState, useEffect } from 'react';
 import { useSnackbar } from '../../../../contexts/SnackbarContext';
@@ -8,7 +8,7 @@ import { useSnackbar } from '../../../../contexts/SnackbarContext';
 const ExperienceListingPage: React.FC = () => {
     const experienceService = useExperienceService();
     const navigate = useNavigate();
-    const [experiences, setExperiences] = useState<Experience[]>([]);
+    const [experiences, setExperiences] = useState<ExperienceResponse[]>([]);
     const [pagination, setPagination] = useState({
         pageSize: 10,
         currentPage: 0,
@@ -35,7 +35,7 @@ const ExperienceListingPage: React.FC = () => {
 
     useEffect(() => {
         fetchExperiences();
-    }, [pagination.currentPage, pagination.pageSize]);
+    }, []);
 
     const handlePageChange = (event: unknown, newPage: number) => {
         setPagination(prev => ({

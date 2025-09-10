@@ -15,7 +15,7 @@ const StyledCheckbox = styled(MuiCheckbox)({
         color: '#1ABC9C',
     },
     '&.Mui-disabled': {
-        color: '#E8F8F5',
+        color: '#1ABC9C',
     },
 });
 

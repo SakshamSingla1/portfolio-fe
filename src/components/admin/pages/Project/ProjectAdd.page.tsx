@@ -1,5 +1,4 @@
-import React from "react";
-import { useProjectService } from "../../../../services/useProjectService";
+import { useProjectService, Project } from "../../../../services/useProjectService";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
@@ -10,25 +9,26 @@ import { useSnackbar } from "../../../../contexts/SnackbarContext";
 const validationSchema = Yup.object().shape({
     projectName: Yup.string()
         .required('Project name is required')
-        .max(50, 'Project name is too long'),
+        .max(100, 'Project name is too long'),
     projectDescription: Yup.string()
         .required('Project description is required')
-        .max(50, 'Project description is too long'),
+        .max(500, 'Project description is too long'),
     projectLink: Yup.string()
         .required('Project link is required')
-        .max(50, 'Project link is too long'),
-    projectDuration: Yup.number()
-        .required('Project duration is required'),
-    technologiesUsed: Yup.string()
-        .required('Technologies used are required'),
+        .url('Must be a valid URL'),
+    technologiesUsed: Yup.array()
+        .of(Yup.number())
+        .min(1, 'At least one technology is required'),
     projectStartDate: Yup.date()
-        .required('Start date is required')
-        .max(new Date(), 'Start date cannot be in the future'),
+        .required('Start date is required'),
     projectEndDate: Yup.date()
         .min(Yup.ref('projectStartDate'), 'End date must be after start date')
         .nullable(),
-    isCurrentlyWorking: Yup.boolean()
-        .required('Currently working is required')
+    currentlyWorking: Yup.boolean()
+        .required('Currently working status is required'),
+    projectImageUrl: Yup.string()
+        .url('Must be a valid URL')
+        .nullable()
 });
 
 const ProjectAddDetailsPage = () => {
@@ -38,16 +38,16 @@ const ProjectAddDetailsPage = () => {
 
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
-    const formik = useFormik({
+    const formik = useFormik<Omit<Project, 'id'>>({
         initialValues: {
             projectName: "",
             projectDescription: "",
             projectLink: "",
-            projectDuration: "",
-            technologiesUsed: "",
-            projectStartDate: new Date().toISOString(),
-            projectEndDate: new Date().toISOString(),
-            isCurrentlyWorking: false,
+            technologiesUsed: [],
+            projectStartDate: new Date(),
+            projectEndDate: new Date(),
+            currentlyWorking: false,
+            projectImageUrl: "",
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
@@ -56,12 +56,12 @@ const ProjectAddDetailsPage = () => {
                 if (response?.status === HTTP_STATUS.OK) {
                     onClose();
                     navigate(ADMIN_ROUTES.PROJECTS);
-                    showSnackbar('success',`${response?.data?.message}`);
+                    showSnackbar('success', `${response?.data?.message}`);
                 } else {
-                    showSnackbar('error',`${response?.data?.message}`);
+                    showSnackbar('error', `${response?.data?.message}`);
                 }
             } catch (error) {
-                showSnackbar('error',`${error}`);
+                showSnackbar('error', `${error}`);
             }
         }
     });
@@ -74,6 +74,7 @@ const ProjectAddDetailsPage = () => {
                 onClose={onClose}
             />
         </div>
-    )
-}
+    );
+};
+
 export default ProjectAddDetailsPage;

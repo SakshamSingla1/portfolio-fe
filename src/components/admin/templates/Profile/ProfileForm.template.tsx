@@ -119,13 +119,17 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            {isEditMode && <div className="px-8 py-6 border-b border-gray-100">
-                <h2 className="text-2xl font-semibold text-gray-800">
-                    Edit Profile
+        <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            {/* Header */}
+            <div className="mb-8 pb-6 border-b border-gray-200">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    {isEditMode ? "Edit Profile" : "Profile"}
                 </h2>
-            </div>}
-            <div className="px-8 pt-8 pb-6 flex flex-col items-center">
+                <p className="text-gray-600">
+                    {isEditMode ? "Update your personal information and social links" : "Your profile information and social presence"}
+                </p>
+            </div>
+            <div className="px-2 md:px-6 pt-2 pb-6 flex flex-col items-center">
                 {isEditMode ? (
                     <ProfileImage
                     value={formik.values.profileImageUrl}
@@ -169,10 +173,14 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                 )}
             </div>
 
-            <div className="p-8">
+            <div className="p-2 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-700">Personal Information</h3>
+                    {/* Personal Information */}
+                    <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            Personal Information
+                        </h3>
                         <TextFieldV2
                             label="Full Name"
                             name="fullName"
@@ -266,8 +274,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                             }}
                         />
                     </div>
-                    <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-700">About & Social</h3>
+                    {/* About & Social */}
+                    <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                            <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                            About & Social
+                        </h3>
                         <div>
                             <TextFieldV2
                                 label="About Me"
@@ -352,20 +364,22 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                     </div>
                 </div>
                 {isEditMode && (
-                    <div className={`flex justify-between mt-10 pt-6 border-t border-gray-100`}>
+                    <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between gap-3">
                         <Button
                             label="Cancel"
                             type="button"
-                            variant="secondaryContained"
+                            variant="tertiaryContained"
                             onClick={onEditClick}
                         />
-                        <Button
-                            label="Save Changes"
-                            type="submit"
-                            variant="primaryContained"
-                            onClick={() => formik.handleSubmit()}
-                            loading={formik.isSubmitting}
-                        />
+                        <div className="flex gap-3">
+                            <Button
+                                label="Save Changes"
+                                type="submit"
+                                variant="primaryContained"
+                                onClick={() => formik.handleSubmit()}
+                                loading={formik.isSubmitting}
+                            />
+                        </div>
                     </div>
                 )}
             </div>

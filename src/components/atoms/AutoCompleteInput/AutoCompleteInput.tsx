@@ -80,7 +80,6 @@ const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
 
 	const handleClearValue = () => {
 		onSearch("");
-		// onChange({label: "", value: ""});
 	};
 
 	const defaultProps = {

@@ -2,27 +2,41 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthenticatedUser } from './hooks/useAuthenticatedUser';
 
-// Admin Pages
+// Education Routes 
 import EducationAddDetailsPage from './components/admin/pages/Education/EducationAddDetails.page';
 import EducationEditDetailsPage from './components/admin/pages/Education/EducationEditDetails.page';
 import EducationDetailsListingPage from './components/admin/pages/Education/EducationDetailsListing.page';
 import EducationDetailsViewPage from './components/admin/pages/Education/EducationDetailsView.page';
+
+// Contact Us Routes 
 import ContactUsListingPage from './components/admin/pages/ContactUs/ContactUsListing.page';
-import ProjectDetailsAddPage from './components/admin/pages/Projects/ProjectDetailsAdd.page';
-import ProjectListingPage from './components/admin/pages/Projects/ProjectListing.page';
-import ProjectDetailsViewPage from './components/admin/pages/Projects/ProjectDetailsView.page';
-import ProjectDetailsEditPage from './components/admin/pages/Projects/ProjectDetailsEdit.page';
+
+// Project Routes 
+import ProjectListingPage from './components/admin/pages/Project/ProjectListing.page';
+import ProjectAddDetailsPage from './components/admin/pages/Project/ProjectAdd.page';
+import ProjectEditDetailsPage from './components/admin/pages/Project/ProjectEdit.page';
+import ProjectViewDetailsPage from './components/admin/pages/Project/ProjectView.page';
+
+// Experience Routes 
 import ExperienceListingPage from './components/admin/pages/Experience/ExperienceListing.page';
 import ExperienceAddDetailsPage from './components/admin/pages/Experience/ExperienceAddDetails.page';
 import ExperienceEditDetailsPage from './components/admin/pages/Experience/ExperienceEditDetails.page';
 import ExperienceDetailsViewPage from './components/admin/pages/Experience/ExperienceViewDetails.page';
+
+// Skill Routes 
 import SkillListingPage from './components/admin/pages/Skill/SkillListing.page';
 import SkillAddDetailsPage from './components/admin/pages/Skill/SkillAddDetails.page';
 import SkillEditDetailsPage from './components/admin/pages/Skill/SkillEditDetails.page';
 import SkillViewDetailsPage from './components/admin/pages/Skill/SkillViewDetails.page';
+
+// Forgot Password Routes 
 import ForgotPasswordPage from './components/admin/pages/ForgotPassword/ForgotPassword.page';
 import ResetPasswordPage from './components/admin/pages/ResetPassword/ResetPassword.page';
+
+// Users Layout 
 import UsersLayout from './layouts/UsersLayout';
+
+// Admin Layout 
 import { ADMIN_ROUTES } from './utils/constant';
 import { ThemeProvider } from 'react-jss';
 import { defaultTheme } from './utils/theme';
@@ -34,7 +48,6 @@ import Register from './components/admin/pages/Register/Register';
 import ProfilePage from './components/admin/pages/Profile/Profile.page';
 import { SnackbarProvider } from './contexts/SnackbarContext';
 import SettingsPage from './components/admin/pages/Settings/Settings.page';
-import HomePage from './components/main/pages/Home/Home.page';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -95,9 +108,9 @@ const App = () => {
 
                   <Route path={ADMIN_ROUTES.PROJECTS}>
                     <Route index element={<ProjectListingPage />} />
-                    <Route path="add" element={<ProjectDetailsAddPage />} />
-                    <Route path=":id/edit" element={<ProjectDetailsEditPage />} />
-                    <Route path=":id" element={<ProjectDetailsViewPage />} />
+                    <Route path="add" element={<ProjectAddDetailsPage />} />
+                    <Route path=":id/edit" element={<ProjectEditDetailsPage />} />
+                    <Route path=":id" element={<ProjectViewDetailsPage />} />
                   </Route>
 
                   <Route path={ADMIN_ROUTES.EXPERIENCE}>

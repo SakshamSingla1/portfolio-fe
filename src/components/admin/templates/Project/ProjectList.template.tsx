@@ -6,14 +6,15 @@ import { ADMIN_ROUTES } from '../../../../utils/constant';
 import TableV1, { ColumnType, TableColumn } from '../../../molecules/TableV1/TableV1';
 import viewEyeIcon from '../../../../assets/icons/viewEyeOutlinedIconPrimary500.svg';
 import editIcon from '../../../../assets/icons/editPenOutlinedIconPrimary500.svg';
-import { Project } from '../../../../services/useProjectService';
+import { Project, ProjectResponse } from '../../../../services/useProjectService';
+import { SkillDropdown } from '../../../../services/useSkillService';
 
 interface IProjectListTemplateProps {
-    projects: Project[];
+    projects: ProjectResponse[];
     pagination: IPagination;
     onPageChange: (event: any, newPage: number) => void;
     onRowsPerPageChange: (event: any) => void;
-    onRowClick?: (project: Project) => void;
+    onRowClick?: (project: ProjectResponse) => void;
 }
 
 const ProjectListTemplate: React.FC<IProjectListTemplateProps> = ({ 
@@ -72,44 +73,33 @@ const ProjectListTemplate: React.FC<IProjectListTemplateProps> = ({
                 label: "Actions", 
                 key: "actions", 
                 type: "custom" as ColumnType,
-                render: (row: Project) => (
-                    <div className="flex justify-center space-x-2">
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(makeRoute(ADMIN_ROUTES.PROJECTS_EDIT, { id: row.id }));
-                            }} 
-                            className="w-6 h-6 cursor-pointer hover:opacity-75 transition-opacity"
-                        >
-                            <img src={editIcon} alt="Edit" className="w-full h-full" />
-                        </button>
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { id: row.id }));
-                            }} 
-                            className="w-6 h-6 cursor-pointer hover:opacity-75 transition-opacity"
-                        >
-                            <img src={viewEyeIcon} alt="View" className="w-full h-full" />
-                        </button>
-                    </div>
-                ),
-                props: {
-                    align: 'center'
-                } 
+                props: {}
             }
         ] as TableColumn[]
     };
 
-    const Action = (degree: string) => {
+    const Action = (id: string) => {
         return (
-            <div className='flex justify-center space-x-2'>
-                <button onClick={()=>handleEditClick(degree)} className={`w-6 h-6 cursor-pointer`}>
+            <div className='flex justify-center space-x-2' title=''>
+                <button onClick={()=>handleEditClick(id)} className={`w-6 h-6 cursor-pointer`}>
                     <img src={editIcon} alt={editIcon} />
                 </button>
-                <button onClick={()=>handleViewClick(degree)} className={`w-6 h-6 cursor-pointer`}>
+                <button onClick={()=>handleViewClick(id)} className={`w-6 h-6 cursor-pointer`}>
                     <img src={viewEyeIcon} alt={viewEyeIcon} />
                 </button>
+            </div>
+        );
+    };
+
+    const techStack = (techStack: SkillDropdown[]) => {
+        return (
+            <div className='flex flex-col items-center justify-center gap-y-4' title={techStack.map((tech: SkillDropdown) => tech.logoName).join(", ")}> 
+                {techStack.map((tech: SkillDropdown) => 
+                    <div key={tech.id} className='flex items-center space-x-2'>
+                        <img src={tech.logoUrl} alt={tech.logoName} className='w-6 h-6' />
+                        <span>{tech.logoName}</span>
+                    </div>
+                )}
             </div>
         );
     };
@@ -123,13 +113,13 @@ const ProjectListTemplate: React.FC<IProjectListTemplateProps> = ({
     };
 
     const records = useMemo(() => {
-        return projects.map((project: Project, index: number) => {
+        return projects.map((project: ProjectResponse, index: number) => {
             return [
                 pagination.currentPage + index,
                 project.projectName,
                 project.projectLink,
-                project.technologiesUsed,
-                project.projectDuration,
+                techStack(project.technologiesUsed),
+                project.currentlyWorking ? "Present" : project.projectStartDate + " - " + project.projectEndDate,
                 Action(project.id?.toString() ?? "")
             ];
         });

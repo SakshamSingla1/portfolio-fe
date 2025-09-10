@@ -1,34 +1,12 @@
 import React, { useEffect } from "react";
 import { useExperienceService } from "../../../../services/useExperienceService";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import ExperienceFormTemplate from '../../templates/Experience/ExperienceForm.template'
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
-const validationSchema = Yup.object().shape({
-    companyName: Yup.string()
-        .required('Company name is required')
-        .max(50, 'Company name is too long'),
-    jobTitle: Yup.string()
-        .required('Job title is required')
-        .max(50, 'Job title is too long'),
-    location: Yup.string()
-        .required('Location is required')
-        .max(100, 'Location is too long'),
-    startDate: Yup.date()
-        .required('Start year is required')
-        .min(1900, 'Invalid year')
-        .max(new Date().getFullYear(), 'Invalid year'),
-    endDate: Yup.date()
-        .min(Yup.ref('startDate'), 'End year must be after start year')
-        .max(new Date().getFullYear() + 5, 'Invalid year'),
-    description: Yup.string()
-        .max(500, 'Description is too long'),
-});
-
-const ExperienceEditDetailsPage = () => {
+const ExperienceViewDetailsPage = () => {
     const experienceService = useExperienceService();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -45,7 +23,6 @@ const ExperienceEditDetailsPage = () => {
             technologiesUsed: [],
             currentlyWorking: false
         },
-        validationSchema: validationSchema,
         onSubmit: () => { }
     });
 
@@ -53,7 +30,16 @@ const ExperienceEditDetailsPage = () => {
         try {
             const response = await experienceService.getById(id);
             if (response?.status === HTTP_STATUS.OK) {
-                formik.setValues(response.data.data);
+                formik.setValues({
+                    companyName: response.data.data.companyName,
+                    jobTitle: response.data.data.jobTitle,
+                    location: response.data.data.location,
+                    startDate: response.data.data.startDate,
+                    endDate: response.data.data.endDate,
+                    description: response.data.data.description,
+                    technologiesUsed: response.data.data.technologiesUsed.map((tech: any) => tech.id),
+                    currentlyWorking: response.data.data.currentlyWorking
+                });
                 showSnackbar('success',`${response?.data?.message}`);
             } else {
                 showSnackbar('error',`${response?.data?.message}`);
@@ -71,9 +57,9 @@ const ExperienceEditDetailsPage = () => {
 
     return (
         <div>
-            <ExperienceFormTemplate formik={formik} mode={MODE.EDIT} onClose={() => navigate(ADMIN_ROUTES.EXPERIENCE)} />
+            <ExperienceFormTemplate formik={formik} mode={MODE.VIEW} onClose={() => navigate(ADMIN_ROUTES.EXPERIENCE)} />
         </div>
     )
 }
-export default ExperienceEditDetailsPage;
+export default ExperienceViewDetailsPage;
 

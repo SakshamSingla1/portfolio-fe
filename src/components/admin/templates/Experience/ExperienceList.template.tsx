@@ -6,14 +6,15 @@ import { ADMIN_ROUTES } from '../../../../utils/constant';
 import TableV1, { ColumnType, TableColumn } from '../../../molecules/TableV1/TableV1';
 import viewEyeIcon from '../../../../assets/icons/viewEyeOutlinedIconPrimary500.svg';
 import editIcon from '../../../../assets/icons/editPenOutlinedIconPrimary500.svg';
-import { Experience } from '../../../../services/useExperienceService';
+import { ExperienceResponse } from '../../../../services/useExperienceService';
+import { SkillDropdown } from '../../../../services/useSkillService';
 
 interface IExperienceListTemplateProps {
-    experiences: Experience[];
+    experiences: ExperienceResponse[];
     pagination: IPagination;
     onPageChange: (event: any, newPage: number) => void;
     onRowsPerPageChange: (event: any) => void;
-    onRowClick?: (experience: Experience) => void;
+    onRowClick?: (experience: ExperienceResponse) => void;
 }
 
 const ExperienceListTemplate: React.FC<IExperienceListTemplateProps> = ({ 
@@ -66,7 +67,7 @@ const ExperienceListTemplate: React.FC<IExperienceListTemplateProps> = ({
                 label: "Duration", 
                 key: "duration", 
                 type: "custom" as ColumnType,
-                render: (row: Experience) => (
+                render: (row: ExperienceResponse) => (
                     <span>
                         {row.endDate} - {row.startDate}
                     </span>
@@ -83,7 +84,7 @@ const ExperienceListTemplate: React.FC<IExperienceListTemplateProps> = ({
                 label: "Actions", 
                 key: "actions", 
                 type: "custom" as ColumnType,
-                render: (row: Experience) => (
+                render: (row: ExperienceResponse) => (
                     <div className="flex justify-center space-x-2">
                         <button 
                             onClick={(e) => {
@@ -125,6 +126,20 @@ const ExperienceListTemplate: React.FC<IExperienceListTemplateProps> = ({
         );
     };
 
+    const techStack = (techStack: SkillDropdown[]) => {
+            return (
+                <div className='flex flex-col items-center justify-center gap-y-4' title={techStack.map((tech: SkillDropdown) => tech.logoName).join(", ")}> 
+                    {techStack.map((tech: SkillDropdown) => 
+                        <div key={tech.id} className='flex items-center space-x-2'>
+                            <img src={tech.logoUrl} alt={tech.logoName} className='w-6 h-6' />
+                            <span>{tech.logoName}</span>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+    
     const handleEditClick = (id: string) => {
         navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_EDIT, { id }));
     };
@@ -134,13 +149,13 @@ const ExperienceListTemplate: React.FC<IExperienceListTemplateProps> = ({
     };
 
     const records = useMemo(() => {
-        return experiences.map((experience: Experience, index: number) => {
+        return experiences.map((experience: ExperienceResponse, index: number) => {
             return [
                 pagination.currentPage + index,
                 experience.companyName,
                 experience.jobTitle,
-                experience.technologiesUsed,
-                `${experience.startDate} - ${experience.endDate}`,
+                techStack(experience.technologiesUsed),
+                experience.currentlyWorking ? `${experience.startDate} - Present` : `${experience.startDate} - ${experience.endDate}`,
                 experience.location,
                 Action(experience.id?.toString() || "")
             ];

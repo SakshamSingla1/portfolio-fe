@@ -10,22 +10,26 @@ import { useSnackbar } from "../../../../contexts/SnackbarContext";
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
         .required('Company name is required')
-        .max(50, 'Company name is too long'),
+        .max(100, 'Company name is too long'),
     jobTitle: Yup.string()
         .required('Job title is required')
-        .max(50, 'Job title is too long'),
+        .max(100, 'Job title is too long'),
     location: Yup.string()
         .required('Location is required')
         .max(100, 'Location is too long'),
     startDate: Yup.date()
-        .required('Start year is required')
-        .min(1900, 'Invalid year')
-        .max(new Date().getFullYear(), 'Invalid year'),
+        .required('Start date is required'),
     endDate: Yup.date()
-        .min(Yup.ref('startDate'), 'End year must be after start year')
-        .max(new Date().getFullYear() + 5, 'Invalid year'),
+        .min(Yup.ref('startDate'), 'End date must be after start date')
+        .nullable(),
+    currentlyWorking: Yup.boolean()
+        .required('Currently working status is required'),
     description: Yup.string()
+        .required('Description is required')
         .max(500, 'Description is too long'),
+    technologiesUsed: Yup.array()
+        .of(Yup.number())
+        .min(1, 'At least one technology is required'),
 });
 
 const ExperienceAddDetailsPage = () => {

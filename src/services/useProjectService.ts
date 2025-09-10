@@ -2,6 +2,7 @@ import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
+import { SkillDropdown } from "./useSkillService";
 
 export const AUTH_URLS = {
     GET_ALL: "/project",
@@ -12,12 +13,24 @@ export interface Project {
     id?: number;
     projectName: string;
     projectDescription: string;
-    projectDuration: string;
     projectLink: string;
-    technologiesUsed: string;
-    projectStartDate: string;
-    projectEndDate?: string;
-    isCurrentlyWorking: boolean;
+    technologiesUsed: number[];
+    projectStartDate: Date;
+    projectEndDate: Date;
+    currentlyWorking: boolean;
+    projectImageUrl: string;
+}
+
+export interface ProjectResponse {
+    id: number;
+    projectName: string;
+    projectDescription: string;
+    projectLink: string;
+    technologiesUsed: SkillDropdown[];
+    projectStartDate: Date;
+    projectEndDate: Date;
+    currentlyWorking: boolean;
+    projectImageUrl: string;
 }
 
 export const useProjectService = () => {

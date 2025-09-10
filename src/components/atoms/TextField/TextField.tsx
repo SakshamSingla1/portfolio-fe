@@ -54,11 +54,10 @@ const useStyles = createUseStyles((theme: any) => ({
                 borderColor: theme.palette.background.primary.primary300,
             },
             "& .Mui-disabled": {
-                backgroundColor: theme.palette.background.neutral.neutral50,
+                color: `${theme.palette.text.neutral.neutral900} !important`,
                 fontWeight: 400,
                 borderColor: theme.palette.background.neutral.neutral200,
                 borderRadius: "12px",
-                WebkitTextFillColor: theme.palette.text.neutral.neutral400,
                 fontSize: "16px"
             },
         },
@@ -75,6 +74,7 @@ const useStyles = createUseStyles((theme: any) => ({
     readOnlyInput: {
         "& .MuiInputBase-input[readonly]": {
           backgroundColor: theme.palette.background.neutral.neutral50,
+          color: `${theme.palette.text.neutral.neutral900} !important`,
         },
     },
 
@@ -115,11 +115,10 @@ const useStyles = createUseStyles((theme: any) => ({
                     borderColor: theme.palette.background.primary.primary300,
                 },
                 "& .Mui-disabled": {
-                    backgroundColor: theme.palette.background.neutral.neutral50,
                     fontWeight: 400,
                     borderColor: theme.palette.background.neutral.neutral200,
                     borderRadius: "6px",
-                    WebkitTextFillColor: theme.palette.text.neutral.neutral400,
+                    color: `${theme.palette.text.neutral.neutral900} !important`,
                     fontSize: "14px",
                 },
             },
