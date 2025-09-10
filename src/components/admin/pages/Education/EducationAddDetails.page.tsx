@@ -1,4 +1,4 @@
-import { useEducationService } from "../../../../services/useEducationService";
+import { Education, useEducationService } from "../../../../services/useEducationService";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
@@ -27,7 +27,9 @@ const validationSchema = Yup.object().shape({
         .required('Location is required')
         .max(100, 'Location is too long'),
     description: Yup.string()
-        .max(500, 'Description is too long')
+        .max(500, 'Description is too long'),
+    grade: Yup.string()
+        .max(10, 'Grade is too long')
 });
 
 const EducationAddDetailsPage = () => {
@@ -35,7 +37,7 @@ const EducationAddDetailsPage = () => {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
 
-    const formik = useFormik({
+    const formik = useFormik<Education>({
         initialValues: {
             institution: "",
             degree: "",
@@ -44,11 +46,17 @@ const EducationAddDetailsPage = () => {
             endYear: "",
             description: "",
             location: "",
+            gradeType: "",
+            grade: "",
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
-                const response = await educationService.create(values);
+                const payload={
+                    ...values,
+                    grade: values.grade + " " + values.gradeType
+                }
+                const response = await educationService.create(payload);
                 if (response?.status === HTTP_STATUS.OK) {
                     navigate(ADMIN_ROUTES.EDUCATION);
                     showSnackbar('success',`${response?.data?.message}`);

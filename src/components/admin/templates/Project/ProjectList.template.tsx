@@ -8,6 +8,7 @@ import viewEyeIcon from '../../../../assets/icons/viewEyeOutlinedIconPrimary500.
 import editIcon from '../../../../assets/icons/editPenOutlinedIconPrimary500.svg';
 import { Project, ProjectResponse } from '../../../../services/useProjectService';
 import { SkillDropdown } from '../../../../services/useSkillService';
+import ProjectTimeline from '../../../molecules/ProjectTimeline/ProjectTimeline';
 
 interface IProjectListTemplateProps {
     projects: ProjectResponse[];
@@ -130,6 +131,7 @@ const ProjectListTemplate: React.FC<IProjectListTemplateProps> = ({
             <div className={`pt-8`}>
                 <TableV1 schema={schema} records={records} />
             </div>
+            <ProjectTimeline projects={projects} />
         </div>
     );
 };

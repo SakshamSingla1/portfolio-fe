@@ -14,6 +14,7 @@ import AutoCompleteInput from "../../../atoms/AutoCompleteInput/AutoCompleteInpu
 import Chip from "../../../atoms/Chip/Chip";
 import ImageUpload from "../../../atoms/ImageUpload/ImageUpload";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
+import ProjectCard from "../../../atoms/ProjectCard/ProjectCard";
 
 interface ProjectFormProps {
     formik: FormikProps<Project>;
@@ -48,9 +49,9 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
         loadSkillsDropdown();
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(formik.values.technologiesUsed)
-    },[formik.values.technologiesUsed])
+    }, [formik.values.technologiesUsed])
 
     const skillOptions = useMemo(() => {
         return skills.map((skill) => ({
@@ -300,6 +301,13 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
                     />
                 )}
             </div>
+            <ProjectCard
+                project={{
+                    ...formik.values,
+                    id: formik.values.id || 0,
+                    technologiesUsed: selectedSkills
+                }}
+            />
         </div>
     );
 };

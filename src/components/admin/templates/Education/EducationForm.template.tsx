@@ -3,14 +3,21 @@ import { DEGREE_OPTIONS, MODE } from "../../../../utils/constant";
 import { titleModification } from "../../../../utils/helper";
 import Button from "../../../atoms/Button/Button";
 import Select from "../../../atoms/Select/Select";
+import EducationCard from "../../../atoms/EducationCard/EducationCard";
+import { GradeType } from "../../../../services/useEducationService";
+import { FormikProps } from "formik";
+import { Education } from "../../../../services/useEducationService";
+import { useEffect } from "react";
+import { InputAdornment } from "@mui/material";
 
 interface EducationFormProps {
-    formik: any;
+    formik: FormikProps<Education>;
     mode: string;
     onClose: () => void;
 }
 
 const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) => {
+
     return (
         <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
             {/* Header Section */}
@@ -69,7 +76,6 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <TextField
-                            name="fieldOfStudy"
                             label="Field of Study"
                             placeholder='Enter field of study'
                             {...formik.getFieldProps("fieldOfStudy")}
@@ -81,7 +87,6 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                             disabled={mode === MODE.VIEW}
                         />
                         <TextField
-                            name="location"
                             label="Location"
                             placeholder='City, Country'
                             {...formik.getFieldProps("location")}
@@ -91,6 +96,38 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                                 formik.setFieldValue('location', newValue);
                             }}
                             disabled={mode === MODE.VIEW}
+                        />
+                        <Select
+                            label="Grade Type"
+                            placeholder='Select grade type'
+                            options={GradeType}
+                            value={formik.values.gradeType}
+                            error={formik.touched.gradeType && Boolean(formik.errors.gradeType)}
+                            onChange={(value: string | number) => {
+                                const newValue = typeof value === 'string' ? titleModification(value) : value;
+                                formik.setFieldValue('gradeType', newValue);
+                            }}
+                            disabled={mode === MODE.VIEW}
+                        />
+                        <TextField
+                            label="Grade"
+                            placeholder='e.g., 8.75 or A+'
+                            value={formik.values.grade}
+                            error={formik.touched.grade && Boolean(formik.errors.grade)}
+                            onChange={(event: any) => {
+                                const newValue = event.target.value;
+                                formik.setFieldValue('grade', newValue);
+                                console.log(newValue);
+                            }}
+                            disabled={mode === MODE.VIEW}
+                            InputProps={{
+                                endAdornment: formik.values.gradeType && (
+                                    <InputAdornment position="end">
+                                        {formik.values.gradeType === "Percentage" ? "%" : formik.values.gradeType}
+                                    </InputAdornment>
+                                )
+                            }}
+                            helperText={formik.values.gradeType && `Grade will be displayed as: ${formik.values.grade} ${formik.values.gradeType}`}
                         />
                     </div>
                 </div>
@@ -103,7 +140,6 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <TextField
-                            name="startYear"
                             label="Start Year"
                             placeholder='e.g., 2019'
                             {...formik.getFieldProps("startYear")}
@@ -116,7 +152,6 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                             disabled={mode === MODE.VIEW}
                         />
                         <TextField
-                            name="endYear"
                             label="End Year"
                             placeholder='e.g., 2023'
                             {...formik.getFieldProps("endYear")}
@@ -138,7 +173,6 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                         Description
                     </h3>
                     <TextField
-                        name="description"
                         label="Description"
                         placeholder='Describe your coursework, achievements, and notable projects...'
                         {...formik.getFieldProps("description")}
@@ -170,6 +204,11 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                         />
                     )}
                 </div>
+            </div>
+            <div className="mt-8 pt-6 border-t border-gray-200">
+                <EducationCard
+                    education={formik.values}
+                />
             </div>
         </div>
     )

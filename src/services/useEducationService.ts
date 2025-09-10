@@ -8,6 +8,12 @@ export const AUTH_URLS = {
     GET_ALL_BY_DEGREE: "/education/:degree",
 }
 
+export const GradeType = [
+    {label:"CGPA",value:"CGPA"},
+    {label:"Percentage",value:"Percentage"},
+    {label:"Grade",value:"Grade"},
+]
+
 export interface Education {
     id?: string;
     institution: string;
@@ -17,6 +23,8 @@ export interface Education {
     endYear: string;
     description: string;
     location: string;
+    gradeType?: string;
+    grade?: string;
 }
 
 export const useEducationService = () => {

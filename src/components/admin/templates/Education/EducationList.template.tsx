@@ -7,6 +7,8 @@ import TableV1, { ColumnType, TableColumn } from '../../../molecules/TableV1/Tab
 import viewEyeIcon from '../../../../assets/icons/viewEyeOutlinedIconPrimary500.svg';
 import editIcon from '../../../../assets/icons/editPenOutlinedIconPrimary500.svg';
 import { Education } from '../../../../services/useEducationService';
+import EducationCard from '../../../atoms/EducationCard/EducationCard';
+import EducationTimeline from '../../../molecules/EducationTimeline/EducationTimeline';
 
 interface IEducationListTemplateProps {
     educations: Education[];
@@ -151,6 +153,9 @@ const EducationListTemplate: React.FC<IEducationListTemplateProps> = ({
         <div>
             <div className={`pt-8`}>
                 <TableV1 schema={schema} records={records} />
+            </div>
+            <div className="mt-8 pt-6 border-t border-gray-200">
+                <EducationTimeline educations={educations} />
             </div>
         </div>
     );

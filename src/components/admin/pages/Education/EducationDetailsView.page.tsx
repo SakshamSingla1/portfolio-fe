@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import EducationFormTemplate from "../../templates/Education/EducationForm.template";
-import { useEducationService } from "../../../../services/useEducationService";
+import { Education, useEducationService } from "../../../../services/useEducationService";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -29,7 +29,9 @@ const validationSchema = Yup.object().shape({
         .required('Location is required')
         .max(100, 'Location is too long'),
     description: Yup.string()
-        .max(500, 'Description is too long')
+        .max(500, 'Description is too long'),
+    grade: Yup.string()
+        .max(10, 'Grade is too long')
 });
 
 const EducationDetailsViewPage = () => {
@@ -38,7 +40,7 @@ const EducationDetailsViewPage = () => {
     const navigate = useNavigate();
     const { degree } = useParams<{ degree: string }>();
     
-    const formik = useFormik({
+    const formik = useFormik<Education>({
         initialValues: {
             institution: "",
             degree: "",
@@ -47,6 +49,8 @@ const EducationDetailsViewPage = () => {
             endYear: "",
             description: "",
             location: "",
+            grade: "",
+            gradeType: "",
         },
         validationSchema: validationSchema,
         onSubmit: () => {},
@@ -70,6 +74,8 @@ const EducationDetailsViewPage = () => {
                         endYear: response.data.data.endYear?.toString() || "",
                         description: response.data.data.description || "",
                         location: response.data.data.location || "",
+                        grade: response.data.data.grade.trim().split(" ")[0] || "",
+                        gradeType: response.data.data.grade.trim().split(" ")[1] || "",
                     });
                     showSnackbar('success',`${response?.data?.message}`);
                 }
