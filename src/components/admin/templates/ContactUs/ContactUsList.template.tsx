@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { IPagination } from '../../../../utils/types';
 import TableV1, { ColumnType, TableColumn } from '../../../molecules/TableV1/TableV1';
 import { ContactUs } from '../../../../services/useContactUsService';
+import ContactForm from '../../../atoms/ContactForm/ContactForm';
 
 interface IContactUsListTemplateProps {
     contactUs: ContactUs[];
@@ -90,6 +91,9 @@ const ContactUsListTemplate: React.FC<IContactUsListTemplateProps> = ({
         <div>
             <div className={`pt-8`}>
                 <TableV1 schema={schema} records={records} />
+            </div>
+            <div className="pt-8 ">
+                <ContactForm />
             </div>
         </div>
     );

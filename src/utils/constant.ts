@@ -30,7 +30,7 @@ export const ADMIN_ROUTES = {
     EDUCATION_ADD: '/admin/education/add',
     EDUCATION_EDIT: '/admin/education/:degree/edit',
     EDUCATION_VIEW: '/admin/education/:degree',
-    CONTACT_US:'/admin/contact-us',
+    CONTACT_US: '/admin/contact-us',
     PROJECTS: '/admin/projects',
     PROJECTS_ADD: '/admin/projects/add',
     PROJECTS_EDIT: '/admin/projects/:id/edit',
@@ -68,7 +68,7 @@ export type DegreeType = {
     label: string;
 }
 
-export const DEGREE_OPTIONS : DegreeType[] = [
+export const DEGREE_OPTIONS: DegreeType[] = [
     { value: 'HIGH_SCHOOL', label: '10th' },
     { value: 'SENIOR_SECONDARY', label: '12th' },
     { value: 'BACHELORS', label: 'Bachelors' },
@@ -78,24 +78,24 @@ export const DEGREE_OPTIONS : DegreeType[] = [
     { value: 'OTHER', label: 'Other' },
 ];
 
-export const SKILL_LEVEL_OPTIONS : DegreeType[] = [
+export const SKILL_LEVEL_OPTIONS: DegreeType[] = [
     { value: 'Beginner', label: 'Beginner' },
     { value: 'Intermediate', label: 'Intermediate' },
     { value: 'Advanced', label: 'Advanced' },
 ];
 
-export const SKILL_CATEGORY_OPTIONS : DegreeType[] = [
-    { value:'Frontend', label:'Frontend' },
-    { value:'Backend', label:'Backend' },
-    { value:'Tool', label:'Tool' },
-    { value:'Soft_Skills', label:'Soft Skills' },
+export const SKILL_CATEGORY_OPTIONS: DegreeType[] = [
+    { value: 'Frontend', label: 'Frontend' },
+    { value: 'Backend', label: 'Backend' },
+    { value: 'Tool', label: 'Tool' },
+    { value: 'Soft_Skills', label: 'Soft Skills' },
 ];
 
 export const NAV_ITEMS = [
-    { id: 1 , name: "Home" , to: "/" },
-    { id: 2 , name: "About" , to: "/about" },
-    { id: 3 , name: "Projects" , to: "/projects" },
-    { id: 4 , name: "Contact" , to: "/contact" },
+    { id: 1, name: "Home", to: "/" },
+    { id: 2, name: "About", to: "/about" },
+    { id: 3, name: "Projects", to: "/projects" },
+    { id: 4, name: "Contact", to: "/contact" },
 ]
 
 export const DEBOUNCE_TIME = {
@@ -104,8 +104,12 @@ export const DEBOUNCE_TIME = {
 }
 
 export const COLORS = {
-    background: "#E4F9F5",
-    accent_1: "#30E3CA",
-    primary: "#11999E",
-    accent_2: "#40514E",
-};
+    primary: '#1A56DB',
+    primaryLight: '#EBF5FF',
+    textPrimary: '#111827',
+    textSecondary: '#4B5563',
+    border: '#E5E7EB',
+    background: '#FFFFFF',
+    success: '#10B981',
+    accent: '#10B981',
+} as const;

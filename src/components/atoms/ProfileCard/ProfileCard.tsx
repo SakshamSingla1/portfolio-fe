@@ -72,13 +72,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       whileTap="tap"
       style={{
         '--background': COLORS.background,
-        '--accent-1': COLORS.accent_1,
+        '--accent': COLORS.accent,
         '--primary': COLORS.primary,
-        '--accent-2': COLORS.accent_2,
       } as React.CSSProperties}
     >
       {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--accent-1)] rounded-full -mr-16 -mt-16 opacity-20" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--accent)] rounded-full -mr-16 -mt-16 opacity-20" />
       <div className="absolute bottom-0 left-0 w-40 h-40 bg-[var(--primary)] rounded-full -ml-20 -mb-20 opacity-20" />
       <div className="relative z-10 flex flex-col md:flex-row bg-[var(--background)]/90 backdrop-blur-sm">
         {/* Image Section - 16:9 Aspect Ratio */}
@@ -88,7 +87,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         >
           <div className="relative pb-[125%] md:pb-[140%] lg:pb-[120%] overflow-hidden">
             <motion.div
-              className="absolute inset-0 bg-[var(--accent-1)]/10"
+              className="absolute inset-0 bg-[var(--accent)]/10"
               initial={{ opacity: 0.5 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6 }}
@@ -114,7 +113,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           {/* Header */}
           <motion.div className="mb-8">
             <motion.h2 
-              className="text-3xl font-extrabold bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent"
+              className="text-3xl font-extrabold bg-gradient-to-r from-[var(--accent)] to-[var(--primary)] bg-clip-text text-transparent"
               initial={{ backgroundPosition: '0% 50%' }}
               animate={{ backgroundPosition: '100% 50%' }}
               transition={{

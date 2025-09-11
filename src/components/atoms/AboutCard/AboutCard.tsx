@@ -41,9 +41,8 @@ const AboutCard: React.FC<AboutCardProps> = ({
       viewport={{ once: true, margin: "-50px" }}
       style={{
         '--background': COLORS.background,
-        '--accent-1': COLORS.accent_1,
+        '--accent': COLORS.accent,
         '--primary': COLORS.primary,
-        '--accent-2': COLORS.accent_2,
       } as React.CSSProperties}
     >
       <div className="flex flex-col md:flex-row-reverse">

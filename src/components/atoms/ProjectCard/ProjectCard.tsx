@@ -81,7 +81,7 @@ const COLORS = {
 } as const;
 
 // Animation variants
-const cardVariants: Variants = {
+const getCardVariants = (): Variants => ({
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -98,19 +98,228 @@ const cardVariants: Variants = {
     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
     transition: {
       type: 'spring',
-      stiffness: 400,
-      damping: 15,
-      mass: 0.5
+      stiffness: 300,
+      damping: 15
     }
   },
   tap: { 
     scale: 0.98,
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
   }
-};
+});
+
+const CARD_STYLES = {
+    card: {
+        base: {
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'white',
+            position: 'relative',
+            '&:hover': {
+                transform: 'translateY(-4px)'
+            }
+        },
+        hover: {
+            y: -8,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            transition: {
+                type: 'spring',
+                stiffness: 300,
+                damping: 15
+            }
+        }
+    },
+    header: {
+        padding: '1.75rem 1.5rem',
+        color: 'white',
+        background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryLight} 100%)`,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
+            pointerEvents: 'none'
+        }
+    },
+    iconContainer: {
+        width: '60px',
+        height: '60px',
+        borderRadius: '16px',
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        backdropFilter: 'blur(4px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        '&:hover': {
+            transform: 'scale(1.05) rotate(5deg)',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)'
+        }
+    },
+    content: {
+        padding: '1.5rem',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    tag: {
+        base: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.4rem 0.9rem',
+            borderRadius: '8px',
+            border: `1px solid ${COLORS.border}`,
+            fontSize: '0.875rem',
+            fontWeight: 500,
+        },
+        primary: {
+            backgroundColor: `${COLORS.primary}08`,
+        },
+        accent: {
+            backgroundColor: `${COLORS.accent}08`,
+        },
+        muted: {
+            backgroundColor: `${COLORS.textSecondary}05`,
+        },
+        grade: {
+            backgroundColor: COLORS.primaryLight,
+            color: COLORS.primary,
+            padding: '0.5rem 1rem',
+            fontWeight: 600,
+            border: `1px solid ${COLORS.primary}30`,
+            boxShadow: `0 2px 4px ${COLORS.primary}10`,
+        }
+    },
+    description: {
+        backgroundColor: COLORS.background,
+        padding: '1rem',
+        borderRadius: '8px',
+        border: `1px solid ${COLORS.border}`,
+        marginTop: 'auto',
+    },
+    footer: {
+        padding: '1.25rem 1.5rem',
+        borderTop: `1px solid ${COLORS.border}`,
+        backgroundColor: COLORS.background,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+    },
+    statusBadge: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        padding: '0.5rem 0.75rem',
+        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+        borderRadius: '6px',
+        border: '1px solid rgba(16, 185, 129, 0.2)',
+        alignSelf: 'flex-start',
+    },
+    techHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        marginBottom: '0.75rem',
+    },
+    techGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+        gap: '0.75rem',
+        width: '100%',
+    },
+    techItem: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.5rem',
+        padding: '0.75rem',
+        borderRadius: '8px',
+        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+        border: '1px solid rgba(0, 0, 0, 0.05)',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+            backgroundColor: 'rgba(26, 86, 219, 0.03)',
+        }
+    },
+    techLogo: {
+        width: '32px',
+        height: '32px',
+        objectFit: 'contain',
+        borderRadius: '6px',
+    },
+    techName: {
+        fontSize: '0.75rem',
+        fontWeight: 500,
+        color: COLORS.textSecondary,
+        textAlign: 'center',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        width: '100%',
+    },
+    projectLink: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        color: COLORS.primary,
+        textDecoration: 'none',
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        marginTop: '0.5rem',
+        alignSelf: 'flex-start',
+        padding: '0.5rem 0',
+        '&:hover': {
+            textDecoration: 'underline',
+        }
+    },
+    statusDot: (isCurrent: boolean) => ({
+        width: '10px',
+        height: '10px',
+        borderRadius: '50%',
+        backgroundColor: isCurrent ? COLORS.accent : COLORS.success,
+        boxShadow: `0 0 0 0 ${isCurrent ? COLORS.accent : COLORS.success}80`,
+        animation: 'pulse 2s infinite',
+        // Keyframes are now defined in a style tag in the component
+    } as React.CSSProperties),
+    gpaBadge: {
+        padding: '0.4rem 1rem',
+        backgroundColor: COLORS.primaryLight,
+        color: COLORS.primary,
+        borderRadius: '9999px',
+        fontSize: '0.8125rem',
+        fontWeight: 600,
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: `0 4px 12px ${COLORS.primary}30`
+        },
+        '&::before': {
+            content: '"🏆"',
+            fontSize: '1rem',
+            lineHeight: 1
+        }
+    }
+} as const;
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   const isCurrent = project.projectEndDate ? new Date(project.projectEndDate) > new Date() : false;
 
@@ -140,6 +349,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     [formatDate]
   );
 
+  const cardVariants = useMemo(() => getCardVariants(), []);
+  
   return (
     <motion.article
       variants={cardVariants}
@@ -147,44 +358,91 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       animate="visible"
       whileHover="hover"
       whileTap="tap"
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white 
-                shadow-sm transition-all duration-300 hover:shadow-lg"
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      style={{
+        ...CARD_STYLES.card.base,
+        ':hover': {
+          transform: 'translateY(-4px)'
+        }
+      } as React.CSSProperties}
     >
       {/* Header */}
-      <header className="relative border-b border-gray-100 p-5">
-        <div className="flex items-start gap-4">
-          <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-blue-100">
+      <header style={CARD_STYLES.header as React.CSSProperties}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={CARD_STYLES.iconContainer as React.CSSProperties}>
             {project.projectImageUrl && !imageError ? (
               <img
                 src={project.projectImageUrl}
                 alt={project.projectName}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '16px',
+                  transition: 'transform 0.3s ease',
+                }}
                 onError={() => setImageError(true)}
                 loading="lazy"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <FaCode className="text-xl text-blue-600" />
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: '100%',
+                color: 'white',
+                fontSize: '1.5rem'
+              }}>
+                <FaCode />
               </div>
             )}
           </div>
           
-          <div className="min-w-0 flex-1">
-            <h3 className="truncate text-lg font-semibold text-gray-900">
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h3 style={{
+              margin: 0,
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              color: 'white',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
               {project.projectName}
             </h3>
             
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <FaCalendarAlt className="h-3.5 w-3.5" />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+              marginTop: '0.5rem',
+              fontSize: '0.875rem',
+              color: 'rgba(255, 255, 255, 0.9)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FaCalendarAlt style={{ fontSize: '0.875rem' }} />
                 <span>{formatDateRange(project.projectStartDate?.toString(), project.projectEndDate?.toString())}</span>
               </div>
               
               {isCurrent && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  backdropFilter: 'blur(4px)'
+                }}>
+                  <span style={{
+                    ...CARD_STYLES.statusDot(true),
+                    animation: 'none',
+                    width: '8px',
+                    height: '8px',
+                    boxShadow: 'none'
+                  }} />
                   Active
                 </span>
               )}
@@ -194,24 +452,55 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       </header>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col p-5">
-        <p className="text-gray-600 line-clamp-3">
+      <div style={{
+        ...CARD_STYLES.content,
+        gap: '1.25rem',
+        padding: '1.5rem'
+      }}>
+        <div style={{
+          color: COLORS.textSecondary,
+          lineHeight: 1.6,
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical',
+          display: '-webkit-box',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}>
           {htmlToElement(project.projectDescription)}
-        </p>
+        </div>
         
         {/* Project Links */}
-        <div className="mt-4 flex flex-wrap gap-3 pt-2">
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          marginTop: 'auto',
+          paddingTop: '0.5rem'
+        }}>
           {project.projectLink && (
             <a
               href={project.projectLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-1.5 text-sm font-medium 
-                         text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              style={{
+                ...CARD_STYLES.tag.base,
+                ...CARD_STYLES.tag.muted,
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+                backgroundColor: CARD_STYLES.tag.muted.backgroundColor,
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.03)',
+                  transform: 'translateY(-1px)'
+                }
+              } as React.CSSProperties}
             >
-              <FaGithub className="h-4 w-4" />
+              <FaGithub style={{ fontSize: '1rem' }} />
               <span>GitHub</span>
-              <span className="text-xs text-gray-400">
+              <span style={{
+                fontSize: '0.75rem',
+                color: COLORS.textSecondary,
+                opacity: 0.8
+              }}>
                 {getDomain(project.projectLink)}
               </span>
             </a>
@@ -222,12 +511,25 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               href={project.projectLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium 
-                         text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-900"
+              style={{
+                ...CARD_STYLES.tag.base,
+                ...CARD_STYLES.tag.primary,
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+                backgroundColor: CARD_STYLES.tag.primary.backgroundColor,
+                '&:hover': {
+                  backgroundColor: `${COLORS.primary}10`,
+                  transform: 'translateY(-1px)'
+                }
+              } as React.CSSProperties}
             >
-              <FaExternalLinkAlt className="h-3.5 w-3.5" />
+              <FaExternalLinkAlt style={{ fontSize: '0.875rem' }} />
               <span>Live Demo</span>
-              <span className="text-xs text-blue-400">
+              <span style={{
+                fontSize: '0.75rem',
+                color: COLORS.primary,
+                opacity: 0.8
+              }}>
                 {getDomain(project.projectLink)}
               </span>
             </a>
@@ -237,9 +539,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
       {/* Tech Stack */}
       {project.technologiesUsed?.length > 0 && (
-        <footer className="border-t border-gray-100 p-5">
-          <h4 className="mb-3 text-sm font-medium text-gray-500">Built with</h4>
-          <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6">
+        <footer style={CARD_STYLES.footer as React.CSSProperties}>
+          <div style={CARD_STYLES.techHeader as React.CSSProperties}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: COLORS.textSecondary }}>TECH STACK</span>
+          </div>
+          <div style={CARD_STYLES.techGrid as React.CSSProperties}>
             {project.technologiesUsed.map((tech, index) => (
               <TechItem key={`${tech.logoName}-${index}`} tech={tech} />
             ))}
