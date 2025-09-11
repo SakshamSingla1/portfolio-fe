@@ -22,7 +22,7 @@ export interface ExperienceRequest {
 }
 
 export interface ExperienceResponse {
-  id: number;
+  id?: number;
   companyName: string;
   jobTitle: string;
   location: string;

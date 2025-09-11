@@ -102,3 +102,10 @@ export const DEBOUNCE_TIME = {
     USER_STATUS_UPDATE: 2000,
     DEFAULT: 300
 }
+
+export const COLORS = {
+    background: "#E4F9F5",
+    accent_1: "#30E3CA",
+    primary: "#11999E",
+    accent_2: "#40514E",
+};

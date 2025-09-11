@@ -12,7 +12,13 @@ const validationSchema = Yup.object().shape({
         .max(100, 'Project name is too long'),
     projectDescription: Yup.string()
         .required('Project description is required')
-        .max(500, 'Project description is too long'),
+        .max(1000, 'Project description is too long')
+        .test('html', 'Project description contains invalid HTML', (value) => {
+            if (!value) return true;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(value, 'text/html');
+            return doc.body.textContent === value;
+        }),
     projectLink: Yup.string()
         .required('Project link is required')
         .url('Must be a valid URL'),

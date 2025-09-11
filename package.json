@@ -25,6 +25,8 @@
     "formik": "^2.4.6",
     "framer-motion": "^12.23.0",
     "github-calendar": "^2.3.4",
+    "jodit": "^4.6.2",
+    "jodit-react": "^5.2.19",
     "jss": "^10.10.0",
     "lucide-react": "^0.525.0",
     "radix-ui": "^1.4.2",

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { FormikProps } from "formik";
 import dayjs from "dayjs";
 
@@ -13,8 +13,18 @@ import { useSkillService, SkillDropdown } from "../../../../services/useSkillSer
 import AutoCompleteInput from "../../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../../atoms/Chip/Chip";
 import ImageUpload from "../../../atoms/ImageUpload/ImageUpload";
-import { useSnackbar } from "../../../../contexts/SnackbarContext";
 import ProjectCard from "../../../atoms/ProjectCard/ProjectCard";
+import JoditEditor from 'jodit-react';
+import { createUseStyles } from "react-jss";
+
+const useStyles = createUseStyles({
+    '@global': {
+        '.jodit-add-new-line, .jodit-add-new-line *': {
+            display: 'none !important',
+            boxSizing: 'border-box',
+        }
+    }
+})
 
 interface ProjectFormProps {
     formik: FormikProps<Project>;
@@ -23,13 +33,75 @@ interface ProjectFormProps {
 }
 
 const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
-
+    const [isSkillsLoading, setIsSkillsLoading] = useState(false);
+    const classes = useStyles();
     const skillService = useSkillService();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
 
+    const descriptionEditor = useRef(null);
+
+    const joditConfiguration = useMemo(() => {
+        return {
+            readonly: mode === MODE.VIEW,
+            placeholder: "Start typing your project description here...",
+            buttons: [
+                'bold', 'italic', 'underline', 'strikethrough', '|',
+                'ul', 'ol', '|',
+                'outdent', 'indent', '|',
+                'font', 'fontsize', 'paragraph', '|',
+                'image', 'link', '|',
+                'align', '|',
+                'undo', 'redo', '|',
+                'source'
+            ],
+            style: {
+                font: '14px Inter, sans-serif',
+                color: '#1F2937',
+                background: '#FFFFFF',
+            },
+            height: 300,
+            minHeight: 200,
+            maxHeight: 600,
+            toolbarButtonSize: 'middle' as const,
+            showCharsCounter: false,
+            showWordsCounter: false,
+            showXPathInStatusbar: false,
+            theme: 'default',
+            uploader: {
+                insertImageAsBase64URI: true
+            },
+            controls: {
+                font: {
+                    list: {
+                        'Inter, sans-serif': 'Inter',
+                        'Arial, sans-serif': 'Arial',
+                        'Georgia, serif': 'Georgia',
+                        'Impact, Charcoal, sans-serif': 'Impact',
+                        'Tahoma, Geneva, sans-serif': 'Tahoma',
+                        'Times New Roman, serif': 'Times New Roman',
+                        'Verdana, Geneva, sans-serif': 'Verdana'
+                    }
+                },
+                fontSize: {
+                    list: ['8', '10', '12', '14', '16', '18', '24', '30', '36', '48']
+                }
+            },
+            extraButtons: [],
+            textIcons: false,
+            toolbarAdaptive: true,
+            showPlaceholder: true,
+            spellcheck: true,
+            colors: {
+                greyscale: ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#D7D7D7', '#F4F5F7', '#FFFFFF'],
+                palette: ['#3AA8F5', '#6C757D', '#6F42C1', '#E83E8C', '#FD7E14', '#20C997', '#28A745', '#FFC107', '#DC3545']
+            }
+        };
+    }, [mode]);
+
     const loadSkillsDropdown = async (searchTerm?: string) => {
         try {
+            setIsSkillsLoading(true);
             const response = await skillService.getDropdown({
                 search: searchTerm || "",
             })
@@ -42,6 +114,10 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
         }
         catch (error) {
             setSkills([]);
+            // In a real app, you might want to show a toast/notification here
+            console.error('Failed to load skills:', error);
+        } finally {
+            setIsSkillsLoading(false);
         }
     }
 
@@ -50,8 +126,8 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
     }, []);
 
     useEffect(() => {
-        console.log(formik.values.technologiesUsed)
-    }, [formik.values.technologiesUsed])
+        console.log(formik)
+    }, [formik])
 
     const skillOptions = useMemo(() => {
         return skills.map((skill) => ({
@@ -85,7 +161,7 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
                 </p>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-8 transition-opacity duration-200" style={{ opacity: isSkillsLoading ? 0.7 : 1 }}>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
@@ -140,6 +216,7 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
                     </div>
                 </div>
 
+                {/* Technologies Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
@@ -156,7 +233,7 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
                                     if (!formik.values.technologiesUsed.includes(selectedOption.value)) {
                                         formik.setFieldValue("technologiesUsed", [...formik.values.technologiesUsed, selectedOption.value]);
                                     } else {
-                                        console.log(`${selectedOption.title} is already added to the project`);
+                                        console.log(`${selectedOption.title} is already added to the experience`);
                                     }
                                 }
                             }}
@@ -168,7 +245,7 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
                                 Array.isArray(formik.errors.technologiesUsed)
                                     ? formik.errors.technologiesUsed.join(', ')
                                     : formik.errors.technologiesUsed
-                                : "Search and select the technologies used in this project"}
+                                : "Search and select the technologies used in this experience"}
                             isDisabled={mode === MODE.VIEW}
                         />
                         {(selectedSkills.length > 0 || formik.values.technologiesUsed.length > 0) && (
@@ -256,58 +333,81 @@ const ProjectFormTemplate = ({ formik, mode, onClose }: ProjectFormProps) => {
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                        Project Description
-                    </h3>
-                    <TextField
-                        label="Description"
-                        placeholder="Describe your project, its features, challenges you solved, and what makes it unique..."
-                        {...formik.getFieldProps("projectDescription")}
-                        value={formik.values.projectDescription}
-                        error={formik.touched.projectDescription && Boolean(formik.errors.projectDescription)}
-                        helperText={formik.errors.projectDescription || "Provide a detailed description of your project (minimum 50 characters recommended)"}
-                        inputProps={{
-                            readOnly: mode === MODE.VIEW
-                        }}
-                        onBlur={(event: any) => {
-                            const newValue = event.target.value.trim();
-                            formik.setFieldValue("projectDescription", newValue);
-                        }}
-                        multiline
-                        rows={4}
-                    />
+                    <div className="mt-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                            Job Description
+                        </h3>
+                        <JoditEditor
+                            ref={descriptionEditor}
+                            value={formik.values.projectDescription ?? ""}
+                            onChange={(newContent) => {
+                                formik.setFieldValue("projectDescription", newContent);
+                            }}
+                            config={joditConfiguration}
+                            onBlur={(newContent) => {
+                                formik.setFieldTouched("projectDescription", true);
+                                formik.setFieldValue("projectDescription", newContent);
+                            }}
+                        />
+                        {formik.errors.projectDescription && formik.touched.projectDescription && (
+                            <div className="mt-2 text-sm text-red-600">
+                                {formik.errors.projectDescription}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
-                <Button
-                    label="Cancel"
-                    variant="tertiaryContained"
-                    onClick={onClose}
-                />
-                {mode !== MODE.VIEW && (
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     <Button
-                        label={
-                            formik.isSubmitting
-                                ? "Saving..."
-                                : mode === MODE.ADD
-                                    ? "Create Project"
-                                    : "Update Project"
-                        }
-                        variant="primaryContained"
-                        onClick={() => formik.handleSubmit()}
+                        label="Cancel"
+                        variant="tertiaryContained"
+                        onClick={onClose}
+                        className="w-full sm:w-auto"
                         disabled={formik.isSubmitting}
                     />
-                )}
+                    {mode !== MODE.VIEW && (
+                        <Button
+                            label={
+                                formik.isSubmitting
+                                    ? mode === MODE.ADD
+                                        ? "Creating Project..."
+                                        : "Updating Project..."
+                                    : mode === MODE.ADD
+                                        ? "Create Project"
+                                        : "Update Project"
+                            }
+                            variant="primaryContained"
+                            onClick={() => formik.handleSubmit()}
+                            disabled={formik.isSubmitting || !formik.isValid}
+                            className="w-full sm:w-auto"
+                            startIcon={
+                                formik.isSubmitting && (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                                )
+                            }
+                        />
+                    )}
+                </div>
             </div>
-            <ProjectCard
-                project={{
-                    ...formik.values,
-                    id: formik.values.id || 0,
-                    technologiesUsed: selectedSkills
-                }}
-            />
+            <div className="mt-8 pt-6 border-t border-gray-200">
+                <ProjectCard
+                    project={{
+                        ...formik.values,
+                        id: formik.values.id || 0,
+                        projectImageUrl: formik.values.projectImageUrl || 'https://via.placeholder.com/600x400?text=Project+Image',
+                        technologiesUsed: selectedSkills,
+                        projectName: formik.values.projectName || 'Project Name',
+                        projectDescription: formik.values.projectDescription || 'Project description will appear here.',
+                        projectLink: formik.values.projectLink || '#',
+                        projectStartDate: formik.values.projectStartDate || new Date(),
+                        projectEndDate: formik.values.projectEndDate || null,
+                        currentlyWorking: formik.values.currentlyWorking || false,
+                    }}
+                />
+            </div>
         </div>
     );
 };

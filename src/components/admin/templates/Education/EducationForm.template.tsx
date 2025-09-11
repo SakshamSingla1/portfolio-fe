@@ -7,8 +7,19 @@ import EducationCard from "../../../atoms/EducationCard/EducationCard";
 import { GradeType } from "../../../../services/useEducationService";
 import { FormikProps } from "formik";
 import { Education } from "../../../../services/useEducationService";
-import { useEffect } from "react";
 import { InputAdornment } from "@mui/material";
+import { createUseStyles } from "react-jss";
+import { useRef, useMemo } from "react";
+import JoditEditor from "jodit-react";
+
+const useStyles = createUseStyles({
+    '@global': {
+        '.jodit-add-new-line, .jodit-add-new-line *': {
+            display: 'none !important',
+            boxSizing: 'border-box',
+        }
+    }
+})
 
 interface EducationFormProps {
     formik: FormikProps<Education>;
@@ -16,7 +27,68 @@ interface EducationFormProps {
     onClose: () => void;
 }
 
-const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) => {
+const EducationFormTemplate : React.FC<EducationFormProps> = ({ formik, mode, onClose }) => {
+    const classes = useStyles();
+
+    const descriptionEditor = useRef(null);
+    
+    const joditConfiguration = useMemo(() => {
+            return {
+                readonly: mode === MODE.VIEW,
+                placeholder: "Start typing your project description here...",
+                buttons: [
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'ul', 'ol', '|',
+                    'outdent', 'indent', '|',
+                    'font', 'fontsize', 'paragraph', '|',
+                    'image', 'link', '|',
+                    'align', '|',
+                    'undo', 'redo', '|',
+                    'source'
+                ],
+                style: {
+                    font: '14px Inter, sans-serif',
+                    color: '#1F2937',
+                    background: '#FFFFFF',
+                },
+                height: 300,
+                minHeight: 200,
+                maxHeight: 600,
+                toolbarButtonSize: 'middle' as const,
+                showCharsCounter: false,
+                showWordsCounter: false,
+                showXPathInStatusbar: false,
+                theme: 'default',
+                uploader: {
+                    insertImageAsBase64URI: true
+                },
+                controls: {
+                    font: {
+                        list: {
+                            'Inter, sans-serif': 'Inter',
+                            'Arial, sans-serif': 'Arial',
+                            'Georgia, serif': 'Georgia',
+                            'Impact, Charcoal, sans-serif': 'Impact',
+                            'Tahoma, Geneva, sans-serif': 'Tahoma',
+                            'Times New Roman, serif': 'Times New Roman',
+                            'Verdana, Geneva, sans-serif': 'Verdana'
+                        }
+                    },
+                    fontSize: {
+                        list: ['8', '10', '12', '14', '16', '18', '24', '30', '36', '48']
+                    }
+                },
+                extraButtons: [],
+                textIcons: false,
+                toolbarAdaptive: true,
+                showPlaceholder: true,
+                spellcheck: true,
+                colors: {
+                    greyscale: ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#D7D7D7', '#F4F5F7', '#FFFFFF'],
+                    palette: ['#3AA8F5', '#6C757D', '#6F42C1', '#E83E8C', '#FD7E14', '#20C997', '#28A745', '#FFC107', '#DC3545']
+                }
+            };
+        }, [mode]);
 
     return (
         <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
@@ -166,26 +238,31 @@ const EducationFormTemplate = ({ formik, mode, onClose }: EducationFormProps) =>
                     </div>
                 </div>
 
-                {/* Description */}
+                {/* Job Description Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                        Description
-                    </h3>
-                    <TextField
-                        label="Description"
-                        placeholder='Describe your coursework, achievements, and notable projects...'
-                        {...formik.getFieldProps("description")}
-                        value={formik.values.description}
-                        error={formik.touched.description && Boolean(formik.errors.description)}
-                        onBlur={(event: any) => {
-                            const newValue = event.target.value;
-                            formik.setFieldValue('description', newValue);
-                        }}
-                        multiline
-                        rows={4}
-                        disabled={mode === MODE.VIEW}
-                    />
+                    <div className="mt-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                            Job Description
+                        </h3>
+                        <JoditEditor
+                            ref={descriptionEditor}
+                            value={formik.values.description ?? ""}
+                            onChange={(newContent) => {
+                                formik.setFieldValue("description", newContent);
+                            }}
+                            config={joditConfiguration}
+                            onBlur={(newContent) => {
+                                formik.setFieldTouched("description", true);
+                                formik.setFieldValue("description", newContent);
+                            }}
+                        />
+                        {formik.errors.description && formik.touched.description && (
+                            <div className="mt-2 text-sm text-red-600">
+                                {formik.errors.description}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Actions */}

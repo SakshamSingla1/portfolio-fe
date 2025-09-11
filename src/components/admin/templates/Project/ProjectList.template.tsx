@@ -131,7 +131,9 @@ const ProjectListTemplate: React.FC<IProjectListTemplateProps> = ({
             <div className={`pt-8`}>
                 <TableV1 schema={schema} records={records} />
             </div>
-            <ProjectTimeline projects={projects} />
+            <div className="mt-8 pt-6 border-t border-gray-200">
+                <ProjectTimeline projects={projects} />
+            </div>
         </div>
     );
 };

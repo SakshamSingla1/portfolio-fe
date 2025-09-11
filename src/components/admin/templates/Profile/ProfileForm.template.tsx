@@ -9,6 +9,8 @@ import { InputAdornment } from '@mui/material';
 import { createUseStyles } from "react-jss";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../../../../utils/constant";
+import ProfileCard from '../../../atoms/ProfileCard/ProfileCard';
+import AboutCard from '../../../atoms/AboutCard/AboutCard';
 
 const useStyles = createUseStyles((theme: any) => ({
         profileImageContainer: {
@@ -383,6 +385,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                     </div>
                 )}
             </div>
+            <div className="mt-8 pt-6 border-t border-gray-200"><ProfileCard profile={formik.values} /></div>
+            <div className="mt-8 pt-6 border-t border-gray-200"><AboutCard aboutMe={formik.values.aboutMe} profileImageUrl={formik.values.profileImageUrl} /></div>
         </div>
     );
 };

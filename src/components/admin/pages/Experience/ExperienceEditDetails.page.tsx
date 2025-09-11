@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useExperienceService } from "../../../../services/useExperienceService";
+import { useExperienceService , ExperienceRequest} from "../../../../services/useExperienceService";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
@@ -38,7 +38,7 @@ const ExperienceEditDetailsPage = () => {
     const { id } = useParams();
     const { showSnackbar } = useSnackbar();
 
-    const formik = useFormik({
+    const formik = useFormik<ExperienceRequest>({
         initialValues: {
             companyName: "",
             jobTitle: "",

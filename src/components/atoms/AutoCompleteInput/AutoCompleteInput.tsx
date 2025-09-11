@@ -127,11 +127,14 @@ const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
                         helperText={helperText}
 					/>
 				)}
-				renderOption={(props, option) => (
-					<li {...props}>
-						{option.label}
-					</li>
-				)}
+				renderOption={(props, option) => {
+					const { key, ...otherProps } = props;
+					return (
+						<li key={key} {...otherProps}>
+							{option.label}
+						</li>
+					);
+				}}
 				onChange={handleInputChange}
 				value={value}
 				onBlur={onBlur}

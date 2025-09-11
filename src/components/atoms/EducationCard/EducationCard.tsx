@@ -2,6 +2,9 @@ import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import { FaGraduationCap, FaCalendarAlt, FaMapMarkerAlt, FaBook, FaExternalLinkAlt } from 'react-icons/fa';
 import { Education } from '../../../services/useEducationService';
+import { htmlToElement , OptionToValue } from '../../../utils/helper';
+import { DEGREE_OPTIONS } from '../../../utils/constant';
+import { IOption } from '../../../utils/types';
 
 // Types
 interface EducationCardProps {
@@ -290,7 +293,7 @@ const EducationCard: React.FC<EducationCardProps> = ({
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
               }}>
-                {education.degree}
+                {OptionToValue(DEGREE_OPTIONS, education.degree)}
               </h3>
               <p style={{
                 margin: 0,
@@ -370,7 +373,7 @@ const EducationCard: React.FC<EducationCardProps> = ({
                 lineHeight: '1.7',
                 fontSize: '0.9375rem',
               }}>
-                {education.description}
+                {htmlToElement(education.description)}
               </p>
             </motion.div>
           )}

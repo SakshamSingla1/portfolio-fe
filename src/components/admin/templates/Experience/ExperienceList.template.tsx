@@ -8,6 +8,7 @@ import viewEyeIcon from '../../../../assets/icons/viewEyeOutlinedIconPrimary500.
 import editIcon from '../../../../assets/icons/editPenOutlinedIconPrimary500.svg';
 import { ExperienceResponse } from '../../../../services/useExperienceService';
 import { SkillDropdown } from '../../../../services/useSkillService';
+import ExperienceTimeline from '../../../molecules/ExperienceTimeline/ExperienceTimeline';
 
 interface IExperienceListTemplateProps {
     experiences: ExperienceResponse[];
@@ -166,6 +167,9 @@ const ExperienceListTemplate: React.FC<IExperienceListTemplateProps> = ({
         <div>
             <div className={`pt-8`}>
                 <TableV1 schema={schema} records={records} />
+            </div>
+            <div className="mt-8 pt-6 border-t border-gray-200">
+                <ExperienceTimeline experiences={experiences} />
             </div>
         </div>
     );

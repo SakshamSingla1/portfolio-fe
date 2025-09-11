@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import TextField from "../../../atoms/TextField/TextField";
 import { MODE, HTTP_STATUS } from "../../../../utils/constant";
 import { titleModification } from "../../../../utils/helper";
@@ -9,17 +9,93 @@ import Checkbox from "../../../atoms/Checkbox/Checkbox";
 import { useSkillService, SkillDropdown } from "../../../../services/useSkillService";
 import AutoCompleteInput from "../../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../../atoms/Chip/Chip";
+import ExperienceCard from "../../../atoms/ExperienceCard/ExperienceCard";
+import ExperienceTimeline from "../../../molecules/ExperienceTimeline/ExperienceTimeline";
+import { ExperienceRequest } from "../../../../services/useExperienceService";
+import { FormikProps } from "formik";
+import JoditEditor from "jodit-react";
+import { createUseStyles } from "react-jss";
+
+const useStyles = createUseStyles({
+    '@global': {
+        '.jodit-add-new-line, .jodit-add-new-line *': {
+            display: 'none !important',
+            boxSizing: 'border-box',
+        }
+    }
+})
 
 interface ExperienceFormProps {
-    formik: any;
+    formik: FormikProps<ExperienceRequest>;
     mode: string;
     onClose: () => void;
 }
 
-const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) => {
+const ExperienceFormTemplate : React.FC<ExperienceFormProps> = ({ formik, mode, onClose }) => {
+    const classes = useStyles();
     const skillService = useSkillService();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
+
+    const descriptionEditor = useRef(null);
+
+    const joditConfiguration = useMemo(() => {
+        return {
+            readonly: mode === MODE.VIEW,
+            placeholder: "Start typing your project description here...",
+            buttons: [
+                'bold', 'italic', 'underline', 'strikethrough', '|',
+                'ul', 'ol', '|',
+                'outdent', 'indent', '|',
+                'font', 'fontsize', 'paragraph', '|',
+                'image', 'link', '|',
+                'align', '|',
+                'undo', 'redo', '|',
+                'source'
+            ],
+            style: {
+                font: '14px Inter, sans-serif',
+                color: '#1F2937',
+                background: '#FFFFFF',
+            },
+            height: 300,
+            minHeight: 200,
+            maxHeight: 600,
+            toolbarButtonSize: 'middle' as const,
+            showCharsCounter: false,
+            showWordsCounter: false,
+            showXPathInStatusbar: false,
+            theme: 'default',
+            uploader: {
+                insertImageAsBase64URI: true
+            },
+            controls: {
+                font: {
+                    list: {
+                        'Inter, sans-serif': 'Inter',
+                        'Arial, sans-serif': 'Arial',
+                        'Georgia, serif': 'Georgia',
+                        'Impact, Charcoal, sans-serif': 'Impact',
+                        'Tahoma, Geneva, sans-serif': 'Tahoma',
+                        'Times New Roman, serif': 'Times New Roman',
+                        'Verdana, Geneva, sans-serif': 'Verdana'
+                    }
+                },
+                fontSize: {
+                    list: ['8', '10', '12', '14', '16', '18', '24', '30', '36', '48']
+                }
+            },
+            extraButtons: [],
+            textIcons: false,
+            toolbarAdaptive: true,
+            showPlaceholder: true,
+            spellcheck: true,
+            colors: {
+                greyscale: ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#D7D7D7', '#F4F5F7', '#FFFFFF'],
+                palette: ['#3AA8F5', '#6C757D', '#6F42C1', '#E83E8C', '#FD7E14', '#20C997', '#28A745', '#FFC107', '#DC3545']
+            }
+        };
+    }, [mode]);
 
     const loadSkills = async (searchTerm?: string) => {
         try {
@@ -105,7 +181,6 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                     </div>
                     <div className="mt-6">
                         <TextField
-                            name="location"
                             label="Location"
                             placeholder="Enter work location (e.g., San Francisco, CA)"
                             {...formik.getFieldProps("location")}
@@ -238,26 +313,29 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
 
                 {/* Job Description Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                        Job Description
-                    </h3>
-                    <TextField
-                        name="description"
-                        label="Description"
-                        placeholder="Describe your role, responsibilities, achievements, and key contributions..."
-                        {...formik.getFieldProps("description")}
-                        value={formik.values.description}
-                        error={formik.touched.description && Boolean(formik.errors.description)}
-                        helperText={formik.errors.description || "Provide a detailed description of your role and accomplishments (minimum 50 characters recommended)"}
-                        disabled={mode === MODE.VIEW}
-                        onBlur={(event: any) => {
-                            const newValue = event.target.value;
-                            formik.setFieldValue('description', newValue);
-                        }}
-                        multiline
-                        rows={4}
-                    />
+                    <div className="mt-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                            Job Description
+                        </h3>
+                        <JoditEditor
+                            ref={descriptionEditor}
+                            value={formik.values.description ?? ""}
+                            onChange={(newContent) => {
+                                formik.setFieldValue("description", newContent);
+                            }}
+                            config={joditConfiguration}
+                            onBlur={(newContent) => {
+                                formik.setFieldTouched("description", true);
+                                formik.setFieldValue("description", newContent);
+                            }}
+                        />
+                        {formik.errors.description && formik.touched.description && (
+                            <div className="mt-2 text-sm text-red-600">
+                                {formik.errors.description}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -282,6 +360,15 @@ const ExperienceFormTemplate = ({ formik, mode, onClose }: ExperienceFormProps) 
                         disabled={formik.isSubmitting}
                     />
                 )}
+            </div>
+            <div className="mt-8 pt-6 border-t border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Experience Preview</h3>
+                <div className="mb-8">
+                    <ExperienceCard experience={{
+                        ...formik.values,
+                        technologiesUsed: selectedSkills
+                    }} />
+                </div>
             </div>
         </div>
     );
