@@ -6,6 +6,7 @@ import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import EducationFormTemplate from "../../templates/Education/EducationForm.template";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
+import { useAuthenticatedUser } from "../../../../hooks/useAuthenticatedUser";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -38,6 +39,7 @@ const EducationEditDetailsPage = () => {
     const navigate = useNavigate();
     const { degree } = useParams();
     const { showSnackbar } = useSnackbar();
+    const { user } = useAuthenticatedUser();
 
     const formik = useFormik<Education>({
         initialValues: {
@@ -50,6 +52,7 @@ const EducationEditDetailsPage = () => {
             location: "",
             grade: "",
             gradeType: "",
+            profileId: user?.id?.toString(),
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {

@@ -1,11 +1,12 @@
 import React from "react";
-import { useExperienceService } from "../../../../services/useExperienceService";
+import { useExperienceService , ExperienceRequest } from "../../../../services/useExperienceService";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate } from "react-router-dom";
 import ExperienceFormTemplate from '../../templates/Experience/ExperienceForm.template'
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
+import { useAuthenticatedUser } from "../../../../hooks/useAuthenticatedUser";
 
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
@@ -36,8 +37,9 @@ const ExperienceAddDetailsPage = () => {
     const experienceService = useExperienceService();
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
+    const { user } = useAuthenticatedUser();
 
-    const formik = useFormik({
+    const formik = useFormik<ExperienceRequest>({
         initialValues: {
             companyName: "",
             jobTitle: "",
@@ -46,7 +48,8 @@ const ExperienceAddDetailsPage = () => {
             endDate: "",
             description: "",
             technologiesUsed: [],
-            currentlyWorking: false
+            currentlyWorking: false,
+            profileId: user?.id?.toString(),
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {

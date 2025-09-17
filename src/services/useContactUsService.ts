@@ -1,12 +1,12 @@
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
-import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
+import { replaceUrlParams } from "../utils/helper";
 
-export const AUTH_URLS = {
-    GET_ALL: "/contact-us",
-    GET_ALL_BY_EMAIL: "/contact-us/:email",
-}
+export const CONTACT_US_URLS = {
+    CREATE: "/contact-us",
+    GET_BY_PROFILE: "/contact-us/profile/:profileId",
+};
 
 export interface ContactUs {
     id?: string;
@@ -24,28 +24,29 @@ export interface ContactUsRequest {
     phone: string;
 }
 
+export interface ContactUsFilterParams {
+    search?: string;
+    page?: number;
+    size?: number;
+}
+
 export const useContactUsService = () => {
     const { user } = useAuthenticatedUser();
-    const getAll = () => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.GET, url, user, null, null, null)
-    };
 
-    const getByEmail = (email: string) => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_EMAIL, { email });
-        return request(API_METHOD.GET, url, user, null, null, null);
-    };
+    // ---------------- CREATE ----------------
+    const create = (contactUs: ContactUsRequest) =>
+        request(API_METHOD.POST, CONTACT_US_URLS.CREATE, null, contactUs);
 
-    const create = (contactUs: ContactUsRequest) => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.POST, url, null, contactUs);
+    // ---------------- GET BY PROFILE (PAGINATED) ----------------
+    const getByProfile = (params: ContactUsFilterParams) => {
+        const url = replaceUrlParams(CONTACT_US_URLS.GET_BY_PROFILE, { profileId: user?.id });
+        return request(API_METHOD.GET, url, user, null, {params});
     };
 
     return {
-        getAll,
-        getByEmail,
         create,
-    }
+        getByProfile,
+    };
 };
 
 export default useContactUsService;

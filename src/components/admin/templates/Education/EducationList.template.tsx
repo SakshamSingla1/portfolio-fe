@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IPagination } from '../../../../utils/types';
-import { makeRoute } from '../../../../utils/helper';
-import { ADMIN_ROUTES } from '../../../../utils/constant';
-import TableV1, { ColumnType, TableColumn } from '../../../molecules/TableV1/TableV1';
+import { makeRoute, OptionToValue } from '../../../../utils/helper';
+import { ADMIN_ROUTES, DEGREE_OPTIONS } from '../../../../utils/constant';
+import TableV1, { ColumnType, TableColumn, TableSchema } from '../../../molecules/TableV1/TableV1';
 import viewEyeIcon from '../../../../assets/icons/viewEyeOutlinedIconPrimary500.svg';
 import editIcon from '../../../../assets/icons/editPenOutlinedIconPrimary500.svg';
 import { Education } from '../../../../services/useEducationService';
@@ -27,16 +27,8 @@ const EducationListTemplate: React.FC<IEducationListTemplateProps> = ({
 }) => {
     const navigate = useNavigate();
 
-    const schema = {
+    const schema : TableSchema = {
         id: 'education-list',
-        pagination: {
-            total: pagination.totalRecords,
-            currentPage: pagination.currentPage,
-            isVisible: true,
-            limit: pagination.pageSize,
-            handleChangePage: onPageChange,
-            handleChangeRowsPerPage: onRowsPerPageChange
-        },
         columns: [
             { 
                 label: "Sr No.", 
@@ -140,7 +132,7 @@ const EducationListTemplate: React.FC<IEducationListTemplateProps> = ({
             return [
                 pagination.currentPage + index,
                 education.institution,
-                education.degree,
+                OptionToValue(DEGREE_OPTIONS, education.degree),
                 education.fieldOfStudy,
                 `${education.startYear} - ${education.endYear}`,
                 education.location,

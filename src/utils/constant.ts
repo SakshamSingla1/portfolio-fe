@@ -1,3 +1,5 @@
+import { IPagination } from "./types";
+
 export const HTTP_STATUS = {
     OK: 200,
     CREATED: 201,
@@ -85,10 +87,20 @@ export const SKILL_LEVEL_OPTIONS: DegreeType[] = [
 ];
 
 export const SKILL_CATEGORY_OPTIONS: DegreeType[] = [
-    { value: 'Frontend', label: 'Frontend' },
-    { value: 'Backend', label: 'Backend' },
-    { value: 'Tool', label: 'Tool' },
-    { value: 'Soft_Skills', label: 'Soft Skills' },
+    { value: 'FRONTEND', label: 'Frontend' },
+    { value: 'BACKEND', label: 'Backend' },
+    { value: 'PROGRAMMING', label: 'Programming' },
+    { value: 'TOOL', label: 'Tool' },
+    { value: 'DATABASE', label: 'Database' },
+    { value: 'DEVOPS', label: 'DevOps' },
+    { value: 'TESTING', label: 'Testing' },
+    { value: 'MOBILE', label: 'Mobile' },
+    { value: 'CLOUD', label: 'Cloud' },
+    { value: 'SECURITY', label: 'Security' },
+    { value: 'DATA_SCIENCE', label: 'Data Science' },
+    { value: 'UI_UX', label: 'UI/UX' },
+    { value: 'SOFT_SKILLS', label: 'Soft Skills' },
+    { value: 'OTHER', label: 'Other' }
 ];
 
 export const NAV_ITEMS = [
@@ -113,3 +125,12 @@ export const COLORS = {
     success: '#10B981',
     accent: '#10B981',
 } as const;
+
+export const initialPaginationValues: IPagination = {
+    currentPage: 0,
+    pageSize: 10,
+    totalPages: 1,
+    totalRecords: 0,
+    handleChangePage: () => {},
+    handleChangeRowsPerPage: () => {},
+}

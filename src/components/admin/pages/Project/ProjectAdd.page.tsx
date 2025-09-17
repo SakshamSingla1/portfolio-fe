@@ -5,6 +5,7 @@ import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate } from "react-router-dom";
 import ProjectFormTemplate from "../../templates/Project/ProjectForm.template";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
+import { useAuthenticatedUser } from "../../../../hooks/useAuthenticatedUser";
 
 const validationSchema = Yup.object().shape({
     projectName: Yup.string()
@@ -12,13 +13,7 @@ const validationSchema = Yup.object().shape({
         .max(100, 'Project name is too long'),
     projectDescription: Yup.string()
         .required('Project description is required')
-        .max(1000, 'Project description is too long')
-        .test('html', 'Project description contains invalid HTML', (value) => {
-            if (!value) return true;
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(value, 'text/html');
-            return doc.body.textContent === value;
-        }),
+        .max(1000, 'Project description is too long'),
     projectLink: Yup.string()
         .required('Project link is required')
         .url('Must be a valid URL'),
@@ -41,6 +36,7 @@ const ProjectAddDetailsPage = () => {
     const projectService = useProjectService();
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
+    const { user } = useAuthenticatedUser();
 
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
@@ -54,6 +50,7 @@ const ProjectAddDetailsPage = () => {
             projectEndDate: new Date(),
             currentlyWorking: false,
             projectImageUrl: "",
+            profileId: user?.id?.toString(),
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {

@@ -7,7 +7,7 @@ interface AuthenticatedUserProviderType {
 
 export interface AuthenticatedUserType {
     email: string;
-    id: string;
+    id: number;
     token: string;
     password: boolean | null; 
     role?: string;

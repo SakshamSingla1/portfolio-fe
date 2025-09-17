@@ -6,6 +6,7 @@ import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import ExperienceFormTemplate from '../../templates/Experience/ExperienceForm.template'
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
+import { useAuthenticatedUser } from "../../../../hooks/useAuthenticatedUser";
 
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
@@ -37,6 +38,7 @@ const ExperienceEditDetailsPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const { showSnackbar } = useSnackbar();
+    const { user } = useAuthenticatedUser();
 
     const formik = useFormik<ExperienceRequest>({
         initialValues: {
@@ -47,7 +49,8 @@ const ExperienceEditDetailsPage = () => {
             endDate: "",
             description: "",
             technologiesUsed: [],
-            currentlyWorking: false
+            currentlyWorking: false,
+            profileId: user?.id?.toString(),
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {

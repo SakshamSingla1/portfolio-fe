@@ -24,16 +24,21 @@ const SkillListingPage: React.FC = () => {
         pageSize: 10,
         currentPage: 0,
         totalRecords: 0,
+        totalPages: 0
     });
 
     const fetchSkills = async () => {
         try {
-            const response = await skillService.getAll();
+            const response = await skillService.getByProfile({
+                page: pagination.currentPage,
+                size: pagination.pageSize,
+            });
             if (response?.status === HTTP_STATUS.OK && response.data) {
-                setSkills(response.data.data || []);
+                setSkills(response.data.data.content || []);
                 setPagination(prev => ({
                     ...prev,
-                    totalRecords: response.data.total || 0
+                    totalRecords: response.data.total || 0,
+                    totalPages: response.data.totalPages || 0
                 }));
                 showSnackbar('success',`${response?.data?.message}`);
             }
@@ -70,8 +75,7 @@ const SkillListingPage: React.FC = () => {
                     currentPage: pagination.currentPage + 1,
                     pageSize: pagination.pageSize,
                     totalRecords: pagination.totalRecords,
-                    handleChangePage: handlePageChange,
-                    handleChangeRowsPerPage: handleRowsPerPageChange
+                    totalPages: pagination.totalPages,
                 }}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

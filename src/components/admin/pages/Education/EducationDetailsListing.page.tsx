@@ -16,17 +16,19 @@ const EducationDetailsListingPage: React.FC = () => {
         pageSize: 10,
         currentPage: 0,
         totalRecords: 0,
+        totalPages: 0,
     });
 
     const fetchEducations = async () => {
         try {
-            const response = await educationService.getAll();
+            const response = await educationService.getAllByProfile({});
 
             if (response?.status === HTTP_STATUS.OK && response.data) {
-                setEducations(response.data.data || []);
+                setEducations(response.data.data.content || []);
                 setPagination(prev => ({
                     ...prev,
-                    totalRecords: response.data.total || 0
+                    totalRecords: response.data.data.totalElements || 0,
+                    totalPages: response.data.data.totalPages || 0
                 }));
                 showSnackbar('success',`${response?.data?.message}`);
             }
@@ -62,8 +64,7 @@ const EducationDetailsListingPage: React.FC = () => {
                     currentPage: pagination.currentPage + 1,
                     pageSize: pagination.pageSize,
                     totalRecords: pagination.totalRecords,
-                    handleChangePage: handlePageChange,
-                    handleChangeRowsPerPage: handleRowsPerPageChange
+                    totalPages: pagination.totalPages,
                 }}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

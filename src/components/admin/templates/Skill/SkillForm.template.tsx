@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "../../../atoms/Button/Button";
 import Select from "../../../atoms/Select/Select";
 import { HTTP_STATUS, MODE, SKILL_CATEGORY_OPTIONS, SKILL_LEVEL_OPTIONS } from "../../../../utils/constant";
-import { titleModification } from "../../../../utils/helper";
+import { OptionToValue, titleModification } from "../../../../utils/helper";
 import { useLogoService, Logo } from "../../../../services/useLogoService";
 import AutoCompleteInput from "../../../atoms/AutoCompleteInput/AutoCompleteInput";
 
@@ -18,7 +18,7 @@ const SkillFormTemplate = ({ formik, mode, onClose }: SkillFormProps) => {
     const [logos, setLogos] = useState<Logo[]>([]);
     const [selectedLogo, setSelectedLogo] = useState<Logo | null>(null);
 
-    const loadLogoDropdown = async (searchTerm: string) => {
+    const loadLogoDropdown = async (searchTerm?: string) => {
         try {
             const response = await logoService.getAll({
                 search: searchTerm
@@ -38,7 +38,11 @@ const SkillFormTemplate = ({ formik, mode, onClose }: SkillFormProps) => {
     };
 
     useEffect(() => {
-        loadLogoDropdown('');
+        formik.setFieldValue("category", selectedLogo?.category);
+    }, [selectedLogo]);
+
+    useEffect(() => {
+        loadLogoDropdown();
     }, []);
 
     useEffect(() => {
@@ -160,13 +164,9 @@ const SkillFormTemplate = ({ formik, mode, onClose }: SkillFormProps) => {
                             label="Skill Category"
                             placeholder="Select Skill Category"
                             options={SKILL_CATEGORY_OPTIONS}
-                            value={formik.values.category}
+                            value={OptionToValue(SKILL_CATEGORY_OPTIONS, formik.values.category || selectedLogo?.category)}
                             error={formik.touched.category && Boolean(formik.errors.category)}
-                            disabled={mode === MODE.VIEW}
-                            onChange={(value: string | number) => {
-                                const newValue = typeof value === "string" ? titleModification(value) : value;
-                                formik.setFieldValue("category", newValue);
-                            }}
+                            disabled={true}
                         />
                     </div>
                 </div>

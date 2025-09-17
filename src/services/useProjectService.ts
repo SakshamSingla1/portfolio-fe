@@ -7,7 +7,8 @@ import { SkillDropdown } from "./useSkillService";
 export const AUTH_URLS = {
     GET_ALL: "/project",
     GET_ALL_BY_ID: "/project/:id",
-}
+    GET_BY_PROFILE: "/project/profile/:profileId",
+};
 
 export interface Project {
     id?: number;
@@ -19,6 +20,7 @@ export interface Project {
     projectEndDate: Date;
     currentlyWorking: boolean;
     projectImageUrl: string;
+    profileId?: string;
 }
 
 export interface ProjectResponse {
@@ -33,11 +35,18 @@ export interface ProjectResponse {
     projectImageUrl: string;
 }
 
+export interface ProjectFilterParams {
+    page?: number;
+    size?: number;
+    search?: string;
+}
+
 export const useProjectService = () => {
     const { user } = useAuthenticatedUser();
+
     const getAll = () => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.GET, url, null, null, null, null)
+        return request(API_METHOD.GET, url, null, null, null, null);
     };
 
     const getById = (id: string) => {
@@ -55,12 +64,24 @@ export const useProjectService = () => {
         return request(API_METHOD.PUT, url, user, project);
     };
 
+    const deleteProject = (id: string) => {
+        const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
+        return request(API_METHOD.DELETE, url, user, null);
+    };
+
+    const getByProfile = (params: ProjectFilterParams) => {
+        const url = replaceUrlParams(AUTH_URLS.GET_BY_PROFILE, { profileId: user?.id });
+        return request(API_METHOD.GET, url, user, null, { params });
+    };
+
     return {
         getAll,
         getById,
         create,
         update,
-    }
+        deleteProject,
+        getByProfile,
+    };
 };
 
 export default useProjectService;

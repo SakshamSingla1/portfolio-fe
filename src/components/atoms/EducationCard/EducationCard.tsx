@@ -1,415 +1,208 @@
-import React from 'react';
-import { motion, Variants } from 'framer-motion';
-import { FaGraduationCap, FaCalendarAlt, FaMapMarkerAlt, FaBook, FaExternalLinkAlt } from 'react-icons/fa';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BookOpen, Calendar, MapPin, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { Education } from '../../../services/useEducationService';
-import { htmlToElement , OptionToValue } from '../../../utils/helper';
+import { htmlToElement, OptionToValue } from '../../../utils/helper';
 import { DEGREE_OPTIONS } from '../../../utils/constant';
-import { IOption } from '../../../utils/types';
+import { Variants } from 'framer-motion';
 
-// Types
 interface EducationCardProps {
   education: Education;
-  onClick?: () => void;
   className?: string;
+  showDetails?: boolean;
+  onToggleDetails?: () => void;
 }
 
-// Colors
-const COLORS = {
-  primary: '#1A56DB',
-  primaryLight: '#EBF5FF',
-  textPrimary: '#111827',
-  textSecondary: '#4B5563',
-  border: '#E5E7EB',
-  background: '#FFFFFF',
-  success: '#10B981',
-  accent: '#10B981',
-} as const;
-
-// Animation variants
+// Animation variants for the card
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { y: 30, opacity: 0, scale: 0.98 },
   visible: {
-    opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.4, 0, 0.2, 1],
-      when: 'beforeChildren',
-      staggerChildren: 0.1
-    }
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: 'easeOut' }
   },
   hover: {
-    y: -8,
-    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-    transition: {
-      type: 'spring',
-      stiffness: 400,
-      damping: 15,
-      mass: 0.5
-    }
-  },
-  tap: { scale: 0.98 }
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.3,
-      ease: [0.4, 0, 0.2, 1]
-    }
+    y: -5,
+    boxShadow: '0 10px 15px -5px rgba(0, 0, 0, 0.1)',
+    transition: { type: 'spring', stiffness: 300 }
   }
 };
 
-const CARD_STYLES = {
-  card: {
-    base: {
-      borderRadius: '16px',
-      overflow: 'hidden',
-      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      background: 'white',
-      position: 'relative',
-      '&:hover': {
-        transform: 'translateY(-4px)'
-      }
-    },
-    hover: {
-      y: -8,
-      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 15
-      }
-    }
-  },
-  header: {
-    padding: '1.75rem 1.5rem',
-    color: 'white',
-    background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryLight} 100%)`,
-    position: 'relative',
-    overflow: 'hidden',
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
-      pointerEvents: 'none'
-    }
-  },
-  iconContainer: {
-    width: '60px',
-    height: '60px',
-    borderRadius: '16px',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    backdropFilter: 'blur(4px)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    '&:hover': {
-      transform: 'scale(1.05) rotate(5deg)',
-      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)'
-    }
-  },
-  content: {
-    padding: '1.5rem',
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  tag: {
-    base: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      padding: '0.4rem 0.9rem',
-      borderRadius: '8px',
-      border: `1px solid ${COLORS.border}`,
-      fontSize: '0.875rem',
-      fontWeight: 500,
-    },
-    primary: {
-      backgroundColor: `${COLORS.primary}08`,
-    },
-    accent: {
-      backgroundColor: `${COLORS.accent}08`,
-    },
-    muted: {
-      backgroundColor: `${COLORS.textSecondary}05`,
-    },
-    grade: {
-      backgroundColor: COLORS.primaryLight,
-      color: COLORS.primary,
-      padding: '0.5rem 1rem',
-      fontWeight: 600,
-      border: `1px solid ${COLORS.primary}30`,
-      boxShadow: `0 2px 4px ${COLORS.primary}10`,
-    }
-  },
-  description: {
-    backgroundColor: COLORS.background,
-    padding: '1rem',
-    borderRadius: '8px',
-    border: `1px solid ${COLORS.border}`,
-    marginTop: 'auto',
-  },
-  footer: {
-    padding: '1rem 1.5rem',
-    borderTop: `1px solid ${COLORS.border}`,
-    backgroundColor: COLORS.background,
-  },
-  statusDot: (isCurrent: boolean) => ({
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-    backgroundColor: isCurrent ? COLORS.accent : COLORS.success,
-    boxShadow: `0 0 0 0 ${isCurrent ? COLORS.accent : COLORS.success}80`,
-    animation: 'pulse 2s infinite',
-    // Keyframes are now defined in a style tag in the component
-  } as React.CSSProperties),
-  gpaBadge: {
-    padding: '0.4rem 1rem',
-    backgroundColor: COLORS.primaryLight,
-    color: COLORS.primary,
-    borderRadius: '9999px',
-    fontSize: '0.8125rem',
-    fontWeight: 600,
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: `0 4px 12px ${COLORS.primary}30`
-    },
-    '&::before': {
-      content: '"🏆"',
-      fontSize: '1rem',
-      lineHeight: 1
-    }
-  }
-} as const;
+// Get appropriate emoji based on degree type
+const getDegreeEmoji = (degree: string) => {
+  const lowerDegree = degree.toLowerCase();
+  
+  if (lowerDegree.includes('bachelor') || lowerDegree.includes('b.tech')) return '🎓';
+  if (lowerDegree.includes('master') || lowerDegree.includes('m.tech')) return '🎯';
+  if (lowerDegree.includes('phd') || lowerDegree.includes('doctor')) return '👨‍🎓';
+  if (lowerDegree.includes('diploma') || lowerDegree.includes('certificate')) return '📜';
+  
+  return '🏫';
+};
 
 const EducationCard: React.FC<EducationCardProps> = ({
   education,
-  onClick,
   className = '',
+  showDetails = false,
+  onToggleDetails,
 }) => {
-  const [isHovered, setIsHovered] = React.useState(false);
-  const isCurrent = education.endYear ? new Date(education.endYear) > new Date() : false;
-  
-  // Format date range
-  const formatDateRange = (start?: number, end?: number) => {
-    if (!start) return '';
-    const startYear = start;
-    const endYear = end ? end : 'Present';
-    return `${startYear} - ${endYear}`;
+  const [isHovered, setIsHovered] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const hasDescription = !!education.description?.trim();
+  const isExpandedState = onToggleDetails ? showDetails : isExpanded;
+
+  const formatDateRange = (startYear: string, endYear?: string) => {
+    return `${startYear} - ${endYear || 'Present'}`;
   };
 
-  // Format grade display
-  const formatGrade = (grade: string, type?: string) => {
-    if (!grade) return '';
-    return type === 'Percentage' ? `${grade}%` : type ? `${grade} ${type}` : grade;
+  const progress = useMemo(() => {
+    if (!education.startYear) return 0;
+    const startYear = parseInt(education.startYear.toString(), 10);
+    const endYear = education.endYear ? parseInt(education.endYear.toString(), 10) : new Date().getFullYear();
+    
+    const start = new Date(startYear, 0, 1).getTime();
+    const end = education.endYear 
+      ? new Date(endYear, 11, 31).getTime() 
+      : Date.now(); 
+      
+    const total = end - start;
+    const elapsed = Date.now() - start;
+    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  }, [education.startYear, education.endYear]);
+
+  const handleToggleDetails = () => {
+    onToggleDetails ? onToggleDetails() : setIsExpanded(!isExpanded);
   };
-
-  const gradeType = education.grade?.trim().split(" ")[1] || '';
-  const grade = education.grade?.trim().split(" ")[0] || '';
-
-  const gradeDisplay = formatGrade(grade, gradeType);
 
   return (
-    <>
-      <style>{`
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 ${isCurrent ? COLORS.accent : COLORS.success}80; }
-          70% { box-shadow: 0 0 0 10px ${isCurrent ? COLORS.accent : COLORS.success}00; }
-          100% { box-shadow: 0 0 0 0 ${isCurrent ? COLORS.accent : COLORS.success}00; }
-        }
-      `}</style>
-      
-      <motion.div 
-        className={`education-card ${className}`}
-        initial="hidden"
-        animate="visible"
-        whileHover="hover"
-        whileTap="tap"
-        variants={cardVariants}
-        style={{ ...CARD_STYLES.card.base, cursor: onClick ? 'pointer' : 'default' } as React.CSSProperties}
-        onClick={onClick}
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-      >
-        {isHovered && (
-          <motion.div 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '4px',
-              background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.accent})`,
-              transformOrigin: 'left',
-            }}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
-          />
-        )}
-        
-        {/* Header */}
+    <motion.article
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover="hover"
+      className={`relative border rounded-xl p-6 bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm ${
+        isHovered ? 'border-teal-500' : 'border-gray-700'
+      } ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="absolute top-1 left-0 right-0 h-2 bg-gray-700 mx-2 overflow-hidden">
         <motion.div 
-          style={CARD_STYLES.header}
-          variants={itemVariants}
-        >
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-          }}>
-            <div style={CARD_STYLES.iconContainer}>
-              <FaGraduationCap size={28} color="white" />
+          className="h-full w-full rounded-full bg-gradient-to-r from-teal-500 to-blue-500"
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 2, ease: 'easeOut' }}
+        />
+      </div>
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl">
+                {getDegreeEmoji(education.degree)}
+              </span>
+              <div>
+                <h3 className="text-2xl font-bold text-white leading-tight">
+                  {education.institution}
+                </h3>
+                {education.degree && (
+                  <p className="text-sm text-gray-400">
+                    {OptionToValue(DEGREE_OPTIONS, education.degree)}
+                  </p>
+                )}
+              </div>
             </div>
             
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h3 style={{
-                margin: 0,
-                color: 'white',
-                fontSize: '1.375rem',
-                fontWeight: 700,
-                marginBottom: '0.25rem',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}>
-                {OptionToValue(DEGREE_OPTIONS, education.degree)}
-              </h3>
-              <p style={{
-                margin: 0,
-                color: 'rgba(255, 255, 255, 0.9)',
-                fontWeight: 500,
-                fontSize: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}>
-                {education.institution}
-                {onClick && <FaExternalLinkAlt size={12} style={{ opacity: 0.7 }} />}
-              </p>
-            </div>
+            {hasDescription && (
+              <button 
+                onClick={handleToggleDetails}
+                className="p-1.5 rounded-full hover:bg-gray-700/50 transition-colors text-gray-400 hover:text-white"
+                aria-label={isExpandedState ? 'Show less' : 'Show more'}
+              >
+                {isExpandedState ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              </button>
+            )}
           </div>
-        </motion.div>
-
-        {/* Body */}
-        <motion.div 
-          style={CARD_STYLES.content}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.2
-              }
-            }
-          }}
-        >
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            marginBottom: '1.25rem',
-          }}>
-            {education.fieldOfStudy && (
-              <motion.div 
-                style={{ ...CARD_STYLES.tag.base, ...CARD_STYLES.tag.primary }}
-                variants={itemVariants}
-              >
-                <FaBook size={14} color={COLORS.primary} style={{ opacity: 0.8 }} />
-                <span>{education.fieldOfStudy}</span>
-              </motion.div>
-            )}
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 text-white">
+              <BookOpen className="w-4 h-4 flex-shrink-0 text-teal-500" />
+              <span>{education.fieldOfStudy}</span>
+            </div>
             
-            {(education.startYear || education.endYear) && (
-              <motion.div 
-                style={{ ...CARD_STYLES.tag.base, ...CARD_STYLES.tag.accent }}
-                variants={itemVariants}
-              >
-                <FaCalendarAlt size={14} color={COLORS.accent} style={{ opacity: 0.8 }} />
-                <span>{formatDateRange(Number(education.startYear), Number(education.endYear))}</span>
-              </motion.div>
-            )}
+            <div className="flex items-center gap-2 text-white">
+              <Calendar className="w-4 h-4 flex-shrink-0 text-blue-400" />
+              <span>{formatDateRange(education.startYear, education.endYear)}</span>
+            </div>
             
             {education.location && (
-              <motion.div 
-                style={{ ...CARD_STYLES.tag.base, ...CARD_STYLES.tag.muted }}
-                variants={itemVariants}
-              >
-                <FaMapMarkerAlt size={14} color={COLORS.textSecondary} style={{ opacity: 0.8 }} />
+              <div className="flex items-center gap-2 text-white">
+                <MapPin className="w-4 h-4 flex-shrink-0 text-rose-400" />
                 <span>{education.location}</span>
-              </motion.div>
+              </div>
             )}
-          </div>
-
-          {education.description && (
-            <motion.div 
-              style={CARD_STYLES.description}
-              variants={itemVariants}
-            >
-              <p style={{
-                margin: 0,
-                color: COLORS.textSecondary,
-                lineHeight: '1.7',
-                fontSize: '0.9375rem',
-              }}>
-                {htmlToElement(education.description)}
-              </p>
-            </motion.div>
-          )}
-        </motion.div>
-        
-        {/* Footer */}
-        <motion.div 
-          style={CARD_STYLES.footer}
-          variants={itemVariants}
-        >
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={CARD_STYLES.statusDot(isCurrent)} />
-              <span style={{
-                fontSize: '0.8125rem',
-                color: COLORS.textSecondary,
-                fontWeight: 500,
-              }}>
-                {isCurrent ? 'In Progress' : 'Completed'}
-              </span>
-            </div>
             
             {education.grade && (
-              <div style={CARD_STYLES.gpaBadge}>
-                {gradeType === 'Percentage' ? 'Percentage: ' : gradeType === 'CGPA' ? 'CGPA: ' : 'Grade: '}{gradeDisplay }
+              <div className="flex items-center gap-2 text-white">
+                <Star className="w-4 h-4 flex-shrink-0 text-yellow-400" />
+                <span>
+                  {education.gradeType || 'Grade'}: 
+                  <span className="font-medium text-white ml-1">
+                    {education.grade.trim().split(' ')[0]} {education.grade.trim().split(' ')[1] === 'Percentage' ? '%' : education.grade.trim().split(' ')[1]}
+                  </span>
+                </span>
               </div>
             )}
           </div>
-        </motion.div>
-      </motion.div>
-    </>
+        </div>
+
+        {/* Expandable description section */}
+        <AnimatePresence>
+          {isExpandedState && hasDescription && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="pt-2">
+                <div className="text-gray-300 text-sm leading-relaxed bg-gray-800/30 p-4 rounded-lg border border-gray-700/50">
+                  <div className="ml-6">
+                    {htmlToElement(education.description || '')}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+      
+      {/* Footer with status and toggle button */}
+      {hasDescription && (
+        <div className="mt-4 pt-4 border-t border-gray-800 flex items-center justify-between">
+          <span className="text-white text-xs flex items-center gap-2">
+            <span className={`relative flex h-2 w-2`}>
+              <span className={`absolute inline-flex h-full w-full rounded-full ${education.endYear && Number(education.endYear) >= Number(new Date().getFullYear()) ? 'bg-teal-400' : 'bg-blue-400'} opacity-100 animate-ping`}></span>
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${education.endYear && Number(education.endYear) >= Number(new Date().getFullYear()) ? 'bg-teal-500' : 'bg-blue-500'}`}></span>
+            </span>
+            {(education.endYear && Number(education.endYear) >= Number(new Date().getFullYear())) ? 'In Progress' : 'Completed'}
+          </span>
+          <button 
+            onClick={handleToggleDetails}
+            className="text-xs font-medium text-teal-400 hover:text-teal-300 flex items-center gap-1"
+          >
+            {isExpandedState ? 'Show less' : 'Show details'}
+            <ChevronDown 
+              size={16} 
+              className={`transition-transform duration-200 ${isExpandedState ? 'rotate-180' : ''}`} 
+            />
+          </button>
+        </div>
+      )}
+    </motion.article>
   );
 };
 
-export default React.memo(EducationCard);
+export default EducationCard;

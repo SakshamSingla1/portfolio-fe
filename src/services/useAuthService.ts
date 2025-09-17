@@ -1,5 +1,6 @@
-import { request } from "."
-import { API_METHOD } from "../utils/constant"
+import { request } from ".";
+import { API_METHOD } from "../utils/constant";
+import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 export const AUTH_URLS = {
     LOGIN: "/admin/login",
@@ -16,8 +17,8 @@ export const AUTH_URLS = {
     REQUEST_DELETE_ACCOUNT_OTP: (id: string) => `/admin/request-delete-profile-otp/${id}`,
     DELETE_ACCOUNT: (id: string) => `/admin/${id}`,
 
-    RESEND_OTP : `/admin/send-otp`,
-}
+    RESEND_OTP: `/admin/send-otp`,
+};
 
 // ---------------- DTOs ----------------
 export interface ChangeEmailRequest {
@@ -46,13 +47,13 @@ export interface AuthForgotPasswordRequest {
 }
 
 export interface AuthResetPasswordRequest {
-    token: string;
+    email: string;
+    otp: string;
     newPassword: string;
 }
 
 export interface AuthDeleteAccountRequest {
     password: string;
-    otp: string;
 }
 
 export interface VerifyOtpRequest {
@@ -63,6 +64,7 @@ export interface VerifyOtpRequest {
 
 // ---------------- Service ----------------
 export const useAuthService = () => {
+    const { user } = useAuthenticatedUser();
     const login = (data: AuthLoginRequest) =>
         request(API_METHOD.POST, AUTH_URLS.LOGIN, null, data);
 
@@ -78,23 +80,23 @@ export const useAuthService = () => {
     const resetPassword = (data: AuthResetPasswordRequest) =>
         request(API_METHOD.POST, AUTH_URLS.RESET_PASSWORD, null, data);
 
-    const changePassword = (id: string, data: ChangePasswordRequest) =>
-        request(API_METHOD.PUT, AUTH_URLS.CHANGE_PASSWORD(id), null, data);
+    const changePassword = (data: ChangePasswordRequest) =>
+        request(API_METHOD.PUT, AUTH_URLS.CHANGE_PASSWORD(user?.id?.toString() || ""), null, data);
 
-    const changeEmail = (id: string, data: ChangeEmailRequest) =>
-        request(API_METHOD.PUT, AUTH_URLS.CHANGE_EMAIL(id), null, data);
+    const changeEmail = (data: ChangeEmailRequest) =>
+        request(API_METHOD.PUT, AUTH_URLS.CHANGE_EMAIL(user?.id?.toString() || ""), null, data);
 
-    const verifyChangeEmailOtp = (id: string, data: VerifyOtpRequest) =>
-        request(API_METHOD.POST, AUTH_URLS.VERIFY_CHANGE_EMAIL_OTP(id), null, data);
+    const verifyChangeEmailOtp = (data: VerifyOtpRequest) =>
+        request(API_METHOD.POST, AUTH_URLS.VERIFY_CHANGE_EMAIL_OTP(user?.id?.toString() || ""), null, data);
 
-    const requestDeleteAccountOtp = (id: string) =>
-        request(API_METHOD.POST, AUTH_URLS.REQUEST_DELETE_ACCOUNT_OTP(id), null, {});
+    const requestDeleteAccountOtp = () =>
+        request(API_METHOD.POST, AUTH_URLS.REQUEST_DELETE_ACCOUNT_OTP(user?.id?.toString() || ""), null, {});
 
-    const deleteAccount = (id: string, data: AuthDeleteAccountRequest) =>
-        request(API_METHOD.DELETE, AUTH_URLS.DELETE_ACCOUNT(id), null, data);
+    const deleteAccount = () =>
+        request(API_METHOD.DELETE, AUTH_URLS.DELETE_ACCOUNT(user?.id?.toString() || ""), null, {});
 
-    const resendOtp = (phone?: string) =>
-        request(API_METHOD.POST, AUTH_URLS.RESEND_OTP, null, { phone });   
+    const resendOtp = () =>
+        request(API_METHOD.POST, AUTH_URLS.RESEND_OTP, null, { phone: user?.phone });
 
     return {
         login,
@@ -108,5 +110,5 @@ export const useAuthService = () => {
         requestDeleteAccountOtp,
         deleteAccount,
         resendOtp,
-    }
-}
+    };
+};

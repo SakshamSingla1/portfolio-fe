@@ -16,7 +16,10 @@ const ContactUsListingPage: React.FC = () => {
 
     const fetchContactUs = async () => {
         try {
-            const response = await contactUsService.getAll();
+            const response = await contactUsService.getByProfile({
+                page: pagination.currentPage,
+                size: pagination.pageSize,
+            });
 
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 showSnackbar('success', `${response?.data?.message}`);

@@ -4,6 +4,7 @@ import { HTTP_STATUS } from '../../../../utils/constant';
 import ExperienceListTemplate from '../../templates/Experience/ExperienceList.template';
 import { useState, useEffect } from 'react';
 import { useSnackbar } from '../../../../contexts/SnackbarContext';
+import { useAuthenticatedUser } from '../../../../hooks/useAuthenticatedUser';
 
 const ExperienceListingPage: React.FC = () => {
     const experienceService = useExperienceService();
@@ -13,18 +14,20 @@ const ExperienceListingPage: React.FC = () => {
         pageSize: 10,
         currentPage: 0,
         totalRecords: 0,
+        totalPages: 0
     });
     const { showSnackbar } = useSnackbar();
 
     const fetchExperiences = async () => {
         try {
-            const response = await experienceService.getAll();
+            const response = await experienceService.getAllByProfile({});
 
             if (response?.status === HTTP_STATUS.OK && response.data) {
-                setExperiences(response.data.data || []);
+                setExperiences(response.data.data.content || []);
                 setPagination(prev => ({
                     ...prev,
-                    totalRecords: response.data.total || 0
+                    totalRecords: response.data.data.totalElements || 0,
+                    totalPages: response.data.data.totalPages || 0
                 }));
                 showSnackbar('success',`${response?.data?.message}`);
             }
@@ -60,8 +63,7 @@ const ExperienceListingPage: React.FC = () => {
                     currentPage: pagination.currentPage + 1,
                     pageSize: pagination.pageSize,
                     totalRecords: pagination.totalRecords,
-                    handleChangePage: handlePageChange,
-                    handleChangeRowsPerPage: handleRowsPerPageChange
+                    totalPages: pagination.totalPages,
                 }}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

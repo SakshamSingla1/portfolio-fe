@@ -1,541 +1,169 @@
-import React from 'react';
-import { motion, Variants } from 'framer-motion';
-import { FaBriefcase, FaCalendarAlt, FaMapMarkerAlt, FaExternalLinkAlt, FaCode, FaLink } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { Code2, MapPin, Calendar, Clock, ExternalLink, ArrowUpRight } from 'lucide-react';
 import { ExperienceResponse } from '../../../services/useExperienceService';
+import { SkillDropdown } from '../../../services/useSkillService';
 import { htmlToElement } from '../../../utils/helper';
 
-// Types
 interface ExperienceCardProps {
     experience: ExperienceResponse;
+    className?: string;
 }
 
-// Colors
-const COLORS = {
-    primary: '#1A56DB',
-    primaryLight: '#EBF5FF',
-    textPrimary: '#111827',
-    textSecondary: '#4B5563',
-    border: '#E5E7EB',
-    background: '#FFFFFF',
-    success: '#10B981',
-    accent: '#10B981',
-} as const;
-
-// Animation variants
-const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        transition: {
-            duration: 0.5,
-            ease: [0.4, 0, 0.2, 1],
-            when: 'beforeChildren',
-            staggerChildren: 0.1
-        }
-    },
-    hover: {
-        y: -8,
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        transition: {
-            type: 'spring',
-            stiffness: 400,
-            damping: 15,
-            mass: 0.5
-        }
-    },
-    tap: { scale: 0.98 }
-};
-
-const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        transition: {
-            duration: 0.3,
-            ease: [0.4, 0, 0.2, 1]
-        }
-    }
-};
-
-// Enhanced styles with better organization and new styles
-const CARD_STYLES = {
-    card: {
-        base: {
-            borderRadius: '16px',
-            overflow: 'hidden',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            background: 'white',
-            position: 'relative',
-            '&:hover': {
-                transform: 'translateY(-4px)'
-            }
-        },
-        hover: {
-            y: -8,
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            transition: {
-                type: 'spring',
-                stiffness: 300,
-                damping: 15
-            }
-        }
-    },
-    header: {
-        padding: '1.75rem 1.5rem',
-        color: 'white',
-        background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryLight} 100%)`,
-        position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
-            pointerEvents: 'none'
-        }
-    },
-    iconContainer: {
-        width: '60px',
-        height: '60px',
-        borderRadius: '16px',
-        backgroundColor: 'rgba(255, 255, 255, 0.15)',
-        backdropFilter: 'blur(4px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        '&:hover': {
-            transform: 'scale(1.05) rotate(5deg)',
-            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)'
-        }
-    },
-    content: {
-        padding: '1.5rem',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-    },
-    tag: {
-        base: {
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.4rem 0.9rem',
-            borderRadius: '8px',
-            border: `1px solid ${COLORS.border}`,
-            fontSize: '0.875rem',
-            fontWeight: 500,
-        },
-        primary: {
-            backgroundColor: `${COLORS.primary}08`,
-        },
-        accent: {
-            backgroundColor: `${COLORS.accent}08`,
-        },
-        muted: {
-            backgroundColor: `${COLORS.textSecondary}05`,
-        },
-        grade: {
-            backgroundColor: COLORS.primaryLight,
-            color: COLORS.primary,
-            padding: '0.5rem 1rem',
-            fontWeight: 600,
-            border: `1px solid ${COLORS.primary}30`,
-            boxShadow: `0 2px 4px ${COLORS.primary}10`,
-        }
-    },
-    description: {
-        backgroundColor: COLORS.background,
-        padding: '1rem',
-        borderRadius: '8px',
-        border: `1px solid ${COLORS.border}`,
-        marginTop: 'auto',
-    },
-    footer: {
-        padding: '1.25rem 1.5rem',
-        borderTop: `1px solid ${COLORS.border}`,
-        backgroundColor: COLORS.background,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem',
-    },
-    statusBadge: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        padding: '0.5rem 0.75rem',
-        backgroundColor: 'rgba(16, 185, 129, 0.08)',
-        borderRadius: '6px',
-        border: '1px solid rgba(16, 185, 129, 0.2)',
-        alignSelf: 'flex-start',
-    },
-    techHeader: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        marginBottom: '0.75rem',
-    },
-    techGrid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-        gap: '0.75rem',
-        width: '100%',
-    },
-    techItem: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '0.5rem',
-        padding: '0.75rem',
-        borderRadius: '8px',
-        backgroundColor: 'rgba(0, 0, 0, 0.02)',
-        border: '1px solid rgba(0, 0, 0, 0.05)',
-        transition: 'all 0.2s ease',
-        '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-            backgroundColor: 'rgba(26, 86, 219, 0.03)',
-        }
-    },
-    techLogo: {
-        width: '32px',
-        height: '32px',
-        objectFit: 'contain',
-        borderRadius: '6px',
-    },
-    techName: {
-        fontSize: '0.75rem',
-        fontWeight: 500,
-        color: COLORS.textSecondary,
-        textAlign: 'center',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        width: '100%',
-    },
-    projectLink: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        color: COLORS.primary,
-        textDecoration: 'none',
-        fontSize: '0.875rem',
-        fontWeight: 500,
-        marginTop: '0.5rem',
-        alignSelf: 'flex-start',
-        padding: '0.5rem 0',
-        '&:hover': {
-            textDecoration: 'underline',
-        }
-    },
-    statusDot: (isCurrent: boolean) => ({
-        width: '10px',
-        height: '10px',
-        borderRadius: '50%',
-        backgroundColor: isCurrent ? COLORS.accent : COLORS.success,
-        boxShadow: `0 0 0 0 ${isCurrent ? COLORS.accent : COLORS.success}80`,
-        animation: 'pulse 2s infinite',
-        // Keyframes are now defined in a style tag in the component
-    } as React.CSSProperties),
-    gpaBadge: {
-        padding: '0.4rem 1rem',
-        backgroundColor: COLORS.primaryLight,
-        color: COLORS.primary,
-        borderRadius: '9999px',
-        fontSize: '0.8125rem',
-        fontWeight: 600,
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: `0 4px 12px ${COLORS.primary}30`
-        },
-        '&::before': {
-            content: '"🏆"',
-            fontSize: '1rem',
-            lineHeight: 1
-        }
-    }
-} as const;
-
 const ExperienceCard: React.FC<ExperienceCardProps> = ({
-    experience,
+    experience: { 
+        companyName,
+        jobTitle,
+        location,
+        startDate,
+        endDate,
+        currentlyWorking,
+        description,
+        technologiesUsed,
+    },
+    className = ''
 }) => {
-    const [isHovered, setIsHovered] = React.useState(false);
-    const isCurrent = experience.endDate ? new Date(experience.endDate) > new Date() : false;
+    const [isHovered, setIsHovered] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
 
-    // Format date range
-    const formatDateRange = (startDate: string | null | undefined, endDate: string | null | undefined) => {
-        if (!startDate) return '';
+    useEffect(() => {
+        // Trigger animation on mount
+        const timer = setTimeout(() => setIsVisible(true), 100);
+        return () => clearTimeout(timer);
+    }, []);
 
-        const formatDate = (dateString: string | null | undefined): string => {
-            if (!dateString) return 'Present';
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    timeZone: 'UTC' // Prevent timezone issues
-                });
-            } catch (e) {
-                console.error('Error formatting date:', e);
-                return 'Present';
-            }
-        };
+    const formatDateRange = (start: string, end?: string | null) => {
+        if (currentlyWorking) {
+            return `${start} - Present`;
+        }
+        return end ? `${start} - ${end}` : `${start} - Present`;
+    };
 
-        const start = formatDate(startDate);
-        const end = endDate ? formatDate(endDate) : 'Present';
-
-        return `${start} - ${end}`;
+    const getDuration = (start: string, end?: string) => {
+        const startDate = new Date(start);
+        const endDate = end ? new Date(end) : new Date();
+        const years = endDate.getFullYear() - startDate.getFullYear();
+        const months = endDate.getMonth() - startDate.getMonth() + (years * 12);
+        
+        if (months >= 12) {
+            const years = Math.floor(months / 12);
+            return `${years}+ ${years === 1 ? 'year' : 'years'}`;
+        }
+        return `${months}+ months`;
     };
 
     return (
-        <>
-            <style>{`
-                @keyframes pulse {
-                    0% { box-shadow: 0 0 0 0 ${isCurrent ? COLORS.accent : COLORS.success}80; }
-                    70% { box-shadow: 0 0 0 10px ${isCurrent ? COLORS.accent : COLORS.success}00; }
-                    100% { box-shadow: 0 0 0 0 ${isCurrent ? COLORS.accent : COLORS.success}00; }
-                }
-                .experience-card::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: 
-                        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.1) 0%, transparent 15%),
-                        radial-gradient(circle at 90% 10%, rgba(255,255,255,0.1) 0%, transparent 15%);
-                    pointer-events: none;
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
-                    z-index: 1;
-                }
-                .experience-card:hover::before {
-                    opacity: 1;
-                }
-            `}</style>
+        <article 
+            className={`relative group overflow-hidden transition-all duration-500 ease-out transform ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            } ${className}`}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            {/* Animated gradient border */}
+            <div className={`absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 ${isHovered ? 'animate-gradient-xy' : ''}`} />
+            
+            {/* Glass card */}
+            <div className="relative h-full bg-gradient-to-br from-gray-900/80 to-gray-800/80 rounded-xl p-6 sm:p-8 border border-gray-800/50 shadow-2xl backdrop-blur-xl overflow-hidden">
+                {/* Animated background elements */}
+                <div className="absolute inset-0 overflow-hidden">
+                    <div className={`absolute -top-32 -right-32 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl transition-all duration-700 scale-100`} />
+                    <div className={`absolute -bottom-32 -left-32 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl transition-all duration-700 scale-100`} />
+                </div>
 
-            <motion.div
-                className="experience-card"
-                initial="hidden"
-                animate="visible"
-                whileHover="hover"
-                whileTap="tap"
-                variants={cardVariants}
-                style={{ 
-                    ...CARD_STYLES.card.base,
-                    position: 'relative',
-                    overflow: 'hidden',
-                } as React.CSSProperties}
-                onHoverStart={() => setIsHovered(true)}
-                onHoverEnd={() => setIsHovered(false)}
-            >
-                {isHovered && (
-                    <motion.div
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            height: '4px',
-                            background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.accent})`,
-                            transformOrigin: 'left',
-                        }}
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
-                    />
-                )}
-
-                {/* Header */}
-                <motion.div
-                    style={CARD_STYLES.header}
-                    variants={itemVariants}
-                >
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                    }}>
-                        <div style={CARD_STYLES.iconContainer}>
-                            <FaBriefcase size={24} color="white" />
-                        </div>
-
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                            <h3 style={{
-                                margin: 0,
-                                color: 'white',
-                                fontSize: '1.375rem',
-                                fontWeight: 700,
-                                marginBottom: '0.25rem',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                            }}>
-                                {experience.jobTitle}
-                            </h3>
-                            <p style={{
-                                margin: 0,
-                                color: 'rgba(255, 255, 255, 0.9)',
-                                fontWeight: 500,
-                                fontSize: '1rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                            }}>
-                                {experience.companyName}
-                            </p>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Body */}
-                <motion.div
-                    style={CARD_STYLES.content}
-                    variants={{
-                        hidden: { opacity: 0 },
-                        visible: {
-                            opacity: 1,
-                            transition: {
-                                staggerChildren: 0.1,
-                                delayChildren: 0.2
-                            }
-                        }
-                    }}
-                >
-                    <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '0.75rem',
-                        marginBottom: '1.25rem',
-                    }}>
-                        {experience.jobTitle && (
-                            <motion.div
-                                style={{ ...CARD_STYLES.tag.base, ...CARD_STYLES.tag.primary }}
-                                variants={itemVariants}
-                            >
-                                <FaBriefcase size={14} color={COLORS.primary} style={{ opacity: 0.8 }} />
-                                <span>{experience.jobTitle}</span>
-                            </motion.div>
-                        )}
-
-                        {(experience.startDate || experience.endDate) && (
-                            <motion.div
-                                style={{ ...CARD_STYLES.tag.base, ...CARD_STYLES.tag.accent }}
-                                variants={itemVariants}
-                            >
-                                <FaCalendarAlt size={14} color={COLORS.accent} style={{ opacity: 0.8 }} />
-                                <span>{formatDateRange(experience.startDate, experience.endDate)}</span>
-                            </motion.div>
-                        )}
-
-                        {experience.location && (
-                            <motion.div
-                                style={{ ...CARD_STYLES.tag.base, ...CARD_STYLES.tag.muted }}
-                                variants={itemVariants}
-                            >
-                                <FaMapMarkerAlt size={14} color={COLORS.textSecondary} style={{ opacity: 0.8 }} />
-                                <span>{experience.location}</span>
-                            </motion.div>
-                        )}
-                    </div>
-
-                    {experience.description && (
-                        <motion.div
-                            style={CARD_STYLES.description}
-                            variants={itemVariants}
-                        >
-                            <p style={{
-                                margin: 0,
-                                color: COLORS.textSecondary,
-                                lineHeight: '1.7',
-                                fontSize: '0.9375rem',
-                                whiteSpace: 'pre-line'
-                            }}>
-                                {htmlToElement(experience.description)}
-                            </p>
-                        </motion.div>
-                    )}
-                </motion.div>
-
-                {/* Footer */}
-                <motion.div
-                    style={CARD_STYLES.footer}
-                    variants={itemVariants}
-                >
-                    {isCurrent && (
-                        <motion.div 
-                            style={CARD_STYLES.statusBadge}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                        >
-                            <div style={CARD_STYLES.statusDot(true)} />
-                            <span style={{
-                                fontSize: '0.8125rem',
-                                fontWeight: 500,
-                                color: COLORS.success,
-                            }}>
-                                Currently Working Here
-                            </span>
-                        </motion.div>
-                    )}
-
-                    {experience.technologiesUsed?.length > 0 && (
-                        <div style={{ width: '100%' }}>
-                            <div style={CARD_STYLES.techHeader}>
-                                <FaCode size={14} color={COLORS.primary} />
-                                <span style={{
-                                    fontSize: '0.875rem',
-                                    fontWeight: 600,
-                                    color: COLORS.textPrimary,
-                                }}>
-                                    Technologies Used
-                                </span>
+                <div className="relative flex flex-col h-full">
+                    {/* Header Section */}
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+                        <div className="flex items-start space-x-4">
+                            <div className="relative">
+                                <div className={`absolute -inset-4 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full blur-xl opacity-0 group-hover:opacity-20 transition-all duration-700 ${isHovered ? 'animate-pulse' : ''}`} />
+                                <div className="relative z-10 p-2.5 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-800/50 shadow-lg">
+                                    <Code2 className="w-6 h-6 text-cyan-400 transition-transform duration-500 group-hover:rotate-12" />
+                                </div>
                             </div>
-                            
-                            <div style={CARD_STYLES.techGrid}>
-                                {experience.technologiesUsed.map((tech, index) => (
-                                    <motion.div
-                                        key={index}
-                                        style={CARD_STYLES.techItem}
-                                        whileHover={{ scale: 1.03 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        title={tech.logoName}
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                    <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                                        {companyName}
+                                    </h2>
+                                </div>
+                                <div className="flex items-center text-sm text-gray-400 mt-1">
+                                    <MapPin className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
+                                    <span className="truncate">{location}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span className="inline-flex items-center justify-center sm:justify-start px-3 py-1.5 rounded-full text-xs font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 backdrop-blur-sm whitespace-nowrap">
+                            <Clock className="w-3 h-3 mr-1.5 flex-shrink-0" />
+                            {getDuration(startDate, endDate || undefined)}
+                        </span>
+                    </div>
+
+                    {/* Job Title & Duration */}
+                    <div className="mb-6">
+                        <h3 className="text-lg sm:text-xl font-semibold text-white flex items-center">
+                            {jobTitle}
+                        </h3>
+                        <div className="flex items-center text-sm text-gray-400 mt-2">
+                            <Calendar className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
+                            <span>{formatDateRange(startDate, endDate || undefined)}</span>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex-1 mb-6 group/desc">
+                        <div className="text-gray-300 border-l-2 border-blue-500/50 pl-4 py-1 leading-relaxed transition-all duration-300 group-hover/desc:border-l-4 group-hover/desc:border-cyan-500/70 group-hover/desc:pl-5">
+                            {htmlToElement(description)}
+                        </div>
+                    </div>
+
+                    {/* Technologies */}
+                    {technologiesUsed && technologiesUsed.length > 0 && (
+                        <div className="mt-auto pt-4 border-t border-gray-800/50 group/tech">
+                            <h4 className="text-xs font-medium text-gray-400 mb-3 tracking-wider uppercase">Technologies Used</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {technologiesUsed.map((tech: SkillDropdown) => (
+                                    <div 
+                                        key={tech.id}
+                                        className="flex items-center px-3 py-1.5 bg-gray-800/50 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-blue-500/10 rounded-lg border border-gray-700/50 transition-all duration-300 group/techitem hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/5"
                                     >
-                                        <img 
-                                            src={tech.logoUrl} 
-                                            alt={tech.logoName} 
-                                            style={CARD_STYLES.techLogo}
-                                            loading="lazy"
-                                        />
-                                        <span style={CARD_STYLES.techName}>
+                                        {tech.logoUrl && (
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-cyan-500/10 rounded-full scale-0 group-hover/techitem:scale-100 transition-transform duration-300" />
+                                                <img 
+                                                    src={tech.logoUrl} 
+                                                    alt={tech.logoName} 
+                                                    className="w-6 h-6 mr-2.5 object-contain relative z-10 transition-transform duration-300 group-hover/techitem:scale-110"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                    }}
+                                                />
+                                            </div>
+                                        )}
+                                        <span className="text-sm font-medium text-gray-300 group-hover/techitem:text-white transition-colors">
                                             {tech.logoName}
                                         </span>
-                                    </motion.div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
                     )}
-                </motion.div>
-            </motion.div>
-        </>
+                </div>
+
+                {/* Decorative elements */}
+                <div className="absolute top-4 right-4 w-12 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="absolute top-0 right-0 w-3 h-[1px] bg-cyan-500/70 animate-pulse" />
+                    <div className="absolute top-0 right-0 w-[1px] h-3 bg-cyan-500/70 animate-pulse" />
+                </div>
+                <div className="absolute bottom-4 left-4 w-12 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="absolute bottom-0 left-0 w-3 h-[1px] bg-purple-500/70 animate-pulse" />
+                    <div className="absolute bottom-0 left-0 w-[1px] h-3 bg-purple-500/70 animate-pulse" />
+                </div>
+            </div>
+            
+            {/* Hover overlay */}
+            <div className={`absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 rounded-2xl group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+        </article>
     );
 };
 
-export default React.memo(ExperienceCard);
+export default ExperienceCard;

@@ -1,10 +1,11 @@
-import { useSkillService } from "../../../../services/useSkillService";
+import { useSkillService, Skill } from "../../../../services/useSkillService";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate } from "react-router-dom";
 import SkillFormTemplate from "../../templates/Skill/SkillForm.template";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
+import { useAuthenticatedUser } from "../../../../hooks/useAuthenticatedUser";
 
 const validationSchema = Yup.object().shape({
     logoId: Yup.number()
@@ -26,16 +27,18 @@ const SkillAddDetailsPage = () => {
     const skillService = useSkillService();
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
+    const { user } = useAuthenticatedUser();
 
     const onClose = () => navigate(ADMIN_ROUTES.SKILL);
 
-    const formik = useFormik({
+    const formik = useFormik<Skill>({
         initialValues: {
             logoId: null,
             logoName: "",
             logoUrl: "",
             level: "",
             category: "",
+            profileId: user?.id?.toString(),
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {

@@ -5,14 +5,17 @@ import { ADMIN_ROUTES, HTTP_STATUS, MODE } from "../../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
 import ExperienceFormTemplate from '../../templates/Experience/ExperienceForm.template'
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
+import { useAuthenticatedUser } from "../../../../hooks/useAuthenticatedUser";
+import { ExperienceRequest } from "../../../../services/useExperienceService";
 
 const ExperienceViewDetailsPage = () => {
     const experienceService = useExperienceService();
     const navigate = useNavigate();
     const { id } = useParams();
     const { showSnackbar } = useSnackbar();
+    const { user } = useAuthenticatedUser();
 
-    const formik = useFormik({
+    const formik = useFormik<ExperienceRequest>({
         initialValues: {
             companyName: "",
             jobTitle: "",
@@ -21,7 +24,8 @@ const ExperienceViewDetailsPage = () => {
             endDate: "",
             description: "",
             technologiesUsed: [],
-            currentlyWorking: false
+            currentlyWorking: false,
+            profileId: user?.id?.toString(),
         },
         onSubmit: () => { }
     });

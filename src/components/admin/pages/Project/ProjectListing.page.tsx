@@ -11,6 +11,7 @@ const ProjectListingPage: React.FC = () => {
         pageSize: 10,
         currentPage: 0,
         totalRecords: 0,
+        totalPages: 0
     });
     const { showSnackbar } = useSnackbar();
 
@@ -18,10 +19,11 @@ const ProjectListingPage: React.FC = () => {
         try {
             const response = await projectService.getAll();
             if (response?.status === HTTP_STATUS.OK && response.data) {
-                setProjects(response.data.data || []);
+                setProjects(response.data.data.content || []);
                 setPagination(prev => ({
                     ...prev,
-                    totalRecords: response.data.total || 0
+                    totalRecords: response.data.total || 0,
+                    totalPages: response.data.totalPages || 0
                 }));
                 showSnackbar('success','Projects fetched successfully');
             }
@@ -57,8 +59,7 @@ const ProjectListingPage: React.FC = () => {
                     currentPage: pagination.currentPage + 1,
                     pageSize: pagination.pageSize,
                     totalRecords: pagination.totalRecords,
-                    handleChangePage: handlePageChange,
-                    handleChangeRowsPerPage: handleRowsPerPageChange
+                    totalPages: pagination.totalPages,
                 }}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

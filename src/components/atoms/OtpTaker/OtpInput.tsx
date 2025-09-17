@@ -140,8 +140,8 @@ const OtpFloatingPopup: React.FC<OtpFloatingPopupProps> = ({
     if (timeLeft > 0) return; // Prevent resend before timer expires
     
     try {
-      // Reset timer to 5 minutes
-      setTimeLeft(300);
+      // Reset timer to 2 minutes
+      setTimeLeft(120);
       await authService.resendOtp();
       showSnackbar('success', 'OTP sent to your email.');
     } catch (error) {
