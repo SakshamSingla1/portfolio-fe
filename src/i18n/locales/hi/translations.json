@@ -1,0 +1,8 @@
+{
+    "general": {
+        "welcome": "Welcome to {{username}}"
+    },
+    "authentication": {
+
+    }
+}

@@ -1,10 +1,22 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import "./index.css";
+import App from "./App";
+import ReactDOM from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
+import { ThemeProvider } from "react-jss";
+import { BrowserRouter } from "react-router-dom";
+import { defaultTheme } from './utils/theme';
+import { AuthenticatedUserProvider } from './contexts/AuthenticatedUserContext';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+
+root.render(
+    <HelmetProvider>
+        <ThemeProvider theme={defaultTheme}>
+            <BrowserRouter>
+                <AuthenticatedUserProvider>
+                    <App />
+                </AuthenticatedUserProvider>
+            </BrowserRouter>
+        </ThemeProvider>
+    </HelmetProvider>
+);
