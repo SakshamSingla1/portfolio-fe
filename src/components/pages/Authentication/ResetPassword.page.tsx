@@ -13,6 +13,7 @@ import { createUseStyles } from 'react-jss';
 import { useSnackbar } from '../../../contexts/SnackbarContext';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
 import { IconButton, InputAdornment } from '@mui/material';
+import { PasswordStrengthMeter } from '../../atoms/PasswordStrengthMeter/PasswordStrengthMeter';
 
 const validationSchema = Yup.object().shape({
   newPassword: Yup.string().matches(REGEX.PASSWORD, 'Please enter a valid password').required('Password is required'),
@@ -78,6 +79,7 @@ const ResetPassword: React.FC = () => {
   const { showSnackbar } = useSnackbar();
   const classes = useStyles();
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [token, setToken] = useState<string>('');
 
   useEffect(() => {
@@ -152,7 +154,7 @@ const ResetPassword: React.FC = () => {
         <TextFieldV2
           name="confirmPassword"
           label="Confirm Password"
-          type={showPassword ? 'text' : 'password'}
+          type={showConfirmPassword ? 'text' : 'password'}
           value={resetFormik.values.confirmPassword}
           onChange={resetFormik.handleChange}
           onBlur={resetFormik.handleBlur}
@@ -166,12 +168,16 @@ const ResetPassword: React.FC = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </IconButton>
               </InputAdornment>
             ),
           }}
+        />
+
+        <PasswordStrengthMeter
+          password={resetFormik.values.newPassword}
         />
 
         {/* Submit Button */}

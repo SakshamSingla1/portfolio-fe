@@ -37,6 +37,8 @@ import ViewProjectPage from './components/pages/Project/ViewProject.page';
 
 import ListingContactUsPage from './components/pages/ContactUs/ListingContactUs.page';
 
+import SettingsPage from './components/pages/Settings/Settings.page';
+
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
@@ -84,8 +86,8 @@ const App = () => {
 
               {/* Protected admin routes */}
               <Route element={<AdminLayout />}>
-                {/* 
-                  <Route path={ADMIN_ROUTES.SETTINGS} element={<SettingsPage />} /> */}
+                
+                  <Route path={ADMIN_ROUTES.SETTINGS} element={<SettingsPage />} />
                 <Route path={ADMIN_ROUTES.SKILL}>
                   <Route index element={<ListingSkillsPage />} />
                   <Route path="add" element={<AddSkillPage />} />

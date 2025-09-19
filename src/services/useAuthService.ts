@@ -1,6 +1,7 @@
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
+import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 const AUTH_URLS = {
     LOGIN: "/admin/login",
@@ -61,6 +62,7 @@ export interface IPasswordRequest {
 }
 
 export const useAuthService = () => {
+    const { user } = useAuthenticatedUser();
 
     // Authentication
     const login = (data: ILoginRequest) => {
@@ -86,26 +88,26 @@ export const useAuthService = () => {
         return request(API_METHOD.POST, AUTH_URLS.RESET_PASSWORD, null, data);
     };
 
-    const changePassword = (userId: string, data: IChangePasswordRequest) => {
-        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_PASSWORD, { id: userId }), null, data);
+    const changePassword = (data: IChangePasswordRequest) => {
+        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_PASSWORD, { id: user?.id }), null, data);
     };
 
     // Email Management
-    const changeEmail = (userId: string, data: IChangeEmailRequest) => {
-        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_EMAIL, { id: userId }), null, data);
+    const changeEmail = (data: IChangeEmailRequest) => {
+        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_EMAIL, { id: user?.id }), null, data);
     };
 
-    const verifyChangeEmailOtp = (userId: string, data: IVerifyOtpRequest) => {
-        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.VERIFY_CHANGE_EMAIL_OTP, { id: userId }), null, data);
+    const verifyChangeEmailOtp = (data: IVerifyOtpRequest) => {
+        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.VERIFY_CHANGE_EMAIL_OTP, { id: user?.id }), null, data);
     };
 
     // Account Management
-    const requestDeleteAccountOtp = (userId: string) => {
-        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.REQUEST_DELETE_ACCOUNT_OTP, { id: userId }), null, null);
+    const requestDeleteAccountOtp = () => {
+        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.REQUEST_DELETE_ACCOUNT_OTP, { id: user?.id }), null, null);
     };
 
-    const deleteAccount = (userId: string, data: IPasswordRequest) => {
-        return request(API_METHOD.DELETE, replaceUrlParams(AUTH_URLS.DELETE_ACCOUNT, { id: userId }), null, data);
+    const deleteAccount = (data: IPasswordRequest) => {
+        return request(API_METHOD.DELETE, replaceUrlParams(AUTH_URLS.DELETE_ACCOUNT, { id: user?.id }), null, data);
     };
 
     // OTP

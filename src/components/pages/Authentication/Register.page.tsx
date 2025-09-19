@@ -14,6 +14,7 @@ import { useSnackbar } from '../../../contexts/SnackbarContext';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
 import { IconButton, InputAdornment } from '@mui/material';
 import OtpPopup from '../../molecules/OtpPopup/OtpPopup';
+import { PasswordStrengthMeter } from '../../atoms/PasswordStrengthMeter/PasswordStrengthMeter';
 
 const validationSchema = Yup.object().shape({
   fullName: Yup.string().required('Full name is required'),
@@ -83,6 +84,7 @@ const Register: React.FC = () => {
   const { showSnackbar } = useSnackbar();
   const classes = useStyles();
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [showOtpInput, setShowOtpInput] = useState<boolean>(false);
 
   useEffect(() => {
@@ -241,7 +243,7 @@ const Register: React.FC = () => {
         <TextFieldV2
           name="confirmPassword"
           label="Confirm Password"
-          type={showPassword ? 'text' : 'password'}
+          type={showConfirmPassword ? 'text' : 'password'}
           value={registerFormik.values.confirmPassword}
           onChange={registerFormik.handleChange}
           onBlur={registerFormik.handleBlur}
@@ -255,12 +257,15 @@ const Register: React.FC = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </IconButton>
               </InputAdornment>
             ),
           }}
+        />
+        <PasswordStrengthMeter
+          password={registerFormik.values.password}
         />
 
         {/* Submit Button */}
