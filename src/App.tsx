@@ -13,7 +13,22 @@ import Register from './components/pages/Authentication/Register.page';
 import ForgotPasswordPage from './components/pages/Authentication/ForgotPassword.page';
 import ResetPasswordPage from './components/pages/Authentication/ResetPassword.page';
 import ProfilePage from './components/pages/Profile/Profile.page';
+
 import { SnackbarProvider } from './contexts/SnackbarContext';
+import EditSkillPage from './components/pages/Skill/EditSkill.page';
+import AddSkillPage from './components/pages/Skill/AddSkill.page';
+import ViewSkillPage from './components/pages/Skill/ViewSkill.page';
+import ListingSkillsPage from './components/pages/Skill/ListingSkills.page';
+
+import AddEducationPage from './components/pages/Education/AddEducation.page';
+import EditEducationPage from './components/pages/Education/EditEducation.page';
+import ViewEducationPage from './components/pages/Education/ViewEducation.page';
+import ListingEducationPage from './components/pages/Education/ListingEducation.page';
+
+import AddExperiencePage from './components/pages/Experience/AddExperience.page';
+import EditExperiencePage from './components/pages/Experience/EditExperience.page';
+import ViewExperiencePage from './components/pages/Experience/ViewExperience.page';
+import ListingExperiencesPage from './components/pages/Experience/ListingExperiences.page';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -62,13 +77,7 @@ const App = () => {
 
               {/* Protected admin routes */}
               <Route element={<AdminLayout />}>
-                {/* <Route path={ADMIN_ROUTES.EDUCATION}>
-                    <Route index element={<EducationDetailsListingPage />} />
-                    <Route path="add" element={<EducationAddDetailsPage />} />
-                    <Route path=":degree/edit" element={<EducationEditDetailsPage />} />
-                    <Route path=":degree" element={<EducationDetailsViewPage />} />
-                  </Route>
-
+                {/* 
                   <Route path={ADMIN_ROUTES.CONTACT_US} element={<ContactUsListingPage />} />
 
                   <Route path={ADMIN_ROUTES.PROJECTS}>
@@ -76,13 +85,6 @@ const App = () => {
                     <Route path="add" element={<ProjectAddDetailsPage />} />
                     <Route path=":id/edit" element={<ProjectEditDetailsPage />} />
                     <Route path=":id" element={<ProjectViewDetailsPage />} />
-                  </Route>
-
-                  <Route path={ADMIN_ROUTES.EXPERIENCE}>
-                    <Route index element={<ExperienceListingPage />} />
-                    <Route path="add" element={<ExperienceAddDetailsPage />} />
-                    <Route path=":id/edit" element={<ExperienceEditDetailsPage />} />
-                    <Route path=":id" element={<ExperienceDetailsViewPage />} />
                   </Route>
 
                   <Route path={ADMIN_ROUTES.SKILL}>
@@ -93,6 +95,27 @@ const App = () => {
                   </Route>
 
                   <Route path={ADMIN_ROUTES.SETTINGS} element={<SettingsPage />} /> */}
+                <Route path={ADMIN_ROUTES.SKILL}>
+                  <Route index element={<ListingSkillsPage />} />
+                  <Route path="add" element={<AddSkillPage />} />
+                  <Route path=":id/edit" element={<EditSkillPage />} />
+                  <Route path=":id" element={<ViewSkillPage />} />
+                </Route>
+
+                <Route path={ADMIN_ROUTES.EDUCATION}>
+                  <Route index element={<ListingEducationPage />} />
+                  <Route path="add" element={<AddEducationPage />} />
+                  <Route path=":id/edit" element={<EditEducationPage />} />
+                  <Route path=":id" element={<ViewEducationPage />} />
+                </Route>
+
+                <Route path={ADMIN_ROUTES.EXPERIENCE}>
+                    <Route index element={<ListingExperiencesPage />} />
+                    <Route path="add" element={<AddExperiencePage />} />
+                    <Route path=":id/edit" element={<EditExperiencePage />} />
+                    <Route path=":id" element={<ViewExperiencePage />} />
+                  </Route>
+
                 <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
                 <Route path="/" element={<Navigate to={ADMIN_ROUTES.PROFILE} replace />} />
               </Route>

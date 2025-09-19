@@ -21,10 +21,15 @@ export interface IPagination {
     totalRecords: number;
 };
 
-export interface option {
-    value: string;
-    label: string;
+export interface IOption {
+    value: string | number;
+    label: string | number | React.ReactNode;
 }
+
+export type MakeRouteParams = {
+    params?: { [key: string]: any } | null;
+    query?: { [key: string]: any } | null;
+};
 
 export const HTTP_STATUS = {
     OK: 200,

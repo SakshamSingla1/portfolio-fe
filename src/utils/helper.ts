@@ -1,5 +1,7 @@
 import moment from "moment";
 import { REGEX } from "./constant";
+import { createSearchParams, generatePath } from "react-router-dom";
+import type { IOption, MakeRouteParams } from "./types";
 
 export const capitalizeFirstLetter = (input: string) => {
   if (!input) return '';
@@ -12,6 +14,10 @@ export const convertToCamelCase = (input: string) => {
 
 export const validatePhoneNumber = (phoneNumber: string) => {
   return REGEX.PHONE_NUMBER.test(phoneNumber);
+};
+
+export const snakeCaseToTitleCase = (str: string) => {
+  return str.replace(/_/g, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
 };
 
 export const timeToLocale = (
@@ -139,4 +145,21 @@ export const createFileFromUrl = (url: string): File => {
   const pathParts = fullPath.split('/');
   const filename = pathParts[pathParts.length - 1] || 'file';
   return new File([new Blob([url])], filename, { type: 'image/jpeg' });
+};
+
+export const OptionToValue = (options: IOption[], value: string): string | number | React.ReactNode | undefined => {
+  return options.find((option: IOption) => option.value === value)?.label;
+};
+
+export const titleModification = (title: string) => {
+  return title.charAt(0).toUpperCase() + title.slice(1);
+};
+
+export const makeRoute = (
+	baseRoute: string,
+	{ params, query }: MakeRouteParams
+): string => {
+	const queryString = createSearchParams(query ?? {});
+	return `${generatePath(baseRoute, params ?? {})}${queryString ? `?${queryString}` : ''
+		}`;
 };

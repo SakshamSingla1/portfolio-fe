@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuthenticatedUser } from '../../../hooks/useAuthenticatedUser';
-import { ADMIN_ROUTES } from '../../../utils/constant';
+import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
 import { HTTP_STATUS } from '../../../utils/types';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -33,7 +32,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const ProfilePage: React.FC = () => {
-    const { user } = useAuthenticatedUser();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [isEditMode, setIsEditMode] = useState(false);
@@ -42,7 +40,7 @@ const ProfilePage: React.FC = () => {
 
     useEffect(() => {
         const mode = searchParams.get('mode');
-        setIsEditMode(mode === 'edit');
+        setIsEditMode(mode === MODE.EDIT);
     }, [searchParams]);
 
     const getProfileData = async () => {

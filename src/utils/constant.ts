@@ -1,4 +1,4 @@
-import type { IPagination, option } from "./types"
+import type { IPagination, IOption } from "./types"
 
 export const API_METHOD = {
     POST: "POST",
@@ -22,10 +22,26 @@ export const REGEX = {
 
 export const ADMIN_ROUTES = {
     LOGIN: "/admin/login",
-    PROFILE: "/admin/profile",
     REGISTER: "/admin/register",
     FORGOT_PASSWORD: "/admin/forgot-password",
     RESET_PASSWORD: "/admin/reset-password",
+    PROFILE: "/admin/profile",
+    EDUCATION: "/admin/education",
+    EDUCATION_ADD: "/admin/education/add",
+    EDUCATION_EDIT: "/admin/education/:id/edit",
+    EDUCATION_VIEW: "/admin/education/:id",
+    EXPERIENCE: "/admin/experience",
+    EXPERIENCE_ADD: "/admin/experience/add",
+    EXPERIENCE_EDIT: "/admin/experience/:id/edit",
+    EXPERIENCE_VIEW: "/admin/experience/:id",
+    PROJECTS: "/admin/projects",
+    SKILL: "/admin/skill",
+    SKILL_ADD: "/admin/skill/add",
+    SKILL_EDIT: "/admin/skill/:id/edit",
+    SKILL_VIEW: "/admin/skill/:id",
+    CONTACT_US: "/admin/contact-us",
+    SETTINGS: "/admin/settings",
+    MAIN_SITE: "/admin/main-site",
 }
 
 export const MODE = {
@@ -38,7 +54,7 @@ export const MODE = {
    
 export const initialPaginationValues: IPagination = {
     currentPage: 0,
-    pageSize: 10,
+    pageSize: 50,
     totalPages: 1,
     totalRecords: 0,
 }
@@ -50,7 +66,7 @@ export const initialPaginationValuesV2: IPagination = {
     totalRecords: 0,
 }
 
-export const sortOptions: option[] = [
+export const sortOptions: IOption[] = [
     { value: "name,asc", label: "Name (Ascending)" },
     { value: "name,desc", label: "Name (Descending)" },
     { value: "createdAt,asc", label: "Created Date(Ascending)" },
@@ -62,7 +78,7 @@ export const RESOURCES: {
 } = {
 }
 
-export const LANGUAGE_CODE: option[] = [
+export const LANGUAGE_CODE: IOption[] = [
     {
         "label": "Afrikaans",
         "value": "af"
@@ -348,3 +364,60 @@ export const LANGUAGE_CODE: option[] = [
         "value": "zu"
     }
 ]
+
+export const COLORS = {
+    primary50: '#E8F8F5',
+    primary100: '#D1F2EB',
+    primary200: '#A3E4D7',
+    primary300: '#76D7C4',
+    primary400: '#48C9B0',
+    primary500: '#1ABC9C',
+    primary600: '#17A589',
+    primary700: '#148F77',
+    primary800: '#0E6655',
+    primary900: '#0B5345',
+    primary950: '#073B32',
+    primary960: '#E8F8F5',
+}
+
+export type Option = {
+    value: string;
+    label: string;
+}
+
+export const SKILL_LEVEL_OPTIONS: Option[] = [
+    { value: 'Beginner', label: 'Beginner' },
+    { value: 'Intermediate', label: 'Intermediate' },
+    { value: 'Advanced', label: 'Advanced' },
+];
+
+export const SKILL_CATEGORY_OPTIONS: Option[] = [
+    { value: 'FRONTEND', label: 'Frontend' },
+    { value: 'BACKEND', label: 'Backend' },
+    { value: 'PROGRAMMING', label: 'Programming' },
+    { value: 'TOOL', label: 'Tool' },
+    { value: 'DATABASE', label: 'Database' },
+    { value: 'DEVOPS', label: 'DevOps' },
+    { value: 'TESTING', label: 'Testing' },
+    { value: 'MOBILE', label: 'Mobile' },
+    { value: 'CLOUD', label: 'Cloud' },
+    { value: 'SECURITY', label: 'Security' },
+    { value: 'DATA_SCIENCE', label: 'Data Science' },
+    { value: 'UI_UX', label: 'UI/UX' },
+    { value: 'SOFT_SKILLS', label: 'Soft Skills' },
+    { value: 'OTHER', label: 'Other' }
+];
+
+export const DEBOUNCE_TIME = {
+    DEFAULT: 500,
+}
+
+export const DEGREE_OPTIONS: Option[] = [
+    { value: 'HIGH_SCHOOL', label: '10th' },
+    { value: 'SENIOR_SECONDARY', label: '12th' },
+    { value: 'BACHELORS', label: 'Bachelors' },
+    { value: 'MASTERS', label: 'Masters' },
+    { value: 'DIPLOMA', label: 'Diploma' },
+    { value: 'PHD', label: 'PhD' },
+    { value: 'OTHER', label: 'Other' },
+];

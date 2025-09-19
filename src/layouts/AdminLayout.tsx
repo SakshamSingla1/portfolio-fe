@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link, Outlet } from 'react-router-dom';
 import { useAuthenticatedUser } from '../hooks/useAuthenticatedUser';
 import { ADMIN_ROUTES } from '../utils/constant';
-// import LogoutButton from '../components/atoms/LogoutButton/LogoutButton';
+import LogoutButton from '../components/atoms/LogoutButton/LogoutButton';
 import Button from '../components/atoms/Button/Button';
 import {
   FaHome,
@@ -101,13 +101,13 @@ const AdminLayout: React.FC = () => {
 
   const navItems = [
     { to: ADMIN_ROUTES.PROFILE, icon: <FaUser />, label: 'Profile Information' },
-    // { to: ADMIN_ROUTES.EDUCATION, icon: <FaGraduationCap />, label: 'Education' },
-    // { to: ADMIN_ROUTES.EXPERIENCE, icon: <FaBriefcase />, label: 'Experience' },
-    // { to: ADMIN_ROUTES.PROJECTS, icon: <FaCode />, label: 'Projects' },
-    // { to: ADMIN_ROUTES.SKILL, icon: <FaDumbbell />, label: 'Skill' },
-    // { to: ADMIN_ROUTES.CONTACT_US, icon: <FaEnvelope />, label: 'Contact Us' },
-    // { to: ADMIN_ROUTES.SETTINGS, icon: <FaCog />, label: 'Settings' },
-    // { to: MAIN_ROUTES.HOME, icon: <FaGlobe />, label: 'Main Site' },
+    { to: ADMIN_ROUTES.EDUCATION, icon: <FaGraduationCap />, label: 'Education' },
+    { to: ADMIN_ROUTES.EXPERIENCE, icon: <FaBriefcase />, label: 'Experience' },
+    { to: ADMIN_ROUTES.PROJECTS, icon: <FaCode />, label: 'Projects' },
+    { to: ADMIN_ROUTES.SKILL, icon: <FaDumbbell />, label: 'Skill' },
+    { to: ADMIN_ROUTES.CONTACT_US, icon: <FaEnvelope />, label: 'Contact Us' },
+    { to: ADMIN_ROUTES.SETTINGS, icon: <FaCog />, label: 'Settings' },
+    { to: ADMIN_ROUTES.MAIN_SITE, icon: <FaGlobe />, label: 'Main Site' },
   ];
 
   const toggleSidebar = (): void => setSidebarOpen(!sidebarOpen);
@@ -219,7 +219,7 @@ const AdminLayout: React.FC = () => {
                 </div>
               </div>
             )}
-            {/* <LogoutButton collapsed={collapsed} /> */}
+            <LogoutButton collapsed={collapsed} />
           </div>
 
           {/* Collapse button */}
