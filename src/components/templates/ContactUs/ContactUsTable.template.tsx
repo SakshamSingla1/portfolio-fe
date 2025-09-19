@@ -10,6 +10,7 @@ interface IContactUsListTemplateProps {
     pagination: IPagination;
     handlePaginationChange: any;
     handleRowsPerPageChange: any;
+    filters: any; // Add proper type here if you have a specific type for filters
 }
 
 const ContactUsTableTemplate: React.FC<IContactUsListTemplateProps> = ({ contactUs, pagination, handlePaginationChange, handleRowsPerPageChange }) => {

@@ -1,7 +1,6 @@
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
-import { type IUser } from "../utils/types";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 export const PROFILE_URLS = {

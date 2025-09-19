@@ -1,5 +1,5 @@
-import React, { type SyntheticEvent, useCallback } from 'react';
-import Autocomplete, { type AutocompleteChangeReason, type AutocompleteChangeDetails } from '@mui/material/Autocomplete';
+import React, { useCallback } from 'react';
+import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import { ClearIcon } from '@mui/x-date-pickers';
 import { createUseStyles } from 'react-jss';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -141,7 +141,7 @@ const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
 						</li>
 					);
 				}}
-				onChange={(value, reason) => handleInputChange(value, reason)}
+				onChange={(_event, value, reason) => handleInputChange(value, reason)}
 				value={value}
 				onBlur={onBlur}
 			/>
