@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useEducationService, type Education } from "../../../services/useEducationService";
 import { MODE } from "../../../utils/constant";
 import { useParams } from "react-router-dom";

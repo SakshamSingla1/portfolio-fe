@@ -1,5 +1,5 @@
-import React, { type ReactNode, type SyntheticEvent, useCallback } from 'react';
-import Autocomplete from '@mui/material/Autocomplete';
+import React, { type SyntheticEvent, useCallback } from 'react';
+import Autocomplete, { type AutocompleteChangeReason, type AutocompleteChangeDetails } from '@mui/material/Autocomplete';
 import { ClearIcon } from '@mui/x-date-pickers';
 import { createUseStyles } from 'react-jss';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -70,7 +70,12 @@ const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
 	id,
 	onBlur
 }) => {
-	const handleInputChange = (e: SyntheticEvent<Element, Event>, value: AutoCompleteOption | null) => {
+	const handleInputChange = (
+		event: SyntheticEvent<Element, Event>,
+		value: AutoCompleteOption | null,
+		reason: AutocompleteChangeReason,
+		details?: AutocompleteChangeDetails<AutoCompleteOption>
+	) => {
 		onChange(value);
 	};
 

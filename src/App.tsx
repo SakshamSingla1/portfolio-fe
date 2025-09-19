@@ -63,13 +63,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const AuthRedirect = () => {
-  const { user } = useAuthenticatedUser();
-  return user ?
-    <Navigate to={ADMIN_ROUTES.PROFILE} replace /> :
-    <Navigate to="/users" replace />;
-};
-
 // Main App component
 const App = () => {
   return (

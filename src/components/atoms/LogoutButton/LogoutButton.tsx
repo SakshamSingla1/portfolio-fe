@@ -7,13 +7,11 @@ import { FaSignOutAlt } from 'react-icons/fa';
 
 interface LogoutButtonProps {
     className?: string;
-    variant?: 'text' | 'contained' | 'outlined';
     collapsed?: boolean;
 }
 
 const LogoutButton: React.FC<LogoutButtonProps> = ({
     className = '',
-    variant = 'outlined',
     collapsed = false,
 }) => {
     const { setAuthenticatedUser } = useAuthenticatedUser();

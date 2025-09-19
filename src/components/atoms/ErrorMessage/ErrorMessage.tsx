@@ -22,10 +22,9 @@ const useStyles = createUseStyles((theme: any) => ({
 
 interface ErrorMessageProps {
     message?: string
-    size?: string
 }
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, size }) => {
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ message }) => {
     const classes = useStyles();
     return (
         <div className={`${classes.errorSmall} text-xs`}>{message}</div>

@@ -30,7 +30,6 @@ interface TableProps {
   schema: TableSchema;
   records: any[][];
   className?: string;
-  isRounded?: boolean;
 }
 
 /** ---- COLOR PALETTE ---- */
@@ -188,7 +187,7 @@ const useStyles = createUseStyles({
 });
 
 /** ---- GENERIC TABLE COMPONENT ---- */
-const TableV1: React.FC<TableProps> = ({ schema, records, className, isRounded }) => {
+const TableV1: React.FC<TableProps> = ({ schema, records, className }) => {
   const classes = useStyles();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);

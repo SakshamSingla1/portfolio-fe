@@ -1,17 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthService, type IResetPasswordRequest, type IVerifyOtpRequest } from '../../../services/useAuthService';
+import { useAuthService, type IResetPasswordRequest } from '../../../services/useAuthService';
 import { ADMIN_ROUTES, REGEX } from '../../../utils/constant';
 import { HTTP_STATUS } from '../../../utils/types';
 import TextFieldV2 from '../../atoms/TextField/TextField';
 import Button from '../../atoms/Button/Button';
-import { useAuthenticatedUser } from '../../../hooks/useAuthenticatedUser';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { motion } from 'framer-motion';
 import { createUseStyles } from 'react-jss';
 import { useSnackbar } from '../../../contexts/SnackbarContext';
-import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
+import { Eye, EyeOff, Lock } from 'lucide-react';
 import { IconButton, InputAdornment } from '@mui/material';
 import { PasswordStrengthMeter } from '../../atoms/PasswordStrengthMeter/PasswordStrengthMeter';
 

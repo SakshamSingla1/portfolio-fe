@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSkillService, type Skill } from "../../../services/useSkillService";
 import { MODE } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import SkillFormTemplate from "../../templates/Skill/SkillForm.template";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
 

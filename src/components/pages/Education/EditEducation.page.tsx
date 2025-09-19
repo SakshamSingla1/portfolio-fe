@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useEducationService, type Education } from "../../../services/useEducationService";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { useNavigate, useParams } from "react-router-dom";

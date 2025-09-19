@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useProjectService, type ProjectResponse } from "../../../services/useProjectService";
 import { MODE } from "../../../utils/constant";
 import { useParams } from "react-router-dom";

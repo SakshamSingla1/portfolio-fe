@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { createUseStyles } from 'react-jss';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { InputAdornment } from '@mui/material';
 import {FiSearch} from "react-icons/fi";
 import TextField from '../../atoms/TextField/TextField';
@@ -10,21 +9,8 @@ import { HTTP_STATUS, type IPagination } from '../../../utils/types';
 import SkillsTableTemplate from '../../templates/Skill/SkillsTable.template';
 import { useSkillService , type Skill , type SkillFilterParams} from '../../../services/useSkillService';
 
-const useStyles = createUseStyles((theme: any) => ({
-    heading: {
-        color: theme.palette.background.neutral.neutral900,
-    },
-    title: {
-        color: theme.palette.background.neutral.neutral900
-    },
-    value: {
-        color: theme.palette.background.neutral.neutral900
-    },
-}));
-
 const ListingSkillsPage : React.FC = () => {
 
-    const classes = useStyles();
     const { showSnackbar } = useSnackbar();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -71,7 +57,7 @@ const ListingSkillsPage : React.FC = () => {
         setFilters({ ...filters, [name]: value ?? "" });
     };
 
-    const handlePaginationChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    const handlePaginationChange = (newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage

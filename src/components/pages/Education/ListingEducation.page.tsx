@@ -56,7 +56,7 @@ const ListingEducationsPage : React.FC = () => {
         setFilters({ ...filters, [name]: value ?? "" });
     };
 
-    const handlePaginationChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    const handlePaginationChange = ( newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage

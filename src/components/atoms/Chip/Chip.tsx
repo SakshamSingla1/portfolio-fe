@@ -1,5 +1,5 @@
 import { FaTimesCircle } from 'react-icons/fa';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 interface ChipProps {
   label: string | ReactNode;

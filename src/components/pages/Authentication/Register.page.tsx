@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthService, type IRegisterRequest, type IVerifyOtpRequest } from '../../../services/useAuthService';
 import { ADMIN_ROUTES, REGEX } from '../../../utils/constant';
@@ -80,7 +80,7 @@ const useStyles = createUseStyles((theme: any) => ({
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const authService = useAuthService();
-  const { user, setAuthenticatedUser } = useAuthenticatedUser();
+  const { user } = useAuthenticatedUser();
   const { showSnackbar } = useSnackbar();
   const classes = useStyles();
   const [showPassword, setShowPassword] = useState<boolean>(false);
