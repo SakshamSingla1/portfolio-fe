@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
-import { type FormikProps, useFormik } from "formik";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { useFormik } from "formik";
 import dayjs from "dayjs";
 import * as Yup from "yup";
 import TextField from "../../atoms/TextField/TextField";
@@ -14,19 +14,9 @@ import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import JoditEditor from 'jodit-react';
-import { createUseStyles } from "react-jss";
 import { HTTP_STATUS } from '../../../utils/types';
 import { useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
-
-const useStyles = createUseStyles({
-    '@global': {
-        '.jodit-add-new-line, .jodit-add-new-line *': {
-            display: 'none !important',
-            boxSizing: 'border-box',
-        }
-    }
-})
 
 const validationSchema = Yup.object().shape({
     projectName: Yup.string()

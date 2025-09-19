@@ -4,23 +4,12 @@ import { FiEye } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
 import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
-import { ADMIN_ROUTES, DEGREE_OPTIONS } from '../../../utils/constant';
-import { convertToCamelCase, DateUtils, makeRoute, OptionToValue, titleModification } from '../../../utils/helper';
+import { ADMIN_ROUTES } from '../../../utils/constant';
+import { DateUtils, makeRoute } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
 import { type ExperienceResponse } from '../../../services/useExperienceService';
-import { createUseStyles } from 'react-jss';
-import type { Skill, SkillDropdown } from '../../../services/useSkillService';
+import type { SkillDropdown } from '../../../services/useSkillService';
 import { Chip } from '@mui/material';
-
-const useStyles = createUseStyles((theme: any) => ({
-    actionButton: {
-        color: theme.palette.background.primary.primary500,
-    },
-    error: {
-        backgroundColor: theme.palette.background.secondary.secondary500,
-        color: theme.palette.background.secondary.secondary500
-    }
-}));
 
 interface IExperienceListTemplateProps {
     experiences: ExperienceResponse[];
@@ -31,7 +20,6 @@ interface IExperienceListTemplateProps {
 }
 
 const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ experiences, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
-    const classes = useStyles();
     const navigate = useNavigate();
 
     const handleEditClick = (id: number) => {
@@ -102,10 +90,10 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
         if (id) {
             return (
                 <div title=''>
-                    <button onClick={() => handleViewClick(id)}><div className={`ml-2 ${classes.actionButton} text-lg`}>
-                        <FiEye className={`ml-2 ${classes.actionButton} text-lg`} />
+                    <button onClick={() => handleViewClick(id)}><div className={`ml-2 text-lg`}>
+                        <FiEye className={`ml-2 text-lg`} />
                     </div></button>
-                    <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 ${classes.actionButton} text-lg`} /></button>
+                    <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 text-lg`} /></button>
                 </div>
             );
         }

@@ -8,16 +8,15 @@ import TextField from "../../../components/atoms/TextField/TextField";
 import Button from "../../../components/atoms/Button/Button";
 import OtpPopup from "../../molecules/OtpPopup/OtpPopup";
 import { useAuthService } from "../../../services/useAuthService";
-import { HTTP_STATUS, type IUser } from "../../../utils/types";
+import { HTTP_STATUS } from "../../../utils/types";
 
 interface EmailTabProps {
-  user: IUser | null;
   handleEmailOtpSubmit: (values: any) => void;
   setFormStatus: React.Dispatch<React.SetStateAction<{ type: "success" | "error"; message: string } | null>>;
   showSnackbar: (type: "success" | "error", message: string) => void;
 }
 
-const EmailTab: React.FC<EmailTabProps> = ({ user, handleEmailOtpSubmit, setFormStatus, showSnackbar }) => {
+const EmailTab: React.FC<EmailTabProps> = ({ handleEmailOtpSubmit, setFormStatus, showSnackbar }) => {
   const authService = useAuthService();
   const [emailOtpOpen, setEmailOtpOpen] = useState(false);
 

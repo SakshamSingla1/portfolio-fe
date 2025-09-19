@@ -5,7 +5,7 @@ import { LiaEdit } from "react-icons/lia";
 import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES, DEGREE_OPTIONS } from '../../../utils/constant';
-import { convertToCamelCase, makeRoute, OptionToValue, titleModification } from '../../../utils/helper';
+import { makeRoute, OptionToValue } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
 import { type Education } from '../../../services/useEducationService';
 import { createUseStyles } from 'react-jss';

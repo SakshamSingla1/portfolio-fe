@@ -3,8 +3,8 @@ import { useSnackbar } from "../../../contexts/SnackbarContext";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useNavigate } from "react-router-dom";
 import { Lock, Email, ErrorOutline, ArrowRight, CheckCircle, Cancel } from "@mui/icons-material";
-import { HTTP_STATUS, type IUser } from "../../../utils/types";
 import { motion, AnimatePresence } from "framer-motion";
+import { type IUser } from "../../../utils/types";
 
 import PasswordTab from "./PasswordTab";
 import EmailTab from "./EmailTab";
@@ -70,7 +70,6 @@ const SettingsTemplate: React.FC<SettingsTemplateProps> = ({
       description: "Update your email address",
       content: (
         <EmailTab
-          user={user}
           handleEmailOtpSubmit={handleEmailOtpSubmit}
           setFormStatus={setFormStatus}
           showSnackbar={showSnackbar}

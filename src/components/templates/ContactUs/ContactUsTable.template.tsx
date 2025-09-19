@@ -10,10 +10,9 @@ interface IContactUsListTemplateProps {
     pagination: IPagination;
     handlePaginationChange: any;
     handleRowsPerPageChange: any;
-    filters: any;
 }
 
-const ContactUsTableTemplate: React.FC<IContactUsListTemplateProps> = ({ contactUs, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
+const ContactUsTableTemplate: React.FC<IContactUsListTemplateProps> = ({ contactUs, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
 
     const getSchema = () => ({
         id: "1",

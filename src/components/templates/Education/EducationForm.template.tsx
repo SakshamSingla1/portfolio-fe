@@ -5,7 +5,6 @@ import Button from "../../atoms/Button/Button";
 import Select from "../../atoms/Select/Select";
 import { GradeType, type Education } from "../../../services/useEducationService";
 import { InputAdornment } from "@mui/material";
-import { createUseStyles } from "react-jss";
 import { useRef, useMemo, useEffect } from "react";
 import JoditEditor from "jodit-react";
 import { useFormik } from "formik";
@@ -39,15 +38,6 @@ const validationSchema = Yup.object().shape({
         .max(10, 'Grade is too long')
 });
 
-const useStyles = createUseStyles({
-    '@global': {
-        '.jodit-add-new-line, .jodit-add-new-line *': {
-            display: 'none !important',
-            boxSizing: 'border-box',
-        }
-    }
-})
-
 interface EducationFormProps {
     onSubmit: (values: Education) => void;
     mode: string;
@@ -55,7 +45,6 @@ interface EducationFormProps {
 }
 
 const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, education }) => {
-    const classes = useStyles();
     const navigate = useNavigate();
     const { user } = useAuthenticatedUser();
 

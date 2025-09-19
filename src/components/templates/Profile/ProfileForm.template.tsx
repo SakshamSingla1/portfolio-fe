@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import TextFieldV2 from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import type { FormikProps } from "formik";
 import type { ProfileRequest } from "../../../services/useProfileService";
-import { FiUser, FiMail, FiGithub, FiLinkedin, FiGlobe, FiMapPin, FiPhone, FiBriefcase, FiCamera } from 'react-icons/fi';
+import { FiUser, FiMail, FiGithub, FiLinkedin, FiGlobe, FiMapPin, FiPhone, FiBriefcase } from 'react-icons/fi';
 // import ProfileImage from "../../../atoms/ProfileImage/ProfileImage";
 import { InputAdornment } from '@mui/material';
 import { createUseStyles } from "react-jss";
-import { useNavigate } from "react-router-dom";
-import { ADMIN_ROUTES } from "../../../utils/constant";
 // import ProfileCard from '../../atoms/ProfileCard/ProfileCard';
 // import AboutCard from '../../atoms/AboutCard/AboutCard';
 
@@ -112,14 +110,6 @@ interface ProfileFormProps {
 }
 
 const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, onEditClick }) => {
-    const classes = useStyles();
-
-    const navigate = useNavigate();
-
-    const handleEditPicture = () => {
-        navigate(ADMIN_ROUTES.PROFILE + "?mode=edit");
-    };
-
     return (
         <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             {/* Header */}

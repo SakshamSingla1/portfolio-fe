@@ -10,22 +10,12 @@ import { useSkillService, type SkillDropdown } from "../../../services/useSkillS
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
 import { type ExperienceRequest, type ExperienceResponse } from "../../../services/useExperienceService";
-import { type FormikProps, useFormik } from "formik";
+import { useFormik } from "formik";
 import JoditEditor from "jodit-react";
-import { createUseStyles } from "react-jss";
 import { HTTP_STATUS } from "../../../utils/types";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
-
-const useStyles = createUseStyles({
-    '@global': {
-        '.jodit-add-new-line, .jodit-add-new-line *': {
-            display: 'none !important',
-            boxSizing: 'border-box',
-        }
-    }
-})
 
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
@@ -60,7 +50,6 @@ interface ExperienceFormProps {
 }
 
 const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode, experience }) => {
-    const classes = useStyles();
     const skillService = useSkillService();
     const navigate = useNavigate();
     const { user } = useAuthenticatedUser();

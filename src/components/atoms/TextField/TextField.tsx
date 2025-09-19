@@ -147,7 +147,7 @@ const TextField = styled((props: TextFieldProps) => {
                 </div>
             )}
             <MuiTextField {...props} label="" className={`${classes.textField} ${props.InputProps?.readOnly ? classes.readOnlyInput : ''}`} helperText={null} />
-            {props.error && !!props.helperText && <ErrorMessage message={props.helperText as string} size={props.size as string} />}
+            {props.error && !!props.helperText && <ErrorMessage message={props.helperText as string} />}
         </div>
     );
 })();

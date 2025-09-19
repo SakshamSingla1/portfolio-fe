@@ -1,6 +1,5 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useAuthenticatedUser } from './hooks/useAuthenticatedUser';
 
 // Admin Layout 
 import { ADMIN_ROUTES } from './utils/constant';

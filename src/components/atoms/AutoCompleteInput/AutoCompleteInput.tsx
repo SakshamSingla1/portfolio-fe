@@ -70,14 +70,15 @@ const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
 	id,
 	onBlur
 }) => {
-	const handleInputChange = (
-		event: SyntheticEvent<Element, Event>,
-		value: AutoCompleteOption | null,
-		reason: AutocompleteChangeReason,
-		details?: AutocompleteChangeDetails<AutoCompleteOption>
+	const handleInputChange = useCallback((
+		value: AutoCompleteOption | null, 
+		reason: AutocompleteChangeReason, 
 	) => {
-		onChange(value);
-	};
+		// Only call the parent's onChange when the value actually changes
+		if (reason === 'selectOption' || reason === 'removeOption' || reason === 'clear') {
+			onChange(value);
+		}
+	}, [onChange]);
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		debouncedSearch(e.target.value);
@@ -140,7 +141,7 @@ const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
 						</li>
 					);
 				}}
-				onChange={handleInputChange}
+				onChange={(value, reason) => handleInputChange(value, reason)}
 				value={value}
 				onBlur={onBlur}
 			/>
