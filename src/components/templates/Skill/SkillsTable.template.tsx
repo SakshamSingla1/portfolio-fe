@@ -4,8 +4,8 @@ import { FiEye } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
 import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
-import { ADMIN_ROUTES } from '../../../utils/constant';
-import { convertToCamelCase, makeRoute, titleModification } from '../../../utils/helper';
+import { ADMIN_ROUTES, SKILL_CATEGORY_OPTIONS } from '../../../utils/constant';
+import { convertToCamelCase, makeRoute, OptionToValue, titleModification } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
 import { type Skill } from '../../../services/useSkillService';
 import { createUseStyles } from 'react-jss';
@@ -67,7 +67,7 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
         pagination.currentPage * pagination.pageSize + index + 1,
         skill.logoName,
         <img src={skill.logoUrl || ""} alt="logo" className="w-10 h-10" />,
-        convertToCamelCase(skill.category || ""),
+        OptionToValue(SKILL_CATEGORY_OPTIONS, skill.category || ""),
         skill.level,
         Action(Number(skill.id))
     ])

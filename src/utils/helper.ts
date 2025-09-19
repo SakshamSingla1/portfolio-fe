@@ -124,7 +124,11 @@ export const DateUtils = {
   dateTimeSecondToDateTime: (dateTime: string): string => {
     if (!dateTime) return "No Data";
     return moment(dateTime).format("DD-MM-YYYY HH:mm");
-  }
+  },
+
+  formatDateTimeToDateMonthYear: (dateTime: string): string => {
+    return moment(dateTime, "YYYY-MM-DD HH:mm:ss").format("D-MMM-YYYY");
+  },
 };
 
 export const getInitials = (str: string): string => {

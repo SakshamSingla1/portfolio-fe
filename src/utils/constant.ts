@@ -26,20 +26,29 @@ export const ADMIN_ROUTES = {
     FORGOT_PASSWORD: "/admin/forgot-password",
     RESET_PASSWORD: "/admin/reset-password",
     PROFILE: "/admin/profile",
+    
     EDUCATION: "/admin/education",
     EDUCATION_ADD: "/admin/education/add",
     EDUCATION_EDIT: "/admin/education/:id/edit",
     EDUCATION_VIEW: "/admin/education/:id",
+    
     EXPERIENCE: "/admin/experience",
     EXPERIENCE_ADD: "/admin/experience/add",
     EXPERIENCE_EDIT: "/admin/experience/:id/edit",
     EXPERIENCE_VIEW: "/admin/experience/:id",
+    
     PROJECTS: "/admin/projects",
+    PROJECTS_ADD: "/admin/projects/add",
+    PROJECTS_EDIT: "/admin/projects/:id/edit",
+    PROJECTS_VIEW: "/admin/projects/:id",
+    
     SKILL: "/admin/skill",
     SKILL_ADD: "/admin/skill/add",
     SKILL_EDIT: "/admin/skill/:id/edit",
     SKILL_VIEW: "/admin/skill/:id",
+    
     CONTACT_US: "/admin/contact-us",
+
     SETTINGS: "/admin/settings",
     MAIN_SITE: "/admin/main-site",
 }

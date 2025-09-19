@@ -4,12 +4,12 @@ import { FiEye } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
 import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
-import { ADMIN_ROUTES, DEGREE_OPTIONS } from '../../../utils/constant';
-import { convertToCamelCase, DateUtils, makeRoute, OptionToValue, titleModification } from '../../../utils/helper';
+import { ADMIN_ROUTES } from '../../../utils/constant';
+import { DateUtils, makeRoute } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
-import { type ExperienceResponse } from '../../../services/useExperienceService';
+import { type ProjectResponse } from '../../../services/useProjectService';
 import { createUseStyles } from 'react-jss';
-import type { Skill, SkillDropdown } from '../../../services/useSkillService';
+import type { SkillDropdown } from '../../../services/useSkillService';
 import { Chip } from '@mui/material';
 
 const useStyles = createUseStyles((theme: any) => ({
@@ -22,15 +22,15 @@ const useStyles = createUseStyles((theme: any) => ({
     }
 }));
 
-interface IExperienceListTemplateProps {
-    experiences: ExperienceResponse[];
+interface IProjectListTemplateProps {
+    projects: ProjectResponse[];
     pagination: IPagination;
     handlePaginationChange: any;
     handleRowsPerPageChange: any;
     filters: any;
 }
 
-const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ experiences, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
+const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const classes = useStyles();
     const navigate = useNavigate();
 
@@ -40,7 +40,7 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
             size: pagination.pageSize,
             search: filters.search,
         };
-        navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_EDIT, { query: { ...query }, params: { id } }));
+        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_EDIT, { query: { ...query }, params: { id } }));
     }
 
     const handleViewClick = (id: number) => {
@@ -49,7 +49,7 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
             size: pagination.pageSize,
             search: filters.search,
         };
-        navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_VIEW, { query: { ...query }, params: { id } }));
+        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query: { ...query }, params: { id } }));
     }
 
     const getSchema = () => ({
@@ -77,21 +77,17 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
         </div>
     }
 
-    const getRecords = () => experiences?.map((experience: ExperienceResponse, index) => [
+    const getRecords = () => projects?.map((project: ProjectResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
-        experience.companyName,
-        experience.jobTitle,
-        experience.location,
-        skillSet(experience.technologiesUsed),
-        experience.currentlyWorking ? DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(experience.endDate || ""),
-        Action(Number(experience.id))
+        project.projectName,
+        skillSet(project.technologiesUsed),
+        project.currentlyWorking ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate),
+        Action(Number(project.id))
     ])
 
     const getTableColumns = () => [
         { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { align: "center" } },
-        { label: "Company Name", key: "companyName", type: "string" as ColumnType, props: {} },
-        { label: "Job Title", key: "jobTitle", type: "string" as ColumnType, props: {} },
-        { label: "Location", key: "location", type: "string" as ColumnType, props: {} },
+        { label: "Project", key: "projectName", type: "string" as ColumnType, props: {} },
         { label: "Technologies Used", key: "technologiesUsed", type: "string" as ColumnType, props: {} },
         { label: "Duration", key: "duration", type: "string" as ColumnType, props: { align: "center" } },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { align: "center" } },
@@ -119,4 +115,4 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
     )
 }
 
-export default ExperiencesTableTemplate;
+export default ProjectsTableTemplate;

@@ -16,17 +16,17 @@ import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 const validationSchema = Yup.object().shape({
     logoId: Yup.number()
         .nullable()
-        .required('Skill logo ID is required'),
+        .required('Skill Logo ID is required'),
     logoName: Yup.string()
-        .required('Skill logo name is required'),
+        .required('Skill Logo Name is required'),
     logoUrl: Yup.string()
-        .required('Skill logo URL is required'),
+        .required('Skill Logo URL is required'),
     level: Yup.string()
-        .required('Skill level is required')
-        .max(50, 'Skill level is too long'),
+        .required('Skill Level is required')
+        .max(50, 'Skill Level is too long'),
     category: Yup.string()
-        .required('Skill category is required')
-        .max(50, 'Skill category is too long'),
+        .required('Skill Category is required')
+        .max(50, 'Skill Category is too long'),
 });
 
 interface SkillFormProps {
@@ -102,7 +102,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     useEffect(() => {
         if (skill) {
-            formik.setFieldValue("logoId", skill.id);
+            formik.setFieldValue("logoId", skill.logoId);
             formik.setFieldValue("logoName", skill.logoName);
             formik.setFieldValue("logoUrl", skill.logoUrl);
             formik.setFieldValue("level", skill.level);
