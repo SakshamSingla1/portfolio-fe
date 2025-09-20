@@ -1,15 +1,30 @@
 import React, { type FC, useEffect, useMemo, useState } from 'react'
-import { type IUser } from '../utils/types';
 
 interface AuthenticatedUserProviderType {
     children: React.ReactNode
 }
 
+export interface AuthenticatedUserType {
+    id: number;
+    email: string;
+    token: string;
+    role?: string;
+    fullName: string;
+    title?: string;
+    aboutMe?: string;
+    phone?: string;
+    location?: string;
+    githubUrl?: string;
+    linkedinUrl?: string;
+    websiteUrl?: string;
+    profileImageUrl?: string;
+}
+
 export interface AuthenticatedUserContextType {
     isAuthDialogActive: boolean,
     syncAuthDialogActive: (value?: boolean) => void,
-    user: IUser | null;
-    setAuthenticatedUser: (user: IUser | null) => void;
+    user: AuthenticatedUserType | null;
+    setAuthenticatedUser: (user: AuthenticatedUserType | null) => void;
 }
 
 export const AuthenticatedUserContext = React.createContext<AuthenticatedUserContextType>({
@@ -22,8 +37,8 @@ export const AuthenticatedUserContext = React.createContext<AuthenticatedUserCon
 export const AuthenticatedUserProvider: FC<AuthenticatedUserProviderType> = ({ children }) => {
 
     const [isAuthDialogActive, setAuthDialogActive] = useState<boolean>(false);
-    const [user, setAuthenticatedUser] = useState<IUser | null>(() => {
-        const storedAuthenticatedUser = sessionStorage.getItem('user');
+    const [user, setAuthenticatedUser] = useState<AuthenticatedUserType | null>(() => {
+        const storedAuthenticatedUser = localStorage.getItem('user');
         try {
             if (storedAuthenticatedUser)
                 return JSON.parse(storedAuthenticatedUser);
@@ -40,9 +55,9 @@ export const AuthenticatedUserProvider: FC<AuthenticatedUserProviderType> = ({ c
 
     useEffect(() => {
         if (user) {
-            sessionStorage.setItem('user', JSON.stringify(user))
+            localStorage.setItem('user', JSON.stringify(user))
         } else {
-            sessionStorage.removeItem('user');
+            localStorage.removeItem('user');
         }
     }, [user])
 
