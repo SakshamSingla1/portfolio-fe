@@ -353,7 +353,7 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
         }
     };
 
-    const handleRemoveImage = (imageid: number | null, e: React.MouseEvent) => {
+    const handleRemoveImage = (imageId: number | null, e: React.MouseEvent) => {
         e.stopPropagation();
         const newImages = multipleImages.filter(img => img.id !== imageId);
         setMultipleImages(newImages);

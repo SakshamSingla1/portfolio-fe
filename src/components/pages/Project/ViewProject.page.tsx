@@ -25,7 +25,7 @@ const ViewProjectPage = () => {
 
     useEffect(() => {
         if (id) {
-            getProject(id);
+            getProject(Number(id));
         }
     }, [id]);
 

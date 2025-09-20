@@ -30,7 +30,7 @@ const EditExperiencePage = () => {
 
     const getExperience = async (id: number | null) => {
         try {
-            const response = await experienceService.getById(id);
+            const response = await experienceService.getById(Number(id));
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 setExperience(response.data.data);
             }
@@ -41,7 +41,7 @@ const EditExperiencePage = () => {
 
     useEffect(() => {
         if (id) {
-            getExperience(id);
+            getExperience(Number(id));
         }
     }, [id]);
 

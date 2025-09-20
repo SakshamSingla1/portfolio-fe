@@ -25,7 +25,7 @@ const SkillViewDetailsPage = () => {
 
     useEffect(() => {
         if (id) {
-            getSkill(id);
+            getSkill(Number(id));
         }
     }, [id]);
 

@@ -25,7 +25,7 @@ const ViewEducationPage = () => {
 
     useEffect(() => {
         if (id) {
-            getEducation(id);
+            getEducation(Number(id));
         }
     }, [id]);
 
