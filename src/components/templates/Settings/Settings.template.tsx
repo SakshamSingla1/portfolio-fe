@@ -18,7 +18,7 @@ interface SettingsTemplateProps {
 }
 
 interface TabType {
-  id: number | null;
+  id: string;
   label: string;
   icon: React.ReactNode;
   description: string;
