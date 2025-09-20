@@ -37,6 +37,7 @@ import ViewProjectPage from './components/pages/Project/ViewProject.page';
 import ListingContactUsPage from './components/pages/ContactUs/ListingContactUs.page';
 
 import SettingsPage from './components/pages/Settings/Settings.page';
+import ProtectedRoute from './components/organisms/ProtectedRoute/ProtectedRoute';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -77,24 +78,25 @@ const App = () => {
               <Route path={ADMIN_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
 
               {/* Protected admin routes */}
-              <Route element={<AdminLayout />}>
-                
+              <Route element={<ProtectedRoute />}>
+                <Route element={<AdminLayout />}>
+
                   <Route path={ADMIN_ROUTES.SETTINGS} element={<SettingsPage />} />
-                <Route path={ADMIN_ROUTES.SKILL}>
-                  <Route index element={<ListingSkillsPage />} />
-                  <Route path="add" element={<AddSkillPage />} />
-                  <Route path=":id/edit" element={<EditSkillPage />} />
-                  <Route path=":id" element={<ViewSkillPage />} />
-                </Route>
+                  <Route path={ADMIN_ROUTES.SKILL}>
+                    <Route index element={<ListingSkillsPage />} />
+                    <Route path="add" element={<AddSkillPage />} />
+                    <Route path=":id/edit" element={<EditSkillPage />} />
+                    <Route path=":id" element={<ViewSkillPage />} />
+                  </Route>
 
-                <Route path={ADMIN_ROUTES.EDUCATION}>
-                  <Route index element={<ListingEducationPage />} />
-                  <Route path="add" element={<AddEducationPage />} />
-                  <Route path=":id/edit" element={<EditEducationPage />} />
-                  <Route path=":id" element={<ViewEducationPage />} />
-                </Route>
+                  <Route path={ADMIN_ROUTES.EDUCATION}>
+                    <Route index element={<ListingEducationPage />} />
+                    <Route path="add" element={<AddEducationPage />} />
+                    <Route path=":id/edit" element={<EditEducationPage />} />
+                    <Route path=":id" element={<ViewEducationPage />} />
+                  </Route>
 
-                <Route path={ADMIN_ROUTES.EXPERIENCE}>
+                  <Route path={ADMIN_ROUTES.EXPERIENCE}>
                     <Route index element={<ListingExperiencesPage />} />
                     <Route path="add" element={<AddExperiencePage />} />
                     <Route path=":id/edit" element={<EditExperiencePage />} />
@@ -112,8 +114,9 @@ const App = () => {
                   <Route path={ADMIN_ROUTES.CONTACT_US} element={<ListingContactUsPage />} />
 
 
-                <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
-                <Route path="/" element={<Navigate to={ADMIN_ROUTES.PROFILE} replace />} />
+                  <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
+                  <Route path="/" element={<Navigate to={ADMIN_ROUTES.LOGIN} replace />} />
+                </Route>
               </Route>
             </Routes>
           </MainLayout>
