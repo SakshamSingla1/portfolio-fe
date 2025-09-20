@@ -61,6 +61,9 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
             const response = await educationService.remove(id);
             if (response.status === 200) {
                 showSnackbar("success", "Education deleted successfully");
+                setEducationToDelete(null);
+                setShowDeletePopup(false);
+                window.location.reload();
             }
         } catch (error) {
             showSnackbar("error", "Education deleted failed");
@@ -134,9 +137,6 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
                             console.log(educationToDelete);
                             if (educationToDelete !== null) {
                                 handleDeleteClick(educationToDelete);
-                                setShowDeletePopup(false);
-                                setEducationToDelete(null);
-                                window.location.reload();
                             }
                         }}
                         onCancel={() => setShowDeletePopup(false)}

@@ -51,6 +51,9 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
             const response = await experienceService.remove(id);
             if (response.status === 200) {
                 showSnackbar("success", "Experience deleted successfully");
+                setExperienceToDelete(null);
+                setShowDeletePopup(false);
+                window.location.reload();
             }
         } catch (error) {
             showSnackbar("error", "Experience deleted failed");
@@ -133,9 +136,6 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
                         onDelete={() => {
                             if (experienceToDelete !== null) {
                                 handleDeleteClick(experienceToDelete);
-                                setShowDeletePopup(false);
-                                setExperienceToDelete(null);
-                                window.location.reload();
                             }
                         }}
                         onCancel={() => setShowDeletePopup(false)}

@@ -7,7 +7,7 @@ import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES } from '../../../utils/constant';
 import { DateUtils, makeRoute } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
-import { type ProjectResponse , useProjectService } from '../../../services/useProjectService';
+import { type ProjectResponse, useProjectService } from '../../../services/useProjectService';
 import { createUseStyles } from 'react-jss';
 import type { SkillDropdown } from '../../../services/useSkillService';
 import { Chip } from '@mui/material';
@@ -63,6 +63,9 @@ const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, 
             const response = await projectService.deleteProject(id);
             if (response.status === 200) {
                 showSnackbar("success", "Project deleted successfully");
+                setProjectToDelete(null);
+                setShowDeletePopup(false);
+                window.location.reload();
             }
         } catch (error) {
             showSnackbar("error", "Project deleted failed");
@@ -133,23 +136,20 @@ const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, 
         <div>
             <TableV1 schema={getSchema()} records={getRecords()} />
             {
-                            showDeletePopup && (
-                                <DeleteConfirmation
-                                    open={showDeletePopup}
-                                    title="Delete Skill"
-                                    description="Are you sure you want to delete this skill?"
-                                    onDelete={() => {
-                                        if (projectToDelete !== null) {
-                                            handleDeleteClick(projectToDelete);
-                                            setShowDeletePopup(false);
-                                            setProjectToDelete(null);
-                                            window.location.reload();
-                                        }
-                                    }}
-                                    onCancel={() => setShowDeletePopup(false)}
-                                />
-                            )
-                        }
+                showDeletePopup && (
+                    <DeleteConfirmation
+                        open={showDeletePopup}
+                        title="Delete Skill"
+                        description="Are you sure you want to delete this skill?"
+                        onDelete={() => {
+                            if (projectToDelete !== null) {
+                                handleDeleteClick(projectToDelete);
+                            }
+                        }}
+                        onCancel={() => setShowDeletePopup(false)}
+                    />
+                )
+            }
         </div>
     )
 }

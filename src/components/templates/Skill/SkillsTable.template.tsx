@@ -61,6 +61,9 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
             const response = await skillService.remove(Number(id));
             if (response.status === 200) {
                 showSnackbar("success", "Skill deleted successfully");
+                setSkillToDelete(null);
+                setShowDeletePopup(false);
+                window.location.reload();
             }
         } catch (error) {
             showSnackbar("error", "Skill deleted failed");
@@ -128,9 +131,6 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
                         onDelete={() => {
                             if (skillToDelete !== null) {
                                 handleDeleteClick(skillToDelete);
-                                setShowDeletePopup(false);
-                                setSkillToDelete(null);
-                                window.location.reload();
                             }
                         }}
                         onCancel={() => setShowDeletePopup(false)}
