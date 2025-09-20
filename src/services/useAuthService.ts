@@ -89,25 +89,25 @@ export const useAuthService = () => {
     };
 
     const changePassword = (data: IChangePasswordRequest) => {
-        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_PASSWORD, { id: user?.id }), null, data);
+        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_PASSWORD, { id: user?.id }), user, data);
     };
 
     // Email Management
     const changeEmail = (data: IChangeEmailRequest) => {
-        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_EMAIL, { id: user?.id }), null, data);
+        return request(API_METHOD.PUT, replaceUrlParams(AUTH_URLS.CHANGE_EMAIL, { id: user?.id }), user, data);
     };
 
     const verifyChangeEmailOtp = (data: IVerifyOtpRequest) => {
-        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.VERIFY_CHANGE_EMAIL_OTP, { id: user?.id }), null, data);
+        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.VERIFY_CHANGE_EMAIL_OTP, { id: user?.id }), user, data);
     };
 
     // Account Management
     const requestDeleteAccountOtp = () => {
-        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.REQUEST_DELETE_ACCOUNT_OTP, { id: user?.id }), null, null);
+        return request(API_METHOD.POST, replaceUrlParams(AUTH_URLS.REQUEST_DELETE_ACCOUNT_OTP, { id: user?.id }), user, null);
     };
 
     const deleteAccount = (data: IPasswordRequest) => {
-        return request(API_METHOD.DELETE, replaceUrlParams(AUTH_URLS.DELETE_ACCOUNT, { id: user?.id }), null, data);
+        return request(API_METHOD.DELETE, replaceUrlParams(AUTH_URLS.DELETE_ACCOUNT, { id: user?.id }), user, data);
     };
 
     // OTP

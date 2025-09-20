@@ -46,13 +46,13 @@ export const useExperienceService = () => {
   // ---------------- GET ALL BY PROFILE ----------------
   const getAllByProfile = (params : ExperienceFilterParams) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_PROFILE, { profileId: user?.id });
-    return request(API_METHOD.GET, url, user, null, {params});
+    return request(API_METHOD.GET, url, null, null, {params});
   };
 
   // ---------------- GET BY ID ----------------
   const getById = (id: number | string) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id });
-    return request(API_METHOD.GET, url, user, null);
+    return request(API_METHOD.GET, url, null, null);
   };
 
   // ---------------- CREATE ----------------

@@ -51,7 +51,7 @@ export const useProjectService = () => {
 
     const getById = (id: string) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null, null, null);
+        return request(API_METHOD.GET, url, null, null, null, null);
     };
 
     const create = (project: Project) => {
