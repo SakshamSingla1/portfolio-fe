@@ -28,7 +28,7 @@ const EditExperiencePage = () => {
         }
     }
 
-    const getExperience = async (id: string) => {
+    const getExperience = async (id: number | null) => {
         try {
             const response = await experienceService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {

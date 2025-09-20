@@ -1,15 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiTrash } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
 import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES } from '../../../utils/constant';
 import { DateUtils, makeRoute } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
-import { type ExperienceResponse } from '../../../services/useExperienceService';
+import { type ExperienceResponse, useExperienceService } from '../../../services/useExperienceService';
 import type { SkillDropdown } from '../../../services/useSkillService';
 import { Chip } from '@mui/material';
+import { useSnackbar } from '../../../hooks/useSnackBar';
+import DeleteConfirmation from '../../molecules/DeleteConfirmation/DeleteConfirmation';
 
 interface IExperienceListTemplateProps {
     experiences: ExperienceResponse[];
@@ -21,6 +23,10 @@ interface IExperienceListTemplateProps {
 
 const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ experiences, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const navigate = useNavigate();
+    const experienceService = useExperienceService();
+    const { showSnackbar } = useSnackbar();
+    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
+    const [experienceToDelete, setExperienceToDelete] = React.useState<number | null>(null);
 
     const handleEditClick = (id: number) => {
         const query = {
@@ -38,6 +44,17 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
             search: filters.search,
         };
         navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_VIEW, { query: { ...query }, params: { id } }));
+    }
+
+    const handleDeleteClick = async (id: number) => {
+        try {
+            const response = await experienceService.remove(id);
+            if (response.status === 200) {
+                showSnackbar("success", "Experience deleted successfully");
+            }
+        } catch (error) {
+            showSnackbar("error", "Experience deleted failed");
+        }
     }
 
     const getSchema = () => ({
@@ -94,6 +111,10 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
                         <FiEye className={`ml-2 text-lg`} />
                     </div></button>
                     <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 text-lg`} /></button>
+                    <button onClick={() => {
+                        setExperienceToDelete(id);
+                        setShowDeletePopup(true);
+                    }}> <FiTrash className={`ml-2 text-lg`} /></button>
                 </div>
             );
         }
@@ -103,6 +124,24 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
     return (
         <div>
             <TableV1 schema={getSchema()} records={getRecords()} />
+            {
+                showDeletePopup && (
+                    <DeleteConfirmation
+                        open={showDeletePopup}
+                        title="Delete Experience"
+                        description="Are you sure you want to delete this experience?"
+                        onDelete={() => {
+                            if (experienceToDelete !== null) {
+                                handleDeleteClick(experienceToDelete);
+                                setShowDeletePopup(false);
+                                setExperienceToDelete(null);
+                                window.location.reload();
+                            }
+                        }}
+                        onCancel={() => setShowDeletePopup(false)}
+                    />
+                )
+            }
         </div>
     )
 }

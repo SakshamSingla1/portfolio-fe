@@ -1,14 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiTrash } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
 import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES, DEGREE_OPTIONS } from '../../../utils/constant';
 import { makeRoute, OptionToValue } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
-import { type Education } from '../../../services/useEducationService';
+import { type Education, useEducationService } from '../../../services/useEducationService';
 import { createUseStyles } from 'react-jss';
+import { useSnackbar } from '../../../hooks/useSnackBar';
+import DeleteConfirmation from '../../molecules/DeleteConfirmation/DeleteConfirmation';
 
 const useStyles = createUseStyles((theme: any) => ({
     actionButton: {
@@ -17,7 +19,7 @@ const useStyles = createUseStyles((theme: any) => ({
     error: {
         backgroundColor: theme.palette.background.secondary.secondary500,
         color: theme.palette.background.secondary.secondary500
-    } 
+    }
 }));
 
 interface IEducationListTemplateProps {
@@ -31,8 +33,12 @@ interface IEducationListTemplateProps {
 const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educations, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const classes = useStyles();
     const navigate = useNavigate();
+    const educationService = useEducationService();
+    const { showSnackbar } = useSnackbar();
+    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
+    const [educationToDelete, setEducationToDelete] = React.useState<number | null>(null);
 
-    const handleEditClick = (id : number) => {
+    const handleEditClick = (id: number) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
@@ -41,13 +47,24 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
         navigate(makeRoute(ADMIN_ROUTES.EDUCATION_EDIT, { query: { ...query }, params: { id } }));
     }
 
-    const handleViewClick = (id : number) => {
+    const handleViewClick = (id: number) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
             search: filters.search,
         };
         navigate(makeRoute(ADMIN_ROUTES.EDUCATION_VIEW, { query: { ...query }, params: { id } }));
+    }
+
+    const handleDeleteClick = async (id: number) => {
+        try {
+            const response = await educationService.remove(id);
+            if (response.status === 200) {
+                showSnackbar("success", "Education deleted successfully");
+            }
+        } catch (error) {
+            showSnackbar("error", "Education deleted failed");
+        }
     }
 
     const getSchema = () => ({
@@ -83,10 +100,10 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
         { label: "Duration", key: "duration", type: "string" as ColumnType, props: { align: "center" } },
         { label: "Grade", key: "grade", type: "string" as ColumnType, props: { align: "center" } },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { align: "center" } },
-      ];
-      
+    ];
 
-    const Action = (id : number) => {
+
+    const Action = (id: number) => {
         if (id) {
             return (
                 <div title=''>
@@ -94,7 +111,11 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
                         <FiEye className={`ml-2 ${classes.actionButton} text-lg`} />
                     </div></button>
                     <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 ${classes.actionButton} text-lg`} /></button>
-                </div>
+                        <button onClick={() => {
+                        setShowDeletePopup(true)
+                        setEducationToDelete(id)
+                        }}> <FiTrash className={`ml-2 ${classes.actionButton} text-lg`} /></button>
+                    </div>
             );
         }
         return null;
@@ -103,6 +124,25 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
     return (
         <div>
             <TableV1 schema={getSchema()} records={getRecords()} />
+            {
+                showDeletePopup && (
+                    <DeleteConfirmation
+                        open={showDeletePopup}
+                        title="Delete Education"
+                        description="Are you sure you want to delete this education?"
+                        onDelete={() => {
+                            console.log(educationToDelete);
+                            if (educationToDelete !== null) {
+                                handleDeleteClick(educationToDelete);
+                                setShowDeletePopup(false);
+                                setEducationToDelete(null);
+                                window.location.reload();
+                            }
+                        }}
+                        onCancel={() => setShowDeletePopup(false)}
+                    />
+                )
+            }
         </div>
     )
 }

@@ -44,18 +44,18 @@ export const useEducationService = () => {
         request(API_METHOD.POST, EDUCATION_URLS.CREATE, user, education);
 
     // ---------------- UPDATE ----------------
-    const update = (id: string, education: Education) => {
+    const update = (id: number | null, education: Education) => {
         const url = replaceUrlParams(EDUCATION_URLS.UPDATE, { id });
         return request(API_METHOD.PUT, url, user, education);
     };
 
-    const remove = (id: string) => {
+    const remove = (id: number) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id, profileId: user?.id });
         return request(API_METHOD.DELETE, url, user, null);
     };
 
     // ---------------- GET BY ID ----------------
-    const getById = (id: string) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id, profileId: user?.id });
         return request(API_METHOD.GET, url, null, null);
     };

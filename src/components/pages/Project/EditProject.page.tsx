@@ -28,7 +28,7 @@ const EditProjectPage = () => {
         }
     }
 
-    const getProject = async (id: string) => {
+    const getProject = async (id: number | null) => {
         try {
             const response = await projectService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {

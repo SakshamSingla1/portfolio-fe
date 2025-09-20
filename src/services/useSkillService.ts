@@ -48,7 +48,7 @@ export const useSkillService = () => {
         return request(API_METHOD.GET, url, null, null, null, null);
     };
 
-    const getById = (id: string) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
         return request(API_METHOD.GET, url, null, null, null, null);
     };
@@ -58,12 +58,12 @@ export const useSkillService = () => {
         return request(API_METHOD.POST, url, user, skill);
     };
 
-    const update = (id: string, skill: Skill) => {
+    const update = (id: number | null, skill: Skill) => {
         const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, skill);
     };
 
-    const remove = (id: string) => {
+    const remove = (id: number) => {
         const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };

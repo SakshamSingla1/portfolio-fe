@@ -15,7 +15,7 @@ import { CloudUpload, Delete, Image as ImageIcon } from '@mui/icons-material';
 export type UploadMode = 'single' | 'multiple' | 'logo';
 
 export interface ImageFile {
-    id: string;
+    id: number | null;
     url: string;
     file?: File;
     name?: string;
@@ -353,7 +353,7 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
         }
     };
 
-    const handleRemoveImage = (imageId: string, e: React.MouseEvent) => {
+    const handleRemoveImage = (imageid: number | null, e: React.MouseEvent) => {
         e.stopPropagation();
         const newImages = multipleImages.filter(img => img.id !== imageId);
         setMultipleImages(newImages);

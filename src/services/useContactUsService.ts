@@ -22,7 +22,7 @@ export interface ContactUsRequest {
     email: string;
     message: string;
     phone: string;
-    profileId: string;
+    profileid: number | null;
 }
 
 export interface ContactUsFilterParams {

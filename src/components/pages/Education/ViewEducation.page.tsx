@@ -12,7 +12,7 @@ const ViewEducationPage = () => {
     const { showSnackbar } = useSnackbar();
     const [education, setEducation] = useState<Education | null>(null);
 
-    const getEducation = async (id: string) => {
+    const getEducation = async (id: number | null) => {
         try {
             const response = await educationService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {

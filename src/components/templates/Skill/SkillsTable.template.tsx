@@ -1,14 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiTrash } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
 import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES, SKILL_CATEGORY_OPTIONS } from '../../../utils/constant';
 import { makeRoute, OptionToValue } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
-import { type Skill } from '../../../services/useSkillService';
+import { type Skill, useSkillService } from '../../../services/useSkillService';
 import { createUseStyles } from 'react-jss';
+import { useSnackbar } from '../../../hooks/useSnackBar';
+import DeleteConfirmation from '../../molecules/DeleteConfirmation/DeleteConfirmation';
 
 const useStyles = createUseStyles((theme: any) => ({
     actionButton: {
@@ -17,7 +19,7 @@ const useStyles = createUseStyles((theme: any) => ({
     error: {
         backgroundColor: theme.palette.background.secondary.secondary500,
         color: theme.palette.background.secondary.secondary500
-    } 
+    }
 }));
 
 interface ISkillListTemplateProps {
@@ -31,6 +33,10 @@ interface ISkillListTemplateProps {
 const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const classes = useStyles();
     const navigate = useNavigate();
+    const skillService = useSkillService();
+    const { showSnackbar } = useSnackbar();
+    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
+    const [skillToDelete, setSkillToDelete] = React.useState<number | null>(null);
 
     const handleEditClick = (id: number) => {
         const query = {
@@ -48,6 +54,17 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
             search: filters.search,
         };
         navigate(makeRoute(ADMIN_ROUTES.SKILL_VIEW, { query: { ...query }, params: { id: id } }));
+    }
+
+    const handleDeleteClick = async (id: number) => {
+        try {
+            const response = await skillService.remove(Number(id));
+            if (response.status === 200) {
+                showSnackbar("success", "Skill deleted successfully");
+            }
+        } catch (error) {
+            showSnackbar("error", "Skill deleted failed");
+        }
     }
 
     const getSchema = () => ({
@@ -89,6 +106,10 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
                         <FiEye className={`ml-2 ${classes.actionButton} text-lg`} />
                     </div></button>
                     <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 ${classes.actionButton} text-lg`} /></button>
+                    <button onClick={() => {
+                        setSkillToDelete(id);
+                        setShowDeletePopup(true);
+                    }}> <FiTrash className={`ml-2 ${classes.actionButton} text-lg`} /></button>
                 </div>
             );
         }
@@ -98,6 +119,24 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
     return (
         <div>
             <TableV1 schema={getSchema()} records={getRecords()} />
+            {
+                showDeletePopup && (
+                    <DeleteConfirmation
+                        open={showDeletePopup}
+                        title="Delete Skill"
+                        description="Are you sure you want to delete this skill?"
+                        onDelete={() => {
+                            if (skillToDelete !== null) {
+                                handleDeleteClick(skillToDelete);
+                                setShowDeletePopup(false);
+                                setSkillToDelete(null);
+                                window.location.reload();
+                            }
+                        }}
+                        onCancel={() => setShowDeletePopup(false)}
+                    />
+                )
+            }
         </div>
     )
 }

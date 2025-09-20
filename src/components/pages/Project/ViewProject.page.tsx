@@ -12,7 +12,7 @@ const ViewProjectPage = () => {
     const { showSnackbar } = useSnackbar();
     const [project, setProject] = useState<ProjectResponse | null>(null);
 
-    const getProject = async (id: string) => {
+    const getProject = async (id: number | null) => {
         try {
             const response = await projectService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
