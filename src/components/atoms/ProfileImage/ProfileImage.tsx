@@ -10,7 +10,7 @@ import {
   Snackbar,
   styled
 } from '@mui/material';
-import { CloudUpload, Delete, Refresh, Image as ImageIcon } from '@mui/icons-material';
+import { Delete, Refresh, Image as ImageIcon } from '@mui/icons-material';
 
 interface ProfileImageProps {
   value?: string | null;
@@ -21,7 +21,6 @@ interface ProfileImageProps {
   label?: string;
   helperText?: string;
   error?: boolean;
-  aspectRatio?: number | string;
   width?: number | string;
   height?: number | string;
 }
@@ -78,7 +77,6 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
   label = 'Upload Image',
   helperText,
   error = false,
-  aspectRatio = '1/1',
   width = 200,
   height = 200,
 }) => {
