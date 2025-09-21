@@ -230,7 +230,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                             label={mode === MODE.ADD ? "Add Skill" : "Update Skill"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting}
+                            disabled={formik.isSubmitting || !formik.isValid}
                         />
                     )}
                 </div>

@@ -150,7 +150,6 @@ const DangerZoneTab: React.FC<DangerZoneTabProps> = ({
                   </InputAdornment>
                 ),
               }}
-              className="bg-gray-50"
             />
           </Box>
         </DialogContent>
@@ -165,10 +164,9 @@ const DangerZoneTab: React.FC<DangerZoneTabProps> = ({
           <Button
             label="Delete Account"
             variant="primaryContained"
-            color="error"
             onClick={() => setDeleteOtpOpen(true)}
             startIcon={<Trash2 className="w-4 h-4" />}
-            className="px-4"
+            disabled={deleteForm.isSubmitting}
           />
         </DialogActions>
       </Dialog>

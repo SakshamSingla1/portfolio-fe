@@ -23,7 +23,6 @@ const validationSchema = Yup.object().shape({
         .required('Project name is required')
         .max(100, 'Project name is too long'),
     projectDescription: Yup.string()
-        .required('Project description is required')
         .max(500, 'Project description is too long'),
     projectLink: Yup.string()
         .required('Project link is required')
@@ -63,7 +62,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     const joditConfiguration = useMemo(() => {
         return {
             readonly: mode === MODE.VIEW,
-            placeholder: "Start typing your project description here...",
+            placeholder: "Start typing your description here...",
             buttons: [
                 'bold', 'italic', 'underline', 'strikethrough', '|',
                 'ul', 'ol', '|',
@@ -118,7 +117,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         };
     }, [mode]);
 
-    const onClose = () => navigate(ADMIN_ROUTES.EXPERIENCE);
+    const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
     const formik = useFormik<Project>({
         initialValues: {
@@ -162,7 +161,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         }
         catch (error) {
             setSkills([]);
-            // In a real app, you might want to show a toast/notification here
             console.error('Failed to load skills:', error);
         } finally {
             setIsSkillsLoading(false);
@@ -427,7 +425,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                         variant="tertiaryContained"
                         onClick={onClose}
                         className="w-full sm:w-auto"
-                        disabled={formik.isSubmitting}
                     />
                     {mode !== MODE.VIEW && (
                         <Button
@@ -443,12 +440,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
                             disabled={formik.isSubmitting || !formik.isValid}
-                            className="w-full sm:w-auto"
-                            startIcon={
-                                formik.isSubmitting && (
-                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                                )
-                            }
                         />
                     )}
                 </div>

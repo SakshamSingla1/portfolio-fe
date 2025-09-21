@@ -95,6 +95,7 @@ const EmailTab: React.FC<EmailTabProps> = ({ handleEmailOtpSubmit, setFormStatus
             variant="primaryContained"
             onClick={() => handleEmailChangeOtpSubmit(emailForm.values.newEmail)}
             endIcon={<ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />}
+            disabled={emailForm.isSubmitting}
           />
         </div>
       </form>

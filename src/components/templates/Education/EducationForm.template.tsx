@@ -53,7 +53,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
     const joditConfiguration = useMemo(() => {
         return {
             readonly: mode === MODE.VIEW,
-            placeholder: "Start typing your project description here...",
+            placeholder: "Start typing your description here...",
             buttons: [
                 'bold', 'italic', 'underline', 'strikethrough', '|',
                 'ul', 'ol', '|',
@@ -343,7 +343,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             label={mode === MODE.ADD ? "Add Education" : "Update Education"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting}
+                            disabled={formik.isSubmitting || !formik.isValid}
                         />
                     )}
                 </div>

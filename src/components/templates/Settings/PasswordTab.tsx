@@ -132,7 +132,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
             label="Update Password"
             variant="primaryContained"
             onClick={() => passwordForm.handleSubmit()}
-            disabled={!passwordForm.isValid}
+            disabled={passwordForm.isSubmitting || !passwordForm.isValid}
             endIcon={<ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />}
           />
         </div>

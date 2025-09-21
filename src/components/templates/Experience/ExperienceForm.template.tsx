@@ -36,7 +36,6 @@ const validationSchema = Yup.object().shape({
     currentlyWorking: Yup.boolean()
         .required('Currently working status is required'),
     description: Yup.string()
-        .required('Description is required')
         .max(500, 'Description is too long'),
     technologiesUsed: Yup.array()
         .of(Yup.number())
@@ -61,7 +60,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     const joditConfiguration = useMemo(() => {
         return {
             readonly: mode === MODE.VIEW,
-            placeholder: "Start typing your project description here...",
+            placeholder: "Start typing your description here...",
             buttons: [
                 'bold', 'italic', 'underline', 'strikethrough', '|',
                 'ul', 'ol', '|',
@@ -417,7 +416,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         }
                         variant="primaryContained"
                         onClick={() => formik.handleSubmit()}
-                        disabled={!formik.isValid}
+                        disabled={!formik.isValid || formik.isSubmitting}
                     />
                 )}
             </div>
