@@ -35,7 +35,6 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                     helperText={formik.errors.profileImageUrl || "Upload a profile image (max 5MB)"}
                     width="100%"
                     height="auto"
-                    aspectRatio="3/4"
                     disabled={!isEditMode}
                 />
             </div>
