@@ -1,8 +1,4 @@
-import React, { type FC, useEffect, useMemo, useState } from 'react'
-
-interface AuthenticatedUserProviderType {
-    children: React.ReactNode
-}
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 
 export interface AuthenticatedUserType {
     id: number;
@@ -21,53 +17,62 @@ export interface AuthenticatedUserType {
 }
 
 export interface AuthenticatedUserContextType {
-    isAuthDialogActive: boolean,
-    syncAuthDialogActive: (value?: boolean) => void,
+    isAuthDialogActive: boolean;
+    syncAuthDialogActive: (value?: boolean) => void;
     user: AuthenticatedUserType | null;
     setAuthenticatedUser: (user: AuthenticatedUserType | null) => void;
+    loading: boolean;
 }
 
 export const AuthenticatedUserContext = React.createContext<AuthenticatedUserContextType>({
     isAuthDialogActive: false,
     syncAuthDialogActive: () => { },
     user: null,
-    setAuthenticatedUser: () => { }
+    setAuthenticatedUser: () => { },
+    loading: true
 });
 
-export const AuthenticatedUserProvider: FC<AuthenticatedUserProviderType> = ({ children }) => {
-
-    const [isAuthDialogActive, setAuthDialogActive] = useState<boolean>(false);
+export const AuthenticatedUserProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setAuthenticatedUser] = useState<AuthenticatedUserType | null>(() => {
-        const storedAuthenticatedUser = localStorage.getItem('user');
-        try {
-            if (storedAuthenticatedUser)
-                return JSON.parse(storedAuthenticatedUser);
-            else
-                throw Error('Invalid JSON');
-        } catch (error) {
-            return null;
+        const stored = sessionStorage.getItem('user');
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch {
+                return null;
+            }
         }
+        return null;
     });
 
+    const [isAuthDialogActive, setAuthDialogActive] = useState<boolean>(false);
+    const [loading, setLoading] = useState(true);
+
     const syncAuthDialogActive = (value?: boolean) => {
-        setAuthDialogActive(value ?? user === null)
-    }
+        setAuthDialogActive(value ?? user === null);
+    };
 
     useEffect(() => {
+        setLoading(true);
         if (user) {
-            localStorage.setItem('user', JSON.stringify(user))
+            sessionStorage.setItem('user', JSON.stringify(user));
         } else {
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
         }
-    }, [user])
+        setLoading(false);
+    }, [user]);
 
-    const providerValue = useMemo(() => {
-        return { isAuthDialogActive, syncAuthDialogActive, user, setAuthenticatedUser };
-    }, [user, setAuthenticatedUser, isAuthDialogActive]);
+    const providerValue = useMemo(() => ({
+        user,
+        setAuthenticatedUser,
+        isAuthDialogActive,
+        syncAuthDialogActive,
+        loading
+    }), [user, isAuthDialogActive, loading]);
 
     return (
         <AuthenticatedUserContext.Provider value={providerValue}>
             {children}
         </AuthenticatedUserContext.Provider>
-    )
-}
+    );
+};

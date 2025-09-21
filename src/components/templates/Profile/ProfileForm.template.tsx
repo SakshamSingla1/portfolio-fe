@@ -5,6 +5,7 @@ import type { FormikProps } from "formik";
 import type { ProfileRequest } from "../../../services/useProfileService";
 import { FiUser, FiMail, FiGithub, FiLinkedin, FiGlobe, FiMapPin, FiPhone, FiBriefcase } from 'react-icons/fi';
 import { InputAdornment } from '@mui/material';
+import ProfileImage from "../../atoms/ProfileImage/ProfileImage";
 
 interface ProfileFormProps {
     formik: FormikProps<ProfileRequest>;
@@ -24,9 +25,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                     {isEditMode ? "Update your personal information and social links" : "Your profile information and social presence"}
                 </p>
             </div>
-            {/* <div className="px-2 md:px-6 pt-2 pb-6 flex flex-col items-center">
-                {isEditMode ? (
-                    <ProfileImage
+            <div className="px-2 md:px-6 pt-2 pb-6 flex flex-col items-center">
+                <ProfileImage
                     value={formik.values.profileImageUrl}
                     onChange={(url) => formik.setFieldValue('profileImageUrl', url)}
                     accept="image/jpeg, image/png, image/webp"
@@ -36,37 +36,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({ formik, isEditMode, o
                     width="100%"
                     height="auto"
                     aspectRatio="3/4"
+                    disabled={!isEditMode}
                 />
-                ) : (
-                    <div className={classes.profileImageContainer}>
-                        <div className={classes.profileImageWrapper}>
-                            <div className={classes.profileImageInner}>
-                                <img
-                                    src={formik.values.profileImageUrl}
-                                    alt="Profile"
-                                    onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.onerror = null;
-                                        target.src = formik.values.profileImageUrl;
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        {onEditClick && (
-                            <div
-                                className={classes.profileImageOverlay}
-                                onClick={handleEditPicture}
-                                aria-label="Change profile picture"
-                            >
-                                <div className={classes.cameraIcon}>
-                                    <FiCamera size={24} />
-                                </div>
-                                <span className={classes.changeText}>Change Photo</span>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div> */}
+            </div>
 
             <div className="p-2 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

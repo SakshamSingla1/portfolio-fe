@@ -267,7 +267,7 @@ const AdminLayout: React.FC = () => {
               <Button
                 variant="primaryContained"
                 label="Edit Profile"
-                onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=edit`)}
+                onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=EDIT`)}
                 className="px-4 py-2 transition-transform duration-200 hover:scale-105"
                 startIcon={<FaUser />}
               />
