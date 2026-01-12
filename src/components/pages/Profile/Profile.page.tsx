@@ -61,6 +61,7 @@ const ProfilePage: React.FC = () => {
 
     const formik = useFormik<ProfileRequest>({
         initialValues: {
+            userName: '',
             fullName: '',
             email: '',
             title: '',
@@ -71,6 +72,7 @@ const ProfilePage: React.FC = () => {
             linkedinUrl: '',
             websiteUrl: '',
             profileImageUrl: '',
+            logoUrl: '',
         },
         validationSchema,
         onSubmit: async (values) => {

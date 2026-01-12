@@ -7,7 +7,7 @@ import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES } from '../../../utils/constant';
 import { DateUtils, makeRoute } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
-import { type ProjectResponse, useProjectService } from '../../../services/useProjectService';
+import { type ProjectResponse, useProjectService, WorkStatusType } from '../../../services/useProjectService';
 import { createUseStyles } from 'react-jss';
 import type { SkillDropdown } from '../../../services/useSkillService';
 import { Chip } from '@mui/material';
@@ -38,9 +38,9 @@ const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, 
     const projectService = useProjectService();
     const { showSnackbar } = useSnackbar();
     const [showDeletePopup, setShowDeletePopup] = React.useState(false);
-    const [projectToDelete, setProjectToDelete] = React.useState<number | null>(null);
+    const [projectToDelete, setProjectToDelete] = React.useState<string | null>(null);
 
-    const handleEditClick = (id: number) => {
+    const handleEditClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
@@ -49,7 +49,7 @@ const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, 
         navigate(makeRoute(ADMIN_ROUTES.PROJECTS_EDIT, { query: { ...query }, params: { id } }));
     }
 
-    const handleViewClick = (id: number) => {
+    const handleViewClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
@@ -58,7 +58,7 @@ const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, 
         navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query: { ...query }, params: { id } }));
     }
 
-    const handleDeleteClick = async (id: number) => {
+    const handleDeleteClick = async (id: string) => {
         try {
             const response = await projectService.deleteProject(id);
             if (response.status === 200) {
@@ -100,9 +100,9 @@ const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, 
     const getRecords = () => projects?.map((project: ProjectResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         project.projectName,
-        skillSet(project.technologiesUsed),
-        project.currentlyWorking ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate),
-        Action(Number(project.id))
+        skillSet(project.skills),
+        project.workStatus === WorkStatusType.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate),
+        Action(String(project.id))
     ])
 
     const getTableColumns = () => [
@@ -114,7 +114,7 @@ const ProjectsTableTemplate: React.FC<IProjectListTemplateProps> = ({ projects, 
     ];
 
 
-    const Action = (id: number) => {
+    const Action = (id: string) => {
         if (id) {
             return (
                 <div title=''>

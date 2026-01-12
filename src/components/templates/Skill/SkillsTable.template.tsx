@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiTrash } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
@@ -7,7 +7,7 @@ import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES, SKILL_CATEGORY_OPTIONS } from '../../../utils/constant';
 import { makeRoute, OptionToValue } from '../../../utils/helper';
 import { type IPagination } from '../../../utils/types';
-import { type Skill, useSkillService } from '../../../services/useSkillService';
+import { type SkillResponse, useSkillService } from '../../../services/useSkillService';
 import { createUseStyles } from 'react-jss';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import DeleteConfirmation from '../../molecules/DeleteConfirmation/DeleteConfirmation';
@@ -23,7 +23,7 @@ const useStyles = createUseStyles((theme: any) => ({
 }));
 
 interface ISkillListTemplateProps {
-    skills: Skill[];
+    skills: SkillResponse[];
     pagination: IPagination;
     handlePaginationChange: any;
     handleRowsPerPageChange: any;
@@ -35,10 +35,10 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
     const navigate = useNavigate();
     const skillService = useSkillService();
     const { showSnackbar } = useSnackbar();
-    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
-    const [skillToDelete, setSkillToDelete] = React.useState<number | null>(null);
+    const [showDeletePopup, setShowDeletePopup] = useState(false);
+    const [skillToDelete, setSkillToDelete] = useState<string | null>(null);
 
-    const handleEditClick = (id: number) => {
+    const handleEditClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
@@ -47,7 +47,7 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
         navigate(makeRoute(ADMIN_ROUTES.SKILL_EDIT, { query: { ...query }, params: { id: id } }));
     }
 
-    const handleViewClick = (id: number) => {
+    const handleViewClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
@@ -56,9 +56,9 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
         navigate(makeRoute(ADMIN_ROUTES.SKILL_VIEW, { query: { ...query }, params: { id: id } }));
     }
 
-    const handleDeleteClick = async (id: number) => {
+    const handleDeleteClick = async (id: string) => {
         try {
-            const response = await skillService.remove(Number(id));
+            const response = await skillService.remove(id);
             if (response.status === 200) {
                 showSnackbar("success", "Skill deleted successfully");
                 setSkillToDelete(null);
@@ -83,13 +83,13 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
         columns: getTableColumns() ?? []
     });
 
-    const getRecords = () => skills?.map((skill: Skill, index) => [
+    const getRecords = () => skills?.map((skill: SkillResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         skill.logoName,
         <img src={skill.logoUrl || ""} alt="logo" className="w-10 h-10" />,
         OptionToValue(SKILL_CATEGORY_OPTIONS, skill.category || ""),
         skill.level,
-        Action(Number(skill.id))
+        Action(String(skill.id))
     ])
 
     const getTableColumns = () => [
@@ -101,7 +101,7 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' } },
     ]
 
-    const Action = (id: number) => {
+    const Action = (id: string) => {
         if (id) {
             return (
                 <div title=''>

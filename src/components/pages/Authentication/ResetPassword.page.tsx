@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthService, type IResetPasswordRequest } from '../../../services/useAuthService';
+import { useAuthService, type PasswordResetConfirmDTO } from '../../../services/useAuthService';
 import { ADMIN_ROUTES, REGEX } from '../../../utils/constant';
 import { HTTP_STATUS } from '../../../utils/types';
 import TextFieldV2 from '../../atoms/TextField/TextField';
@@ -93,7 +93,7 @@ const ResetPassword: React.FC = () => {
     }
   }, []);
 
-  const resetFormik = useFormik<IResetPasswordRequest>({
+  const resetFormik = useFormik<PasswordResetConfirmDTO>({
     initialValues: { token: '', newPassword: '', confirmPassword: '' },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {

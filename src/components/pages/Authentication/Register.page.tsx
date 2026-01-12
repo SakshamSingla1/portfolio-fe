@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthService, type IRegisterRequest, type IVerifyOtpRequest } from '../../../services/useAuthService';
+import { useAuthService, type AuthRegisterDTO, type AuthVerifyOtpDTO } from '../../../services/useAuthService';
 import { ADMIN_ROUTES, REGEX } from '../../../utils/constant';
 import { HTTP_STATUS } from '../../../utils/types';
 import TextFieldV2 from '../../atoms/TextField/TextField';
@@ -93,8 +93,8 @@ const Register: React.FC = () => {
     }
   }, [user, navigate]);
 
-  const registerFormik = useFormik<IRegisterRequest>({
-    initialValues: { fullName: '', email: '', password: '', phone: '', confirmPassword: '' },
+  const registerFormik = useFormik<AuthRegisterDTO>({
+    initialValues: { userName: '', fullName: '', email: '', password: '', phone: '', confirmPassword: '', role: 'ADMIN' },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
@@ -112,7 +112,7 @@ const Register: React.FC = () => {
     },
   });
 
-  const otpFormik = useFormik<IVerifyOtpRequest>({
+  const otpFormik = useFormik<AuthVerifyOtpDTO>({
     initialValues: { otp: '' ,
         phone: registerFormik.values.phone,
     },
@@ -138,7 +138,7 @@ const Register: React.FC = () => {
 
   const resendOtp = async () => {
     try {
-      const response = await authService.sendOtp(registerFormik.values.phone);
+      const response = await authService.sendOtp({phone: registerFormik.values.phone});
       if (response.status === HTTP_STATUS.OK) {
         showSnackbar('success', 'OTP resent successfully');
       }
