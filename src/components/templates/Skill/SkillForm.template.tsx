@@ -8,19 +8,15 @@ import { useLogoService, type Logo } from "../../../services/useLogoService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import * as Yup from "yup";
 import { useFormik } from "formik";
-import { type Skill } from "../../../services/useSkillService";
+import { type Skill, SkillLevelType } from "../../../services/useSkillService";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 
 const validationSchema = Yup.object().shape({
-    logoId: Yup.number()
+    logoId: Yup.string()
         .nullable()
         .required('Skill Logo ID is required'),
-    logoName: Yup.string()
-        .required('Skill Logo Name is required'),
-    logoUrl: Yup.string()
-        .required('Skill Logo URL is required'),
     level: Yup.string()
         .required('Skill Level is required')
         .max(50, 'Skill Level is too long'),
@@ -47,12 +43,9 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     const formik = useFormik<Skill>({
         initialValues: {
-            logoId: null,
-            logoName: "",
-            logoUrl: "",
-            level: "",
-            category: "",
-            profileId: user?.id?.toString(),
+            logoId: "",
+            level: SkillLevelType.BEGINNER,
+            profileId: user?.id?.toString() || "",
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
@@ -76,7 +69,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                 setLogos(fetchedLogos);
 
                 if (formik.values.logoId) {
-                    const existing = fetchedLogos.find((l: Logo) => l.id === formik.values.logoId);
+                    const existing = fetchedLogos.find((l: Logo) => l.id === Number(formik.values.logoId));
                     if (existing) setSelectedLogo(existing);
                 }
             }
@@ -93,7 +86,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
             </div>
         ),
         title: logo.name,
-        value: Number(logo.id),
+        value: String(logo.id),
     }));
 
     useEffect(() => {
@@ -103,10 +96,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     useEffect(() => {
         if (skill) {
             formik.setFieldValue("logoId", skill.logoId);
-            formik.setFieldValue("logoName", skill.logoName);
-            formik.setFieldValue("logoUrl", skill.logoUrl);
             formik.setFieldValue("level", skill.level);
-            formik.setFieldValue("category", skill.category);
         }
     }, [skill]);
 
@@ -114,9 +104,12 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         loadLogoDropdown();
     }, []);
 
+    useEffect(() => {
+        console.log(formik);
+    }, [formik]);
+
     return (
         <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
-            {/* Header Section */}
             <div className="mb-8 pb-6 border-b border-gray-200">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                     {mode === MODE.ADD
@@ -168,17 +161,17 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
                         {/* Logo Preview */}
                         <div className="flex items-center md:justify-end">
-                            {(selectedLogo || formik.values.logoUrl) ? (
+                            {(selectedLogo) ? (
                                 <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
                                     <img
-                                        src={selectedLogo?.url || formik.values.logoUrl || ''}
-                                        alt={selectedLogo?.name || formik.values.logoName || 'Logo'}
+                                        src={selectedLogo?.url || ''}
+                                        alt={selectedLogo?.name || 'Logo'}
                                         className="w-16 h-16 rounded-md shadow-sm"
                                     />
                                     <div>
                                         <p className="text-sm text-gray-600">Selected</p>
                                         <p className="text-base font-medium text-gray-900 truncate max-w-[200px]">
-                                            {selectedLogo?.name || formik.values.logoName || '—'}
+                                            {selectedLogo?.name || '—'}
                                         </p>
                                     </div>
                                 </div>
@@ -215,8 +208,8 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                             label="Skill Category"
                             placeholder="Select Skill Category"
                             options={SKILL_CATEGORY_OPTIONS}
-                            value={OptionToValue(SKILL_CATEGORY_OPTIONS, formik.values.category || selectedLogo?.category || "")}
-                            error={formik.touched.category && Boolean(formik.errors.category)}
+                            value={OptionToValue(SKILL_CATEGORY_OPTIONS, selectedLogo?.category || "")}
+                            error={formik.touched.level && Boolean(formik.errors.level)}
                             disabled={true}
                         />
                     </div>

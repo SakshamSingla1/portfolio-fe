@@ -34,7 +34,7 @@ const ContactUsTableTemplate: React.FC<IContactUsListTemplateProps> = ({ contact
         contactUs.email,
         contactUs.phone,
         contactUs.message,
-        DateUtils.formatDateTimeToDateMonthYear(contactUs.created)
+        DateUtils.formatDateTimeToDateMonthYear(contactUs.createdAt)
     ])
 
     const getTableColumns = () => [

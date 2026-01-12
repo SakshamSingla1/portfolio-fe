@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuthService, type IForgotPasswordRequest } from '../../../services/useAuthService';
+import { useAuthService } from '../../../services/useAuthService';
 import { ADMIN_ROUTES } from '../../../utils/constant';
 import { HTTP_STATUS } from '../../../utils/types';
 import TextFieldV2 from '../../atoms/TextField/TextField';
@@ -79,7 +79,7 @@ const ForgotPassword: React.FC = () => {
   const { showSnackbar } = useSnackbar();
   const classes = useStyles();
 
-  const formik = useFormik<IForgotPasswordRequest>({
+  const formik = useFormik({
     initialValues: { email: '' },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {

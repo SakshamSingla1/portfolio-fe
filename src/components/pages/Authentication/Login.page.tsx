@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthService, type ILoginRequest } from '../../../services/useAuthService';
+import { useAuthService, type AuthLoginDTO } from '../../../services/useAuthService';
 import { ADMIN_ROUTES } from '../../../utils/constant';
 import { HTTP_STATUS } from '../../../utils/types';
 import TextFieldV2 from '../../atoms/TextField/TextField';
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
     emailRef.current?.focus();
   }, [user, navigate]);
 
-  const formik = useFormik<ILoginRequest>({
+  const formik = useFormik<AuthLoginDTO>({
     initialValues: { email: '', password: '' },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {

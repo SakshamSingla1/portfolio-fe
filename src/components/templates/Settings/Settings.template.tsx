@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import { useSnackbar } from "../../../contexts/SnackbarContext";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
-import { useNavigate } from "react-router-dom";
-import { Lock, Email, ErrorOutline, ArrowRight, CheckCircle, Cancel } from "@mui/icons-material";
+// import { useSnackbar } from "../../../contexts/SnackbarContext";
+// import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+// import { useNavigate } from "react-router-dom";
+import { Lock, ArrowRight, CheckCircle, Cancel } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
-import { type IUser } from "../../../utils/types";
+// import { type IUser } from "../../../utils/types";
 
 import PasswordTab from "./PasswordTab";
-import EmailTab from "./EmailTab";
-import DangerZoneTab from "./DangerZoneTab";
+// import DangerZoneTab from "./DangerZoneTab";
 
 interface SettingsTemplateProps {
-  user: IUser | null;
+  // user: IUser | null;
   handleChangePasswordSubmit: (values: any) => void;
-  handleEmailOtpSubmit: (values: any) => void;
-  handleDeleteAccountSubmit: (values: any) => void;
+  // handleEmailOtpSubmit: (values: any) => void;
+  // handleDeleteAccountSubmit: (values: any) => void;
 }
 
 interface TabType {
@@ -26,23 +25,23 @@ interface TabType {
 }
 
 const SettingsTemplate: React.FC<SettingsTemplateProps> = ({
-  user,
+  // user,
   handleChangePasswordSubmit,
-  handleEmailOtpSubmit,
-  handleDeleteAccountSubmit,
+  // handleEmailOtpSubmit,
+  // handleDeleteAccountSubmit,
 }) => {
-  const { showSnackbar } = useSnackbar();
-  const { setAuthenticatedUser } = useAuthenticatedUser();
-  const navigate = useNavigate();
+  // const { showSnackbar } = useSnackbar();
+  // const { setAuthenticatedUser } = useAuthenticatedUser();
+  // const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState(0);
   const [formStatus, setFormStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const handleLogout = () => {
-    setAuthenticatedUser(null);
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
+  // const handleLogout = () => {
+  //   setAuthenticatedUser(null);
+  //   localStorage.removeItem("user");
+  //   navigate("/login");
+  // };
 
   const handleTabChange = (index: number) => {
     setActiveTab(index);
@@ -63,34 +62,34 @@ const SettingsTemplate: React.FC<SettingsTemplateProps> = ({
         />
       ),
     },
-    {
-      id: "email",
-      label: "Email Settings",
-      icon: <Email />,
-      description: "Update your email address",
-      content: (
-        <EmailTab
-          handleEmailOtpSubmit={handleEmailOtpSubmit}
-          setFormStatus={setFormStatus}
-          showSnackbar={showSnackbar}
-        />
-      ),
-    },
-    {
-      id: "danger",
-      label: "Danger Zone",
-      icon: <ErrorOutline color="error" />,
-      description: "Manage your account security",
-      content: (
-        <DangerZoneTab
-          user={user}
-          handleDeleteAccountSubmit={handleDeleteAccountSubmit}
-          setFormStatus={setFormStatus}
-          showSnackbar={showSnackbar}
-          handleLogout={handleLogout}
-        />
-      ),
-    },
+    // {
+    //   id: "email",
+    //   label: "Email Settings",
+    //   icon: <Email />,
+    //   description: "Update your email address",
+    //   content: (
+    //     <EmailTab
+    //       handleEmailOtpSubmit={handleEmailOtpSubmit}
+    //       setFormStatus={setFormStatus}
+    //       showSnackbar={showSnackbar}
+    //     />
+    //   ),
+    // },
+    // {
+    //   id: "danger",
+    //   label: "Danger Zone",
+    //   icon: <ErrorOutline color="error" />,
+    //   description: "Manage your account security",
+    //   content: (
+    //     <DangerZoneTab
+    //       user={user}
+    //       handleDeleteAccountSubmit={handleDeleteAccountSubmit}
+    //       setFormStatus={setFormStatus}
+    //       showSnackbar={showSnackbar}
+    //       handleLogout={handleLogout}
+    //     />
+    //   ),
+    // },
   ];
 
   return (

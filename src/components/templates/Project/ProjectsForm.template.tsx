@@ -4,11 +4,10 @@ import dayjs from "dayjs";
 import * as Yup from "yup";
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
-import Checkbox from "../../atoms/Checkbox/Checkbox";
 import DatePicker from "../../atoms/DatePicker/DatePicker";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { titleModification } from "../../../utils/helper";
-import { type Project, type ProjectResponse } from "../../../services/useProjectService";
+import { type Project, type ProjectResponse, WorkStatusType,WorkStatusOptions } from "../../../services/useProjectService";
 import { useSkillService, type SkillDropdown } from "../../../services/useSkillService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
@@ -35,8 +34,8 @@ const validationSchema = Yup.object().shape({
     projectEndDate: Yup.date()
         .min(Yup.ref('projectStartDate'), 'End date must be after start date')
         .nullable(),
-    currentlyWorking: Yup.boolean()
-        .required('Currently working status is required'),
+    workStatus: Yup.string()
+        .required('Work status is required'),
     projectImageUrl: Yup.string()
         .url('Must be a valid URL')
         .nullable()
@@ -121,15 +120,15 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     const formik = useFormik<Project>({
         initialValues: {
-            projectName: "",
-            projectDescription: "",
-            projectLink: "",
-            technologiesUsed: [],
-            projectStartDate: "",
-            projectEndDate: "",
-            currentlyWorking: false,
-            projectImageUrl: "",
-            profileId: user?.id
+            profileId:String(user?.id),
+     projectName:"",
+    projectDescription:"",
+    projectLink:"",
+    projectStartDate:"",
+    projectEndDate:"",
+    workStatus:"",
+    projectImageUrl:"",
+    skillIds:[],
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
@@ -172,10 +171,10 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             formik.setFieldValue("projectName", projects.projectName || "");
             formik.setFieldValue("projectDescription", projects.projectDescription || "");
             formik.setFieldValue("projectLink", projects.projectLink || "");
-            formik.setFieldValue("technologiesUsed", projects.technologiesUsed.map((skill) => skill.id) || []);
+            formik.setFieldValue("skillIds", projects.skills.map((skill) => skill.id) || []);
             formik.setFieldValue("projectStartDate", projects.projectStartDate || "");
             formik.setFieldValue("projectEndDate", projects.projectEndDate || "");
-            formik.setFieldValue("currentlyWorking", projects.currentlyWorking || false);
+            formik.setFieldValue("workStatus", projects.workStatus || WorkStatusType.CURRENT);
             formik.setFieldValue("projectImageUrl", projects.projectImageUrl || "");
         }
     }, [projects]);
@@ -198,8 +197,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     }, [skills])
 
     const selectedSkills = useMemo(() => {
-        return skills.filter(skill => formik.values.technologiesUsed.includes(skill.id));
-    }, [skills, formik.values.technologiesUsed]);
+        return skills.filter(skill => formik.values.skillIds.includes(skill.id));
+    }, [skills, formik.values.skillIds]);
 
     return (
         <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
@@ -289,8 +288,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             value={null}
                             onChange={(selectedOption: any) => {
                                 if (selectedOption) {
-                                    if (!formik.values.technologiesUsed.includes(selectedOption.value)) {
-                                        formik.setFieldValue("technologiesUsed", [...formik.values.technologiesUsed, selectedOption.value]);
+                                    if (!formik.values.skillIds.includes(selectedOption.value)) {
+                                        formik.setFieldValue("skillIds", [...formik.values.skillIds, selectedOption.value]);
                                     } else {
                                         console.log(`${selectedOption.title} is already added to the experience`);
                                     }
@@ -299,15 +298,15 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             onSearch={(value: string) => {
                                 loadSkillsDropdown(value);
                             }}
-                            error={formik.touched.technologiesUsed && Boolean(formik.errors.technologiesUsed)}
-                            helperText={formik.errors.technologiesUsed && formik.touched.technologiesUsed ?
-                                Array.isArray(formik.errors.technologiesUsed)
-                                    ? formik.errors.technologiesUsed.join(', ')
-                                    : formik.errors.technologiesUsed
+                            error={formik.touched.skillIds && Boolean(formik.errors.skillIds)}
+                            helperText={formik.errors.skillIds && formik.touched.skillIds ?
+                                Array.isArray(formik.errors.skillIds)
+                                    ? formik.errors.skillIds.join(', ')
+                                    : formik.errors.skillIds
                                 : "Search and select the technologies used in this experience"}
                             isDisabled={mode === MODE.VIEW}
                         />
-                        {(selectedSkills.length > 0 || formik.values.technologiesUsed.length > 0) && (
+                        {(selectedSkills.length > 0 || formik.values.skillIds.length > 0) && (
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <p className="text-sm font-medium text-gray-700 mb-3">
                                     Selected Technologies ({selectedSkills.length})
@@ -319,11 +318,11 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                                 key={skill.id}
                                                 label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>}
                                                 onDelete={() => {
-                                                    const updatedTechs = formik.values.technologiesUsed.filter((tech: any) => {
+                                                    const updatedTechs = formik.values.skillIds.filter((tech: any) => {
                                                         const techId = typeof tech === 'object' && tech !== null && 'id' in tech ? tech.id : tech;
                                                         return techId !== skill.id;
                                                     });
-                                                    formik.setFieldValue("technologiesUsed", updatedTechs);
+                                                    formik.setFieldValue("skillIds", updatedTechs);
                                                 }}
                                             />
                                         ) : (
@@ -367,26 +366,22 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                 error={!!formik.touched.projectEndDate && Boolean(formik.errors.projectEndDate)}
                                 helperText={typeof formik.errors.projectEndDate === 'string' ? formik.errors.projectEndDate : undefined}
                                 fullWidth
-                                disabled={mode === MODE.VIEW || formik.values.currentlyWorking}
+                                disabled={mode === MODE.VIEW || formik.values.workStatus === WorkStatusType.CURRENT}
                             />
                         </div>
 
                         <div className="bg-blue-50 p-4 rounded-lg">
-                            <Checkbox
-                                label="Currently Working on this Project"
-                                checked={formik.values.currentlyWorking || false}
-                                onChange={(checked) => {
-                                    formik.setFieldValue("currentlyWorking", checked);
-                                    if (checked) {
-                                        formik.setFieldValue("projectEndDate", null);
-                                    }
-                                }}
-                                disabled={mode === MODE.VIEW}
-                                labelClassName="text-sm font-medium text-gray-700"
+                            <AutoCompleteInput
+                                label="Work Status"
+                                placeHolder="Select Work Status"
+                                options={WorkStatusOptions}
+                                value={formik.values.workStatus ? WorkStatusOptions.find(option => option.value === formik.values.workStatus) : null}
+                                onChange={(option: any) => option && formik.setFieldValue("workStatus", option.value)}
+                                onSearch={() => { }}
+                                error={formik.touched.workStatus && Boolean(formik.errors.workStatus)}
+                                helperText={formik.touched.workStatus ? formik.errors.workStatus : "Select the work status"}
+                                isDisabled={mode === MODE.VIEW}
                             />
-                            <p className="text-xs text-gray-500 mt-1 ml-6">
-                                Check this if the project is still in progress
-                            </p>
                         </div>
                     </div>
                 </div>

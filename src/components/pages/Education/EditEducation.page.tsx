@@ -16,7 +16,7 @@ const EditEducationPage = () => {
     const handleSubmit = async (values: Education) => {
         try {
             if (!id) return;
-            const response = await educationService.update(Number(id), values);
+            const response = await educationService.update(String(id), values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);
                 navigate(ADMIN_ROUTES.EDUCATION);
@@ -28,7 +28,7 @@ const EditEducationPage = () => {
         }
     }
 
-    const getEducation = async (id: number | null) => {
+    const getEducation = async (id: string | null) => {
         try {
             const response = await educationService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -41,7 +41,7 @@ const EditEducationPage = () => {
 
     useEffect(() => {
         if (id) {
-            getEducation(Number(id));
+            getEducation(String(id));
         }
     }, [id]);
 
