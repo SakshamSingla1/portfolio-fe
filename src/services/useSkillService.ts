@@ -37,8 +37,8 @@ export interface SkillResponse {
 }
 
 export interface SkillFilterParams {
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
     search?: string;
     sortDir?: string;
     sortBy?: string;

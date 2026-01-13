@@ -1,70 +1,68 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom';
-import { InputAdornment } from '@mui/material';
-import {FiSearch} from "react-icons/fi";
-import TextField from '../../atoms/TextField/TextField';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { initialPaginationValues } from '../../../utils/constant';
 import { HTTP_STATUS, type IPagination } from '../../../utils/types';
-import ProjectsTableTemplate from '../../templates/Project/ProjectsTable.template';
+import { initialPaginationValues } from '../../../utils/constant';
 import { useProjectService , type ProjectResponse , type ProjectFilterParams} from '../../../services/useProjectService';
+import { useSearchParams } from 'react-router-dom';
+import { useSnackbar } from '../../../hooks/useSnackBar';
+import ProjectsTable from '../../templates/Project/ProjectsTable.template';
 
-const ListingProjectsPage : React.FC = () => {
-    const { showSnackbar } = useSnackbar();
+const ProjectListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-
     const projectService = useProjectService();
-
-    const [projects , setProjects] = useState<ProjectResponse[]>([]);
+    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
     };
 
-    const [filters, setFilters] = useState<ProjectFilterParams>(initialFiltersValues);
+    const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
     const [pagination, setPagination] = useState<IPagination>({
         ...initialPaginationValues,
         currentPage: Number(searchParams.get("page")) || 0,
-        pageSize: Number(searchParams.get("size")) || 50,
+        pageSize: Number(searchParams.get("size")) || 10,
     });
+    const [projects, setProjectsTo] = useState<ProjectResponse[]>([]);
 
-    const refreshProjects = async (page: number, size: number) => {
+    const refreshProjects = async (page: string, size: string) => {
         const params: ProjectFilterParams = {
             page: page,
             size: size,
-            search: filters?.search?.trim(),
+            sortDir: "DESC",
+            sortBy: "createdAt",
+            search: filters?.search,
         };
         await projectService.getByProfile(params)
-            .then(res => {
-                if (res.status === HTTP_STATUS.OK) {
+            .then((res) => {
+                if (res?.status === HTTP_STATUS.OK) {
                     const { totalElements, totalPages } = res?.data?.data;
                     setPagination({
                         ...pagination,
                         totalPages: totalPages,
                         totalRecords: totalElements
                     });
-                    setProjects(res?.data?.data?.content)
+                    setProjectsTo(res?.data?.data?.content);
                 }
-            }).catch(error => {
-                showSnackbar('error', error);
-                setProjects([]);
+            }).catch((error) => {
+                console.error("Error fetching projects:", error);
+                setProjectsTo([]);
+                showSnackbar('error', 'Failed to load projects');
             })
     }
 
     const handleFiltersChange = (name: string, value: any) => {
-        setPagination({ ...pagination, currentPage: 0 });
-        setFilters({ ...filters, [name]: value ?? "" });
-    };
+        setFiltersTo({ ...filters, [name]: value ?? "" });
+        setPagination({ ...pagination, currentPage: 0 })
+    }
 
-    const handlePaginationChange = ( newPage: number) => {
+    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage
         }));
-    };
+    }
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newRowsPerPage = parseInt(event.target.value, 50);
+        const newRowsPerPage = parseInt(event.target.value, 10);
         setPagination((prevPagination) => ({
             ...prevPagination,
             pageSize: newRowsPerPage
@@ -72,37 +70,23 @@ const ListingProjectsPage : React.FC = () => {
     };
 
     useEffect(() => {
-        refreshProjects(pagination.currentPage, pagination.pageSize);
-    }, [pagination.currentPage, pagination.pageSize, filters.search]);
+        refreshProjects(pagination.currentPage.toString(), pagination.pageSize.toString());
+    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         const params: Record<string, string> = {
-            page: String(pagination.currentPage),
-            size: String(pagination.pageSize),
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             search: filters.search ?? "",
         };
         setSearchParams(params);
     }, [filters.search, pagination]);
 
     return (
-        <div className='grid gap-y-4'>
-            <div className='flex justify-end'>
-                <div className={`w-[230px]`}>
-                    <TextField
-                        label=''
-                        placeholder="Search.."
-                        name='search'
-                        value={filters.search}
-                        onChange={(e: any) => handleFiltersChange("search", e.target.value)}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start" className="pl-[11px]"> <FiSearch /></InputAdornment>,
-                        }}
-                    />
-                </div>
-            </div>
-            <ProjectsTableTemplate projects={projects} filters={filters} pagination={pagination} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} />
+        <div>
+            <ProjectsTable projects={projects} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
         </div>
     )
 }
 
-export default ListingProjectsPage;
+export default ProjectListPage;

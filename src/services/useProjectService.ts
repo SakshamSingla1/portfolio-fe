@@ -45,8 +45,8 @@ export interface ProjectResponse {
 }
 
 export interface ProjectFilterParams {
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
     search?: string;
     sortDir?: string;
     sortBy?: string;

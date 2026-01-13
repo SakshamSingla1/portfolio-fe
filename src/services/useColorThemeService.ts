@@ -8,6 +8,15 @@ export const COLOR_THEME_URLS = {
     GET_COLOR_THEME_BY_ID: "color-themes/:id",
 }
 
+export interface ColorThemeFilterRequest {
+    page: string;
+    size: string;
+    sortDir?: string;
+    sortBy?: string;
+    search?: string;
+    status?: string;
+}
+
 export interface ColorShade {
     colorName: string;
     colorCode: string;
@@ -32,8 +41,8 @@ export interface ColorTheme {
 }
 
 export const useColorThemeService = () => {
-    const getColorTheme = async () => {
-        return request(API_METHOD.GET, COLOR_THEME_URLS.GET_COLOR_THEME, null);
+    const getColorTheme = async (params: ColorThemeFilterRequest) => {
+        return request(API_METHOD.GET, COLOR_THEME_URLS.GET_COLOR_THEME, null,null,{params});
     }
 
     const getColorThemeByThemeName = async (themeName: string) => {

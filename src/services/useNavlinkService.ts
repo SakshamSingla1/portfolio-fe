@@ -3,8 +3,8 @@ import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
 
 export const NAVLINK_URLS = {
-    GET_NAVLINKS: "nav-link",
-    GET_NAVLINK_BY_INDEX: "nav-link/:index",
+    GET_NAVLINKS: "navlinks",
+    GET_NAVLINK_BY_INDEX: "navlinks/:index",
 }
 
 export interface NavlinkFilterRequest {
@@ -12,6 +12,7 @@ export interface NavlinkFilterRequest {
     sort: string;
     page: string;
     size: string;
+    status?: string;
 }
 
 export interface NavlinkRequest {

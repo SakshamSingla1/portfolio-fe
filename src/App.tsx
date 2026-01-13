@@ -1,15 +1,13 @@
-// In App.tsx
 import { Route, Routes, Navigate } from "react-router-dom";
 import { AuthenticatedUserProvider } from "./contexts/AuthenticatedUserContext";
 import { useAuthenticatedUser } from "./hooks/useAuthenticatedUser";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminLayout from "./layouts/AdminLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 import AdminRoutes from "./routes/AdminRoutes";
 import Authentication from "./components/pages/Authentication/Authentication.page";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
 
-// ---------------- PROTECTED ROUTE ----------------
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuthenticatedUser();
   const navigate = useNavigate();
@@ -25,16 +23,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <div>Loading...</div>;
   }
 
-  return <AdminLayout>{children}</AdminLayout>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 };
 
-// ---------------- MAIN APP ROUTES ----------------
 function App() {
   return (
     <SnackbarProvider>
       <AuthenticatedUserProvider>
         <Routes>
-          <Route path="/" element={<Authentication />} />
+          <Route path="/login" element={<Authentication />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route
             path="/admin/*"
@@ -66,6 +63,7 @@ function App() {
         </Routes>
       </AuthenticatedUserProvider>
     </SnackbarProvider>
+
   );
 }
 

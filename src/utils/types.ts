@@ -129,3 +129,10 @@ export const useColors = () => {
         warning500: getColor(defaultTheme, "warning500") ?? "#F59E0B"
     };
 };
+
+export const SORT_ENUM = {
+   NAME_ASC: "name_asc",
+   NAME_DESC: "name_desc",
+   CREATED_AT_ASC: "created_at_asc",
+   CREATED_AT_DESC: "created_at_desc"
+}

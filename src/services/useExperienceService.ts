@@ -44,8 +44,8 @@ export interface ExperienceResponse {
 
 export interface ExperienceFilterParams {
     search?: string;
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
     sortDir?: string;
     sortBy?: string;
 }

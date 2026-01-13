@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link, Outlet } from 'react-router-dom';
 import { useAuthenticatedUser } from '../hooks/useAuthenticatedUser';
 import { ADMIN_ROUTES } from '../utils/constant';
 import LogoutButton from '../components/atoms/LogoutButton/LogoutButton';
@@ -90,7 +90,7 @@ const NavItem: React.FC<INavItemProps> = ({ to, icon, label, active, collapsed, 
   </Link>
 );
 
-const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AdminLayout: React.FC = () => {
   const colors = useColors();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(false);
@@ -278,7 +278,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
         {/* Page content */}
         <main style={{ flex: 1, padding: 24, overflowY: 'auto', background: `linear-gradient(to bottom right, ${colors.primary50}, ${colors.primary100}, ${colors.primary500})` }}>
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

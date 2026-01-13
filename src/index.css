@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-@global {
-    '.jodit-add-new-line, .jodit-add-new-line *': {
-        display: 'none !important',
-        boxSizing: 'border-box',
+@layer base {
+    .jodit-add-new-line, .jodit-add-new-line * {
+        display: none !important;
+        box-sizing: border-box;
     }
 }
