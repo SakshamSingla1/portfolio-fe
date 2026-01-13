@@ -21,10 +21,6 @@ export const REGEX = {
 }
 
 export const ADMIN_ROUTES = {
-    LOGIN: "/admin/login",
-    REGISTER: "/admin/register",
-    FORGOT_PASSWORD: "/admin/forgot-password",
-    RESET_PASSWORD: "/admin/reset-password",
     PROFILE: "/admin/profile",
     
     EDUCATION: "/admin/education",
@@ -42,15 +38,30 @@ export const ADMIN_ROUTES = {
     PROJECTS_EDIT: "/admin/projects/:id/edit",
     PROJECTS_VIEW: "/admin/projects/:id",
     
-    SKILL: "/admin/skill",
-    SKILL_ADD: "/admin/skill/add",
-    SKILL_EDIT: "/admin/skill/:id/edit",
-    SKILL_VIEW: "/admin/skill/:id",
+    SKILL: "/admin/skills",
+    SKILL_ADD: "/admin/skills/add",
+    SKILL_EDIT: "/admin/skills/:id/edit",
+    SKILL_VIEW: "/admin/skills/:id",
     
     CONTACT_US: "/admin/contact-us",
 
     SETTINGS: "/admin/settings",
     MAIN_SITE: "/admin/main-site",
+
+    NAVLINKS: "/admin/navlinks",
+    NAVLINKS_ADD: "/admin/navlinks/add",
+    NAVLINKS_EDIT: "/admin/navlinks/:index/edit",
+    NAVLINKS_VIEW: "/admin/navlinks/:index",
+
+    TEMPLATES: "/admin/templates",
+    TEMPLATES_ADD: "/admin/templates/add",
+    TEMPLATES_EDIT: "/admin/templates/:name/edit",
+    TEMPLATES_VIEW: "/admin/templates/:name",
+
+    COLOR_THEME: "/admin/color-themes",
+    COLOR_THEME_ADD: "/admin/color-themes/add",
+    COLOR_THEME_EDIT: "/admin/color-themes/:themeName/edit",
+    COLOR_THEME_VIEW: "/admin/color-themes/:themeName",
 }
 
 export const MODE = {
@@ -430,3 +441,8 @@ export const DEGREE_OPTIONS: Option[] = [
     { value: 'PHD', label: 'PhD' },
     { value: 'OTHER', label: 'Other' },
 ];
+
+export const ROLES = {
+    ADMIN: 'ADMIN',
+    SUPER_ADMIN: 'SUPER_ADMIN',
+};

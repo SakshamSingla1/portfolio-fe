@@ -7,6 +7,13 @@ export const PROFILE_URLS = {
     GET_BY_ID: "/profile/:id",
 }
 
+export const VerificationStatus = {
+    PENDING: "PENDING",
+    VERIFIED: "VERIFIED",
+}
+
+
+
 export interface ProfileRequest {
     fullName: string;
     userName: string;

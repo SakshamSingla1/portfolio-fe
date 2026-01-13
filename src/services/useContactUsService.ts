@@ -22,13 +22,13 @@ export interface ContactUsRequest {
     email: string;
     message: string;
     phone: string;
-    profileid: number | null;
+    profileId: string | null;
 }
 
 export interface ContactUsFilterParams {
     search?: string;
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
     sortDir?: string;
     sortBy?: string;
 }

@@ -1,71 +1,66 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom';
-import { InputAdornment } from '@mui/material';
-import {FiSearch} from "react-icons/fi";
-import TextField from '../../atoms/TextField/TextField';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { initialPaginationValues } from '../../../utils/constant';
 import { HTTP_STATUS, type IPagination } from '../../../utils/types';
-import SkillsTableTemplate from '../../templates/Skill/SkillsTable.template';
+import { initialPaginationValues } from '../../../utils/constant';
+import SkillTableTemplate from '../../templates/Skill/SkillsTable.template';
 import { useSkillService , type SkillResponse , type SkillFilterParams} from '../../../services/useSkillService';
+import { useSearchParams } from 'react-router-dom';
+import { useSnackbar } from '../../../hooks/useSnackBar';
 
-const ListingSkillsPage : React.FC = () => {
-
-    const { showSnackbar } = useSnackbar();
+const ListingSkillsPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-
     const skillService = useSkillService();
-
-    const [skills , setSkills] = useState<SkillResponse[]>([]);
+    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
     };
 
-    const [filters, setFilters] = useState<SkillFilterParams>(initialFiltersValues);
+    const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
     const [pagination, setPagination] = useState<IPagination>({
         ...initialPaginationValues,
         currentPage: Number(searchParams.get("page")) || 0,
-        pageSize: Number(searchParams.get("size")) || 50,
+        pageSize: Number(searchParams.get("size")) || 10,
     });
+    const [skills, setSkillsTo] = useState<SkillResponse[]>([]);
 
-    const refreshSkills = async (page: number, size: number) => {
+    const refreshSkills = async (page: string, size: string) => {
         const params: SkillFilterParams = {
             page: page,
             size: size,
-            search: filters?.search?.trim(),
+            search: filters?.search,
         };
         await skillService.getByProfile(params)
-            .then(res => {
-                if (res.status === HTTP_STATUS.OK) {
+            .then((res) => {
+                if (res?.status === HTTP_STATUS.OK) {
                     const { totalElements, totalPages } = res?.data?.data;
                     setPagination({
                         ...pagination,
                         totalPages: totalPages,
                         totalRecords: totalElements
                     });
-                    setSkills(res?.data?.data?.content)
+                    setSkillsTo(res?.data?.data?.content);
                 }
-            }).catch(error => {
-                showSnackbar('error', error);
-                setSkills([]);
+            }).catch((error) => {
+                console.error("Error fetching skills:", error);
+                setSkillsTo([]);
+                showSnackbar('error', 'Failed to load skills');
             })
     }
 
     const handleFiltersChange = (name: string, value: any) => {
-        setPagination({ ...pagination, currentPage: 0 });
-        setFilters({ ...filters, [name]: value ?? "" });
-    };
+        setFiltersTo({ ...filters, [name]: value ?? "" });
+        setPagination({ ...pagination, currentPage: 0 })
+    }
 
-    const handlePaginationChange = (newPage: number) => {
+    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage
         }));
-    };
+    }
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newRowsPerPage = parseInt(event.target.value, 50);
+        const newRowsPerPage = parseInt(event.target.value, 10);
         setPagination((prevPagination) => ({
             ...prevPagination,
             pageSize: newRowsPerPage
@@ -73,35 +68,21 @@ const ListingSkillsPage : React.FC = () => {
     };
 
     useEffect(() => {
-        refreshSkills(pagination.currentPage, pagination.pageSize);
-    }, [pagination.currentPage, pagination.pageSize, filters.search]);
+        refreshSkills(pagination.currentPage.toString(), pagination.pageSize.toString());
+    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         const params: Record<string, string> = {
-            page: String(pagination.currentPage),
-            size: String(pagination.pageSize),
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             search: filters.search ?? "",
         };
         setSearchParams(params);
     }, [filters.search, pagination]);
 
     return (
-        <div className='grid gap-y-4'>
-            <div className='flex justify-end'>
-                <div className={`w-[230px]`}>
-                    <TextField
-                        label=''
-                        placeholder="Search.."
-                        name='search'
-                        value={filters.search}
-                        onChange={(e: any) => handleFiltersChange("search", e.target.value)}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start" className="pl-[11px]"> <FiSearch /></InputAdornment>,
-                        }}
-                    />
-                </div>
-            </div>
-            <SkillsTableTemplate skills={skills} filters={filters} pagination={pagination} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} />
+        <div>
+            <SkillTableTemplate skills={skills} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
         </div>
     )
 }

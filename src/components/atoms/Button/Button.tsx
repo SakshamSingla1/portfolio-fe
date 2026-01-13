@@ -1,428 +1,235 @@
 import React, { useMemo } from "react";
 import MuiButton, { type ButtonProps as MuiButtonProps } from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import { createUseStyles, useTheme } from "react-jss";
-import whiteRightArrow from '../../../assets/icons/whiteRightArrow.svg';
-import rightArrow from '../../../assets/icons/rightArrowButton.svg';
+import { createUseStyles } from "react-jss";
+import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+import { getColor } from "../../../utils/helper";
 
-type CustomVariant = "primaryContained" | "secondaryContained" | "tertiaryContained" | "primaryText" | "secondaryText" | "tertiaryText" | "viewBtn";
-type CustomSize = "small" | "medium" | "large";
+type CustomVariant = 
+  | "primaryContained" 
+  | "secondaryContained" 
+  | "tertiaryContained" 
+  | "primaryText" 
+  | "secondaryText" 
+  | "underlined" 
+  | "tertiaryText";
 
-interface StyleProps {
-    theme: any;
-    iconPosition?: string;
-    label?: string | null;
-}
+type CustomSize = "extraSmall" | "small" | "medium" | "large";
 
 const useStyles = createUseStyles({
-    largeIcon: {
-        width: "22px",
-        height: "22px",
+  root: {
+    minWidth: "auto",
+    padding: "0px",
+    lineHeight: "1 !important",
+    "&:hover": {
+      backgroundColor: "transparent",
     },
-    mediumIcon: {
-        width: "20px",
-        height: "20px",
+    "&.Mui-disabled": {
+      opacity: 0.6,
     },
-    smallIcon: {
-        width: "16px",
-        height: "16px",
+  },
+  iconButton: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 28,
+    height: 40,
+    borderRadius: "45px",
+    padding: "8px",
+  },
+  iconWithText: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  label: {
+    textTransform: "capitalize",
+    fontWeight: 500,
+  },
+  // Size variants
+  extraSmall: {
+    minHeight: 32,
+    padding: "4px 12px",
+    fontSize: "14px",
+    borderRadius: "4px",
+  },
+  small: {
+    minHeight: 36,
+    padding: "6px 16px",
+    fontSize: "14px",
+    borderRadius: "4px",
+  },
+  medium: {
+    minHeight: 40,
+    padding: "8px 20px",
+    fontSize: "16px",
+    borderRadius: "6px",
+  },
+  large: {
+    minHeight: 48,
+    padding: "12px 24px",
+    fontSize: "16px",
+    borderRadius: "8px",
+  },
+  // Variant styles
+  primaryContained: (colors: any) => ({
+    color: colors.neutral50,
+    backgroundColor: colors.primary300,
+    "&:hover": {
+      backgroundColor: `${colors.primary300}E6`, // 90% opacity
     },
-    root: {
-        minWidth: "auto",
-        padding: "0px",
-        lineHeight: "1 !important",
-        "&:hover": {
-            backgroundColor: "none",
-        },
+    "&:active": {
+      backgroundColor: `${colors.primary300}CC`, // 80% opacity
     },
-    primaryContained: (props: StyleProps) => ({
-        color: 'white',
-        borderRadius: "8px",
-        border: `1px solid ${props.theme.palette.background.primary.primary500}`,
-        backgroundColor: props.theme.palette.background.primary.primary500,
-        position: 'relative',
-        overflow: 'hidden',
-        paddingLeft: '20px',
-        transition: 'padding-left 0.3s ease',
-        "&::before": {
-            content: `''`,
-            position: 'absolute',
-            left: props.iconPosition ?? '10px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            background: props.label ? `url(${whiteRightArrow}) no-repeat center center` : 'none',
-            backgroundSize: 'contain',
-            opacity: 0,
-            transition: 'opacity 0.2s ease, left 0.2s ease',
-        },
-        "&:hover": {
-            paddingLeft: props.label ? '40px' : '20px',
-            backgroundColor: props.theme.palette.background.primary.primary700,
-        },
-        "&:hover::before": {
-            left: props.iconPosition ?? '10px',
-            opacity: 1,
-        },
-        "&:disabled": {
-            color: props.theme.palette.text.neutral.neutral400,
-            backgroundColor: props.theme.palette.background.neutral.neutral50,
-            border: "none"
-        },
-        '&:focus': {
-            backgroundColor: props.theme.palette.background.primary.primary700,
-        },
-        '&:active': {
-            backgroundColor: props.theme.palette.background.primary.primary800,
-        },
-    }),
-    secondaryContained: (props: StyleProps) => ({
-        color: props.theme.palette.background.primary.primary500,
-        backgroundColor: props.theme.palette.background.primary.primary100,
-        borderRadius: "8px",
-        borderColor: "white",
-        border: '1px solid',
-        position: 'relative',
-        overflow: 'hidden',
-        paddingLeft: '20px',
-        transition: 'padding-left 0.3s ease',
-        "&::before": {
-            content: `''`,
-            position: 'absolute',
-            left: props.iconPosition ?? "10px",
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            background: props.label ? `url(${rightArrow}) no-repeat center center` : 'none',
-            backgroundSize: 'contain',
-            opacity: 0,
-            transition: 'opacity 0.2s ease, left 0.2s ease',
-        },
-        "&:hover": {
-            paddingLeft: props.label ? '40px' : '20px',
-            backgroundColor: props.theme.palette.background.primary.primary200
-        },
-        "&:hover::before": {
-            left: props.iconPosition ?? "10px",
-            opacity: 1,
-        },
-        "&:disabled": {
-            color: props.theme.palette.text.neutral.neutral400,
-            backgroundColor: props.theme.palette.background.neutral.neutral50,
-        },
-        '&:focus': {
-            backgroundColor: props.theme.palette.background.primary.primary200,
-            border: `1px solid ${props.theme.palette.border.primary.primary400}`
-        },
-        '&:active': {
-            backgroundColor: props.theme.palette.background.primary.primary200,
-        },
-    }),
-    tertiaryContained: (props: StyleProps) => ({
-        color: props.theme.palette.background.primary.primary500,
-        borderRadius: "8px",
-        borderColor: props.theme.palette.border.primary.primary800,
-        border: '1px solid',
-        backgroundColor: "white",
-        position: 'relative',
-        overflow: 'hidden',
-        paddingLeft: '20px',
-        transition: 'padding-left 0.3s ease',
-        "&::before": {
-            content: `''`,
-            position: 'absolute',
-            left: props.iconPosition ?? '10px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            background: props.label ? `url(${rightArrow}) no-repeat center center` : 'none',
-            backgroundSize: 'contain',
-            opacity: 0,
-            transition: 'opacity 0.2s ease, left 0.2s ease',
-        },
-        "&:hover": {
-            paddingLeft: props.label ? '40px' : '20px',
-            backgroundColor: "white",
-        },
-        "&:hover::before": {
-            left: props.iconPosition ?? '10px',
-            opacity: 1,
-        },
-        "&:disabled": {
-            color: props.theme.palette.text.neutral.neutral300,
-            border: `1px solid ${props.theme.palette.border.neutral.neutral300}`
-        },
-        '&:focus': {
-            backgroundColor: props.theme.palette.background.primary.primary50,
-        },
-        '&:active': {
-            backgroundColor: props.theme.palette.background.primary.primary50,
-        },
-    }),
-    primaryText: (props: StyleProps) => ({
-        color: props.theme.palette.background.primary.primary500,
-        borderRadius: "10px",
-        border: 'none',
-        backgroundColor: "transparent",
-        textDecoration: "underline",
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'padding-left 0.3s ease',
-        paddingLeft: '20px',
-        "&::before": {
-            content: `''`,
-            position: 'absolute',
-            left: props.iconPosition ?? '40px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            background: props.label ? `url(${rightArrow}) no-repeat center center` : 'none',
-            backgroundSize: 'contain',
-            opacity: 0,
-            transition: 'opacity 0.3s ease, left 0.3s ease',
-        },
-        "&:hover": {
-            paddingLeft: props.label ? '40px' : '20px',
-            color: props.theme.palette.background.primary.primary500,
-            textDecoration: "underline",
-            backgroundColor: "white",
-        },
-        "&:hover::before": {
-            left: props.iconPosition || '40px',
-            opacity: 1,
-        },
-        "&:disabled": {
-            color: props.theme.palette.text.neutral.neutral300,
-        },
-        '&:focus': {
-            color: props.theme.palette.background.primary.primary500,
-        },
-        '&:active': {
-            color: props.theme.palette.background.primary.primary500,
-            backgroundColor: props.theme.palette.background.primary.primary50,
-        },
-    }),
-    secondaryText: (props: StyleProps) => ({
-        color: props.theme.palette.text.primary.primary500,
-        borderRadius: "10px",
-        border: 'none',
-        backgroundColor: "inherit",
-        textDecoration: "underline",
-        textUnderlineOffset: "3px",
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'padding-left 0.3s ease',
-        paddingLeft: '20px',
-        "&::before": {
-            content: `''`,
-            position: 'absolute',
-            left: props.iconPosition || '40px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            background: props.label ? `url(${rightArrow}) no-repeat center center` : 'none',
-            backgroundSize: 'contain',
-            opacity: 0,
-            padding: "12px",
-            transition: 'opacity 0.3s ease, left 0.3s ease',
-        },
-        "&:hover": {
-            paddingLeft: props.label ? '40px' : '20px',
-            textDecoration: "underline",
-            textUnderlineOffset: "3px",
-            color: props.theme.palette.background.primary.primary500,
-            backgroundColor: "inherit",
-        },
-        "&:hover::before": {
-            left: props.iconPosition ?? '40px',
-            opacity: 1,
-        },
-        "&:disabled": {
-            color: props.theme.palette.text.neutral.neutral300,
-        },
-        '&:focus': {
-            color: props.theme.palette.text.primary.primary900,
-            backgroundColor: props.theme.palette.background.primary.primary50,
-        },
-        '&:active': {
-            color: props.theme.palette.text.primary.primary800,
-        },
-    }),
-    tertiaryText: (props: StyleProps) => ({
-        color: props.theme.palette.text.neutral.neutral500,
-        borderRadius: "10px",
-        border: 'none',
-        backgroundColor: "transparent",
-        textDecoration: "underline",
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'padding-left 0.3s ease',
-        paddingLeft: '20px',
-        "&::before": {
-            content: `''`,
-            position: 'absolute',
-            left: '5px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            background: props.label ? `url(${rightArrow}) no-repeat center center` : 'none',
-            backgroundSize: 'contain',
-            opacity: 0,
-            transition: 'opacity 0.3s ease, left 0.3s ease',
-        },
-        "&:hover": {
-            paddingLeft: props.label ? '40px' : '20px',
-            color: props.theme.palette.text.primary.primary700,
-            textDecoration: "underline",
-            backgroundColor: "white",
-        },
-        "&:hover::before": {
-            left: '10px',
-            opacity: 1,
-        },
-        "&:disabled": {
-            color: props.theme.palette.text.neutral.neutral300,
-        },
-        '&:focus': {
-            color: props.theme.palette.text.neutral.neutral800,
-        },
-        '&:active': {
-            color: props.theme.palette.text.primary.primary700,
-            backgroundColor: props.theme.palette.background.neutral.neutral50,
-        },
-    }),
-    viewBtn: (props: StyleProps) => ({
-        position: 'relative',
-        color: props.theme.palette.text.primary.primary500,
-        cursor: 'pointer',
-        backgroundColor: "inherit",
-        textDecoration: "underline",
-        textUnderlineOffset: "3px",
-        transition: 'color 0.3s ease, padding-left 0.3s ease',
-        padding: "12px 12px 12px 24px !important",
-        "&::before": {
-            content: `''`,
-            position: 'absolute',
-            left: '25px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            background: `url(${rightArrow}) no-repeat center center`,
-            backgroundSize: 'contain',
-            opacity: 0,
-            transition: 'opacity 0.3s ease, left 0.3s ease',
-        },
-        "&:hover": {
-            paddingLeft: '25px',
-            backgroundColor: "inherit",
-            textDecoration: "underline",
-            textUnderlineOffset: "3px",
-            color: props.theme.palette.text.primary.primary950,
-        },
-        "&:hover::before": {
-            left: '0',
-            opacity: 1,
-        },
-    }),
-    label: {
-        textTransform: "none",
+    "&.Mui-disabled": {
+      backgroundColor: colors.neutral200,
+      color: colors.neutral400,
     },
-    small: (props: StyleProps) => ({
-        height: "fit-content",
-        fontSize: "14px",
-        padding: props.label ? "8px 16px" : "8px",
-    }),
-    medium: (props: StyleProps) => ({
-        height: "fit-content",
-        fontSize: "16px",
-        padding: props.label ? "10px 20px" : "10px",
-    }),
-    large: (props: StyleProps) => ({
-        height: "fit-content",
-        fontSize: "18px",
-        lineHeight: "22px",
-        padding: props.label ? "12px 24px" : "12px",
-    }),
+  }),
+  secondaryContained: (colors: any) => ({
+    color: colors.primary300,
+    backgroundColor: colors.neutral50,
+    border: `1px solid ${colors.primary300}`,
+    "&:hover": {
+      backgroundColor: `${colors.neutral50}E6`,
+    },
+    "&:active": {
+      backgroundColor: `${colors.neutral200}CC`,
+    },
+    "&.Mui-disabled": {
+      borderColor: colors.neutral200,
+      color: colors.neutral400,
+    },
+  }),
+  tertiaryContained: (colors: any) => ({
+    color: colors.primary300,
+    backgroundColor: colors.neutral50,
+    border: `1px solid ${colors.neutral200}`,
+    "&:hover": {
+      backgroundColor: colors.neutral50,
+      borderColor: colors.primary300,
+    },
+    "&.Mui-disabled": {
+      color: colors.neutral400,
+      borderColor: colors.neutral200,
+    },
+  }),
+  primaryText: (colors: any) => ({
+    color: colors.primary300,
+    backgroundColor: "transparent",
+    textDecoration: "none",
+    "&:hover": {
+      textDecoration: "underline",
+      backgroundColor: "transparent",
+    },
+    "&.Mui-disabled": {
+      color: colors.neutral400,
+    },
+  }),
+  secondaryText: (colors: any) => ({
+    color: colors.neutral700,
+    backgroundColor: "transparent",
+    textDecoration: "none",
+    "&:hover": {
+      color: colors.primary300,
+      textDecoration: "underline",
+      backgroundColor: "transparent",
+    },
+    "&.Mui-disabled": {
+      color: colors.neutral400,
+    },
+  }),
+tertiaryText: (colors: any) => ({
+  color: colors.neutral700,
+  '&:hover': {
+    backgroundColor: colors.neutral50,
+  }
+}),
+  underlined: (colors: any) => ({
+    color: colors.neutral700,
+    backgroundColor: "transparent",
+    textDecoration: "underline",
+    "&:hover": {
+      color: colors.primary300,
+      backgroundColor: "transparent",
+    },
+    "&.Mui-disabled": {
+      color: colors.neutral400,
+    },
+  }),
 });
 
-interface ButtonProps extends Omit<MuiButtonProps, "variant"> {
-    variant: CustomVariant;
-    label?: string | null;
-    isLoading?: boolean;
-    iconButton?: string;
-    size?: CustomSize;
-    iconPosition?: string;
-    startIcon?: React.ReactNode;
-    children?: React.ReactNode;
+interface ButtonProps extends Omit<MuiButtonProps, "variant" | "size"> {
+  variant: CustomVariant;
+  label?: string | React.ReactNode;
+  isLoading?: boolean;
+  iconButton?: React.ReactNode;
+  size?: CustomSize;
+  buttonWithImg?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
-    variant,
-    label,
-    iconPosition = "10px",
-    isLoading,
-    iconButton,
-    size = "large",
-    className = '',
-    disabled,
-    startIcon,
-    children,
-    ...props
+  variant = "primaryContained",
+  label,
+  isLoading = false,
+  iconButton,
+  size = "medium",
+  buttonWithImg = false,
+  className = "",
+  disabled = false,
+  ...props
 }) => {
-    const theme = useTheme();
-    const styles = useStyles({ theme, iconPosition, label });
+  const { defaultTheme } = useAuthenticatedUser();
 
-    const getIconStyle = (size: string) => {
-        switch (size) {
-            case "small":
-                return styles.smallIcon;
-            case "medium":
-                return styles.mediumIcon;
-            case "large":
-            default:
-                return styles.largeIcon;
-        }
-    };
+  const colors = {
+    primary300: getColor(defaultTheme, "primary300") || "#10b981",
+    neutral50: getColor(defaultTheme, "neutral50") || "#FAFAFA",
+    neutral200: getColor(defaultTheme, "neutral200") || "#eeeeee",
+    neutral400: getColor(defaultTheme, "neutral400") || "#aaaaaa",
+    neutral700: getColor(defaultTheme, "neutral700") || "#555",
+    neutral900: getColor(defaultTheme, "neutral900") || "#222",
+    secondary50: getColor(defaultTheme, "secondary50") || "#FFFDE7",
+    secondary200: getColor(defaultTheme, "secondary200") || "#FFECB3",
+    secondary400: getColor(defaultTheme, "secondary400") || "#FFC107",
+  };
 
-    const buttonContent = useMemo(() => {
-        if (isLoading) {
-            return <CircularProgress size={20} />;
-        }
+  const styles = useStyles(colors);
 
-        if (iconButton) {
-            return <img className={getIconStyle(size)} src={iconButton} alt="" />;
-        }
+  const buttonContent = useMemo(() => {
+    if (isLoading) {
+      return <CircularProgress size={20} color="inherit" />;
+    }
 
-        return (
-            <span className="flex items-center gap-2">
-                {startIcon && <span className="flex-shrink-0">{startIcon}</span>}
-                {label}
-                {children}
-            </span>
-        );
-    }, [isLoading, iconButton, size, label, children, startIcon]);
+    if (buttonWithImg && (iconButton || label)) {
+      return (
+        <span className={styles.iconWithText}>
+          {iconButton}
+          {label && <span>{label}</span>}
+        </span>
+      );
+    }
 
-    return (
-        <MuiButton
-            variant="contained"
-            disabled={disabled || isLoading}
-            className={`${styles[variant]} ${styles[size]} ${className} ${styles.label} font-medium`}
-            classes={{
-                root: `${styles.root}`,
-                startIcon: '!m-0'
-            }}
-            {...props}
-        >
-            {buttonContent}
-        </MuiButton>
-    );
+    return iconButton || label;
+  }, [isLoading, buttonWithImg, iconButton, label, styles]);
+
+  return (
+    <MuiButton
+      variant="text"
+      className={`
+        ${styles.root} 
+        ${styles[variant]} 
+        ${styles[size]} 
+        ${styles.label} 
+        ${className}
+      `}
+      disabled={disabled || isLoading}
+      disableRipple
+      disableElevation
+      {...props}
+    >
+      {buttonContent}
+    </MuiButton>
+  );
 };
 
 export default Button;

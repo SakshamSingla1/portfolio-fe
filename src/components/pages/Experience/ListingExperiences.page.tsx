@@ -1,70 +1,68 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom';
-import { InputAdornment } from '@mui/material';
-import {FiSearch} from "react-icons/fi";
-import TextField from '../../atoms/TextField/TextField';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { initialPaginationValues } from '../../../utils/constant';
 import { HTTP_STATUS, type IPagination } from '../../../utils/types';
-import ExperiencesTableTemplate from '../../templates/Experience/ExperiencesTable.template';
-import { useExperienceService , type ExperienceResponse , type ExperienceFilterParams} from '../../../services/useExperienceService';
+import { initialPaginationValues } from '../../../utils/constant';
+import ExperienceListTableTemplate from '../../templates/Experience/ExperiencesTable.template';
+import { useSearchParams } from 'react-router-dom';
+import { useSnackbar } from '../../../hooks/useSnackBar';
+import { useExperienceService, type ExperienceResponse, type ExperienceFilterParams } from '../../../services/useExperienceService';
 
-const ListingExperiencesPage : React.FC = () => {
-    const { showSnackbar } = useSnackbar();
+const ExperienceListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-
     const experienceService = useExperienceService();
-
-    const [experiences , setExperiences] = useState<ExperienceResponse[]>([]);
+    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
     };
 
-    const [filters, setFilters] = useState<ExperienceFilterParams>(initialFiltersValues);
+    const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
     const [pagination, setPagination] = useState<IPagination>({
         ...initialPaginationValues,
         currentPage: Number(searchParams.get("page")) || 0,
-        pageSize: Number(searchParams.get("size")) || 50,
+        pageSize: Number(searchParams.get("size")) || 10,
     });
+    const [experiences, setExperiencesTo] = useState<ExperienceResponse[]>([]);
 
-    const refreshExperiences = async (page: number, size: number) => {
+    const refreshExperiences = async (page: string, size: string) => {
         const params: ExperienceFilterParams = {
             page: page,
             size: size,
-            search: filters?.search?.trim(),
+            sortDir: "DESC",
+            sortBy: "createdAt",
+            search: filters?.search,
         };
         await experienceService.getAllByProfile(params)
-            .then(res => {
-                if (res.status === HTTP_STATUS.OK) {
+            .then((res) => {
+                if (res?.status === HTTP_STATUS.OK) {
                     const { totalElements, totalPages } = res?.data?.data;
                     setPagination({
                         ...pagination,
                         totalPages: totalPages,
                         totalRecords: totalElements
                     });
-                    setExperiences(res?.data?.data?.content)
+                    setExperiencesTo(res?.data?.data?.content);
                 }
-            }).catch(error => {
-                showSnackbar('error', error);
-                setExperiences([]);
+            }).catch((error) => {
+                console.error("Error fetching experiences:", error);
+                setExperiencesTo([]);
+                showSnackbar('error', 'Failed to load experiences');
             })
     }
 
     const handleFiltersChange = (name: string, value: any) => {
-        setPagination({ ...pagination, currentPage: 0 });
-        setFilters({ ...filters, [name]: value ?? "" });
-    };
+        setFiltersTo({ ...filters, [name]: value ?? "" });
+        setPagination({ ...pagination, currentPage: 0 })
+    }
 
-    const handlePaginationChange = ( newPage: number) => {
+    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage
         }));
-    };
+    }
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newRowsPerPage = parseInt(event.target.value, 50);
+        const newRowsPerPage = parseInt(event.target.value, 10);
         setPagination((prevPagination) => ({
             ...prevPagination,
             pageSize: newRowsPerPage
@@ -72,37 +70,23 @@ const ListingExperiencesPage : React.FC = () => {
     };
 
     useEffect(() => {
-        refreshExperiences(pagination.currentPage, pagination.pageSize);
-    }, [pagination.currentPage, pagination.pageSize, filters.search]);
+        refreshExperiences(pagination.currentPage.toString(), pagination.pageSize.toString());
+    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         const params: Record<string, string> = {
-            page: String(pagination.currentPage),
-            size: String(pagination.pageSize),
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             search: filters.search ?? "",
         };
         setSearchParams(params);
     }, [filters.search, pagination]);
 
     return (
-        <div className='grid gap-y-4'>
-            <div className='flex justify-end'>
-                <div className={`w-[230px]`}>
-                    <TextField
-                        label=''
-                        placeholder="Search.."
-                        name='search'
-                        value={filters.search}
-                        onChange={(e: any) => handleFiltersChange("search", e.target.value)}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start" className="pl-[11px]"> <FiSearch /></InputAdornment>,
-                        }}
-                    />
-                </div>
-            </div>
-            <ExperiencesTableTemplate experiences={experiences} filters={filters} pagination={pagination} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} />
+        <div>
+            <ExperienceListTableTemplate experiences={experiences} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
         </div>
     )
 }
 
-export default ListingExperiencesPage;
+export default ExperienceListPage;

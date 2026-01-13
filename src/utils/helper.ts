@@ -2,6 +2,7 @@ import moment from "moment";
 import { REGEX } from "./constant";
 import { createSearchParams, generatePath } from "react-router-dom";
 import type { IOption, MakeRouteParams } from "./types";
+import type { ColorTheme } from "../services/useColorThemeService";
 
 export const capitalizeFirstLetter = (input: string) => {
   if (!input) return '';
@@ -166,4 +167,34 @@ export const makeRoute = (
 	const queryString = createSearchParams(query ?? {});
 	return `${generatePath(baseRoute, params ?? {})}${queryString ? `?${queryString}` : ''
 		}`;
+};
+
+export const getColor = (theme: ColorTheme | null,colorName: string) => {
+    if(!theme?.palette?.colorGroups) return "";
+    for( const group of theme.palette.colorGroups){
+        for(const shade of group.colorShades){
+            if(shade.colorName === colorName) return shade.colorCode;
+        }
+    }
+    return "";
+}
+
+export const userNameMaker = (email: string): string => {
+    if (!email) return 'user';
+    return email.split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, '') || 'user';
+}
+
+export const getBreadcrumbsFromUrl = (pathname: string): Array<{ label: string; path: string }> => {
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const breadcrumbs = [];
+  let currentPath = '';
+  for (const segment of pathSegments) {
+    currentPath = `${currentPath}/${segment}`;
+    const label = segment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    breadcrumbs.push({ label, path: currentPath });
+  }
+  return breadcrumbs;
 };

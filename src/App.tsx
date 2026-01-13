@@ -1,129 +1,70 @@
-import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Route, Routes, Navigate } from "react-router-dom";
+import { AuthenticatedUserProvider } from "./contexts/AuthenticatedUserContext";
+import { useAuthenticatedUser } from "./hooks/useAuthenticatedUser";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import DashboardLayout from "./layouts/DashboardLayout";
+import AdminRoutes from "./routes/AdminRoutes";
+import Authentication from "./components/pages/Authentication/Authentication.page";
+import { SnackbarProvider } from "./contexts/SnackbarContext";
 
-// Admin Layout 
-import { ADMIN_ROUTES } from './utils/constant';
-import { ThemeProvider } from 'react-jss';
-import { defaultTheme } from './utils/theme';
-import { AuthenticatedUserProvider } from './contexts/AuthenticatedUserContext';
-import Login from './components/pages/Authentication/Login.page';
-import AdminLayout from './layouts/AdminLayout';
-import Register from './components/pages/Authentication/Register.page';
-import ForgotPasswordPage from './components/pages/Authentication/ForgotPassword.page';
-import ResetPasswordPage from './components/pages/Authentication/ResetPassword.page';
-import ProfilePage from './components/pages/Profile/Profile.page';
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuthenticatedUser();
+  const navigate = useNavigate();
 
-import { SnackbarProvider } from './contexts/SnackbarContext';
-import EditSkillPage from './components/pages/Skill/EditSkill.page';
-import AddSkillPage from './components/pages/Skill/AddSkill.page';
-import ViewSkillPage from './components/pages/Skill/ViewSkill.page';
-import ListingSkillsPage from './components/pages/Skill/ListingSkills.page';
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (!savedUser && !user) {
+      navigate("/login", { replace: true });
+    }
+  }, [user, navigate]);
 
-import AddEducationPage from './components/pages/Education/AddEducation.page';
-import EditEducationPage from './components/pages/Education/EditEducation.page';
-import ViewEducationPage from './components/pages/Education/ViewEducation.page';
-import ListingEducationPage from './components/pages/Education/ListingEducation.page';
-
-import AddExperiencePage from './components/pages/Experience/AddExperience.page';
-import EditExperiencePage from './components/pages/Experience/EditExperience.page';
-import ViewExperiencePage from './components/pages/Experience/ViewExperience.page';
-import ListingExperiencesPage from './components/pages/Experience/ListingExperiences.page';
-
-import ListingProjectsPage from './components/pages/Project/ListingProjects.page';
-import AddProjectPage from './components/pages/Project/AddProject.page';
-import EditProjectPage from './components/pages/Project/EditProject.page';
-import ViewProjectPage from './components/pages/Project/ViewProject.page';
-
-import ListingContactUsPage from './components/pages/ContactUs/ListingContactUs.page';
-
-import SettingsPage from './components/pages/Settings/Settings.page';
-import ProtectedRoute from './components/organisms/ProtectedRoute/ProtectedRoute';
-
-const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const location = useLocation();
-
-  const hideLayout = [
-    ADMIN_ROUTES.LOGIN,
-    ADMIN_ROUTES.REGISTER,
-    ADMIN_ROUTES.FORGOT_PASSWORD,
-    ADMIN_ROUTES.RESET_PASSWORD,
-    ...Object.values(ADMIN_ROUTES).filter(route => route !== ADMIN_ROUTES.LOGIN && route !== ADMIN_ROUTES.REGISTER && route !== ADMIN_ROUTES.FORGOT_PASSWORD && route !== ADMIN_ROUTES.RESET_PASSWORD)
-  ].some(route => location.pathname.startsWith(route.split('/')[1]));
-
-  if (hideLayout) {
-    return <>{children}</>;
+  if (!user) {
+    return <div>Loading...</div>;
   }
 
-  return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-grow">
-        {children}
-      </main>
-    </div>
-  );
+  return <DashboardLayout>{children}</DashboardLayout>;
 };
 
-// Main App component
-const App = () => {
+function App() {
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <SnackbarProvider>
       <AuthenticatedUserProvider>
-        <SnackbarProvider>
-          <MainLayout>
-            <Routes>
-              {/* Authentication Routes */}
-              <Route path={ADMIN_ROUTES.REGISTER} element={<Register />} />
-              <Route path={ADMIN_ROUTES.LOGIN} element={<Login />} />
-              <Route path={ADMIN_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
-              <Route path={ADMIN_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
-
-              {/* Protected admin routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route element={<AdminLayout />}>
-
-                  <Route path={ADMIN_ROUTES.SETTINGS} element={<SettingsPage />} />
-                  <Route path={ADMIN_ROUTES.SKILL}>
-                    <Route index element={<ListingSkillsPage />} />
-                    <Route path="add" element={<AddSkillPage />} />
-                    <Route path=":id/edit" element={<EditSkillPage />} />
-                    <Route path=":id" element={<ViewSkillPage />} />
-                  </Route>
-
-                  <Route path={ADMIN_ROUTES.EDUCATION}>
-                    <Route index element={<ListingEducationPage />} />
-                    <Route path="add" element={<AddEducationPage />} />
-                    <Route path=":id/edit" element={<EditEducationPage />} />
-                    <Route path=":id" element={<ViewEducationPage />} />
-                  </Route>
-
-                  <Route path={ADMIN_ROUTES.EXPERIENCE}>
-                    <Route index element={<ListingExperiencesPage />} />
-                    <Route path="add" element={<AddExperiencePage />} />
-                    <Route path=":id/edit" element={<EditExperiencePage />} />
-                    <Route path=":id" element={<ViewExperiencePage />} />
-                  </Route>
-
-
-                  <Route path={ADMIN_ROUTES.PROJECTS}>
-                    <Route index element={<ListingProjectsPage />} />
-                    <Route path="add" element={<AddProjectPage />} />
-                    <Route path=":id/edit" element={<EditProjectPage />} />
-                    <Route path=":id" element={<ViewProjectPage />} />
-                  </Route>
-
-                  <Route path={ADMIN_ROUTES.CONTACT_US} element={<ListingContactUsPage />} />
-
-
-                  <Route path={ADMIN_ROUTES.PROFILE} element={<ProfilePage />} />
-                  <Route path="/" element={<Navigate to={ADMIN_ROUTES.LOGIN} replace />} />
-                </Route>
-              </Route>
-            </Routes>
-          </MainLayout>
-        </SnackbarProvider>
+        <Routes>
+          <Route path="/login" element={<Authentication />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute>
+                <AdminRoutes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <div className="flex flex-col items-center justify-center min-h-screen p-4">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">
+                  404 - Page Not Found
+                </h1>
+                <p className="text-gray-600 mb-6">
+                  The page you're looking for doesn't exist.
+                </p>
+                <button
+                  onClick={() => window.history.back()}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  Go Back
+                </button>
+              </div>
+            }
+          />
+        </Routes>
       </AuthenticatedUserProvider>
-    </ThemeProvider>
+    </SnackbarProvider>
+
   );
-};
+}
 
 export default App;

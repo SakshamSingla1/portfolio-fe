@@ -19,6 +19,7 @@ import {
   FaGlobe,
 } from 'react-icons/fa';
 import { FiPlus } from 'react-icons/fi';
+import { useColors } from '../utils/types';
 
 interface INavItemProps {
   to: string;
@@ -26,43 +27,62 @@ interface INavItemProps {
   label: string;
   active: boolean;
   collapsed: boolean;
+  colors: any;
 }
 
-const NavItem: React.FC<INavItemProps> = ({
-  to,
-  icon,
-  label,
-  active,
-  collapsed
-}) => (
+const NavItem: React.FC<INavItemProps> = ({ to, icon, label, active, collapsed, colors}) => (
   <Link
     to={to}
-    className={`group relative flex items-center p-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${active
-        ? 'bg-gradient-to-r from-[#D1F2EB] to-[#E8F8F5] text-[#0E6655] shadow-lg shadow-[#1ABC9C]/10 border-l-4 border-[#1ABC9C]'
-        : 'text-gray-700 hover:bg-gradient-to-r hover:from-[#E8F8F5] hover:to-gray-50 hover:shadow-md hover:border-l-4 hover:border-[#1ABC9C]/30'
-      } ${collapsed ? 'justify-center' : ''}`}
+    className={`group relative flex items-center p-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02]`}
+    style={{
+      background: active
+        ? `linear-gradient(to right, ${colors.primary50}, ${colors.primary100})`
+        : undefined,
+      color: active ? colors.primary700 : colors.neutral800,
+      justifyContent: collapsed ? 'center' : 'flex-start',
+      borderLeft: active ? `4px solid ${colors.primary500}` : undefined,
+    }}
     title={collapsed ? label : ''}
   >
-    <div className={`${!collapsed ? 'mr-3' : ''} relative`}>
-      <div className={`p-2 rounded-lg transition-all duration-300 ${active
-          ? 'bg-[#1ABC9C]/10 text-[#0E6655] scale-110'
-          : 'bg-gray-100/50 text-gray-600 group-hover:bg-[#1ABC9C]/5 group-hover:text-[#0E6655] group-hover:scale-110'
-        }`}>
-        <span className="text-base">{icon}</span>
+    <div style={{ marginRight: collapsed ? 0 : '12px', position: 'relative' }}>
+      <div
+        style={{
+          padding: '8px',
+          borderRadius: '8px',
+          background: active ? `${colors.primary500}20` : `${colors.neutral200}50`,
+          color: active ? colors.primary700 : colors.neutral800,
+          transform: active ? 'scale(1.1)' : undefined,
+          transition: 'all 0.3s',
+        }}
+      >
+        {icon}
       </div>
       {active && (
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#1ABC9C] rounded-full animate-pulse border-2 border-white"></div>
+        <div
+          style={{
+            position: 'absolute',
+            top: -4,
+            right: -4,
+            width: 12,
+            height: 12,
+            backgroundColor: colors.primary500,
+            borderRadius: '50%',
+            border: `2px solid ${colors.neutral50}`,
+            animation: 'pulse 1s infinite',
+          }}
+        />
       )}
     </div>
     {!collapsed && (
-      <div className="flex-1 flex items-center justify-between">
-        <span className={`font-medium transition-colors ${active ? 'text-[#0E6655]' : 'text-gray-700 group-hover:text-[#0E6655]'
-          }`}>{label}</span>
+      <div style={{ display: 'flex', flex: 1, justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontWeight: 500, color: active ? colors.primary700 : colors.neutral800 }}>
+          {label}
+        </span>
         {active && (
-          <div className="flex space-x-1">
-            <div className="w-1 h-1 bg-[#1ABC9C] rounded-full animate-pulse"></div>
-            <div className="w-1 h-1 bg-[#1ABC9C] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-1 h-1 bg-[#1ABC9C] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          <div style={{ display: 'flex', gap: 2 }}>
+            <div style={{ width: 4, height: 4, backgroundColor: colors.primary500, borderRadius: '50%', animation: 'pulse 1s infinite' }} />
+            <div style={{ width: 4, height: 4, backgroundColor: colors.primary500, borderRadius: '50%', animation: 'pulse 1s infinite', animationDelay: '0.2s' }} />
+            <div style={{ width: 4, height: 4, backgroundColor: colors.primary500, borderRadius: '50%', animation: 'pulse 1s infinite', animationDelay: '0.4s' }} />
           </div>
         )}
       </div>
@@ -71,6 +91,7 @@ const NavItem: React.FC<INavItemProps> = ({
 );
 
 const AdminLayout: React.FC = () => {
+  const colors = useColors();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -82,11 +103,7 @@ const AdminLayout: React.FC = () => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      if (mobile) {
-        setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
-      }
+      setSidebarOpen(!mobile);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -94,9 +111,7 @@ const AdminLayout: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
+    if (isMobile) setSidebarOpen(false);
   }, [location.pathname, isMobile]);
 
   const navItems = [
@@ -110,15 +125,13 @@ const AdminLayout: React.FC = () => {
     { to: ADMIN_ROUTES.MAIN_SITE, icon: <FaGlobe />, label: 'Main Site' },
   ];
 
-  const toggleSidebar = (): void => setSidebarOpen(!sidebarOpen);
-  const toggleCollapse = (): void => setCollapsed(!collapsed);
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleCollapse = () => setCollapsed(!collapsed);
 
-  const renderAddButton = (): React.ReactNode => {
+  const renderAddButton = () => {
     const currentPath = location.pathname;
     const currentNav = navItems.find(item => currentPath.startsWith(item.to));
-    const showAddButton = ['Education', 'Experience', 'Projects', 'Skill']
-      .includes(currentNav?.label || '');
-
+    const showAddButton = ['Education', 'Experience', 'Projects', 'Skill'].includes(currentNav?.label || '');
     if (!showAddButton) return null;
 
     return (
@@ -132,7 +145,7 @@ const AdminLayout: React.FC = () => {
     );
   };
 
-  const getAddIcon = (path: string): React.ReactNode => {
+  const getAddIcon = (path: string) => {
     if (path.startsWith('/admin/education')) return <FaGraduationCap />;
     if (path.startsWith('/admin/experience')) return <FaBriefcase />;
     if (path.startsWith('/admin/projects')) return <FaCode />;
@@ -141,135 +154,122 @@ const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Mobile sidebar backdrop */}
+    <div style={{ display: 'flex', height: '100vh', backgroundColor: colors.neutral50 }}>
+      {/* Mobile backdrop */}
       <div
-        className={`fixed inset-0 z-20 transition-opacity duration-300 ${sidebarOpen && isMobile ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          } lg:hidden`}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 20,
+          opacity: sidebarOpen && isMobile ? 1 : 0,
+          pointerEvents: sidebarOpen && isMobile ? 'auto' : 'none',
+          transition: 'opacity 0.3s',
+          backgroundColor: 'rgba(0,0,0,0.2)',
+        }}
         onClick={toggleSidebar}
-        aria-hidden="true"
       />
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 bg-white shadow-lg transition-all duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } ${collapsed ? 'w-20' : 'w-64'}`}
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 30,
+          width: collapsed ? 80 : 256,
+          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'all 0.3s ease-in-out',
+          backgroundColor: colors.neutral50,
+          boxShadow: `0 4px 12px ${colors.neutral200}`,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
-        <div className="flex h-full flex-col">
-          {/* Logo */}
-          <div className="bg-[#1ABC9C] p-4 h-16 flex items-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-black/5 to-transparent"></div>
-            <div className="ml-3 flex items-center w-full relative z-10">
-              <div className="p-1 bg-white/10 rounded-lg">
-                <FaHome className="text-2xl text-white" />
-              </div>
-              {!collapsed && (
-                <div className="ml-4 flex flex-col">
-                  <span className="text-2xl font-bold text-white tracking-wide drop-shadow-lg">Admin</span>
-                  <span className="text-white/80 text-xs font-medium tracking-wider uppercase">Dashboard Portal</span>
-                </div>
-              )}
+        {/* Logo */}
+        <div style={{ height: 64, backgroundColor: colors.primary500, padding: 16, display: 'flex', alignItems: 'center' }}>
+          <FaHome size={28} color={colors.neutral50} />
+          {!collapsed && (
+            <div style={{ marginLeft: 12, color: colors.neutral50 }}>
+              <div style={{ fontSize: 18, fontWeight: 'bold' }}>Admin</div>
+              <div style={{ fontSize: 12 }}>Dashboard Portal</div>
             </div>
-          </div>
-
-          {/* Enhanced Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-transparent to-gray-50/30">
-            {!collapsed && (
-              <div className="mb-6 px-2">
-                <div className="flex items-center space-x-2 mb-3">
-                  <div className="w-2 h-2 bg-[#1ABC9C] rounded-full animate-pulse"></div>
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                    Navigation Menu
-                  </h3>
-                  <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent"></div>
-                </div>
-              </div>
-            )}
-            <div className="space-y-2">
-              {navItems.map((item, index) => (
-                <div
-                  key={item.to}
-                  className="transform transition-all duration-300"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                    animation: 'slideInLeft 0.6s ease-out forwards'
-                  }}
-                >
-                  <NavItem
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                    active={location.pathname.startsWith(item.to)}
-                    collapsed={collapsed}
-                  />
-                </div>
-              ))}
-            </div>
-          </nav>
-
-          {/* User Info & Logout */}
-          <div className="border-t border-gray-200 p-4 mt-auto bg-gray-50/50">
-            {!collapsed && (
-              <div className="mb-3 p-2 bg-white rounded-lg border-2 border-[#1ABC9C]/10 shadow-lg shadow-[#1ABC9C]/10">
-                <div className="font-medium text-[#0E6655] truncate text-sm">
-                  {user?.fullName}
-                </div>
-                <div className="text-xs text-[#0E6655] truncate">
-                  {user?.email}
-                </div>
-              </div>
-            )}
-            <LogoutButton collapsed={collapsed} />
-          </div>
-
-          {/* Collapse button */}
-          {!isMobile && <button
-            onClick={toggleCollapse}
-            className="absolute -right-3 top-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#0E6655] shadow-md transition-all duration-200 hover:bg-[#D1F2EB] hover:shadow-lg border border-gray-100"
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <div className="transition-transform duration-200 hover:scale-110">
-              {collapsed ? (
-                <FaChevronRight size={12} />
-              ) : (
-                <FaChevronLeft size={12} />
-              )}
-            </div>
-          </button>}
+          )}
         </div>
+
+        {/* Navigation */}
+        <nav style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+          {navItems.map((item) => (
+            <div key={item.to} style={{ marginBottom: 8 }}>
+              <NavItem
+                to={item.to}
+                icon={item.icon}
+                label={item.label}
+                active={location.pathname.startsWith(item.to)}
+                collapsed={collapsed}
+                colors={colors}
+              />
+            </div>
+          ))}
+        </nav>
+
+        {/* User info & logout */}
+        <div style={{ padding: 16, borderTop: `1px solid ${colors.neutral200}` }}>
+          {!collapsed && (
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontWeight: 500, color: colors.primary700 }}>{user?.fullName}</div>
+              <div style={{ fontSize: 12, color: colors.primary700 }}>{user?.email}</div>
+            </div>
+          )}
+          <LogoutButton collapsed={collapsed} />
+        </div>
+
+        {/* Collapse button */}
+        {!isMobile && (
+          <button
+            onClick={toggleCollapse}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: -12,
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: colors.neutral50,
+              border: `1px solid ${colors.neutral200}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transform: 'translateY(-50%)',
+            }}
+          >
+            {collapsed ? <FaChevronRight size={12} /> : <FaChevronLeft size={12} />}
+          </button>
+        )}
       </aside>
 
       {/* Main content */}
-      <div
-        className={`flex flex-1 flex-col transition-all duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-64'
-          }`}
-      >
-        {/* Top bar */}
-        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm backdrop-blur-sm">
-          <div className="flex items-center">
+      <div style={{ flex: 1, marginLeft: collapsed ? 80 : 256, transition: 'margin 0.3s' }}>
+        {/* Topbar */}
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 64, padding: '0 16px', borderBottom: `1px solid ${colors.neutral200}`, backgroundColor: colors.neutral50 }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <button
-              className="mr-4 rounded-lg p-2 text-gray-500 hover:bg-[#E8F8F5] transition-colors duration-200 lg:hidden"
               onClick={toggleSidebar}
-              aria-label="Toggle sidebar"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}
             >
-              <FaBars />
+              <FaBars color={colors.neutral800} />
             </button>
-            <div className="flex items-center space-x-2">
-              <div className="w-1 h-6 bg-[#1ABC9C] rounded-full"></div>
-              <h1 className="text-xl font-semibold text-[#0E6655] tracking-wide">
-                {navItems.find((item) => location.pathname.startsWith(item.to))
-                  ?.label || 'Dashboard'}
-              </h1>
-            </div>
+            <h1 style={{ fontSize: 18, fontWeight: 600, color: colors.primary700 }}>
+              {navItems.find(item => location.pathname.startsWith(item.to))?.label || 'Dashboard'}
+            </h1>
           </div>
-          <div className="flex items-center space-x-3">
+          <div style={{ display: 'flex', gap: 8 }}>
             {location.pathname.startsWith(ADMIN_ROUTES.PROFILE) && (
               <Button
                 variant="primaryContained"
                 label="Edit Profile"
                 onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=EDIT`)}
-                className="px-4 py-2 transition-transform duration-200 hover:scale-105"
-                startIcon={<FaUser />}
               />
             )}
             {renderAddButton()}
@@ -277,10 +277,8 @@ const AdminLayout: React.FC = () => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-[#D1F2EB] via-[#E8F8F5] to-[#1ABC9C] p-4 md:p-6">
-          <div className="mx-auto max-w-7xl">
-            <Outlet />
-          </div>
+        <main style={{ flex: 1, padding: 24, overflowY: 'auto', background: `linear-gradient(to bottom right, ${colors.primary50}, ${colors.primary100}, ${colors.primary500})` }}>
+          <Outlet />
         </main>
       </div>
     </div>

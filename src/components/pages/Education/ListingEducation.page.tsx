@@ -1,70 +1,67 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom';
-import { InputAdornment } from '@mui/material';
-import {FiSearch} from "react-icons/fi";
-import TextField from '../../atoms/TextField/TextField';
-import { useSnackbar } from '../../../hooks/useSnackBar';
+import { HTTP_STATUS, type IPagination, SORT_ENUM } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
-import EducationsTableTemplate from '../../templates/Education/EducationsTable.template';
+import EducationTable from '../../templates/Education/EducationsTable.template';
 import { useEducationService , type Education , type EducationFilterParams} from '../../../services/useEducationService';
+import { useSearchParams } from 'react-router-dom';
+import { useSnackbar } from '../../../hooks/useSnackBar';
 
-const ListingEducationsPage : React.FC = () => {
-    const { showSnackbar } = useSnackbar();
+const ServiceListingPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-
     const educationService = useEducationService();
-
-    const [educations , setEducations] = useState<Education[]>([]);
+    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
     };
 
-    const [filters, setFilters] = useState<EducationFilterParams>(initialFiltersValues);
+    const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
     const [pagination, setPagination] = useState<IPagination>({
         ...initialPaginationValues,
         currentPage: Number(searchParams.get("page")) || 0,
-        pageSize: Number(searchParams.get("size")) || 50,
+        pageSize: Number(searchParams.get("size")) || 10,
     });
+    const [educations, setEducationsTo] = useState<Education[]>([]);
 
-    const refreshEducations = async (page: number, size: number) => {
+    const refreshServices = async (page: string, size: string) => {
         const params: EducationFilterParams = {
             page: page,
             size: size,
-            search: filters?.search?.trim(),
+            sortDir: SORT_ENUM.CREATED_AT_DESC,
+            search: filters?.search,
         };
         await educationService.getAllByProfile(params)
-            .then(res => {
-                if (res.status === HTTP_STATUS.OK) {
+            .then((res) => {
+                if (res?.status === HTTP_STATUS.OK) {
                     const { totalElements, totalPages } = res?.data?.data;
                     setPagination({
                         ...pagination,
                         totalPages: totalPages,
                         totalRecords: totalElements
                     });
-                    setEducations(res?.data?.data?.content)
+                    setEducationsTo(res?.data?.data?.content);
                 }
-            }).catch(error => {
-                showSnackbar('error', error);
-                setEducations([]);
+            }).catch((error) => {
+                console.error("Error fetching educations:", error);
+                setEducationsTo([]);
+                showSnackbar('error', 'Failed to load educations');
             })
     }
 
     const handleFiltersChange = (name: string, value: any) => {
-        setPagination({ ...pagination, currentPage: 0 });
-        setFilters({ ...filters, [name]: value ?? "" });
-    };
+        setFiltersTo({ ...filters, [name]: value ?? "" });
+        setPagination({ ...pagination, currentPage: 0 })
+    }
 
-    const handlePaginationChange = ( newPage: number) => {
+    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage
         }));
-    };
+    }
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newRowsPerPage = parseInt(event.target.value, 50);
+        const newRowsPerPage = parseInt(event.target.value, 10);
         setPagination((prevPagination) => ({
             ...prevPagination,
             pageSize: newRowsPerPage
@@ -72,37 +69,24 @@ const ListingEducationsPage : React.FC = () => {
     };
 
     useEffect(() => {
-        refreshEducations(pagination.currentPage, pagination.pageSize);
-    }, [pagination.currentPage, pagination.pageSize, filters.search]);
+        refreshServices(pagination.currentPage.toString(), pagination.pageSize.toString());
+    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         const params: Record<string, string> = {
-            page: String(pagination.currentPage),
-            size: String(pagination.pageSize),
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            status: filters.status ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, filters.status, pagination]);
 
     return (
-        <div className='grid gap-y-4'>
-            <div className='flex justify-end'>
-                <div className={`w-[230px]`}>
-                    <TextField
-                        label=''
-                        placeholder="Search.."
-                        name='search'
-                        value={filters.search}
-                        onChange={(e: any) => handleFiltersChange("search", e.target.value)}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start" className="pl-[11px]"> <FiSearch /></InputAdornment>,
-                        }}
-                    />
-                </div>
-            </div>
-            <EducationsTableTemplate educations={educations} filters={filters} pagination={pagination} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} />
+        <div>
+            <EducationTable educations={educations} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
         </div>
     )
 }
 
-export default ListingEducationsPage;
+export default ServiceListingPage;  
