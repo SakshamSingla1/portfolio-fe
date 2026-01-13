@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiTrash } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
@@ -6,7 +6,7 @@ import TableV1 from '../../organisms/TableV1/TableV1';
 import { type ColumnType } from '../../organisms/TableV1/TableV1';
 import { ADMIN_ROUTES, DEGREE_OPTIONS } from '../../../utils/constant';
 import { makeRoute, OptionToValue } from '../../../utils/helper';
-import { type IPagination } from '../../../utils/types';
+import { HTTP_STATUS, type IPagination } from '../../../utils/types';
 import { type Education, useEducationService } from '../../../services/useEducationService';
 import { createUseStyles } from 'react-jss';
 import { useSnackbar } from '../../../hooks/useSnackBar';
@@ -35,10 +35,10 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
     const navigate = useNavigate();
     const educationService = useEducationService();
     const { showSnackbar } = useSnackbar();
-    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
-    const [educationToDelete, setEducationToDelete] = React.useState<number | null>(null);
+    const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
+    const [educationToDelete, setEducationToDelete] = useState<string | null>(null);
 
-    const handleEditClick = (id: number) => {
+    const handleEditClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
@@ -47,7 +47,7 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
         navigate(makeRoute(ADMIN_ROUTES.EDUCATION_EDIT, { query: { ...query }, params: { id } }));
     }
 
-    const handleViewClick = (id: number) => {
+    const handleViewClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
@@ -56,10 +56,10 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
         navigate(makeRoute(ADMIN_ROUTES.EDUCATION_VIEW, { query: { ...query }, params: { id } }));
     }
 
-    const handleDeleteClick = async (id: number) => {
+    const handleDeleteClick = async (id: string) => {
         try {
             const response = await educationService.remove(id);
-            if (response.status === 200) {
+            if (response.status === HTTP_STATUS.OK) {
                 showSnackbar("success", "Education deleted successfully");
                 setEducationToDelete(null);
                 setShowDeletePopup(false);
@@ -91,7 +91,7 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
         education.location,
         education.startYear + " - " + education.endYear,
         education.grade?.trim().split(" ")[1] === "Percentage" ? education.grade?.trim().split(" ")[0] + "%" : education.grade,
-        Action(Number(education.id))
+        Action(String(education.id))
     ])
 
     const getTableColumns = () => [
@@ -106,7 +106,7 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
     ];
 
 
-    const Action = (id: number) => {
+    const Action = (id: string) => {
         if (id) {
             return (
                 <div title=''>

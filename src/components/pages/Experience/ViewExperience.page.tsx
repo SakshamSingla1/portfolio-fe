@@ -12,9 +12,9 @@ const ViewExperiencePage = () => {
     const { showSnackbar } = useSnackbar();
     const [experience, setExperience] = useState<ExperienceResponse | null>(null);
 
-    const getExperience = async (id: number | null) => {
+    const getExperience = async (id: string | null) => {
         try {
-            const response = await experienceService.getById(Number(id));
+            const response = await experienceService.getById(String(id));
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 setExperience(response.data.data);
             }
@@ -25,7 +25,7 @@ const ViewExperiencePage = () => {
 
     useEffect(() => {
         if (id) {
-            getExperience(Number(id));
+            getExperience(String(id));
         }
     }, [id]);
 

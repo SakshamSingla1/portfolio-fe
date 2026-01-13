@@ -7,7 +7,7 @@ import { useSnackbar } from '../../../hooks/useSnackBar';
 import { initialPaginationValues } from '../../../utils/constant';
 import { HTTP_STATUS, type IPagination } from '../../../utils/types';
 import SkillsTableTemplate from '../../templates/Skill/SkillsTable.template';
-import { useSkillService , type Skill , type SkillFilterParams} from '../../../services/useSkillService';
+import { useSkillService , type SkillResponse , type SkillFilterParams} from '../../../services/useSkillService';
 
 const ListingSkillsPage : React.FC = () => {
 
@@ -16,7 +16,7 @@ const ListingSkillsPage : React.FC = () => {
 
     const skillService = useSkillService();
 
-    const [skills , setSkills] = useState<Skill[]>([]);
+    const [skills , setSkills] = useState<SkillResponse[]>([]);
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",

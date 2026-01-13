@@ -12,7 +12,7 @@ const ViewProjectPage = () => {
     const { showSnackbar } = useSnackbar();
     const [project, setProject] = useState<ProjectResponse | null>(null);
 
-    const getProject = async (id: number | null) => {
+    const getProject = async (id: string | null) => {
         try {
             const response = await projectService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -25,7 +25,7 @@ const ViewProjectPage = () => {
 
     useEffect(() => {
         if (id) {
-            getProject(Number(id));
+            getProject(String(id));
         }
     }, [id]);
 

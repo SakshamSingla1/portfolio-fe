@@ -153,27 +153,21 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
     }, [education]);
 
     useEffect(() => {
-        console.log("formik.values", formik);
+        console.log("formik", formik);
     }, [formik]);
 
     return (
         <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
-            {/* Header Section */}
             <div className="mb-8 pb-6 border-b border-gray-200">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                     {mode === MODE.ADD ? "Add Education" : mode === MODE.EDIT ? "Edit Education" : "Education Details"}
                 </h2>
                 <p className="text-gray-600">
-                    {mode === MODE.ADD
-                        ? "Add your academic achievement to your profile"
-                        : mode === MODE.EDIT
-                            ? "Update your education information"
-                            : "View education details"}
+                    {mode === MODE.ADD? "Add your academic achievement to your profile": mode === MODE.EDIT? "Update your education information": "View education details"}
                 </p>
             </div>
 
             <div className="space-y-8">
-                {/* Basic Information */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
@@ -205,8 +199,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         />
                     </div>
                 </div>
-
-                {/* Details */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
@@ -255,7 +247,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             onChange={(event: any) => {
                                 const newValue = event.target.value;
                                 formik.setFieldValue('grade', newValue);
-                                console.log(newValue);
                             }}
                             disabled={mode === MODE.VIEW}
                             InputProps={{
@@ -269,8 +260,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         />
                     </div>
                 </div>
-
-                {/* Timeline */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
@@ -303,8 +292,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         />
                     </div>
                 </div>
-
-                {/* Job Description Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="mt-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -330,8 +317,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         )}
                     </div>
                 </div>
-
-                {/* Actions */}
                 <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
                     <Button
                         label="Cancel"
@@ -348,11 +333,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     )}
                 </div>
             </div>
-            {/* <div className="mt-8 pt-6 border-t border-gray-200">
-                <EducationCard
-                    education={formik.values}
-                />
-            </div> */}
         </div>
     )
 }

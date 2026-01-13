@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiTrash } from "react-icons/fi";
 import { LiaEdit } from "react-icons/lia";
@@ -12,6 +12,7 @@ import type { SkillDropdown } from '../../../services/useSkillService';
 import { Chip } from '@mui/material';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import DeleteConfirmation from '../../molecules/DeleteConfirmation/DeleteConfirmation';
+import { EmploymentStatus } from '../../../services/useExperienceService';
 
 interface IExperienceListTemplateProps {
     experiences: ExperienceResponse[];
@@ -25,28 +26,30 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
     const navigate = useNavigate();
     const experienceService = useExperienceService();
     const { showSnackbar } = useSnackbar();
-    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
-    const [experienceToDelete, setExperienceToDelete] = React.useState<number | null>(null);
+    const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
+    const [experienceToDelete, setExperienceToDelete] = useState<string | null>(null);
 
-    const handleEditClick = (id: number) => {
+    const handleEditClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
             search: filters.search,
         };
         navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_EDIT, { query: { ...query }, params: { id } }));
+        console.log(id);
     }
 
-    const handleViewClick = (id: number) => {
+    const handleViewClick = (id: string) => {
         const query = {
             page: pagination.currentPage,
             size: pagination.pageSize,
             search: filters.search,
         };
         navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_VIEW, { query: { ...query }, params: { id } }));
+        console.log(id);
     }
 
-    const handleDeleteClick = async (id: number) => {
+    const handleDeleteClick = async (id: string) => {
         try {
             const response = await experienceService.remove(id);
             if (response.status === 200) {
@@ -73,9 +76,9 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
         columns: getTableColumns() ?? []
     });
 
-    const skillSet = (technologiesUsed: SkillDropdown[]) => {
-        return <div className={`flex flex-wrap gap-2 ${technologiesUsed.length > 3 ? "flex-wrap" : "flex-col"}`}>
-            {technologiesUsed.map((skill: SkillDropdown) => (
+    const skillSet = (skills: SkillDropdown[]) => {
+        return <div className={`flex flex-wrap gap-2 ${skills.length > 3 ? "flex-wrap" : "flex-col"}`}>
+            {skills.map((skill: SkillDropdown) => (
                 <Chip
                     key={skill.id || skill.logoName}
                     label={skill.logoName}
@@ -90,9 +93,9 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
         experience.companyName,
         experience.jobTitle,
         experience.location,
-        skillSet(experience.technologiesUsed),
-        experience.currentlyWorking ? DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(experience.endDate || ""),
-        Action(Number(experience.id))
+        skillSet(experience.skills),
+        experience.employmentStatus === EmploymentStatus.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(experience.endDate || ""),
+        Action(String(experience.id))
     ])
 
     const getTableColumns = () => [
@@ -100,22 +103,22 @@ const ExperiencesTableTemplate: React.FC<IExperienceListTemplateProps> = ({ expe
         { label: "Company Name", key: "companyName", type: "string" as ColumnType, props: {} },
         { label: "Job Title", key: "jobTitle", type: "string" as ColumnType, props: {} },
         { label: "Location", key: "location", type: "string" as ColumnType, props: {} },
-        { label: "Technologies Used", key: "technologiesUsed", type: "string" as ColumnType, props: {} },
+        { label: "Skills", key: "skills", type: "custom" as ColumnType, props: {} },
         { label: "Duration", key: "duration", type: "string" as ColumnType, props: { align: "center" } },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { align: "center" } },
     ];
 
 
-    const Action = (id: number) => {
+    const Action = (id: string) => {
         if (id) {
             return (
                 <div title=''>
-                    <button onClick={() => handleViewClick(id)}><div className={`ml-2 text-lg`}>
+                    <button onClick={() => handleViewClick(String(id))}><div className={`ml-2 text-lg`}>
                         <FiEye className={`ml-2 text-lg`} />
                     </div></button>
-                    <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 text-lg`} /></button>
+                    <button onClick={() => handleEditClick(String(id))}> <LiaEdit className={`ml-2 text-lg`} /></button>
                     <button onClick={() => {
-                        setExperienceToDelete(id);
+                        setExperienceToDelete(String(id));
                         setShowDeletePopup(true);
                     }}> <FiTrash className={`ml-2 text-lg`} /></button>
                 </div>
