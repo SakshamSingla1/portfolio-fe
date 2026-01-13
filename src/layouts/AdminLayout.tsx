@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link, Outlet } from 'react-router-dom';
 import { useAuthenticatedUser } from '../hooks/useAuthenticatedUser';
 import { ADMIN_ROUTES } from '../utils/constant';
-import LogoutButton from '../components/atoms/LogoutButton/LogoutButton';
 import Button from '../components/atoms/Button/Button';
 import {
   FaHome,
@@ -221,7 +220,6 @@ const AdminLayout: React.FC = () => {
               <div style={{ fontSize: 12, color: colors.primary700 }}>{user?.email}</div>
             </div>
           )}
-          <LogoutButton collapsed={collapsed} />
         </div>
 
         {/* Collapse button */}
