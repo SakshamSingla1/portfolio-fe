@@ -2,6 +2,7 @@ import moment from "moment";
 import { REGEX } from "./constant";
 import { createSearchParams, generatePath } from "react-router-dom";
 import type { IOption, MakeRouteParams } from "./types";
+import type { ColorTheme } from "../services/useColorThemeService";
 
 export const capitalizeFirstLetter = (input: string) => {
   if (!input) return '';
@@ -167,3 +168,18 @@ export const makeRoute = (
 	return `${generatePath(baseRoute, params ?? {})}${queryString ? `?${queryString}` : ''
 		}`;
 };
+
+export const getColor = (theme: ColorTheme | null,colorName: string) => {
+    if(!theme?.palette?.colorGroups) return "";
+    for( const group of theme.palette.colorGroups){
+        for(const shade of group.colorShades){
+            if(shade.colorName === colorName) return shade.colorCode;
+        }
+    }
+    return "";
+}
+
+export const userNameMaker = (email: string): string => {
+    if (!email) return 'user';
+    return email.split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, '') || 'user';
+}
