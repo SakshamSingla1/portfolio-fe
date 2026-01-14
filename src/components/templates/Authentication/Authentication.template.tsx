@@ -26,8 +26,8 @@ const AuthenticationTemplate: React.FC<AuthenticationTemplateProps> = ({
 }) => {
   const classes = useStyles();
 
-  const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 1024);
-  const [isOnboardingVisible, setIsOnboardingVisible] = useState(true);
+  const [isDesktopView, setIsDesktopView] = useState<boolean>(window.innerWidth >= 1024);
+  const [isOnboardingVisible, setIsOnboardingVisible] = useState<boolean>(true);
 
   const onFlip = () => {
     if (!isDesktopView) {

@@ -131,8 +131,24 @@ export const useColors = () => {
 };
 
 export const SORT_ENUM = {
-   NAME_ASC: "name_asc",
-   NAME_DESC: "name_desc",
-   CREATED_AT_ASC: "created_at_asc",
-   CREATED_AT_DESC: "created_at_desc"
+    ASC: "asc",
+    DESC: "desc",
 }
+
+export const ROLES = {
+    ADMIN: "ADMIN",
+    SUPER_ADMIN: "SUPER_ADMIN",
+}
+
+export const RoleOptions = [
+    { value: ROLES.ADMIN, label: "Admin" },
+    { value: ROLES.SUPER_ADMIN, label: "Super Admin" },
+]
+
+export const NavlinkIconOptions = [
+    { value: "FiHome"},
+    { value: "FiUsers" },
+    { value: "FiSettings" },
+    { value: "FiFileText" },
+    { value: "FiLogOut" },
+]

@@ -9,9 +9,10 @@ import { DEBOUNCE_TIME } from '../../../utils/constant';
 import TextField from '../TextField/TextField';
 
 export interface AutoCompleteOption {
-	label: any;
+	label: string | React.ReactNode;
 	value: number | string;
 	title?: string;
+	icon?: React.ReactNode;
 }
 
 const useStyles = createUseStyles((theme: any) => ({
@@ -57,7 +58,7 @@ interface AutoCompleteInputProps {
 	onBlur?: () => void;
 }
 
-const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
+const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 	label,
 	options,
 	onSearch,
@@ -151,4 +152,4 @@ const AutoCompleteInputV3: React.FC<AutoCompleteInputProps> = ({
 	);
 };
 
-export default AutoCompleteInputV3;
+export default AutoCompleteInput;

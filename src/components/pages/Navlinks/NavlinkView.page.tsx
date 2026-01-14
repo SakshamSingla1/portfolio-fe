@@ -7,15 +7,16 @@ import { useParams } from 'react-router-dom';
 
 const NavlinkViewPage: React.FC = () => {
     const params = useParams();
+    const role = String(params.role);
     const index = String(params.index);
 
     const navlinkService = useNavlinkService();
 
     const [navlink, setNavlink] = useState<NavlinkResponse | null>(null);
 
-    const loadNavlink = async (index: string) => {
+    const loadNavlink = async (role: string, index: string) => {
         try {
-            const response = await navlinkService.getNavlinkByIndex(index);
+            const response = await navlinkService.getNavlinkByRoleIndex(role, index);
             if (response?.status === HTTP_STATUS.OK) {
                 setNavlink(response.data.data);
             }
@@ -25,8 +26,8 @@ const NavlinkViewPage: React.FC = () => {
     };
 
     useEffect(() => {
-        loadNavlink(index);
-    }, [index]);
+        loadNavlink(role, index);
+    }, [role, index]);
 
     return (
         <div>

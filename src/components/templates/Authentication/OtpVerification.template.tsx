@@ -71,7 +71,7 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
                     });
                     setDefaultTheme(user.defaultTheme);
                     setNavlinks(user.navLinks);
-                    navigate(`/${user.role.toLowerCase()}/dashboard`);
+                    navigate(`/admin/dashboard`);
                     showSnackbar('success', 'Login successful!');
                 }
             }

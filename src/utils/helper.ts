@@ -198,3 +198,21 @@ export const getBreadcrumbsFromUrl = (pathname: string): Array<{ label: string; 
   }
   return breadcrumbs;
 };
+
+export const formatToEnumKey = (name: string) => {
+	return name
+		.toUpperCase()
+		.replace(/\s+/g, '_')
+		.replace(/[^A-Z0-9]/g, '_')
+		.replace(/_+/g, '_')
+		.replace(/^_+/, '')
+		.replace(/_+$/, '');
+};
+
+export const enumToNormalKey = (enumKey: string): string => {
+  return enumKey
+    .toLowerCase()
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};

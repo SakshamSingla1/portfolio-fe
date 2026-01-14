@@ -1,6 +1,6 @@
 import React from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
-import { StatusOptions, type IPagination } from "../../../utils/types";
+import { RoleOptions, StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
@@ -29,7 +29,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         navigate(makeRoute(ADMIN_ROUTES.NAVLINKS_ADD, {}));
     }
 
-    const handleEdit = (index: string) => {
+    const handleEdit = (role: string, index: string) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -37,13 +37,13 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         }
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_EDIT, {
-                params: { index },
+                params: { role, index },
                 query: query    
             })
         );
     }
 
-    const handleView = (index: string) => {
+    const handleView = (role: string, index: string) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -51,19 +51,19 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         }
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_VIEW, {
-                params: { index },
+                params: { role, index },
                 query: query
             })
         );
     }
 
-    const Action = (index: string) => {
+    const Action = (role: string, index: string) => {
         return (
             <div className='flex justify-center space-x-2' title=''>
-                <button onClick={() => handleEdit(index)} className={`w-6 h-6`}>
+                <button onClick={() => handleEdit(role, index)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>
-                <button onClick={() => handleView(index)} className={`w-6 h-6`}>
+                <button onClick={() => handleView(role, index)} className={`w-6 h-6`}>
                     <FiEye />
                 </button>
             </div>
@@ -73,16 +73,18 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
     const getRecords = () => navlinks?.map((navlink: NavlinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         navlink.name,
+        navlink.role,
         navlink.index,
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
         navlink.status,
-        Action(navlink.index ?? "")
+        Action(navlink.role ?? "", navlink.index ?? "")
     ])
 
     const getTableColumns = () => [
         { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' } },
         { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' } },
+        { label: "Role", key: "role", type: "text" as ColumnType, props: { className: '' } },
         { label: "Index", key: "index", type: "number" as ColumnType, props: { className: '' } },
         { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' } },
         { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' } },
@@ -114,12 +116,22 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
                 />
             </div>
             <div className='flex justify-between'>
+                <div className={`w-[250px]`}>
+                    <Select
+                        label="Role"
+                        options={RoleOptions}
+                        value={filters.role || ""}
+                        onChange={(e) => handleFiltersChange("role", e)}
+                        fullWidth
+                        placeholder="Select Role"
+                    />
+                </div>
                 <div className="w-[250px]">
                     <Select
-                        label=""
+                        label="Status"
                         options={StatusOptions}
                         value={filters.status || ""}
-                        onChange={(value) => handleFiltersChange("status", value)}
+                        onChange={(e) => handleFiltersChange("status", e)}
                         fullWidth
                         placeholder="Select Status"
                     />

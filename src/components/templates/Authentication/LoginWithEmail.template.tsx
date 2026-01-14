@@ -67,7 +67,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                 setDefaultTheme(user.defaultTheme);
                 setNavlinks(user.navLinks);
 
-                navigate(`/${user.role.toLowerCase()}/dashboard`);
+                navigate(`/admin/dashboard`);
                 showSnackbar('success', 'Login successful!');
             } catch (error) {
                 console.error("Login failed:", error);

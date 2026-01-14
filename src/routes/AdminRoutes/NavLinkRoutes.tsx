@@ -9,8 +9,8 @@ const NavLinkRoutes = () => {
         <Routes>
             <Route index element={<ListingNavLinkPage />} />
             <Route path="add" element={<AddNavLinkPage />} />
-            <Route path=":index/edit" element={<EditNavLinkPage />} />
-            <Route path=":index" element={<ViewNavLinkPage />} />
+            <Route path=":role/:index/edit" element={<EditNavLinkPage />} />
+            <Route path=":role/:index" element={<ViewNavLinkPage />} />
         </Routes>
     );
 };

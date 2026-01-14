@@ -27,8 +27,10 @@ const NavlinkListPage: React.FC = () => {
         const params: NavlinkFilterRequest = {
             page: page,
             size: size,
-            sort: SORT_ENUM.CREATED_AT_DESC,
+            sortDir: SORT_ENUM.ASC,
+            sortBy: "index",
             search: filters?.search,
+            role: filters?.role,
             status: filters?.status
         };
         await navlinkService.getAllNavlinks(params)

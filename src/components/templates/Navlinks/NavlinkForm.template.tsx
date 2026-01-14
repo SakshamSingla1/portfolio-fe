@@ -4,11 +4,12 @@ import { type NavlinkRequest, type NavlinkResponse } from '../../../services/use
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
 import { useNavigate } from 'react-router-dom';
 import TextField from '../../atoms/TextField/TextField';
-import { makeRoute } from '../../../utils/helper';
+import { formatToEnumKey, makeRoute } from '../../../utils/helper';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import CustomRadioGroup from '../../molecules/CustomRadioGroup/CustomRadioGroup';
-import { Status } from '../../../utils/types';
+import { Status , ROLES, RoleOptions } from '../../../utils/types';
+import Select from '../../atoms/Select/Select';
 
 interface NavlinkFormTemplateProps {
   onSubmit: (values: NavlinkRequest) => void;
@@ -20,6 +21,7 @@ const validationSchema = Yup.object().shape({
   index: Yup.string().required('Index is required'),
   name: Yup.string().required('Name is required'),
   path: Yup.string().required('Path is required'),
+  role: Yup.string().required('Role is required'),
   status: Yup.string().required('Status is required'),
 });
 
@@ -31,6 +33,8 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({ onSubmit, mod
       index: navlink?.index?.toString() || '',
       name: navlink?.name || '',
       path: navlink?.path || '',
+      icon: navlink?.icon || '',
+      role: navlink?.role || ROLES.SUPER_ADMIN,
       status: navlink?.status || Status.ACTIVE
     },
     validationSchema,
@@ -43,6 +47,8 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({ onSubmit, mod
         index: navlink.index?.toString() || '',
         name: navlink.name || '',
         path: navlink.path || '',
+        icon: navlink.icon || '',
+        role: navlink.role || ROLES.SUPER_ADMIN,
         status: navlink.status
       });
     }
@@ -72,6 +78,9 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({ onSubmit, mod
               placeholder='Enter navlink name'
               fullWidth
               {...formik.getFieldProps('name')}
+              onBlur={(e) => {
+                formik.setFieldValue('name', formatToEnumKey(e.target.value));
+              }}
               disabled={mode === MODE.VIEW}
               error={formik.touched.name && Boolean(formik.errors.name)}
               helperText={formik.touched.name && formik.errors.name}
@@ -101,6 +110,20 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({ onSubmit, mod
               error={formik.touched.index && Boolean(formik.errors.index)}
               helperText={formik.touched.index && formik.errors.index}
               inputProps={{ min: 0 }}
+            />
+          </div>
+          <div className='space-y-1'>
+            <Select
+              label="Role"
+              placeholder='Select role'
+              options={RoleOptions}
+              value={formik.values.role}
+              error={formik.touched.role && Boolean(formik.errors.role)}
+              helperText={Boolean(formik.touched.role && formik.errors.role) ? formik.errors.role : ""}
+              onChange={(value) => {
+                formik.setFieldValue('role', value);
+              }}
+              disabled={mode === MODE.VIEW}
             />
           </div>
         </div>

@@ -56,7 +56,6 @@ interface TableProps {
   isRounded?: boolean;
 }
 const useStyles = createUseStyles((colors: any) => ({
-  // Table container styles
   tableContainer: {
     borderRadius: '0.75rem',
     overflow: 'hidden',
@@ -68,8 +67,6 @@ const useStyles = createUseStyles((colors: any) => ({
       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     },
   },
-  
-  // Header styles
   tableHeader: {
     backgroundColor: colors.primary50,
     color: colors.primary700,
@@ -81,15 +78,11 @@ const useStyles = createUseStyles((colors: any) => ({
       fontWeight: 600,
     },
   },
-  
-  // Table styles
   table: {
     width: '100%',
     borderCollapse: 'separate',
     borderSpacing: 0,
   },
-  
-  // Table head styles
   tableHead: {
     backgroundColor: colors.primary50,
     '& th': {
@@ -109,13 +102,11 @@ const useStyles = createUseStyles((colors: any) => ({
       },
     },
   },
-  
-  // Table body styles
   tableBody: {
     '& tr': {
       transition: 'background-color 0.2s ease',
       '&:hover': {
-        backgroundColor: 'rgba(209, 242, 235, 0.3)',
+        backgroundColor: colors.primary50,
       },
       '&:last-child td': {
         borderBottom: 'none',
@@ -135,13 +126,9 @@ const useStyles = createUseStyles((colors: any) => ({
       lineHeight: '1.5',
     },
   },
-  
-  // Striped rows
   stripedRow: {
     backgroundColor: colors.primary50,
   },
-  
-  // Empty state
   emptyState: {
     padding: '3rem 1.5rem',
     textAlign: 'center',
@@ -149,8 +136,6 @@ const useStyles = createUseStyles((colors: any) => ({
     fontSize: '0.9375rem',
     backgroundColor: 'white',
   },
-  
-  // Pagination styles
   pagination: {
     backgroundColor: 'white',
     borderTop: `1px solid ${colors.neutral200}`,
