@@ -16,15 +16,17 @@ export const VerificationStatus = {
 
 export interface ProfileRequest {
     fullName: string;
+    userName: string;
+    title: string;
+    aboutMe: string;
     email: string;
-    title?: string;
-    aboutMe?: string;
-    phone?: string;
-    location?: string;
-    githubUrl?: string;
-    linkedinUrl?: string;
-    websiteUrl?: string;
-    profileImageUrl?: string;
+    phone: string;
+    location: string;
+    githubUrl: string;
+    linkedinUrl: string;
+    websiteUrl: string;
+    profileImageUrl: string;
+    logoUrl: string;
 }
 
 export const useProfileService = () => {

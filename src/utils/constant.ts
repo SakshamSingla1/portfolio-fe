@@ -21,10 +21,6 @@ export const REGEX = {
 }
 
 export const ADMIN_ROUTES = {
-    LOGIN: "/admin/login",
-    REGISTER: "/admin/register",
-    FORGOT_PASSWORD: "/admin/forgot-password",
-    RESET_PASSWORD: "/admin/reset-password",
     PROFILE: "/admin/profile",
     
     EDUCATION: "/admin/education",
@@ -62,10 +58,10 @@ export const ADMIN_ROUTES = {
     TEMPLATES_EDIT: "/admin/templates/:name/edit",
     TEMPLATES_VIEW: "/admin/templates/:name",
 
-    COLOR_THEME: "/admin/color-theme",
-    COLOR_THEME_ADD: "/admin/color-theme/add",
-    COLOR_THEME_EDIT: "/admin/color-theme/:themeName/edit",
-    COLOR_THEME_VIEW: "/admin/color-theme/:themeName",
+    COLOR_THEME: "/admin/color-themes",
+    COLOR_THEME_ADD: "/admin/color-themes/add",
+    COLOR_THEME_EDIT: "/admin/color-themes/:themeName/edit",
+    COLOR_THEME_VIEW: "/admin/color-themes/:themeName",
 }
 
 export const MODE = {

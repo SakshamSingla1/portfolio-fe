@@ -32,35 +32,33 @@ export interface Education {
 
 export interface EducationFilterParams {
     search?: string;
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
+    sortDir?: string;
+    sortBy?: string;
 }
 
 export const useEducationService = () => {
     const { user } = useAuthenticatedUser();
-
-    // ---------------- CREATE ----------------
+    
     const create = (education: Education) =>
         request(API_METHOD.POST, EDUCATION_URLS.CREATE, user, education);
 
-    // ---------------- UPDATE ----------------
-    const update = (id: number | null, education: Education) => {
+    const update = (id: string | null, education: Education) => {
         const url = replaceUrlParams(EDUCATION_URLS.UPDATE, { id });
         return request(API_METHOD.PUT, url, user, education);
     };
 
-    const remove = (id: number) => {
+    const remove = (id: string) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id, profileId: user?.id });
         return request(API_METHOD.DELETE, url, user, null);
     };
 
-    // ---------------- GET BY ID ----------------
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id, profileId: user?.id });
+    const getById = (id: string | null) => {
+        const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id, profileId: String(user?.id) });
         return request(API_METHOD.GET, url, null, null);
     };
 
-    // ---------------- GET ALL BY PROFILE ----------------
     const getAllByProfile = (params : EducationFilterParams) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_ALL, { profileId: user?.id });
         return request(API_METHOD.GET, url, null, null, {params});

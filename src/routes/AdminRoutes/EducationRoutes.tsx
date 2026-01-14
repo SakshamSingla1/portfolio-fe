@@ -3,15 +3,14 @@ import ListingEducationPage from "../../components/pages/Education/ListingEducat
 import AddEducationPage from "../../components/pages/Education/AddEducation.page";
 import EditEducationPage from "../../components/pages/Education/EditEducation.page";
 import ViewEducationPage from "../../components/pages/Education/ViewEducation.page";
-import { ADMIN_ROUTES } from "../../utils/constant";
 
 const EducationRoutes = () => {
     return (
         <Routes>
-            <Route index path={ADMIN_ROUTES.EDUCATION} element={<ListingEducationPage />} />
-            <Route path={ADMIN_ROUTES.EDUCATION_ADD} element={<AddEducationPage />} />
-            <Route path={ADMIN_ROUTES.EDUCATION_EDIT} element={<EditEducationPage />} />
-            <Route path={ADMIN_ROUTES.EDUCATION_VIEW} element={<ViewEducationPage />} />
+            <Route index element={<ListingEducationPage />} />
+            <Route path="add" element={<AddEducationPage />} />
+            <Route path=":id/edit" element={<EditEducationPage />} />
+            <Route path=":id" element={<ViewEducationPage />} />
         </Routes>
     );
 };

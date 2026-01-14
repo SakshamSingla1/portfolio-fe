@@ -9,35 +9,39 @@ const SKILL_URLS = {
     SKILL_BY_PROFILE_ID : "/skill/profile/:profileId",
 }
 
+export const SkillLevelType = {
+    BEGINNER : "Beginner",
+    INTERMEDIATE : "Intermediate",
+    ADVANCED : "Advanced",
+} as const;
+
 export interface Skill {
-    id?: number;
-    logoId?: number | null;
-    logoName?: string | null;
-    logoUrl?: string | null;
-    category?: string | null;
+    logoId: string;
     level: string;
-    profileId?: string | null;
+    profileId: string;
 }
 
 export interface SkillDropdown {
-    id: number;
+    id: string;
     logoName: string;
     logoUrl: string;
-    category?: string | null;
 }
 
 export interface SkillResponse {
-    id: number;
-    logoName?: string | null;
-    logoUrl?: string | null;
-    category?: string | null;
+    id: string;
+    logoId: string;
+    logoName: string;
+    logoUrl: string;
+    category: string;
     level: string;
 }
 
 export interface SkillFilterParams {
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
     search?: string;
+    sortDir?: string;
+    sortBy?: string;
 }
 
 export const useSkillService = () => {
@@ -48,7 +52,7 @@ export const useSkillService = () => {
         return request(API_METHOD.GET, url, null, null, null, null);
     };
 
-    const getById = (id: number | null) => {
+    const getById = (id: string | null) => {
         const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
         return request(API_METHOD.GET, url, null, null, null, null);
     };
@@ -58,12 +62,12 @@ export const useSkillService = () => {
         return request(API_METHOD.POST, url, user, skill);
     };
 
-    const update = (id: number | null, skill: Skill) => {
+    const update = (id: string | null, skill: Skill) => {
         const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, skill);
     };
 
-    const remove = (id: number) => {
+    const remove = (id: string) => {
         const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };

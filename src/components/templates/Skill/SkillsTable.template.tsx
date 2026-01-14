@@ -1,74 +1,84 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiEye, FiTrash } from "react-icons/fi";
-import { LiaEdit } from "react-icons/lia";
-import TableV1 from '../../organisms/TableV1/TableV1';
-import { type ColumnType } from '../../organisms/TableV1/TableV1';
-import { ADMIN_ROUTES, SKILL_CATEGORY_OPTIONS } from '../../../utils/constant';
-import { makeRoute, OptionToValue } from '../../../utils/helper';
-import { type IPagination } from '../../../utils/types';
-import { type Skill, useSkillService } from '../../../services/useSkillService';
-import { createUseStyles } from 'react-jss';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import DeleteConfirmation from '../../molecules/DeleteConfirmation/DeleteConfirmation';
+import React from "react";
+import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type IPagination } from "../../../utils/types";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { makeRoute } from "../../../utils/helper";
+import TextField from "../../atoms/TextField/TextField";
+import { InputAdornment } from '@mui/material';
+import Table from "../../organisms/TableV1/TableV1";
+import { type SkillResponse, type SkillFilterParams } from "../../../services/useSkillService";
+import { FiEdit, FiEye, FiSearch } from "react-icons/fi";
+import { ADMIN_ROUTES } from "../../../utils/constant";
+import Button from "../../atoms/Button/Button";
+import { convertToCamelCase } from "../../../utils/helper";
 
-const useStyles = createUseStyles((theme: any) => ({
-    actionButton: {
-        color: theme.palette.background.primary.primary500,
-    },
-    error: {
-        backgroundColor: theme.palette.background.secondary.secondary500,
-        color: theme.palette.background.secondary.secondary500
-    }
-}));
-
-interface ISkillListTemplateProps {
-    skills: Skill[];
+interface SkillTableTemplateProps {
+    skills: SkillResponse[];
     pagination: IPagination;
-    handlePaginationChange: any;
-    handleRowsPerPageChange: any;
-    filters: any;
+    handleFiltersChange: (name: string, value: any) => void;
+    handlePaginationChange: (event: any, newPage: number) => void;
+    handleRowsPerPageChange: (event: any) => void;
+    filters: SkillFilterParams;
 }
 
-const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
-    const classes = useStyles();
+const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const navigate = useNavigate();
-    const skillService = useSkillService();
-    const { showSnackbar } = useSnackbar();
-    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
-    const [skillToDelete, setSkillToDelete] = React.useState<number | null>(null);
-
-    const handleEditClick = (id: number) => {
-        const query = {
-            page: pagination.currentPage,
-            size: pagination.pageSize,
-            search: filters.search,
-        };
-        navigate(makeRoute(ADMIN_ROUTES.SKILL_EDIT, { query: { ...query }, params: { id: id } }));
+    const [searchParams] = useSearchParams();
+    
+    const handleAddSkill = () => {
+        navigate(makeRoute(
+            ADMIN_ROUTES.SKILL_ADD,{}
+        ));
     }
 
-    const handleViewClick = (id: number) => {
+    const handleEdit = (id: string) => {
         const query = {
-            page: pagination.currentPage,
-            size: pagination.pageSize,
-            search: filters.search,
-        };
-        navigate(makeRoute(ADMIN_ROUTES.SKILL_VIEW, { query: { ...query }, params: { id: id } }));
-    }
-
-    const handleDeleteClick = async (id: number) => {
-        try {
-            const response = await skillService.remove(Number(id));
-            if (response.status === 200) {
-                showSnackbar("success", "Skill deleted successfully");
-                setSkillToDelete(null);
-                setShowDeletePopup(false);
-                window.location.reload();
-            }
-        } catch (error) {
-            showSnackbar("error", "Skill deleted failed");
+            page: searchParams.get("page") || "",
+            size: searchParams.get("size") || "",
+            search: searchParams.get("search") || "",
         }
+        navigate(makeRoute(ADMIN_ROUTES.SKILL_EDIT, { query, params: { id: id } }));
     }
+
+    const handleView = (id: string) => {
+        const query = {
+            page: searchParams.get("page") || "",
+            size: searchParams.get("size") || "",
+            search: searchParams.get("search") || "",
+        }
+        navigate(makeRoute(ADMIN_ROUTES.SKILL_VIEW, { query, params: { id: id } }));
+    }
+
+    const Action = (id: string) => {
+        return (
+            <div className='flex justify-center space-x-2' title=''>
+                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
+                    <FiEdit />
+                </button>
+                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
+                    <FiEye />
+                </button>
+            </div>
+        );
+    };
+
+    const getRecords = () => skills?.map((skill: SkillResponse, index) => [
+        pagination.currentPage * pagination.pageSize + index + 1,
+        skill.logoName,
+        <img src={skill.logoUrl} alt={skill.logoName} className='w-10 h-10' />,
+        skill.level,
+        convertToCamelCase(skill.category),
+        Action(skill.id ?? "")
+    ])
+
+    const getTableColumns = () => [
+        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' } },
+        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' } },
+        { label: "Logo", key: "logo", type: "custom" as ColumnType, props: { className: '' } },
+        { label: "Level", key: "level", type: "text" as ColumnType, props: { className: '' } },
+        { label: "Category", key: "category", type: "custom" as ColumnType, props: { className: '' } },
+        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' } },
+    ]
 
     const getSchema = () => ({
         id: "1",
@@ -83,62 +93,35 @@ const SkillsTableTemplate: React.FC<ISkillListTemplateProps> = ({ skills, pagina
         columns: getTableColumns() ?? []
     });
 
-    const getRecords = () => skills?.map((skill: Skill, index) => [
-        pagination.currentPage * pagination.pageSize + index + 1,
-        skill.logoName,
-        <img src={skill.logoUrl || ""} alt="logo" className="w-10 h-10" />,
-        OptionToValue(SKILL_CATEGORY_OPTIONS, skill.category || ""),
-        skill.level,
-        Action(Number(skill.id))
-    ])
-
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' } },
-        { label: "Logo Name", key: "logoName", type: "string" as ColumnType, props: { className: '' } },
-        { label: "Logo URL", key: "logoUrl", type: "string" as ColumnType, props: { className: '' } },
-        { label: "Category", key: "category", type: "string" as ColumnType, props: { className: '' } },
-        { label: "Level", key: "level", type: "string" as ColumnType, props: { className: '' } },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' } },
-    ]
-
-    const Action = (id: number) => {
-        if (id) {
-            return (
-                <div title=''>
-                    <button onClick={() => handleViewClick(id)}><div className={`ml-2 ${classes.actionButton} text-lg`}>
-                        <FiEye className={`ml-2 ${classes.actionButton} text-lg`} />
-                    </div></button>
-                    <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 ${classes.actionButton} text-lg`} /></button>
-                    <button onClick={() => {
-                        setSkillToDelete(id);
-                        setShowDeletePopup(true);
-                    }}> <FiTrash className={`ml-2 ${classes.actionButton} text-lg`} /></button>
-                </div>
-            );
-        }
-        return null;
-    };
-
     return (
-        <div>
-            <TableV1 schema={getSchema()} records={getRecords()} />
-            {
-                showDeletePopup && (
-                    <DeleteConfirmation
-                        open={showDeletePopup}
-                        title="Delete Skill"
-                        description="Are you sure you want to delete this skill?"
-                        onDelete={() => {
-                            if (skillToDelete !== null) {
-                                handleDeleteClick(skillToDelete);
-                            }
+        <div className="grid gap-y-4">
+            <div className='flex justify-between'>
+                <div className={`text-2xl font-semibold my-auto`}>Skill List</div>
+                <Button 
+                    onClick={handleAddSkill}
+                    variant="primaryContained"
+                    label="Add New Skill"
+                />
+            </div>
+            <div className='flex justify-end'>
+                <div className={`w-[250px]`}>
+                    <TextField
+                        label=''
+                        variant="outlined"
+                        placeholder="Search...."
+                        value={filters.search}
+                        name='search'
+                        onChange={(event) => {
+                            handleFiltersChange("search", event.target.value)
                         }}
-                        onCancel={() => setShowDeletePopup(false)}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
+                        }}
                     />
-                )
-            }
+                </div>
+            </div>
+            <Table schema={getSchema()} records={getRecords()} />
         </div>
     )
 }
-
-export default SkillsTableTemplate;
+export default SkillTableTemplate;

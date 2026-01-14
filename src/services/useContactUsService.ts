@@ -14,7 +14,7 @@ export interface ContactUs {
     email: string;
     message: string;
     phone: string;
-    created: string;
+    createdAt: string;
 }
 
 export interface ContactUsRequest {
@@ -22,23 +22,23 @@ export interface ContactUsRequest {
     email: string;
     message: string;
     phone: string;
-    profileid: number | null;
+    profileId: string | null;
 }
 
 export interface ContactUsFilterParams {
     search?: string;
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
+    sortDir?: string;
+    sortBy?: string;
 }
 
 export const useContactUsService = () => {
     const { user } = useAuthenticatedUser();
 
-    // ---------------- CREATE ----------------
     const create = (contactUs: ContactUsRequest) =>
         request(API_METHOD.POST, CONTACT_US_URLS.CREATE, null, contactUs);
 
-    // ---------------- GET BY PROFILE (PAGINATED) ----------------
     const getByProfile = (params: ContactUsFilterParams) => {
         const url = replaceUrlParams(CONTACT_US_URLS.GET_BY_PROFILE, { profileId: user?.id });
         return request(API_METHOD.GET, url, user, null, {params});

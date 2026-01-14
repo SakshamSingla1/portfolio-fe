@@ -10,64 +10,69 @@ export const EXPERIENCE_URLS = {
   CREATE: "/experience",
 };
 
+export const EmploymentStatus = {
+    CURRENT: "CURRENT",
+    PREVIOUS: "PREVIOUS",
+    INTERNSHIP: "INTERNSHIP",
+    CONTRACT: "CONTRACT",
+    FREELANCE: "FREELANCE",
+}
+
 export interface ExperienceRequest {
   companyName: string;
   jobTitle: string;
   location: string;
   startDate: string;
   endDate?: string | null;
-  currentlyWorking: boolean;
+  employmentStatus: string;
   description: string;
-  technologiesUsed: number[]; // IDs
-  profileId?: number;
+  skillIds: string[];
+  profileId?: string;
 }
 
 export interface ExperienceResponse {
-  id?: number;
+  id?: string;
   companyName: string;
   jobTitle: string;
   location: string;
   startDate: string;
   endDate?: string | null;
-  currentlyWorking: boolean;
+  employmentStatus: string;
   description: string;
-  technologiesUsed: SkillDropdown[]; // objects in response
+  skills: SkillDropdown[];
 }
 
 export interface ExperienceFilterParams {
-  search?: string;
-  page?: number;
-  size?: number;
+    search?: string;
+    page?: string;
+    size?: string;
+    sortDir?: string;
+    sortBy?: string;
 }
 
 export const useExperienceService = () => {
   const { user } = useAuthenticatedUser();
 
-  // ---------------- GET ALL BY PROFILE ----------------
   const getAllByProfile = (params : ExperienceFilterParams) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_PROFILE, { profileId: user?.id });
     return request(API_METHOD.GET, url, null, null, {params});
   };
 
-  // ---------------- GET BY ID ----------------
-  const getById = (id: number | string) => {
-    const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id });
+  const getById = (id: string) => {
+    const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id : String(id) });
     return request(API_METHOD.GET, url, null, null);
   };
 
-  // ---------------- CREATE ----------------
   const create = (experience: ExperienceRequest) =>
     request(API_METHOD.POST, EXPERIENCE_URLS.CREATE, user, experience);
 
-  // ---------------- UPDATE ----------------
-  const update = (id: number | string, experience: ExperienceRequest) => {
-    const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id });
+  const update = (id: string, experience: ExperienceRequest) => {
+    const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id : String(id) });
     return request(API_METHOD.PUT, url, user, experience);
   };
 
-  // ---------------- DELETE ----------------
-  const remove = (id: number | string) => {
-    const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id });
+  const remove = (id: string) => {
+    const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id : String(id) });
     return request(API_METHOD.DELETE, url, user, null);
   };
 

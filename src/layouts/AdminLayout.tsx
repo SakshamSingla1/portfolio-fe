@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthenticatedUser } from '../hooks/useAuthenticatedUser';
 import { ADMIN_ROUTES } from '../utils/constant';
-import LogoutButton from '../components/atoms/LogoutButton/LogoutButton';
 import Button from '../components/atoms/Button/Button';
 import {
   FaHome,
@@ -30,7 +29,7 @@ interface INavItemProps {
   colors: any;
 }
 
-const NavItem: React.FC<INavItemProps> = ({ to, icon, label, active, collapsed, colors}) => (
+const NavItem: React.FC<INavItemProps> = ({ to, icon, label, active, collapsed, colors }) => (
   <Link
     to={to}
     className={`group relative flex items-center p-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02]`}
@@ -90,7 +89,7 @@ const NavItem: React.FC<INavItemProps> = ({ to, icon, label, active, collapsed, 
   </Link>
 );
 
-const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AdminLayout: React.FC = () => {
   const colors = useColors();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(false);
@@ -127,6 +126,31 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleCollapse = () => setCollapsed(!collapsed);
+
+  const renderAddButton = () => {
+    const currentPath = location.pathname;
+    const currentNav = navItems.find(item => currentPath.startsWith(item.to));
+    const showAddButton = ['Education', 'Experience', 'Projects', 'Skill'].includes(currentNav?.label || '');
+    if (!showAddButton) return null;
+
+    return (
+      <Button
+        variant="primaryContained"
+        label={`Add ${currentNav?.label}`}
+        onClick={() => navigate(`${currentNav?.to}/add`)}
+        startIcon={getAddIcon(currentPath)}
+        className="px-4 py-2"
+      />
+    );
+  };
+
+  const getAddIcon = (path: string) => {
+    if (path.startsWith('/admin/education')) return <FaGraduationCap />;
+    if (path.startsWith('/admin/experience')) return <FaBriefcase />;
+    if (path.startsWith('/admin/projects')) return <FaCode />;
+    if (path.startsWith('/admin/skill')) return <FaDumbbell />;
+    return <FiPlus />;
+  };
 
   return (
     <div style={{ display: 'flex', height: '100vh', backgroundColor: colors.neutral50 }}>
@@ -196,7 +220,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <div style={{ fontSize: 12, color: colors.primary700 }}>{user?.email}</div>
             </div>
           )}
-          <LogoutButton collapsed={collapsed} />
         </div>
 
         {/* Collapse button */}
@@ -239,11 +262,21 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               {navItems.find(item => location.pathname.startsWith(item.to))?.label || 'Dashboard'}
             </h1>
           </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {location.pathname.startsWith(ADMIN_ROUTES.PROFILE) && (
+              <Button
+                variant="primaryContained"
+                label="Edit Profile"
+                onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=EDIT`)}
+              />
+            )}
+            {renderAddButton()}
+          </div>
         </header>
 
         {/* Page content */}
         <main style={{ flex: 1, padding: 24, overflowY: 'auto', background: `linear-gradient(to bottom right, ${colors.primary50}, ${colors.primary100}, ${colors.primary500})` }}>
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

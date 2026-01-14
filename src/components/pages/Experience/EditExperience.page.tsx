@@ -16,7 +16,7 @@ const EditExperiencePage = () => {
     const handleSubmit = async (values: ExperienceRequest) => {
         try {
             if (!id) return;
-            const response = await experienceService.update(id, values);
+            const response = await experienceService.update(String(id), values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);
                 navigate(ADMIN_ROUTES.EXPERIENCE);
@@ -28,9 +28,9 @@ const EditExperiencePage = () => {
         }
     }
 
-    const getExperience = async (id: number | null) => {
+    const getExperience = async (id: string | null) => {
         try {
-            const response = await experienceService.getById(Number(id));
+            const response = await experienceService.getById(String(id));
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 setExperience(response.data.data);
             }
@@ -41,7 +41,7 @@ const EditExperiencePage = () => {
 
     useEffect(() => {
         if (id) {
-            getExperience(Number(id));
+            getExperience(String(id));
         }
     }, [id]);
 

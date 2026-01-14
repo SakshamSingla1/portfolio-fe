@@ -57,7 +57,6 @@ const useStyles = createUseStyles({
 
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { defaultTheme } = useAuthenticatedUser();
-
   const colors = {
     primary50: getColor(defaultTheme, "primary50") ?? "#EEF2FF",
     primary500: getColor(defaultTheme, "primary500") ?? "#6366F1",

@@ -10,35 +10,46 @@ export const AUTH_URLS = {
     GET_BY_PROFILE: "/project/profile/:profileId",
 };
 
+export const WorkStatusType = {
+    CURRENT: "CURRENT",
+    COMPLETED: "COMPLETED"
+};
+
+export const WorkStatusOptions = [
+    {label: "Current" ,value: WorkStatusType.CURRENT},
+    {label: "Completed" ,value: WorkStatusType.COMPLETED}
+]
+
 export interface Project {
-    id?: number;
-    projectName: string;
-    projectDescription: string;
-    projectLink: string;
-    technologiesUsed: number[];
-    projectStartDate: string;
-    projectEndDate: string;
-    currentlyWorking: boolean;
-    projectImageUrl: string;
-    profileId?: number;
+    profileId : string;
+    projectName : string;
+    projectDescription : string;
+    projectLink : string;
+    projectStartDate : string;
+    projectEndDate : string;
+    workStatus : string;
+    projectImageUrl : string;
+    skillIds : string[];
 }
 
 export interface ProjectResponse {
-    id: number;
+    id: string;
     projectName: string;
     projectDescription: string;
     projectLink: string;
-    technologiesUsed: SkillDropdown[];
     projectStartDate: string;
     projectEndDate: string;
-    currentlyWorking: boolean;
+    workStatus: string;
     projectImageUrl: string;
+    skills: SkillDropdown[];
 }
 
 export interface ProjectFilterParams {
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
     search?: string;
+    sortDir?: string;
+    sortBy?: string;
 }
 
 export const useProjectService = () => {
@@ -49,7 +60,7 @@ export const useProjectService = () => {
         return request(API_METHOD.GET, url, null, null, null, null);
     };
 
-    const getById = (id: number | null) => {
+    const getById = (id: string | null) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
         return request(API_METHOD.GET, url, null, null, null, null);
     };
@@ -59,12 +70,12 @@ export const useProjectService = () => {
         return request(API_METHOD.POST, url, user, project);
     };
 
-    const update = (id: number | null, project: Project) => {
+    const update = (id: string | null, project: Project) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, project);
     };
 
-    const deleteProject = (id: number) => {
+    const deleteProject = (id: string) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };

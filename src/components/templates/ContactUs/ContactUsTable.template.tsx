@@ -1,19 +1,41 @@
-import React from 'react';
-import TableV1 from '../../organisms/TableV1/TableV1';
-import { type ColumnType } from '../../organisms/TableV1/TableV1';
-import { type IPagination } from '../../../utils/types';
-import { type ContactUs } from '../../../services/useContactUsService';
-import { DateUtils } from '../../../utils/helper';
+import React from "react";
+import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type IPagination } from "../../../utils/types";
+import TextField from "../../atoms/TextField/TextField";
+import { InputAdornment } from '@mui/material';
+import Table from "../../organisms/TableV1/TableV1";
+import { type ContactUs, type ContactUsFilterParams } from "../../../services/useContactUsService";
+import { FiSearch } from "react-icons/fi";
+import { DateUtils } from "../../../utils/helper";
 
-interface IContactUsListTemplateProps {
+interface ContactUsTableTemplateProps {
     contactUs: ContactUs[];
     pagination: IPagination;
-    handlePaginationChange: any;
-    handleRowsPerPageChange: any;
-    filters: any; // Add proper type here if you have a specific type for filters
+    handleFiltersChange: (name: string, value: any) => void;
+    handlePaginationChange: (event: any, newPage: number) => void;
+    handleRowsPerPageChange: (event: any) => void;
+    filters: ContactUsFilterParams;
 }
 
-const ContactUsTableTemplate: React.FC<IContactUsListTemplateProps> = ({ contactUs, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contactUs, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
+
+    const getRecords = () => contactUs?.map((contactUs: ContactUs, index) => [
+        pagination.currentPage * pagination.pageSize + index + 1,
+        contactUs.name,
+        contactUs.email,
+        contactUs.phone,
+        contactUs.message,
+        DateUtils.formatDateTimeToDateMonthYear(contactUs.createdAt)
+    ])
+
+    const getTableColumns = () => [
+        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' } },
+        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' } },
+        { label: "Logo", key: "logo", type: "custom" as ColumnType, props: { className: '' } },
+        { label: "Level", key: "level", type: "text" as ColumnType, props: { className: '' } },
+        { label: "Category", key: "category", type: "custom" as ColumnType, props: { className: '' } },
+        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' } },
+    ]
 
     const getSchema = () => ({
         id: "1",
@@ -28,29 +50,30 @@ const ContactUsTableTemplate: React.FC<IContactUsListTemplateProps> = ({ contact
         columns: getTableColumns() ?? []
     });
 
-    const getRecords = () => contactUs?.map((contactUs: ContactUs, index) => [
-        pagination.currentPage * pagination.pageSize + index + 1,
-        contactUs.name,
-        contactUs.email,
-        contactUs.phone,
-        contactUs.message,
-        DateUtils.formatDateTimeToDateMonthYear(contactUs.created)
-    ])
-
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { align: "center" } },
-        { label: "Name", key: "name", type: "string" as ColumnType, props: {} },
-        { label: "Email", key: "email", type: "string" as ColumnType, props: {} },
-        { label: "Phone", key: "phone", type: "string" as ColumnType, props: {} },
-        { label: "Message", key: "message", type: "string" as ColumnType, props: {} },
-        { label: "Created", key: "created", type: "string" as ColumnType, props: {} },
-      ];
-
     return (
-        <div>
-            <TableV1 schema={getSchema()} records={getRecords()} />
+        <div className="grid gap-y-4">
+            <div className='flex justify-between'>
+                <div className={`text-2xl font-semibold my-auto`}>Contact Us List</div>
+            </div>
+            <div className='flex justify-end'>
+                <div className={`w-[250px]`}>
+                    <TextField
+                        label=''
+                        variant="outlined"
+                        placeholder="Search...."
+                        value={filters.search}
+                        name='search'
+                        onChange={(event) => {
+                            handleFiltersChange("search", event.target.value)
+                        }}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
+                        }}
+                    />
+                </div>
+            </div>
+            <Table schema={getSchema()} records={getRecords()} />
         </div>
     )
 }
-
 export default ContactUsTableTemplate;

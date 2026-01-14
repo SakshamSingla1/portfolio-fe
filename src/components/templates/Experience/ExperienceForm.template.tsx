@@ -5,17 +5,24 @@ import { titleModification } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
 import DatePicker from "../../atoms/DatePicker/DatePicker";
 import dayjs from "dayjs";
-import Checkbox from "../../atoms/Checkbox/Checkbox";
 import { useSkillService, type SkillDropdown } from "../../../services/useSkillService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
-import { type ExperienceRequest, type ExperienceResponse } from "../../../services/useExperienceService";
+import { EmploymentStatus, type ExperienceRequest, type ExperienceResponse } from "../../../services/useExperienceService";
 import { useFormik } from "formik";
 import JoditEditor from "jodit-react";
 import { HTTP_STATUS } from "../../../utils/types";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+
+export const employmentStatusOptions = [
+    { label: "Current", value: EmploymentStatus.CURRENT },
+    { label: "Previous", value: EmploymentStatus.PREVIOUS },
+    { label: "Internship", value: EmploymentStatus.INTERNSHIP },
+    { label: "Contract", value: EmploymentStatus.CONTRACT },
+    { label: "Freelance", value: EmploymentStatus.FREELANCE },
+];
 
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
@@ -33,13 +40,12 @@ const validationSchema = Yup.object().shape({
         .min(Yup.ref('startDate'), 'End date must be after start date')
         .notRequired()
         .nullable(),
-    currentlyWorking: Yup.boolean()
-        .required('Currently working status is required'),
+    employmentStatus: Yup.string()
+        .required('Employment status is required'),
     description: Yup.string()
         .max(500, 'Description is too long'),
-    technologiesUsed: Yup.array()
-        .of(Yup.number())
-        .min(1, 'At least one technology is required'),
+    skillIds: Yup.array(Yup.string())
+        .min(1, 'At least one skill is required'),
 });
 
 interface ExperienceFormProps {
@@ -124,10 +130,10 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
             location: "",
             startDate: "",
             endDate: "",
-            currentlyWorking: false,
+            employmentStatus: EmploymentStatus.CURRENT,
             description: "",
-            technologiesUsed: [],
-            profileId: user?.id,
+            skillIds: [],
+            profileId: String(user?.id),
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
@@ -166,8 +172,8 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     }, [skills]);
 
     const selectedSkills = useMemo(() => {
-        return skills.filter(skill => formik.values.technologiesUsed.includes(skill.id));
-    }, [skills, formik.values.technologiesUsed]);
+        return skills.filter(skill => formik.values.skillIds.includes(String(skill.id)));
+    }, [skills, formik.values.skillIds]);
 
 
     useEffect(() => {
@@ -177,9 +183,9 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
             formik.setFieldValue("location", experience.location || "");
             formik.setFieldValue("startDate", experience.startDate || "");
             formik.setFieldValue("endDate", experience.endDate || "");
-            formik.setFieldValue("currentlyWorking", experience.currentlyWorking || false);
+            formik.setFieldValue("employmentStatus", experience.employmentStatus || EmploymentStatus.CURRENT);
             formik.setFieldValue("description", experience.description || "");
-            formik.setFieldValue("technologiesUsed", experience.technologiesUsed.map((skill) => skill.id) || []);
+            formik.setFieldValue("skillIds", experience.skills.map((skill) => String(skill.id)) || []);
         }
     }, [experience]);
 
@@ -187,28 +193,22 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         loadSkills();
     }, []);
 
+    useEffect(() => {
+        console.log("formik", formik);
+    }, [formik]);
+
     return (
         <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
-            {/* Header Section */}
             <div className="mb-8 pb-6 border-b border-gray-200">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD
-                        ? "Add New Experience"
-                        : mode === MODE.EDIT
-                            ? "Edit Experience"
-                            : "Experience Details"}
+                    {mode === MODE.ADD ? "Add New Experience" : mode === MODE.EDIT ? "Edit Experience" : "Experience Details"}
                 </h2>
                 <p className="text-gray-600">
-                    {mode === MODE.ADD
-                        ? "Add your professional experience to your portfolio"
-                        : mode === MODE.EDIT
-                            ? "Update your experience information"
-                            : "View experience details"}
+                    {mode === MODE.ADD ? "Add your professional experience to your portfolio" : mode === MODE.EDIT ? "Update your experience information" : "View experience details"}
                 </p>
             </div>
 
             <div className="space-y-8">
-                {/* Basic Information Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
@@ -255,7 +255,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         />
                     </div>
                 </div>
-                {/* Technologies Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
@@ -269,25 +268,19 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             value={null}
                             onChange={(selectedOption: any) => {
                                 if (selectedOption) {
-                                    if (!formik.values.technologiesUsed.includes(selectedOption.value)) {
-                                        formik.setFieldValue("technologiesUsed", [...formik.values.technologiesUsed, selectedOption.value]);
+                                    if (!formik.values.skillIds.includes(selectedOption.value)) {
+                                        formik.setFieldValue("skillIds", [...formik.values.skillIds, selectedOption.value]);
                                     } else {
                                         console.log(`${selectedOption.title} is already added to the experience`);
                                     }
                                 }
                             }}
-                            onSearch={(value: string) => {
-                                loadSkills(value);
-                            }}
-                            error={formik.touched.technologiesUsed && Boolean(formik.errors.technologiesUsed)}
-                            helperText={formik.errors.technologiesUsed && formik.touched.technologiesUsed ?
-                                Array.isArray(formik.errors.technologiesUsed)
-                                    ? formik.errors.technologiesUsed.join(', ')
-                                    : formik.errors.technologiesUsed
-                                : "Search and select the technologies used in this experience"}
+                            onSearch={(value: string) => loadSkills(value)}
+                            error={formik.touched.skillIds && Boolean(formik.errors.skillIds)}
+                            helperText={formik.errors.skillIds && formik.touched.skillIds ? Array.isArray(formik.errors.skillIds) ? formik.errors.skillIds.join(', ') : formik.errors.skillIds : "Search and select the technologies used in this experience"}
                             isDisabled={mode === MODE.VIEW}
                         />
-                        {(selectedSkills.length > 0 || formik.values.technologiesUsed.length > 0) && (
+                        {(selectedSkills.length > 0 || formik.values.skillIds.length > 0) && (
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <p className="text-sm font-medium text-gray-700 mb-3">
                                     Selected Technologies ({selectedSkills.length})
@@ -295,23 +288,15 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                                 <div className="flex flex-wrap gap-2">
                                     {selectedSkills.map((skill) => (
                                         mode !== MODE.VIEW ? (
-                                            <Chip
-                                                key={skill.id}
-                                                label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>}
-                                                onDelete={() => {
-                                                    const updatedTechs = formik.values.technologiesUsed.filter((tech: any) => {
+                                            <Chip key={skill.id} label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>} onDelete={() => {
+                                                    const updatedTechs = formik.values.skillIds.filter((tech: any) => {
                                                         const techId = typeof tech === 'object' && tech !== null && 'id' in tech ? tech.id : tech;
                                                         return techId !== skill.id;
                                                     });
-                                                    formik.setFieldValue("technologiesUsed", updatedTechs);
-                                                }}
-                                            />
+                                                    formik.setFieldValue("skillIds", updatedTechs);
+                                                }} />
                                         ) : (
-                                            <Chip
-                                                key={skill.id}
-                                                label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>}
-                                                onDelete={() => { }}
-                                            />
+                                            <Chip key={skill.id} label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>} onDelete={() => { }} />
                                         )
                                     ))}
                                 </div>
@@ -319,8 +304,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         )}
                     </div>
                 </div>
-
-                {/* Timeline Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
@@ -331,9 +314,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             <DatePicker
                                 label="Start Date"
                                 value={formik.values.startDate ? dayjs(formik.values.startDate) : null}
-                                onChange={(newValue) =>
-                                    formik.setFieldValue("startDate", newValue?.format("YYYY-MM-DD"))
-                                }
+                                onChange={(newValue) => formik.setFieldValue("startDate", newValue?.format("YYYY-MM-DD"))}
                                 error={!!formik.touched.startDate && Boolean(formik.errors.startDate)}
                                 helperText={formik.errors.startDate}
                                 fullWidth
@@ -342,37 +323,28 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             <DatePicker
                                 label="End Date"
                                 value={formik.values.endDate ? dayjs(formik.values.endDate) : null}
-                                onChange={(newValue) =>
-                                    formik.setFieldValue("endDate", newValue?.format("YYYY-MM-DD"))
-                                }
+                                onChange={(newValue) => formik.setFieldValue("endDate", newValue?.format("YYYY-MM-DD"))}
                                 error={!!formik.touched.endDate && Boolean(formik.errors.endDate)}
                                 helperText={formik.errors.endDate}
                                 fullWidth
-                                disabled={mode === MODE.VIEW || formik.values.currentlyWorking}
+                                disabled={mode === MODE.VIEW || formik.values.employmentStatus === EmploymentStatus.CURRENT}
                             />
                         </div>
-
                         <div className="bg-blue-50 p-4 rounded-lg">
-                            <Checkbox
-                                label="Currently Working at this Company"
-                                checked={formik.values.currentlyWorking || false}
-                                onChange={(checked) => {
-                                    formik.setFieldValue("currentlyWorking", checked);
-                                    if (checked) {
-                                        formik.setFieldValue("endDate", "");
-                                    }
-                                }}
-                                disabled={mode === MODE.VIEW}
-                                labelClassName="text-sm font-medium text-gray-700"
+                            <AutoCompleteInput
+                                label="Employment Status"
+                                placeHolder="Select Employment Status"
+                                options={employmentStatusOptions}
+                                value={formik.values.employmentStatus ? employmentStatusOptions.find(option => option.value === formik.values.employmentStatus) : null}
+                                onChange={(option: any) => option && formik.setFieldValue("employmentStatus", option.value)}
+                                onSearch={() => { }}
+                                error={formik.touched.employmentStatus && Boolean(formik.errors.employmentStatus)}
+                                helperText={formik.touched.employmentStatus ? formik.errors.employmentStatus : "Select the employment status"}
+                                isDisabled={mode === MODE.VIEW}
                             />
-                            <p className="text-xs text-gray-500 mt-1 ml-6">
-                                Check this if you are still employed at this company
-                            </p>
                         </div>
                     </div>
                 </div>
-
-                {/* Job Description Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="mt-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -399,8 +371,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                     </div>
                 </div>
             </div>
-
-            {/* Action Buttons */}
             <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
                 <Button
                     label="Cancel"
@@ -409,11 +379,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                 />
                 {mode !== MODE.VIEW && (
                     <Button
-                        label={
-                            mode === MODE.ADD
-                                ? "Add Experience"
-                                : "Update Experience"
-                        }
+                        label={mode === MODE.ADD ? "Add Experience" : "Update Experience"}
                         variant="primaryContained"
                         onClick={() => formik.handleSubmit()}
                         disabled={!formik.isValid || formik.isSubmitting}

@@ -12,7 +12,7 @@ const SkillViewDetailsPage = () => {
     const { showSnackbar } = useSnackbar();
     const [skill, setSkill] = useState<Skill | null>(null);
 
-    const getSkill = async (id: number | null) => {
+    const getSkill = async (id: string | null) => {
         try {
             const response = await skillService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -25,7 +25,7 @@ const SkillViewDetailsPage = () => {
 
     useEffect(() => {
         if (id) {
-            getSkill(Number(id));
+            getSkill(String(id));
         }
     }, [id]);
 

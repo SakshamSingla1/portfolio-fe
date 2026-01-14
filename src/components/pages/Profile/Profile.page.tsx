@@ -7,8 +7,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProfileService, type ProfileRequest } from '../../../services/useProfileService';
 import ProfileFormTemplate from '../../templates/Profile/ProfileForm.template';
 import { useSnackbar } from '../../../contexts/SnackbarContext';
+import Button from '../../atoms/Button/Button';
 
 const validationSchema = Yup.object().shape({
+    userName: Yup.string()
+        .required('User name is required'),
     fullName: Yup.string()
         .min(3, 'Full name must be at least 3 characters')
         .required('Full name is required'),
@@ -29,6 +32,10 @@ const validationSchema = Yup.object().shape({
         .required('Linkedin URL is required'),
     websiteUrl: Yup.string()
         .required('Website URL is required'),
+    profileImageUrl: Yup.string()
+        .required('Profile image URL is required'),
+    logoUrl: Yup.string()
+        .required('Logo URL is required'),
 });
 
 const ProfilePage: React.FC = () => {
@@ -61,6 +68,7 @@ const ProfilePage: React.FC = () => {
 
     const formik = useFormik<ProfileRequest>({
         initialValues: {
+            userName: '',
             fullName: '',
             email: '',
             title: '',
@@ -71,6 +79,7 @@ const ProfilePage: React.FC = () => {
             linkedinUrl: '',
             websiteUrl: '',
             profileImageUrl: '',
+            logoUrl: '',
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -86,12 +95,32 @@ const ProfilePage: React.FC = () => {
     });
 
     return (
-        <div>
-            <ProfileFormTemplate
-                formik={formik}
-                isEditMode={isEditMode}
-                onEditClick={() => navigate(`${ADMIN_ROUTES.PROFILE}`)}
-            />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-8 border-b border-gray-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Profile</h1>
+                            <p className="text-gray-600 mt-1">Manage your profile information</p>
+                        </div>
+                        {!isEditMode && (
+                            <Button
+                                variant="primaryContained"
+                                onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=${MODE.EDIT}`)}
+                                label="Edit Profile"
+                                className="whitespace-nowrap"
+                            />
+                        )}
+                    </div>
+                </div>
+                <div className="p-6">
+                    <ProfileFormTemplate
+                        formik={formik}
+                        isEditMode={isEditMode}
+                        onEditClick={() => navigate(`${ADMIN_ROUTES.PROFILE}`)}
+                    />
+                </div>
+            </div>
         </div>
     );
 };

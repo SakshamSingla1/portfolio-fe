@@ -1,74 +1,91 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiEye, FiTrash } from "react-icons/fi";
-import { LiaEdit } from "react-icons/lia";
-import TableV1 from '../../organisms/TableV1/TableV1';
-import { type ColumnType } from '../../organisms/TableV1/TableV1';
-import { ADMIN_ROUTES, DEGREE_OPTIONS } from '../../../utils/constant';
-import { makeRoute, OptionToValue } from '../../../utils/helper';
-import { type IPagination } from '../../../utils/types';
-import { type Education, useEducationService } from '../../../services/useEducationService';
-import { createUseStyles } from 'react-jss';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import DeleteConfirmation from '../../molecules/DeleteConfirmation/DeleteConfirmation';
+import React from "react";
+import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type IPagination } from "../../../utils/types";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { DateUtils, makeRoute } from "../../../utils/helper";
+import TextField from "../../atoms/TextField/TextField";
+import { InputAdornment } from '@mui/material';
+import TableV1 from "../../organisms/TableV1/TableV1";
+import { FiEdit, FiEye, FiSearch } from "react-icons/fi";
+import { ADMIN_ROUTES } from "../../../utils/constant";
+import Button from "../../atoms/Button/Button";
+import type { Education, EducationFilterParams } from "../../../services/useEducationService";
 
-const useStyles = createUseStyles((theme: any) => ({
-    actionButton: {
-        color: theme.palette.background.primary.primary500,
-    },
-    error: {
-        backgroundColor: theme.palette.background.secondary.secondary500,
-        color: theme.palette.background.secondary.secondary500
-    }
-}));
-
-interface IEducationListTemplateProps {
+interface IEducationsTableTemplateProps {
     educations: Education[];
     pagination: IPagination;
-    handlePaginationChange: any;
-    handleRowsPerPageChange: any;
-    filters: any;
+    handleFiltersChange: (name: string, value: any) => void;
+    handlePaginationChange: (event: any, newPage: number) => void;
+    handleRowsPerPageChange: (event: any) => void;
+    filters: EducationFilterParams;
 }
 
-const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educations, pagination, handlePaginationChange, handleRowsPerPageChange, filters }) => {
-    const classes = useStyles();
+const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educations, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const navigate = useNavigate();
-    const educationService = useEducationService();
-    const { showSnackbar } = useSnackbar();
-    const [showDeletePopup, setShowDeletePopup] = React.useState(false);
-    const [educationToDelete, setEducationToDelete] = React.useState<number | null>(null);
+    const [searchParams] = useSearchParams();
 
-    const handleEditClick = (id: number) => {
-        const query = {
-            page: pagination.currentPage,
-            size: pagination.pageSize,
-            search: filters.search,
-        };
-        navigate(makeRoute(ADMIN_ROUTES.EDUCATION_EDIT, { query: { ...query }, params: { id } }));
+    const handleAddEducation = () => {
+        navigate(makeRoute(ADMIN_ROUTES.EDUCATION_ADD, {}));
     }
 
-    const handleViewClick = (id: number) => {
+    const handleEdit = (id: string) => {
         const query = {
-            page: pagination.currentPage,
-            size: pagination.pageSize,
-            search: filters.search,
-        };
-        navigate(makeRoute(ADMIN_ROUTES.EDUCATION_VIEW, { query: { ...query }, params: { id } }));
-    }
-
-    const handleDeleteClick = async (id: number) => {
-        try {
-            const response = await educationService.remove(id);
-            if (response.status === 200) {
-                showSnackbar("success", "Education deleted successfully");
-                setEducationToDelete(null);
-                setShowDeletePopup(false);
-                window.location.reload();
-            }
-        } catch (error) {
-            showSnackbar("error", "Education deleted failed");
+            page: searchParams.get("page") || "",
+            size: searchParams.get("size") || "",
+            search: searchParams.get("search") || "",
         }
+        navigate(
+            makeRoute(ADMIN_ROUTES.EDUCATION_EDIT, {
+                params: { id },
+                query: query    
+            })
+        );
     }
+
+    const handleView = (id: string) => {
+        const query = {
+            page: searchParams.get("page") || "",
+            size: searchParams.get("size") || "",
+            search: searchParams.get("search") || "",
+        }
+        navigate(
+            makeRoute(ADMIN_ROUTES.EDUCATION_VIEW, {
+                params: { id },
+                query: query
+            })
+        );
+    }
+
+    const Action = (id: string) => {
+        return (
+            <div className='flex justify-center space-x-2' title=''>
+                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
+                    <FiEdit />
+                </button>
+                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
+                    <FiEye />
+                </button>
+            </div>
+        );
+    };
+
+    const getRecords = () => educations?.map((education: Education, index) => [
+        pagination.currentPage * pagination.pageSize + index + 1,
+        education.institution,
+        education.degree,
+        DateUtils.dateTimeSecondToDate(education.startYear ?? ""),
+        DateUtils.dateTimeSecondToDate(education.endYear ?? ""),
+        Action(education.id ?? "")
+    ])
+
+    const getTableColumns = () => [
+        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' } },
+        { label: "Institution", key: "institution", type: "text" as ColumnType, props: { className: '' } },
+        { label: "Degree", key: "degree", type: "text" as ColumnType, props: { className: '' } },
+        { label: "Start Year", key: "startYear", type: "date" as ColumnType, props: { className: '' } },
+        { label: "End Year", key: "endYear", type: "date" as ColumnType, props: { className: '' } },
+        { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' } },
+    ]
 
     const getSchema = () => ({
         id: "1",
@@ -83,68 +100,35 @@ const EducationsTableTemplate: React.FC<IEducationListTemplateProps> = ({ educat
         columns: getTableColumns() ?? []
     });
 
-    const getRecords = () => educations?.map((education: Education, index) => [
-        pagination.currentPage * pagination.pageSize + index + 1,
-        OptionToValue(DEGREE_OPTIONS, education.degree),
-        education.fieldOfStudy,
-        education.institution,
-        education.location,
-        education.startYear + " - " + education.endYear,
-        education.grade?.trim().split(" ")[1] === "Percentage" ? education.grade?.trim().split(" ")[0] + "%" : education.grade,
-        Action(Number(education.id))
-    ])
-
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { align: "center" } },
-        { label: "Degree", key: "degree", type: "string" as ColumnType, props: {} },
-        { label: "Field of Study", key: "fieldOfStudy", type: "string" as ColumnType, props: {} },
-        { label: "Institution", key: "institution", type: "string" as ColumnType, props: {} },
-        { label: "Location", key: "location", type: "string" as ColumnType, props: {} },
-        { label: "Duration", key: "duration", type: "string" as ColumnType, props: { align: "center" } },
-        { label: "Grade", key: "grade", type: "string" as ColumnType, props: { align: "center" } },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { align: "center" } },
-    ];
-
-
-    const Action = (id: number) => {
-        if (id) {
-            return (
-                <div title=''>
-                    <button onClick={() => handleViewClick(id)}><div className={`ml-2 ${classes.actionButton} text-lg`}>
-                        <FiEye className={`ml-2 ${classes.actionButton} text-lg`} />
-                    </div></button>
-                    <button onClick={() => handleEditClick(id)}> <LiaEdit className={`ml-2 ${classes.actionButton} text-lg`} /></button>
-                        <button onClick={() => {
-                        setShowDeletePopup(true)
-                        setEducationToDelete(id)
-                        }}> <FiTrash className={`ml-2 ${classes.actionButton} text-lg`} /></button>
-                    </div>
-            );
-        }
-        return null;
-    };
-
     return (
-        <div>
-            <TableV1 schema={getSchema()} records={getRecords()} />
-            {
-                showDeletePopup && (
-                    <DeleteConfirmation
-                        open={showDeletePopup}
-                        title="Delete Education"
-                        description="Are you sure you want to delete this education?"
-                        onDelete={() => {
-                            console.log(educationToDelete);
-                            if (educationToDelete !== null) {
-                                handleDeleteClick(educationToDelete);
-                            }
+        <div className="grid gap-y-4">
+            <div className='flex justify-between'>
+                <div className={`text-2xl font-semibold my-auto`}>Education List</div>
+                <Button 
+                    onClick={() => handleAddEducation()}
+                    variant="primaryContained"
+                    label="Add New Education"
+                />
+            </div>
+            <div className='flex justify-between'>
+                <div className={`w-[250px]`}>
+                    <TextField
+                        label=''
+                        variant="outlined"
+                        placeholder="Search...."
+                        value={filters.search}
+                        name='search'
+                        onChange={(event) => {
+                            handleFiltersChange("search", event.target.value)
                         }}
-                        onCancel={() => setShowDeletePopup(false)}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
+                        }}
                     />
-                )
-            }
+                </div>
+            </div>
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </div>
     )
 }
-
 export default EducationsTableTemplate;
