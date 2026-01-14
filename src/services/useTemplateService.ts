@@ -9,7 +9,8 @@ export const TEMPLATE_URLS = {
 
 export interface TemplateFilterRequest {
     search?: string;
-    sort: string;
+    sortDir?: string;
+    sortBy?: string;
     page: string;
     size: string;
 }

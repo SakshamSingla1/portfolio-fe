@@ -27,7 +27,8 @@ const TemplateListPage: React.FC = () => {
         const params: TemplateFilterRequest = {
             page: page,
             size: size,
-            sort: SORT_ENUM.CREATED_AT_DESC,
+            sortDir: SORT_ENUM.DESC,
+            sortBy: "createdAt",
             search: filters?.search,
         };
         await templateService.getAllTemplates(params)

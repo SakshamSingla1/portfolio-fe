@@ -11,7 +11,7 @@ import { type Project, type ProjectResponse, WorkStatusType,WorkStatusOptions } 
 import { useSkillService, type SkillDropdown } from "../../../services/useSkillService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
-import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
+// import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import JoditEditor from 'jodit-react';
 import { HTTP_STATUS } from '../../../utils/types';
 import { useNavigate } from "react-router-dom";
@@ -258,7 +258,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Project Image
                                 </label>
-                                <ImageUpload
+                                {/* <ImageUpload
                                     uploadMode="single"
                                     value={formik.values.projectImageUrl}
                                     onChange={(url) => formik.setFieldValue('projectImageUrl', url)}
@@ -268,7 +268,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                     helperText={formik.errors.projectImageUrl}
                                     width="100%"
                                     height="200px"
-                                />
+                                /> */}
                             </div>
                         </div>
                     </div>

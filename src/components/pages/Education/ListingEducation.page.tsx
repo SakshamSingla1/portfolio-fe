@@ -27,7 +27,8 @@ const ServiceListingPage: React.FC = () => {
         const params: EducationFilterParams = {
             page: page,
             size: size,
-            sortDir: SORT_ENUM.CREATED_AT_DESC,
+            sortDir: SORT_ENUM.DESC,
+            sortBy: "createdAt",
             search: filters?.search,
         };
         await educationService.getAllByProfile(params)
