@@ -128,31 +128,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleCollapse = () => setCollapsed(!collapsed);
 
-  const renderAddButton = () => {
-    const currentPath = location.pathname;
-    const currentNav = navItems.find(item => currentPath.startsWith(item.to));
-    const showAddButton = ['Education', 'Experience', 'Projects', 'Skill'].includes(currentNav?.label || '');
-    if (!showAddButton) return null;
-
-    return (
-      <Button
-        variant="primaryContained"
-        label={`Add ${currentNav?.label}`}
-        onClick={() => navigate(`${currentNav?.to}/add`)}
-        startIcon={getAddIcon(currentPath)}
-        className="px-4 py-2"
-      />
-    );
-  };
-
-  const getAddIcon = (path: string) => {
-    if (path.startsWith('/admin/education')) return <FaGraduationCap />;
-    if (path.startsWith('/admin/experience')) return <FaBriefcase />;
-    if (path.startsWith('/admin/projects')) return <FaCode />;
-    if (path.startsWith('/admin/skill')) return <FaDumbbell />;
-    return <FiPlus />;
-  };
-
   return (
     <div style={{ display: 'flex', height: '100vh', backgroundColor: colors.neutral50 }}>
       {/* Mobile backdrop */}
@@ -263,16 +238,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <h1 style={{ fontSize: 18, fontWeight: 600, color: colors.primary700 }}>
               {navItems.find(item => location.pathname.startsWith(item.to))?.label || 'Dashboard'}
             </h1>
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {location.pathname.startsWith(ADMIN_ROUTES.PROFILE) && (
-              <Button
-                variant="primaryContained"
-                label="Edit Profile"
-                onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=EDIT`)}
-              />
-            )}
-            {renderAddButton()}
           </div>
         </header>
 
