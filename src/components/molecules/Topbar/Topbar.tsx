@@ -1,156 +1,199 @@
-import React, { useMemo, useCallback, useDeferredValue } from "react";
-import { FiBell, FiSearch, FiChevronRight } from "react-icons/fi";
+import React, { useMemo } from "react";
+import { createUseStyles } from "react-jss";
+import { FiMenu, FiChevronRight } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
-import {
-  getColor,
-  getBreadcrumbsFromUrl,
-  makeRoute,
-} from "../../../utils/helper";
-import { ADMIN_ROUTES } from "../../../utils/constant";
+import { getBreadcrumbsFromUrl, getColor } from "../../../utils/helper";
 
-const Topbar: React.FC<{ collapsed: boolean }> = React.memo(() => {
-  const { defaultTheme, user } = useAuthenticatedUser();
+const useStyles = createUseStyles({
+  topbar: (c: any) => ({
+    height: 64,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 16px",
+    borderBottom: `1px solid ${c.neutral200}`,
+    background: c.neutral0,
+    gap: 12,
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
+  }),
+
+  left: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+    overflow: "hidden",
+  },
+
+  menuBtn: (c: any) => ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: 4,
+    borderRadius: 6,
+    color: c.neutral800,
+    transition: "all 0.2s",
+    "&:hover": {
+      background: c.neutral50,
+    },
+  }),
+
+  breadcrumbs: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "nowrap",
+    overflow: "hidden",
+    gap: 4,
+  },
+
+  crumbBtn: (c: any) => ({
+    background: "transparent",
+    border: "none",
+    padding: "2px 6px",
+    borderRadius: 4,
+    cursor: "pointer",
+    fontSize: 13,
+    color: c.primary500,
+    whiteSpace: "nowrap",
+    fontWeight: 500,
+    transition: "all 0.2s",
+    "&:hover": {
+      background: c.primary50,
+      color: c.primary700,
+    },
+    "&:focus-visible": {
+      outline: `2px solid ${c.primary500}`,
+      outlineOffset: 2,
+    },
+  }),
+
+  crumbCurrent: (c: any) => ({
+    fontSize: 13,
+    fontWeight: 600,
+    color: c.neutral800,
+    padding: "2px 6px",
+    whiteSpace: "nowrap",
+  }),
+
+  separator: (c: any) => ({
+    display: "inline-flex",
+    alignItems: "center",
+    margin: "0 4px",
+    color: c.neutral800,
+    opacity: 0.4,
+  }),
+
+  right: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  iconBtn: (c: any) => ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    cursor: "pointer",
+    background: c.neutral50,
+    border: `1px solid ${c.neutral200}`,
+    color: c.neutral800,
+    transition: "all 0.2s",
+    "&:hover": {
+      background: c.neutral200,
+    },
+  }),
+
+  profileMenu: {
+    position: "relative",
+  },
+
+  dropdown: (c: any) => ({
+    position: "absolute",
+    top: 40,
+    right: 0,
+    background: c.neutral0,
+    border: `1px solid ${c.neutral200}`,
+    borderRadius: 6,
+    boxShadow: `0 4px 12px ${c.neutral200}`,
+    padding: 8,
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 120,
+    zIndex: 100,
+  }),
+
+  dropdownItem: (c: any) => ({
+    padding: "6px 12px",
+    cursor: "pointer",
+    fontSize: 13,
+    color: c.neutral800,
+    borderRadius: 4,
+    transition: "all 0.2s",
+    "&:hover": {
+      background: c.neutral50,
+    },
+  }),
+});
+
+interface TopbarProps {
+  onToggleSidebar: () => void;
+}
+
+const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { defaultTheme } = useAuthenticatedUser();
 
-  /* ---------------- COLORS ---------------- */
-  const colors = useMemo(
-    () => ({
-      primary50: getColor(defaultTheme, "primary50") ?? "#EEF2FF",
-      primary700: getColor(defaultTheme, "primary700") ?? "#4338CA",
-      neutral0: "#FFFFFF",
-      neutral50: getColor(defaultTheme, "neutral50") ?? "#F9FAFB",
-      neutral200: getColor(defaultTheme, "neutral200") ?? "#E5E7EB",
-      neutral800: getColor(defaultTheme, "neutral800") ?? "#1F2937",
-    }),
-    [defaultTheme]
-  );
+  const colors = {
+    primary50: getColor(defaultTheme, "primary50") ?? "#EEF2FF",
+    primary500: getColor(defaultTheme, "primary500") ?? "#6366F1",
+    primary700: getColor(defaultTheme, "primary700") ?? "#4338CA",
+    neutral0: "#FFFFFF",
+    neutral50: getColor(defaultTheme, "neutral50") ?? "#F9FAFB",
+    neutral200: getColor(defaultTheme, "neutral200") ?? "#E5E7EB",
+    neutral800: getColor(defaultTheme, "neutral800") ?? "#1F2937",
+  };
 
-  /* ---------------- BREADCRUMBS ---------------- */
-  const rawBreadcrumbs = useMemo(
-    () => getBreadcrumbsFromUrl(location.pathname),
-    [location.pathname]
-  );
-  const breadcrumbs = useDeferredValue(rawBreadcrumbs);
-
-  /* ---------------- HANDLERS ---------------- */
-  const navigateTo = useCallback(
-    (path: string) => navigate(path),
-    [navigate]
-  );
-
-  const goToProfile = useCallback(
-    () => navigate(makeRoute(ADMIN_ROUTES.PROFILE, {})),
-    [navigate]
-  );
+  const classes = useStyles(colors);
+  const breadcrumbs = useMemo(() => getBreadcrumbsFromUrl(location.pathname), [location.pathname]);
 
   return (
-    <header
-      className="
-        relative top-0 z-40
-        flex items-center
-        px-4 sm:px-5
-        box-border
-        min-h-21.5 max-h-21.5
-        overflow-hidden
-      "
-      style={{
-        background: colors.neutral0,
-        borderBottom: `1px solid ${colors.neutral200}`,
-      }}
-    >
-      {/* LEFT : Breadcrumbs */}
-      <div className="flex items-center gap-2 min-w-0">
-        <nav className="flex items-center gap-2 truncate text-sm font-semibold">
-          {breadcrumbs.length === 0 && (
-            <span style={{ color: colors.neutral800 }}>Dashboard</span>
-          )}
+    <header className={classes.topbar}>
+      {/* LEFT: Menu & Breadcrumbs */}
+      <div className={classes.left}>
+        <button className={classes.menuBtn} onClick={onToggleSidebar} aria-label="Toggle sidebar">
+          <FiMenu size={18} />
+        </button>
 
+        <nav className={classes.breadcrumbs} aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;
-
             return (
-              <div key={crumb.path} className="flex items-center gap-2">
-                {index !== 0 && (
-                  <FiChevronRight
-                    size={14}
-                    className="text-gray-400"
-                  />
-                )}
-
+              <React.Fragment key={crumb.path}>
                 {isLast ? (
-                  <span
-                    className="truncate max-w-40"
-                    style={{ color: colors.neutral800 }}
-                  >
-                    {crumb.label}
-                  </span>
+                  <span className={classes.crumbCurrent}>{crumb.label}</span>
                 ) : (
-                  <button
-                    onClick={() => navigateTo(crumb.path)}
-                    className="truncate max-w-40 hover:underline"
-                    style={{ color: colors.primary700 }}
-                  >
+                  <button className={classes.crumbBtn} onClick={() => navigate(crumb.path)}>
                     {crumb.label}
                   </button>
                 )}
-              </div>
+                {!isLast && <span className={classes.separator}><FiChevronRight size={12} /></span>}
+              </React.Fragment>
             );
           })}
         </nav>
       </div>
-
-      {/* CENTER : Search (Perfectly Centered) */}
-      <div
-        className="
-          hidden md:flex
-          absolute left-1/2 -translate-x-1/2
-          items-center gap-2
-          rounded-lg px-3 py-2
-          h-12
-        "
-        style={{
-          background: colors.neutral50,
-          color: colors.neutral800,
-        }}
-      >
-        <FiSearch className="opacity-70" />
-        <input
-          type="text"
-          placeholder="Search..."
-          className="
-            bg-transparent focus:outline-none
-            text-sm placeholder-gray-400
-            w-56
-          "
-        />
-      </div>
-
-      {/* RIGHT : Actions */}
-      <div className="ml-auto flex items-center gap-4">
-        <button className="p-2 rounded-full hover:bg-gray-100">
-          <FiBell size={20} className="text-gray-700" />
-        </button>
-
-        <button
-          onClick={goToProfile}
-          className="
-            inline-flex items-center justify-center
-            w-10 h-10 rounded-full
-            font-bold text-sm
-            hover:shadow-md
-          "
-          style={{
-            background: colors.neutral50,
-            color: colors.neutral800,
-          }}
-        >
-          {user?.fullName?.[0]?.toUpperCase() ?? "U"}
-        </button>
-      </div>
     </header>
   );
-});
+};
 
 export default Topbar;

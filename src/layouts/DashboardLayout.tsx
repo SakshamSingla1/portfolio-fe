@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import Topbar from "../components/molecules/Topbar/Topbar";
 import { createUseStyles } from "react-jss";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { getColor } from "../utils/helper";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const useStyles = createUseStyles({
   layoutWrapper: (c: any) => ({
@@ -13,8 +14,30 @@ const useStyles = createUseStyles({
     color: c.neutral800,
   }),
   sidebarWrapper: {
+    position: "relative",
     transition: "width 0.28s ease",
   },
+  collapseBtn: (c: any) => ({
+    position: "absolute",
+    top: "50%",
+    right: -12, // Overlaps sidebar’s right border
+    transform: "translateY(-50%)",
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    background: c.neutral0,
+    border: `1px solid ${c.neutral200}`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    zIndex: 20,
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+    transition: "all 0.2s",
+    "&:hover": {
+      background: c.neutral200,
+    },
+  }),
   contentWrapper: (c: any) => ({
     flexGrow: 1,
     background: c.neutral0,
@@ -22,10 +45,12 @@ const useStyles = createUseStyles({
     display: "flex",
     flexDirection: "column",
     height: "100vh",
+    overflow: "hidden",
+    position: "relative",
   }),
   mainContent: {
     flexGrow: 1,
-    padding: "24px",
+    padding: 24,
     overflow: "auto",
   },
 });
@@ -46,14 +71,28 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   const [collapsed, setCollapsed] = useState(false);
 
+  const handleToggleSidebar = useCallback(() => {
+    setCollapsed((prev) => !prev);
+  }, []);
+
   return (
     <div className={classes.layoutWrapper}>
-      <div className={classes.sidebarWrapper}>
+      {/* SIDEBAR */}
+      <div
+        className={classes.sidebarWrapper}
+        style={{ width: collapsed ? 64 : 240 }}
+      >
         <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+
+        {/* Collapse / Expand Button on left vertical center */}
+        <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
+          {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
+        </div>
       </div>
 
+      {/* MAIN CONTENT */}
       <div className={classes.contentWrapper}>
-        <Topbar collapsed={collapsed} />
+        <Topbar onToggleSidebar={handleToggleSidebar} />
         <div className={classes.mainContent}>{children}</div>
       </div>
     </div>

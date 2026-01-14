@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthenticatedUser } from '../hooks/useAuthenticatedUser';
 import { ADMIN_ROUTES } from '../utils/constant';
 import Button from '../components/atoms/Button/Button';
@@ -29,7 +29,7 @@ interface INavItemProps {
   colors: any;
 }
 
-const NavItem: React.FC<INavItemProps> = ({ to, icon, label, active, collapsed, colors}) => (
+const NavItem: React.FC<INavItemProps> = ({ to, icon, label, active, collapsed, colors }) => (
   <Link
     to={to}
     className={`group relative flex items-center p-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02]`}
