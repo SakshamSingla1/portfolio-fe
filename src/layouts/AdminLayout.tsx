@@ -273,11 +273,6 @@ const AdminLayout: React.FC = () => {
             {renderAddButton()}
           </div>
         </header>
-
-        {/* Page content */}
-        <main style={{ flex: 1, padding: 24, overflowY: 'auto', background: `linear-gradient(to bottom right, ${colors.primary50}, ${colors.primary100}, ${colors.primary500})` }}>
-          <Outlet />
-        </main>
       </div>
     </div>
   );
