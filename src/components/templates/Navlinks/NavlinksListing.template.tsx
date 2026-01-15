@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
 import { RoleOptions, StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -7,10 +7,11 @@ import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
 import Table from "../../organisms/TableV1/TableV1";
 import { type NavlinkResponse, type NavlinkFilterRequest } from "../../../services/useNavlinkService";
-import { FiEdit, FiEye, FiSearch } from "react-icons/fi";
+import { FiEdit, FiEye, FiSearch, FiFilter, FiChevronUp, FiChevronDown, FiPlus } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
 import Select from "../../atoms/Select/Select";
+import { enumToNormalKey } from "../../../utils/helper";
 
 interface INavlinkListTableTemplateProps {
     navlinks: NavlinkResponse[];
@@ -24,6 +25,8 @@ interface INavlinkListTableTemplateProps {
 const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ navlinks, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
 
     const handleAddNavlink = () => {
         navigate(makeRoute(ADMIN_ROUTES.NAVLINKS_ADD, {}));
@@ -34,11 +37,12 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
+            role: searchParams.get("role") || "",
         }
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_EDIT, {
                 params: { role, index },
-                query: query    
+                query: query
             })
         );
     }
@@ -48,6 +52,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
+            role: searchParams.get("role") || "",
         }
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_VIEW, {
@@ -59,7 +64,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
 
     const Action = (role: string, index: string) => {
         return (
-            <div className='flex justify-center space-x-2' title=''>
+            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
                 <button onClick={() => handleEdit(role, index)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>
@@ -72,9 +77,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
 
     const getRecords = () => navlinks?.map((navlink: NavlinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
-        navlink.name,
-        navlink.role,
-        navlink.index,
+        `${enumToNormalKey(navlink.role)} - ${enumToNormalKey(navlink.name)} (${navlink.index})`,
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
         navlink.status,
@@ -82,18 +85,17 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
     ])
 
     const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' } },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' } },
-        { label: "Role", key: "role", type: "text" as ColumnType, props: { className: '' } },
-        { label: "Index", key: "index", type: "number" as ColumnType, props: { className: '' } },
-        { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' } },
-        { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' } },
-        { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' } },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' } },
+        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+        { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ]
 
     const getSchema = () => ({
         id: "1",
+        mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
             currentPage: pagination.currentPage,
@@ -102,54 +104,135 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns() ?? []
+        columns: getTableColumns(),
+        hover: true,
+        striped: true
     });
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     return (
         <div className="grid gap-y-4">
-            <div className='flex justify-between'>
-                <div className={`text-2xl font-semibold my-auto`}>Navlink List</div>
-                <Button 
-                    onClick={() => handleAddNavlink()}
-                    variant="primaryContained"
-                    label="Add New Navlink"
-                />
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800">
+                            Navlink List
+                        </h1>
+                    </div>
+                    <Button
+                        onClick={handleAddNavlink}
+                        variant={isMobile ? "primaryText" : "primaryContained"}
+                        label={isMobile ? "" : "Add New Navlink"}
+                        startIcon={isMobile ? <FiPlus /> : ""}
+                        className={isMobile ? 'w-12 h-12 rounded-full' : ''}
+                    />
+                </div>
             </div>
-            <div className='flex justify-between'>
-                <div className={`w-[250px]`}>
-                    <Select
-                        label="Role"
-                        options={RoleOptions}
-                        value={filters.role || ""}
-                        onChange={(e) => handleFiltersChange("role", e)}
-                        fullWidth
-                        placeholder="Select Role"
-                    />
-                </div>
-                <div className="w-[250px]">
-                    <Select
-                        label="Status"
-                        options={StatusOptions}
-                        value={filters.status || ""}
-                        onChange={(e) => handleFiltersChange("status", e)}
-                        fullWidth
-                        placeholder="Select Status"
-                    />
-                </div>
-                <div className={`w-[250px]`}>
-                    <TextField
-                        label=''
-                        variant="outlined"
-                        placeholder="Search...."
-                        value={filters.search}
-                        name='search'
-                        onChange={(event) => {
-                            handleFiltersChange("search", event.target.value)
-                        }}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                        }}
-                    />
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
+                    {isMobile ? (
+                        <div className="w-full">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
+                            >
+                                <span className="flex items-center">
+                                    <FiFilter />
+                                    <span className="ml-2">Filters</span>
+                                </span>
+                                <span className="transform transition-transform">
+                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
+                                </span>
+                            </button>
+
+                            {showFilters && (
+                                <div className="space-y-3 p-4">
+                                    <div className={`w-[250px]`}>
+                                        <Select
+                                            label="Role"
+                                            options={RoleOptions}
+                                            value={filters.role || ""}
+                                            onChange={(e) => handleFiltersChange("role", e)}
+                                            fullWidth
+                                            placeholder="Select Role"
+                                        />
+                                    </div>
+                                    <div className="w-[250px]">
+                                        <Select
+                                            label="Status"
+                                            options={StatusOptions}
+                                            value={filters.status || ""}
+                                            onChange={(e) => handleFiltersChange("status", e)}
+                                            fullWidth
+                                            placeholder="Select Status"
+                                        />
+                                    </div>
+                                    <TextField
+                                        label='Search'
+                                        variant="outlined"
+                                        placeholder="Search..."
+                                        value={filters.search}
+                                        name='search'
+                                        onChange={(event) => {
+                                            handleFiltersChange("search", event.target.value)
+                                        }}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
+                                        }}
+                                        fullWidth
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            <div className={`w-[250px]`}>
+                                <Select
+                                    label="Role"
+                                    options={RoleOptions}
+                                    value={filters.role || ""}
+                                    onChange={(e) => handleFiltersChange("role", e)}
+                                    fullWidth
+                                    placeholder="Select Role"
+                                />
+                            </div>
+                            <div className="w-[250px]">
+                                <Select
+                                    label="Status"
+                                    options={StatusOptions}
+                                    value={filters.status || ""}
+                                    onChange={(e) => handleFiltersChange("status", e)}
+                                    fullWidth
+                                    placeholder="Select Status"
+                                />
+                            </div>
+                            <div className="w-[250px]">
+                                <TextField
+                                    label=''
+                                    variant="outlined"
+                                    placeholder="Search...."
+                                    value={filters.search}
+                                    name='search'
+                                    onChange={(event) => {
+                                        handleFiltersChange("search", event.target.value)
+                                    }}
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
+                                    }}
+                                    fullWidth
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
             <Table schema={getSchema()} records={getRecords()} />
