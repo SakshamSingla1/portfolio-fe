@@ -9,16 +9,11 @@ import { FiUserPlus } from "react-icons/fi";
 import { AUTH_STATE } from "../../../utils/types";
 import { userNameMaker } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputAdornment,IconButton } from "@mui/material";
 import { FiLock, FiEye, FiEyeOff, FiUser, FiMail, FiPhone } from "react-icons/fi";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { ROLES } from "../../../utils/constant";
-
-export const roles = [
-    { id: 1, enumCode: "ELDER", name: "Elder" },
-    { id: 2, enumCode: "CARETAKER", name: "Caretaker" },
-];
 
 interface RegisterTemplateProps {
     setEmail: (email: string) => void;
@@ -28,10 +23,9 @@ interface RegisterTemplateProps {
 
 /* ---------------------- Validation Schema ---------------------- */
 const validationSchema = Yup.object({
-    name: Yup.string().required("Name is required"),
+    fullName: Yup.string().required("Name is required"),
     email: Yup.string().email("Enter a valid email").required("Email is required"),
     phone: Yup.string().required("Phone number is required"),
-    roleCode: Yup.string().required("Role is required"),
     password: Yup.string().min(6).required("Password is required"),
     confirmPassword: Yup.string().required("Confirm Password is required").oneOf([Yup.ref("password")], "Passwords must match"),
 });
@@ -79,6 +73,10 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
             }
         },
     });
+
+    useEffect(() => {
+        console.log(formik);
+    },[formik])
 
     return (
         <div className="w-full">

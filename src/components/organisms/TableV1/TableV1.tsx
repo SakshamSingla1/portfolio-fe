@@ -179,6 +179,8 @@ const useStyles = createUseStyles((colors: any) => ({
     backgroundColor: 'white',
     borderTop: `1px solid ${colors.neutral200}`,
     padding: '0.15rem 1.0rem',
+    display: 'flex',
+    justifyContent: 'flex-end',
     '@media (max-width: 768px)': {
       padding: '0.5rem',
       flexDirection: 'column',
@@ -197,10 +199,9 @@ const useStyles = createUseStyles((colors: any) => ({
     },
     '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
       margin: 0,
-      fontSize: '0.5rem',
+      fontSize: '1.0rem',
       color: colors.neutral700,
       '@media (max-width: 768px)': {
-        fontSize: '0.75rem',
         textAlign: 'center',
       },
     },
@@ -227,12 +228,8 @@ const useStyles = createUseStyles((colors: any) => ({
     '& .MuiTablePagination-select': {
       border: `1px solid ${colors.neutral200}`,
       borderRadius: '0.375rem',
-      '&:focus': {
-        borderColor: colors.primary400,
-      },
       '@media (max-width: 768px)': {
         fontSize: '0.75rem',
-        padding: '0.25rem 1.5rem 0.25rem 0.5rem',
       },
     },
   },

@@ -13,7 +13,7 @@ import TemplateRoutes from './AdminRoutes/TemplateRoutes';
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route index element={<Navigate to="dashboard" replace />} />
+      <Route index element={<Navigate to="profile" replace />} />
       <Route path="profile" element={<div><ProfileRoutes /></div>} />
       <Route path="experience/*" element={<div><ExperienceRoutes /></div>} />
       <Route path="education/*" element={<div><EducationRoutes /></div>} />
@@ -24,7 +24,6 @@ const AdminRoutes = () => {
       <Route path="navlinks/*" element={<div><NavLinkRoutes /></div>} />
       <Route path="color-themes/*" element={<div><ColorThemeRoutes /></div>} />
       <Route path="templates/*" element={<div><TemplateRoutes /></div>} />
-      <Route path="dashboard" element={<div>Dashboard Content</div>} />
       <Route path="*" element={<div>Not Found</div>} />
     </Routes>
   );

@@ -34,6 +34,7 @@ export interface ProfileRequest {
     profileImagePublicId?: string;
     logoUrl?: string;
     logoPublicId?: string;
+    themeName: string;
 }
 
 export const useProfileService = () => {

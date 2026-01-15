@@ -9,6 +9,8 @@ import ProfileFormTemplate from '../../templates/Profile/ProfileForm.template';
 import { useSnackbar } from '../../../contexts/SnackbarContext';
 import Button from '../../atoms/Button/Button';
 import { FiEdit } from 'react-icons/fi';
+import { useAuthenticatedUser } from '../../../hooks/useAuthenticatedUser';
+import { useColorThemeService } from '../../../services/useColorThemeService';
 
 const validationSchema = Yup.object().shape({
     userName: Yup.string()
@@ -35,8 +37,14 @@ const validationSchema = Yup.object().shape({
         .required('Website URL is required'),
     profileImageUrl: Yup.string()
         .required('Profile image URL is required'),
+    profileImagePublicId: Yup.string()
+        .required('Profile Image Public ID is required'),
     logoUrl: Yup.string()
         .required('Logo URL is required'),
+    logoPublicId: Yup.string()
+        .required('Logo Public ID is required'),
+    themeName: Yup.string()
+        .required('Theme name is required'),
 });
 
 const ProfilePage: React.FC = () => {
@@ -45,8 +53,10 @@ const ProfilePage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const profileService = useProfileService();
+    const colorThemeService = useColorThemeService();
     const { showSnackbar } = useSnackbar();
     const colors = useColors();
+    const { setDefaultTheme } = useAuthenticatedUser();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -74,6 +84,17 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    const loadTheme = async (themeName: string) => {
+        try {
+            const response = await colorThemeService.getColorThemeByThemeName(themeName);
+            if (response.status === HTTP_STATUS.OK) {
+                setDefaultTheme(response.data.data);
+            }
+        } catch (error) {
+            showSnackbar('error', `${error}`);
+        }
+    };
+
     useEffect(() => {
         getProfileData();
     }, []);
@@ -91,7 +112,10 @@ const ProfilePage: React.FC = () => {
             linkedinUrl: '',
             websiteUrl: '',
             profileImageUrl: '',
+            profileImagePublicId: '',
             logoUrl: '',
+            logoPublicId: '',
+            themeName: ''
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -104,6 +128,10 @@ const ProfilePage: React.FC = () => {
             }
         },
     });
+
+    useEffect(() => {
+        loadTheme(formik.values.themeName);
+    }, [formik.values.themeName]);
 
     return (
         <div>

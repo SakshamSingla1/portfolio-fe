@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import TextFieldV2 from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import type { FormikProps } from "formik";
@@ -16,10 +16,12 @@ import {
 import { InputAdornment } from "@mui/material";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import { useProfileService } from "../../../services/useProfileService";
-import { useColors } from "../../../utils/types";
+import { Status, useColors } from "../../../utils/types";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { HTTP_STATUS } from "../../../utils/types";
 import type { ImageUploadResponse } from "../../../services/useProfileService";
+import { useColorThemeService, type ColorTheme, type ColorThemeFilterRequest } from "../../../services/useColorThemeService";
+import AutoCompleteInput, { type AutoCompleteOption } from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 interface ProfileFormProps {
     formik: FormikProps<ProfileRequest>;
@@ -35,10 +37,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     onEditClick,
 }) => {
     const colors = useColors();
-    const {showSnackbar} = useSnackbar();
+    const { showSnackbar } = useSnackbar();
     const profileService = useProfileService();
-    const [isUploadingLogo,setIsUploadingLogo]=useState<boolean>(false);
-    const [isUploadingProfile,setIsUploadingProfile]=useState<boolean>(false);
+    const colorThemeService = useColorThemeService();
+    const [isUploadingLogo, setIsUploadingLogo] = useState<boolean>(false);
+    const [isUploadingProfile, setIsUploadingProfile] = useState<boolean>(false);
+    const [colorThemes, setColorThemes] = useState<ColorTheme[]>([]);
 
 
     const uploadProfileImage = async (file: File): Promise<ImageUploadResponse> => {
@@ -81,36 +85,62 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
         }
     };
 
+    const loadColorThemes = async (searchTerm: string = '') => {
+        const colorFilterParams: ColorThemeFilterRequest = {
+            page: "0",
+            size: "10",
+            search: searchTerm.trim(),
+            status: Status.ACTIVE
+        };
+        try {
+            const response = await colorThemeService.getColorTheme(colorFilterParams);
+            if (response.status === HTTP_STATUS.OK && response.data?.data?.content) {
+                setColorThemes(response.data.data.content);
+            }
+        } catch (error) {
+            console.error('Failed to load color themes:', error);
+            setColorThemes([]);
+        }
+    };
+
+    const dropDownOptions = useMemo<AutoCompleteOption[]>(() => {
+        return colorThemes.map((colorTheme) => ({
+            label: colorTheme.themeName,
+            value: colorTheme.themeName,
+        }));
+    }, [colorThemes]);
+
     useEffect(() => {
-        console.log(formik)
-    },[formik])
+        loadColorThemes();
+    }, []);
 
     return (
         <div className={isMobile ? 'px-3' : ''}>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
-                <div className="space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-xl" 
-                     style={{ 
-                         borderColor: colors.neutral200,
-                     }}>
+                <div className="space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-xl"
+                    style={{
+                        borderColor: colors.neutral200,
+                    }}>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <h3 className="text-lg font-semibold flex items-center"
                             style={{ color: colors.neutral900 }}>
-                            <span className="w-2 h-2 rounded-full mr-3" 
-                                  style={{ backgroundColor: colors.primary500 }}></span>
+                            <span className="w-2 h-2 rounded-full mr-3"
+                                style={{ backgroundColor: colors.primary500 }}></span>
                             Profile Images
                         </h3>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6">
                         <div className="space-y-2">
                             <ImageUpload
                                 label="Profile Image"
-                                value={formik.values.profileImageUrl || null}
-                                onChange={(url) => {
-                                    formik.setFieldValue("profileImageUrl", url);
-                                    if (!url) {
-                                        formik.setFieldValue("profileImagePublicId", "");
-                                    }
+                                value={formik.values.profileImageUrl ? {
+                                    url: formik.values.profileImageUrl,
+                                    publicId: formik.values.profileImagePublicId
+                                } : null}
+                                onChange={(value) => {
+                                    formik.setFieldValue("profileImageUrl", value?.url || "");
+                                    formik.setFieldValue("profileImagePublicId", value?.publicId || "");
                                 }}
                                 onUpload={uploadProfileImage}
                                 disabled={!isEditMode || isUploadingProfile}
@@ -124,12 +154,13 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                         <div className="space-y-2">
                             <ImageUpload
                                 label="Logo"
-                                value={formik.values.logoUrl || null}
-                                onChange={(url) => {
-                                    formik.setFieldValue("logoUrl", url);
-                                    if (!url) {
-                                        formik.setFieldValue("logoPublicId", "");
-                                    }
+                                value={formik.values.logoUrl ? {
+                                    url: formik.values.logoUrl,
+                                    publicId: formik.values.logoPublicId
+                                } : null}
+                                onChange={(value) => {
+                                    formik.setFieldValue("logoUrl", value?.url || "");
+                                    formik.setFieldValue("logoPublicId", value?.publicId || "");
                                 }}
                                 onUpload={uploadLogo}
                                 disabled={!isEditMode || isUploadingLogo}
@@ -142,18 +173,18 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                     </div>
                 </div>
                 <div className="space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-xl"
-                     style={{ 
-                         borderColor: colors.neutral200,
-                     }}>
+                    style={{
+                        borderColor: colors.neutral200,
+                    }}>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <h3 className="text-lg font-semibold flex items-center"
                             style={{ color: colors.neutral900 }}>
-                            <span className="w-2 h-2 rounded-full mr-3" 
-                                  style={{ backgroundColor: colors.primary500 }}></span>
+                            <span className="w-2 h-2 rounded-full mr-3"
+                                style={{ backgroundColor: colors.primary500 }}></span>
                             Personal Information
                         </h3>
-                        <div className="text-xs sm:text-sm" 
-                             style={{ color: colors.neutral500 }}>
+                        <div className="text-xs sm:text-sm"
+                            style={{ color: colors.neutral500 }}>
                             Basic contact details
                         </div>
                     </div>
@@ -173,8 +204,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <FiUser className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                    style={{ color: colors.neutral400 }} />
+                                            <FiUser className="w-4 h-4 sm:w-5 sm:h-5"
+                                                style={{ color: colors.neutral400 }} />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -194,8 +225,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <FiMail className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                   style={{ color: colors.neutral400 }} />
+                                            <FiMail className="w-4 h-4 sm:w-5 sm:h-5"
+                                                style={{ color: colors.neutral400 }} />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -215,8 +246,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiBriefcase className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                     style={{ color: colors.neutral400 }} />
+                                        <FiBriefcase className="w-4 h-4 sm:w-5 sm:h-5"
+                                            style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
                                 ),
                             }}
@@ -235,8 +266,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiPhone className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                  style={{ color: colors.neutral400 }} />
+                                        <FiPhone className="w-4 h-4 sm:w-5 sm:h-5"
+                                            style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
                                 ),
                             }}
@@ -256,30 +287,53 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <FiMapPin className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                      style={{ color: colors.neutral400 }} />
+                                            <FiMapPin className="w-4 h-4 sm:w-5 sm:h-5"
+                                                style={{ color: colors.neutral400 }} />
                                         </InputAdornment>
                                     ),
                                 }}
                             />
+                        </div>
+                        <div className="col-span-1 sm:col-span-2">
+
+                            <AutoCompleteInput
+                                label="Color Theme"
+                                placeHolder="Search and select a theme"
+                                options={dropDownOptions}
+                                value={dropDownOptions.find(option => option.value === formik.values.themeName) || null}
+                                onChange={(selectedOption: AutoCompleteOption | null) => {
+                                    formik.setFieldValue("themeName", selectedOption?.value || "");
+                                }}
+                                onSearch={loadColorThemes}
+                                isDisabled={!isEditMode}
+                            />
+                            {formik.errors.themeName && formik.touched.themeName ? (
+                                <p className="mt-1 text-sm" style={{ color: colors.error500 }}>
+                                    {formik.errors.themeName}
+                                </p>
+                            ) : (
+                                <p className="mt-1 text-xs" style={{ color: colors.neutral500 }}>
+                                    Select a color scheme for your portfolio
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* About & Social Section */}
                 <div className="space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-xl xl:col-span-2"
-                     style={{ 
-                         borderColor: colors.neutral200,
-                     }}>
+                    style={{
+                        borderColor: colors.neutral200,
+                    }}>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <h3 className="text-lg font-semibold flex items-center"
                             style={{ color: colors.neutral900 }}>
-                            <span className="w-2 h-2 rounded-full mr-3" 
-                                  style={{ backgroundColor: colors.success500 }}></span>
+                            <span className="w-2 h-2 rounded-full mr-3"
+                                style={{ backgroundColor: colors.success500 }}></span>
                             About & Social
                         </h3>
-                        <div className="text-xs sm:text-sm" 
-                             style={{ color: colors.neutral500 }}>
+                        <div className="text-xs sm:text-sm"
+                            style={{ color: colors.neutral500 }}>
                             Professional summary and social links
                         </div>
                     </div>
@@ -312,8 +366,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiGithub className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                   style={{ color: colors.neutral400 }} />
+                                        <FiGithub className="w-4 h-4 sm:w-5 sm:h-5"
+                                            style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
                                 ),
                             }}
@@ -331,10 +385,10 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiLinkedin className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                     style={{ color: colors.neutral400 }} />
+                                        <FiLinkedin className="w-4 h-4 sm:w-5 sm:h-5"
+                                            style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
-                                    ),
+                                ),
                             }}
                         />
 
@@ -351,8 +405,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <FiGlobe className="w-4 h-4 sm:w-5 sm:h-5" 
-                                                      style={{ color: colors.neutral400 }} />
+                                            <FiGlobe className="w-4 h-4 sm:w-5 sm:h-5"
+                                                style={{ color: colors.neutral400 }} />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -361,11 +415,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                     </div>
                 </div>
             </div>
-
-            {/* Action Buttons */}
             {isEditMode && (
                 <div className="my-6">
-                    <div className="flex flex-row justify-between gap-3">
+                    <div className="flex justify-between gap-3">
                         <Button
                             label="Cancel"
                             variant="tertiaryContained"
@@ -376,6 +428,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
                             loading={formik.isSubmitting}
+                            disabled={!formik.isValid || !formik.dirty}
                         />
                     </div>
                 </div>

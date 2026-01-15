@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, SORT_ENUM } from '../../../utils/types';
+import { HTTP_STATUS, type IPagination, SORT_ENUM, Status } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import NavlinkListTableTemplate from '../../templates/Navlinks/NavlinksListing.template';
 import { useNavlinkService , type NavlinkResponse , type NavlinkFilterRequest} from '../../../services/useNavlinkService';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
+import { useAuthenticatedUser } from '../../../hooks/useAuthenticatedUser';
 
 const NavlinkListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navlinkService = useNavlinkService();
     const { showSnackbar } = useSnackbar();
+    const { user,setNavlinks } = useAuthenticatedUser();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -24,31 +26,45 @@ const NavlinkListPage: React.FC = () => {
     const [navlinks, setNavlinksTo] = useState<NavlinkResponse[]>([]);
 
     const refreshNavlinks = async (page: string, size: string) => {
-        const params: NavlinkFilterRequest = {
-            page: page,
-            size: size,
-            sortDir: SORT_ENUM.ASC,
-            sortBy: "index",
-            search: filters?.search,
-            role: filters?.role,
-            status: filters?.status
-        };
-        await navlinkService.getAllNavlinks(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setNavlinksTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                setNavlinksTo([]);
-                console.log(error);
-                showSnackbar('error', 'Failed to fetch navlinks');
-            })
+        try {
+            const params: NavlinkFilterRequest = {
+                page,
+                size,
+                sortDir: SORT_ENUM.ASC,
+                sortBy: "index",
+                search: filters?.search,
+                role: filters?.role,
+                status: filters?.status
+            };
+            const userRoleParams: NavlinkFilterRequest = {
+                page: "0",
+                size: "100",
+                sortDir: SORT_ENUM.ASC,
+                sortBy: "index",
+                role: user?.role,
+                status: Status.ACTIVE
+            };
+            const [res1, res2] = await Promise.all([
+                navlinkService.getAllNavlinks(params),
+                navlinkService.getAllNavlinks(userRoleParams)
+            ]);
+            if (res1?.status === HTTP_STATUS.OK) {
+                const { totalElements, totalPages } = res1?.data?.data;
+                setPagination(prev => ({
+                    ...prev,
+                    totalPages,
+                    totalRecords: totalElements
+                }));
+                setNavlinksTo(res1?.data?.data?.content);
+            }
+            if (res2?.status === HTTP_STATUS.OK) {
+                setNavlinks(res2?.data?.data?.content || []);
+            }
+        } catch (error) {
+            console.log(error);
+            setNavlinksTo([]);
+            showSnackbar('error', 'Failed to fetch navlinks');
+        }
     }
 
     const handleFiltersChange = (name: string, value: any) => {

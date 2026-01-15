@@ -67,11 +67,13 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
 
     return (
         <div className="grid gap-y-4">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        Contact Us List
-                    </h1>
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800">
+                            Contact Us List
+                        </h1>
+                    </div>
                 </div>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">

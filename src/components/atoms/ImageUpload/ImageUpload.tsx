@@ -1,18 +1,23 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useColors } from "../../../utils/types";
 import { type ImageUploadResponse } from "../../../services/useProfileService";
 import { FiUpload, FiX, FiImage, FiZoomIn, FiCheck, FiAlertCircle, FiInfo, FiTrash2 } from "react-icons/fi";
 
+interface ImageValue {
+    url: string;
+    publicId?: string;
+}
+
 interface ImageUploadProps {
     label?: string;
-    value?: string | null;
-    onChange: (url: string | null) => void;
+    value?: ImageValue | null;
+    onChange: (value: ImageValue | null) => void;
     onUpload: (file: File) => Promise<ImageUploadResponse>;
     accept?: string;
     disabled?: boolean;
     maxSize?: number;
     showPreview?: boolean;
-    aspectRatio?: string;
+    aspectRatio?: "square" | "video" | "portrait" | "wide";
     className?: string;
     error?: boolean;
     helperText?: string;
@@ -40,10 +45,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const colors = useColors();
     const [loading, setLoading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
-    const [previewImage, setPreviewImage] = useState<string | null>(value || null);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [showZoomModal, setShowZoomModal] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+
+    useEffect(() => {
+        setPreviewImage(value?.url || null);
+    }, [value]);
 
     const aspectRatioClasses = {
         square: "aspect-square",
@@ -70,9 +79,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const handleFileSelect = async (file: File) => {
         if (!file || disabled) return;
         if (!validateFile(file)) return;
+        
         setLoading(true);
         setUploadError(null);
         setUploadSuccess(false);
+        
         try {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -80,12 +91,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             };
             reader.readAsDataURL(file);
             const result = await onUpload(file);
-            onChange(result.url);
+            onChange({
+                url: result.url,
+                publicId: result.publicId
+            });
+            
             setUploadSuccess(true);
             setTimeout(() => setUploadSuccess(false), 3000);
         } catch (err) {
             setUploadError('Upload failed. Please try again.');
-            setPreviewImage(value || null);
+            setPreviewImage(value?.url || null);
             setUploadSuccess(false);
         } finally {
             setLoading(false);
@@ -145,32 +160,34 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
             {!previewImage ? (
                 <div
-                    className={`relative rounded-xl border-2 transition-all duration-300 ${disabled
+                    className={`relative rounded-xl border-2 transition-all duration-300 ${
+                        disabled
                             ? 'opacity-50 cursor-not-allowed'
                             : 'cursor-pointer hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
-                        } ${dragActive
+                    } ${
+                        dragActive
                             ? 'border-primary500 bg-primary50 shadow-lg scale-[1.02]'
                             : loading
-                                ? 'border-warning400 bg-warning50'
-                                : hasError
-                                    ? 'border-error500 bg-error50'
-                                    : 'border-dashed hover:border-primary300'
-                        }`}
+                            ? 'border-warning400 bg-warning50'
+                            : hasError
+                            ? 'border-error500 bg-error50'
+                            : 'border-dashed hover:border-primary300'
+                    }`}
                     style={{
                         borderColor: dragActive
                             ? undefined
                             : loading
-                                ? colors.warning400
-                                : hasError
-                                    ? colors.error500
-                                    : colors.neutral300,
+                            ? colors.warning400
+                            : hasError
+                            ? colors.error500
+                            : colors.neutral300,
                         backgroundColor: dragActive
                             ? undefined
                             : loading
-                                ? colors.warning50
-                                : hasError
-                                    ? colors.error50
-                                    : colors.neutral50,
+                            ? colors.warning50
+                            : hasError
+                            ? colors.error50
+                            : colors.neutral50,
                     }}
                     onClick={() => !disabled && inputRef.current?.click()}
                     onDragEnter={handleDrag}
@@ -188,17 +205,20 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     />
 
                     <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 space-y-4">
-                        <div className={`relative rounded-full p-3 sm:p-4 transition-all duration-300 ${loading ? 'animate-pulse' : dragActive ? 'animate-bounce' : ''
+                        <div
+                            className={`relative rounded-full p-3 sm:p-4 transition-all duration-300 ${
+                                loading ? 'animate-pulse' : dragActive ? 'animate-bounce' : ''
                             }`}
                             style={{
                                 backgroundColor: loading
                                     ? colors.warning100
                                     : dragActive
-                                        ? colors.primary100
-                                        : hasError
-                                            ? colors.error100
-                                            : colors.neutral100,
-                            }}>
+                                    ? colors.primary100
+                                    : hasError
+                                    ? colors.error100
+                                    : colors.neutral100,
+                            }}
+                        >
                             {loading ? (
                                 <FiUpload className="w-6 h-6 sm:w-8 sm:h-8 animate-bounce" style={{ color: colors.warning500 }} />
                             ) : dragActive ? (
@@ -212,35 +232,37 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
                         <div className="text-center space-y-2">
                             <p
-                                className={`text-sm sm:text-base font-medium ${dragActive ? 'text-primary600' : loading ? 'text-warning500' : hasError ? 'text-error500' : ''
-                                    }`}
+                                className={`text-sm sm:text-base font-medium ${
+                                    dragActive
+                                        ? 'text-primary600'
+                                        : loading
+                                        ? 'text-warning500'
+                                        : hasError
+                                        ? 'text-error500'
+                                        : ''
+                                }`}
                                 style={{
                                     color: dragActive
                                         ? colors.primary600
                                         : loading
-                                            ? colors.warning500
-                                            : hasError
-                                                ? colors.error500
-                                                : colors.neutral700
+                                        ? colors.warning500
+                                        : hasError
+                                        ? colors.error500
+                                        : colors.neutral700,
                                 }}
                             >
                                 {loading
-                                    ? "Uploading..."
+                                    ? 'Uploading...'
                                     : dragActive
-                                        ? "Drop image here"
-                                        : placeholder || "Click to upload or drag and drop"
-                                }
+                                    ? 'Drop image here'
+                                    : placeholder || 'Click to upload or drag and drop'}
                             </p>
-                            <p
-                                className="text-xs sm:text-sm"
-                                style={{ color: colors.neutral500 }}
-                            >
+                            <p className="text-xs sm:text-sm" style={{ color: colors.neutral500 }}>
                                 {loading
-                                    ? "Please wait..."
+                                    ? 'Please wait...'
                                     : hasError
-                                        ? "Try again or choose a different file"
-                                        : `Accepts ${accept.replace('image/', '').toUpperCase()} files (Max ${maxSize}MB)`
-                                }
+                                    ? 'Try again or choose a different file'
+                                    : `Accepts ${accept.replace('image/', '').toUpperCase()} files (Max ${maxSize}MB)`}
                             </p>
                         </div>
                     </div>
@@ -249,9 +271,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                         <div className="absolute inset-0 rounded-xl bg-white bg-opacity-90 flex items-center justify-center backdrop-blur-sm">
                             <div className="flex flex-col items-center space-y-2 sm:space-y-3">
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                    <div
+                                        className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
+                                        style={{ animationDelay: '0ms' }}
+                                    ></div>
+                                    <div
+                                        className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
+                                        style={{ animationDelay: '150ms' }}
+                                    ></div>
+                                    <div
+                                        className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
+                                        style={{ animationDelay: '300ms' }}
+                                    ></div>
                                 </div>
                                 <p className="text-xs sm:text-sm font-medium" style={{ color: colors.warning500 }}>
                                     Uploading image...
@@ -264,8 +295,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 <div className="space-y-3">
                     <div className="relative group">
                         <div
-                            className={`rounded-xl overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${aspectRatioClasses[aspectRatio as keyof typeof aspectRatioClasses] || aspectRatioClasses.square
-                                } ${hasError ? 'border-error500' : 'border-neutral200'}`}
+                            className={`rounded-xl overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
+                                aspectRatioClasses[aspectRatio as keyof typeof aspectRatioClasses] ||
+                                aspectRatioClasses.square
+                            } ${hasError ? 'border-error500' : 'border-neutral200'}`}
                             style={{ borderColor: hasError ? colors.error500 : colors.neutral200 }}
                         >
                             <img
@@ -280,7 +313,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                                 </div>
                             )}
 
-                            {/* Right Bottom Corner Action Buttons */}
                             <div className="absolute bottom-2 right-2 flex space-x-1 sm:space-x-2 z-10">
                                 {showPreview && (
                                     <button
@@ -292,15 +324,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                                     </button>
                                 )}
                                 {!disabled && (
-                                    <>
-                                        <button
-                                            onClick={handleRemove}
-                                            className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full text-white flex items-center justify-center hover:bg-error600 transition-all duration-200 shadow-lg hover:scale-110"
-                                            title="Remove image"
-                                        >
-                                            <FiTrash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
-                                        </button>
-                                    </>
+                                    <button
+                                        onClick={handleRemove}
+                                        className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full text-white flex items-center justify-center hover:bg-error600 transition-all duration-200 shadow-lg hover:scale-110"
+                                        title="Remove image"
+                                    >
+                                        <FiTrash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -309,9 +339,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                             <div className="absolute inset-0 bg-white bg-opacity-90 rounded-xl flex items-center justify-center backdrop-blur-sm z-20">
                                 <div className="flex flex-col items-center space-y-2 sm:space-y-3">
                                     <div className="flex items-center space-x-2">
-                                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                        <div
+                                            className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
+                                            style={{ animationDelay: '0ms' }}
+                                        ></div>
+                                        <div
+                                            className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
+                                            style={{ animationDelay: '150ms' }}
+                                        ></div>
+                                        <div
+                                            className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
+                                            style={{ animationDelay: '300ms' }}
+                                        ></div>
                                     </div>
                                     <p className="text-xs sm:text-sm font-medium" style={{ color: colors.warning500 }}>
                                         Updating image...
@@ -324,12 +363,21 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             )}
 
             {displayHelperText && (
-                <div className={`flex items-start space-x-2 text-xs sm:text-sm ${hasError ? 'text-error500' : 'text-neutral500'
-                    }`}>
+                <div
+                    className={`flex items-start space-x-2 text-xs sm:text-sm ${
+                        hasError ? 'text-error500' : 'text-neutral500'
+                    }`}
+                >
                     {hasError ? (
-                        <FiAlertCircle className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" style={{ color: colors.error500 }} />
+                        <FiAlertCircle
+                            className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0"
+                            style={{ color: colors.error500 }}
+                        />
                     ) : (
-                        <FiInfo className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" style={{ color: colors.neutral400 }} />
+                        <FiInfo
+                            className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0"
+                            style={{ color: colors.neutral400 }}
+                        />
                     )}
                     <span>{displayHelperText}</span>
                 </div>
