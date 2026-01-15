@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TextFieldV2 from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import type { FormikProps } from "formik";
@@ -16,93 +16,191 @@ import {
 import { InputAdornment } from "@mui/material";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import { useProfileService } from "../../../services/useProfileService";
+import { useColors } from "../../../utils/types";
+import { useSnackbar } from "../../../hooks/useSnackBar";
+import { HTTP_STATUS } from "../../../utils/types";
+import type { ImageUploadResponse } from "../../../services/useProfileService";
 
 interface ProfileFormProps {
     formik: FormikProps<ProfileRequest>;
     isEditMode: boolean;
+    isMobile?: boolean;
     onEditClick?: () => void;
 }
 
 const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     formik,
     isEditMode,
+    isMobile,
     onEditClick,
 }) => {
-    const { uploadProfileImage } = useProfileService();
+    const colors = useColors();
+    const {showSnackbar} = useSnackbar();
+    const profileService = useProfileService();
+    const [isUploadingLogo,setIsUploadingLogo]=useState<boolean>(false);
+    const [isUploadingProfile,setIsUploadingProfile]=useState<boolean>(false);
+
+
+    const uploadProfileImage = async (file: File): Promise<ImageUploadResponse> => {
+        setIsUploadingProfile(true);
+        try {
+            const response = await profileService.uploadProfileImage(file);
+            if (response.status === HTTP_STATUS.OK) {
+                formik.setFieldValue('profileImageUrl', response.data.data.url);
+                formik.setFieldValue('profileImagePublicId', response.data.data.publicId);
+                showSnackbar('success', 'Profile image uploaded successfully!');
+                return response.data.data;
+            }
+            throw new Error('Upload failed');
+        } catch (error) {
+            console.error(error);
+            showSnackbar('error', 'Failed to upload profile image. Please try again.');
+            throw error;
+        } finally {
+            setIsUploadingProfile(false);
+        }
+    };
+
+    const uploadLogo = async (file: File): Promise<ImageUploadResponse> => {
+        setIsUploadingLogo(true);
+        try {
+            const response = await profileService.uploadLogo(file);
+            if (response.status === HTTP_STATUS.OK) {
+                formik.setFieldValue('logoUrl', response.data.data.url);
+                formik.setFieldValue('logoPublicId', response.data.data.publicId);
+                showSnackbar('success', 'Logo image uploaded successfully!');
+                return response.data.data;
+            }
+            throw new Error('Upload failed');
+        } catch (error) {
+            console.error(error);
+            showSnackbar('error', 'Failed to upload logo image. Please try again.');
+            throw error;
+        } finally {
+            setIsUploadingLogo(false);
+        }
+    };
+
+    useEffect(() => {
+        console.log(formik)
+    },[formik])
 
     return (
-        <div>
-            <div className="px-2 md:px-6 pt-2 pb-6 flex flex-col items-center">
-                <ImageUpload
-                    label="Profile Image"
-                    disabled={!isEditMode}
-                    value={
-                        formik.values.profileImageUrl
-                            ? {
-                                  url: formik.values.profileImageUrl,
-                                  publicId: formik.values.profileImagePublicId!,
-                              }
-                            : null
-                    }
-                    onUpload={async ([file]) => uploadProfileImage(file)}
-                    onChange={(res) => {
-                        if (Array.isArray(res)) {
-                            if (res.length > 0) {
-                                formik.setFieldValue("profileImageUrl", res[0].url);
-                                formik.setFieldValue("profileImagePublicId", res[0].publicId);
-                            }
-                        } else {
-                            formik.setFieldValue("profileImageUrl", res.url);
-                            formik.setFieldValue("profileImagePublicId", res.publicId);
-                        }
-                    }}
-                />
-            </div>
+        <div className={isMobile ? 'px-3' : ''}>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
+                <div className="space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-xl" 
+                     style={{ 
+                         borderColor: colors.neutral200,
+                     }}>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <h3 className="text-lg font-semibold flex items-center"
+                            style={{ color: colors.neutral900 }}>
+                            <span className="w-2 h-2 rounded-full mr-3" 
+                                  style={{ backgroundColor: colors.primary500 }}></span>
+                            Profile Images
+                        </h3>
+                    </div>
 
-            <div className="p-2 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
-                            <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                        <div className="space-y-2">
+                            <ImageUpload
+                                label="Profile Image"
+                                value={formik.values.profileImageUrl || null}
+                                onChange={(url) => {
+                                    formik.setFieldValue("profileImageUrl", url);
+                                    if (!url) {
+                                        formik.setFieldValue("profileImagePublicId", "");
+                                    }
+                                }}
+                                onUpload={uploadProfileImage}
+                                disabled={!isEditMode || isUploadingProfile}
+                                maxSize={5}
+                                aspectRatio="square"
+                                error={Boolean(formik.errors.profileImageUrl) && formik.touched.profileImageUrl}
+                                helperText={formik.errors.profileImageUrl && formik.touched.profileImageUrl ? formik.errors.profileImageUrl : ""}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <ImageUpload
+                                label="Logo"
+                                value={formik.values.logoUrl || null}
+                                onChange={(url) => {
+                                    formik.setFieldValue("logoUrl", url);
+                                    if (!url) {
+                                        formik.setFieldValue("logoPublicId", "");
+                                    }
+                                }}
+                                onUpload={uploadLogo}
+                                disabled={!isEditMode || isUploadingLogo}
+                                maxSize={5}
+                                aspectRatio="wide"
+                                error={Boolean(formik.errors.logoUrl) && formik.touched.logoUrl}
+                                helperText={formik.errors.logoUrl && formik.touched.logoUrl ? formik.errors.logoUrl : ""}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-xl"
+                     style={{ 
+                         borderColor: colors.neutral200,
+                     }}>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <h3 className="text-lg font-semibold flex items-center"
+                            style={{ color: colors.neutral900 }}>
+                            <span className="w-2 h-2 rounded-full mr-3" 
+                                  style={{ backgroundColor: colors.primary500 }}></span>
                             Personal Information
                         </h3>
+                        <div className="text-xs sm:text-sm" 
+                             style={{ color: colors.neutral500 }}>
+                            Basic contact details
+                        </div>
+                    </div>
 
-                        <TextFieldV2
-                            label="Full Name"
-                            name="fullName"
-                            value={formik.values.fullName}
-                            onChange={formik.handleChange}
-                            disabled={!isEditMode}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.fullName && Boolean(formik.errors.fullName)}
-                            helperText={formik.touched.fullName && formik.errors.fullName}
-                            className="bg-gray-50"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <FiUser className="w-5 h-5" />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        <div className="col-span-1 sm:col-span-2">
+                            <TextFieldV2
+                                label="Full Name"
+                                name="fullName"
+                                value={formik.values.fullName}
+                                onChange={formik.handleChange}
+                                disabled={!isEditMode}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+                                helperText={formik.touched.fullName && formik.errors.fullName}
+                                style={{ backgroundColor: colors.neutral50 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <FiUser className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                    style={{ color: colors.neutral400 }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </div>
 
-                        <TextFieldV2
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={formik.values.email}
-                            disabled
-                            error={formik.touched.email && Boolean(formik.errors.email)}
-                            helperText={formik.touched.email && formik.errors.email}
-                            className="bg-gray-100"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <FiMail className="w-5 h-5" />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                        <div className="col-span-1 sm:col-span-2">
+                            <TextFieldV2
+                                label="Email"
+                                name="email"
+                                type="email"
+                                value={formik.values.email}
+                                disabled
+                                error={formik.touched.email && Boolean(formik.errors.email)}
+                                helperText={formik.touched.email && formik.errors.email}
+                                style={{ backgroundColor: colors.neutral100 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <FiMail className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                   style={{ color: colors.neutral400 }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </div>
 
                         <TextFieldV2
                             label="Professional Title"
@@ -113,11 +211,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             onBlur={formik.handleBlur}
                             error={formik.touched.title && Boolean(formik.errors.title)}
                             helperText={formik.touched.title && formik.errors.title}
-                            className="bg-gray-50"
+                            style={{ backgroundColor: colors.neutral50 }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiBriefcase className="w-5 h-5" />
+                                        <FiBriefcase className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                     style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
                                 ),
                             }}
@@ -132,54 +231,74 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             onBlur={formik.handleBlur}
                             error={formik.touched.phone && Boolean(formik.errors.phone)}
                             helperText={formik.touched.phone && formik.errors.phone}
-                            className="bg-gray-50"
+                            style={{ backgroundColor: colors.neutral50 }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiPhone className="w-5 h-5" />
+                                        <FiPhone className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                  style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
                                 ),
                             }}
                         />
 
-                        <TextFieldV2
-                            label="Location"
-                            name="location"
-                            value={formik.values.location}
-                            onChange={formik.handleChange}
-                            disabled={!isEditMode}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.location && Boolean(formik.errors.location)}
-                            helperText={formik.touched.location && formik.errors.location}
-                            className="bg-gray-50"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <FiMapPin className="w-5 h-5" />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                        <div className="col-span-1 sm:col-span-2">
+                            <TextFieldV2
+                                label="Location"
+                                name="location"
+                                value={formik.values.location}
+                                onChange={formik.handleChange}
+                                disabled={!isEditMode}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.location && Boolean(formik.errors.location)}
+                                helperText={formik.touched.location && formik.errors.location}
+                                style={{ backgroundColor: colors.neutral50 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <FiMapPin className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                      style={{ color: colors.neutral400 }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </div>
                     </div>
+                </div>
 
-                    <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
-                            <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                {/* About & Social Section */}
+                <div className="space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-xl xl:col-span-2"
+                     style={{ 
+                         borderColor: colors.neutral200,
+                     }}>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <h3 className="text-lg font-semibold flex items-center"
+                            style={{ color: colors.neutral900 }}>
+                            <span className="w-2 h-2 rounded-full mr-3" 
+                                  style={{ backgroundColor: colors.success500 }}></span>
                             About & Social
                         </h3>
+                        <div className="text-xs sm:text-sm" 
+                             style={{ color: colors.neutral500 }}>
+                            Professional summary and social links
+                        </div>
+                    </div>
 
-                        <TextFieldV2
-                            label="About Me"
-                            name="aboutMe"
-                            multiline
-                            rows={4}
-                            disabled={!isEditMode}
-                            value={formik.values.aboutMe}
-                            onChange={formik.handleChange}
-                            error={formik.touched.aboutMe && Boolean(formik.errors.aboutMe)}
-                            helperText={formik.touched.aboutMe && formik.errors.aboutMe}
-                            className="bg-gray-50"
-                        />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                        <div className="col-span-1 lg:col-span-2">
+                            <TextFieldV2
+                                label="About Me"
+                                name="aboutMe"
+                                multiline
+                                rows={4}
+                                disabled={!isEditMode}
+                                value={formik.values.aboutMe}
+                                onChange={formik.handleChange}
+                                error={formik.touched.aboutMe && Boolean(formik.errors.aboutMe)}
+                                helperText={formik.touched.aboutMe && formik.errors.aboutMe}
+                                style={{ backgroundColor: colors.neutral50 }}
+                            />
+                        </div>
 
                         <TextFieldV2
                             label="GitHub URL"
@@ -189,10 +308,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             onChange={formik.handleChange}
                             error={formik.touched.githubUrl && Boolean(formik.errors.githubUrl)}
                             helperText={formik.touched.githubUrl && formik.errors.githubUrl}
+                            style={{ backgroundColor: colors.neutral50 }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiGithub className="w-5 h-5" />
+                                        <FiGithub className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                   style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
                                 ),
                             }}
@@ -206,36 +327,45 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             onChange={formik.handleChange}
                             error={formik.touched.linkedinUrl && Boolean(formik.errors.linkedinUrl)}
                             helperText={formik.touched.linkedinUrl && formik.errors.linkedinUrl}
+                            style={{ backgroundColor: colors.neutral50 }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <FiLinkedin className="w-5 h-5" />
+                                        <FiLinkedin className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                     style={{ color: colors.neutral400 }} />
                                     </InputAdornment>
-                                ),
+                                    ),
                             }}
                         />
 
-                        <TextFieldV2
-                            label="Personal Website"
-                            name="websiteUrl"
-                            disabled={!isEditMode}
-                            value={formik.values.websiteUrl}
-                            onChange={formik.handleChange}
-                            error={formik.touched.websiteUrl && Boolean(formik.errors.websiteUrl)}
-                            helperText={formik.touched.websiteUrl && formik.errors.websiteUrl}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <FiGlobe className="w-5 h-5" />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                        <div className="col-span-1 lg:col-span-2">
+                            <TextFieldV2
+                                label="Personal Website"
+                                name="websiteUrl"
+                                disabled={!isEditMode}
+                                value={formik.values.websiteUrl}
+                                onChange={formik.handleChange}
+                                error={formik.touched.websiteUrl && Boolean(formik.errors.websiteUrl)}
+                                helperText={formik.touched.websiteUrl && formik.errors.websiteUrl}
+                                style={{ backgroundColor: colors.neutral50 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <FiGlobe className="w-4 h-4 sm:w-5 sm:h-5" 
+                                                      style={{ color: colors.neutral400 }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                {isEditMode && (
-                    <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between gap-3">
+            {/* Action Buttons */}
+            {isEditMode && (
+                <div className="my-6">
+                    <div className="flex flex-row justify-between gap-3">
                         <Button
                             label="Cancel"
                             variant="tertiaryContained"
@@ -248,8 +378,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                             loading={formik.isSubmitting}
                         />
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

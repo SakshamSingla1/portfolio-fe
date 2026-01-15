@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
 import { createUseStyles } from "react-jss";
-import { FiMenu, FiChevronRight } from "react-icons/fi";
+import { FiChevronRight } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { getBreadcrumbsFromUrl, getColor } from "../../../utils/helper";
 
 const useStyles = createUseStyles({
   topbar: (c: any) => ({
-    height: 64,
+    height: 64, // Fixed height
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -18,6 +18,7 @@ const useStyles = createUseStyles({
     position: "sticky",
     top: 0,
     zIndex: 50,
+    flexShrink: 0, // Prevents shrinking
   }),
 
   left: {
@@ -26,6 +27,7 @@ const useStyles = createUseStyles({
     gap: 12,
     flex: 1,
     overflow: "hidden",
+    minHeight: 64, // Ensure minimum height
   },
 
   menuBtn: (c: any) => ({
@@ -144,11 +146,7 @@ const useStyles = createUseStyles({
   }),
 });
 
-interface TopbarProps {
-  onToggleSidebar: () => void;
-}
-
-const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
+const Topbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { defaultTheme } = useAuthenticatedUser();
@@ -168,12 +166,7 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
 
   return (
     <header className={classes.topbar}>
-      {/* LEFT: Menu & Breadcrumbs */}
       <div className={classes.left}>
-        <button className={classes.menuBtn} onClick={onToggleSidebar} aria-label="Toggle sidebar">
-          <FiMenu size={18} />
-        </button>
-
         <nav className={classes.breadcrumbs} aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;

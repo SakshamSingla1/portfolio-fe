@@ -47,7 +47,7 @@ const iconMap: Record<string, JSX.Element> = {
 
 const useStyles = createUseStyles({
   sidebar: (c: any) => ({
-    width: c.collapsed ? 72 : 240,
+    width: c.collapsed ? 64 : 240,
     background: c.neutral0,
     borderRight: `1px solid ${c.neutral200}`,
     display: "flex",
@@ -73,7 +73,7 @@ const useStyles = createUseStyles({
   footer: {
     padding: '0.5rem',
     marginTop: 'auto',
-    marginBottom: '2rem',
+    marginBottom: '4rem',
   },
   logoutBtn: (colors: any) => ({
     '&': {

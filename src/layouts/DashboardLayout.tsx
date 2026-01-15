@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import Topbar from "../components/molecules/Topbar/Topbar";
 import { createUseStyles } from "react-jss";
@@ -20,7 +20,7 @@ const useStyles = createUseStyles({
   collapseBtn: (c: any) => ({
     position: "absolute",
     top: "50%",
-    right: -12, // Overlaps sidebar’s right border
+    right: -12,
     transform: "translateY(-50%)",
     width: 28,
     height: 28,
@@ -69,30 +69,41 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   const classes = useStyles(colors);
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  const handleToggleSidebar = useCallback(() => {
+  const handleToggleSidebar = () => {
     setCollapsed((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setCollapsed(true);
+    }
+  }, [isMobile]);
 
   return (
     <div className={classes.layoutWrapper}>
-      {/* SIDEBAR */}
       <div
         className={classes.sidebarWrapper}
         style={{ width: collapsed ? 64 : 240 }}
       >
         <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-
-        {/* Collapse / Expand Button on left vertical center */}
-        <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
+        {!isMobile && <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
           {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
-        </div>
+        </div>}
       </div>
-
-      {/* MAIN CONTENT */}
       <div className={classes.contentWrapper}>
-        <Topbar onToggleSidebar={handleToggleSidebar} />
+        <Topbar />
         <div className={classes.mainContent}>{children}</div>
       </div>
     </div>

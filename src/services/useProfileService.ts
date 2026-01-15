@@ -49,15 +49,13 @@ export const useProfileService = () => {
         return request(API_METHOD.PUT, url, user, profile);
     };
 
-    const uploadProfileImage = async (file: File) => {
+    const uploadProfileImage = (file: File) => {
         const formData = new FormData();
-
-        formData.append("files", file);
-
+        formData.append("file", file);
         return request(
-            API_METHOD.POST,
+            API_METHOD.PUT,
             replaceUrlParams(PROFILE_URLS.UPLOAD_PROFILE_IMAGE, { id: user?.id }),
-            null,
+            user,
             formData
         );
     };

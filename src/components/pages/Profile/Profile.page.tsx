@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
-import { HTTP_STATUS } from '../../../utils/types';
+import { HTTP_STATUS, useColors } from '../../../utils/types';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { useProfileService, type ProfileRequest } from '../../../services/usePro
 import ProfileFormTemplate from '../../templates/Profile/ProfileForm.template';
 import { useSnackbar } from '../../../contexts/SnackbarContext';
 import Button from '../../atoms/Button/Button';
+import { FiEdit } from 'react-icons/fi';
 
 const validationSchema = Yup.object().shape({
     userName: Yup.string()
@@ -42,8 +43,19 @@ const ProfilePage: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [isEditMode, setIsEditMode] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const profileService = useProfileService();
     const { showSnackbar } = useSnackbar();
+    const colors = useColors();
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         const mode = searchParams.get('mode');
@@ -91,34 +103,53 @@ const ProfilePage: React.FC = () => {
                 showSnackbar('error', `${response?.data?.message}`);
             }
         },
-        enableReinitialize: true
     });
 
     return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-8 border-b border-gray-100">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Profile</h1>
-                            <p className="text-gray-600 mt-1">Manage your profile information</p>
-                        </div>
+        <div>
+            <div className={`mx-auto ${isMobile ? 'w-full px-3' : 'max-w-6xl px-4 sm:px-6 lg:px-8'}`}>
+                <div className={`rounded-xl overflow-hidden `}
+                     style={{ 
+                         backgroundColor: 'white',
+                     }}>
+                    <div style={{ 
+                         background: `linear-gradient(to right, ${colors.primary50}, ${colors.primary500})`,
+                         borderBottom: `1px solid ${colors.neutral200}`,
+                         padding: isMobile ? '24px 16px' : '32px 24px',
+                         position: 'relative'
+                    }}>
                         {!isEditMode && (
-                            <Button
-                                variant="primaryContained"
-                                onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=${MODE.EDIT}`)}
-                                label="Edit Profile"
-                                className="whitespace-nowrap"
-                            />
+                            <div className={`absolute top-4 right-4 z-10`}>
+                                <Button
+                                    variant={isMobile ? 'primaryText' : 'primaryContained'}
+                                    onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=${MODE.EDIT}`)}
+                                    label={isMobile ? '' : 'Edit Profile'}
+                                    iconButton={isMobile ? <FiEdit color='white' /> : ""}
+                                />
+                            </div>
                         )}
+                        
+                        <div>
+                            <h1 className={`font-bold ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}
+                                style={{ 
+                                    color: colors.neutral900,
+                                    marginBottom: '8px',
+                                    maxWidth: isMobile ? '200px' : 'none'
+                                }}>
+                                {isMobile ? 'My Profile' : 'Profile'}
+                            </h1>
+                        </div>
                     </div>
-                </div>
-                <div className="p-6">
-                    <ProfileFormTemplate
-                        formik={formik}
-                        isEditMode={isEditMode}
-                        onEditClick={() => navigate(`${ADMIN_ROUTES.PROFILE}`)}
-                    />
+                    
+                    {/* Form Section */}
+                    <div style={{ padding: isMobile ? '0' : '24px' }}>
+                        <ProfileFormTemplate
+                            formik={formik}
+                            isEditMode={isEditMode}
+                            onEditClick={() => navigate(`${ADMIN_ROUTES.PROFILE}`)}
+                            isMobile={isMobile}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
