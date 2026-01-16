@@ -5,6 +5,7 @@ import { createUseStyles } from "react-jss";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { getColor } from "../utils/helper";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { Outlet } from "react-router-dom";
 
 const useStyles = createUseStyles({
   layoutWrapper: (c: any) => ({
@@ -55,7 +56,7 @@ const useStyles = createUseStyles({
   },
 });
 
-const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const DashboardLayout: React.FC = () => {
   const { defaultTheme } = useAuthenticatedUser();
   const colors = {
     primary50: getColor(defaultTheme, "primary50") ?? "#EEF2FF",
@@ -104,7 +105,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
       </div>
       <div className={classes.contentWrapper}>
         <Topbar />
-        <div className={classes.mainContent}>{children}</div>
+        <div className={classes.mainContent}><Outlet /></div>
       </div>
     </div>
   );

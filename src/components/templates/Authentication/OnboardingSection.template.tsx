@@ -13,7 +13,7 @@ const OnboardingSection = ({ onFlip }: { onFlip: () => void }) => {
       ref={ref}
       className="h-full flex flex-col rounded-tl-3xl rounded-bl-3xl 
       bg-gradient-to-br from-slate-950 via-slate-900 to-black 
-      text-white relative overflow-hidden"
+      text-white relative overflow-hidden w-full"
     >
       <motion.div
         className="absolute inset-0 opacity-35"
