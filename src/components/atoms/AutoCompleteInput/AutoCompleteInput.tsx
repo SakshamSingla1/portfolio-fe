@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import { ClearIcon } from '@mui/x-date-pickers';
 import { createUseStyles } from 'react-jss';
@@ -123,7 +123,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   const colors = useColors();
   const classes = useStyles(colors)();
 
-  const handleInputChange = useCallback((
+  const handleInputChange = (
     _event: React.SyntheticEvent,
     value: AutoCompleteOption | null, 
     reason: AutocompleteChangeReason, 
@@ -131,15 +131,15 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     if (reason === 'selectOption' || reason === 'removeOption' || reason === 'clear') {
       onChange(value);
     }
-  }, [onChange]);
+  };
 
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onSearch(e.target.value);
-  }, [onSearch]);
+  };
 
-  const handleClearValue = useCallback(() => {
+  const handleClearValue = () => {
     onSearch("");
-  }, [onSearch]);
+  };
 
   const debouncedSearch = useMemo(
     () => useDebounce((value: string) => {

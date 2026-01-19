@@ -9,6 +9,7 @@ import { useSearchParams } from "react-router-dom";
 import { InputAdornment, IconButton } from "@mui/material";
 import Button from "../../atoms/Button/Button";
 import { useSnackbar } from "../../../hooks/useSnackBar";
+import { PasswordStrengthMeter } from "../../atoms/PasswordStrengthMeter/PasswordStrengthMeter";
 
 interface ResetPasswordProps {
   setAuthState: (authState: AUTH_STATE) => void;
@@ -108,42 +109,45 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
             error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
             helperText={formik.touched.newPassword && formik.errors.newPassword}
           />
-          <TextField
-            fullWidth
-            name="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            label="Confirm Password"
-            value={formik.values.confirmPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FiLock className="text-gray-400" />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    edge="end"
-                    size="small"
-                  >
-                    {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-            error={
-              formik.touched.confirmPassword &&
-              Boolean(formik.errors.confirmPassword)
-            }
-            helperText={
-              formik.touched.confirmPassword &&
-              formik.errors.confirmPassword
-            }
-          />
+          <div>
+            <TextField
+              fullWidth
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              label="Confirm Password"
+              value={formik.values.confirmPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FiLock className="text-gray-400" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      edge="end"
+                      size="small"
+                    >
+                      {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              error={
+                formik.touched.confirmPassword &&
+                Boolean(formik.errors.confirmPassword)
+              }
+              helperText={
+                formik.touched.confirmPassword &&
+                formik.errors.confirmPassword
+              }
+            />
+            <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />
+          </div>
           <div className="flex justify-center items-center">
             <Button
               label="Reset Password"

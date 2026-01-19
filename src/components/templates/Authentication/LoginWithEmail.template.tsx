@@ -24,7 +24,6 @@ const validationSchema = Yup.object({
     email: Yup.string()
         .email("Please enter a valid email")
         .required("Email is required"),
-
     password: Yup.string().required("Password is required"),
 });
 
@@ -146,36 +145,38 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                         error={formik.touched.email && Boolean(formik.errors.email)}
                         helperText={formik.touched.email && formik.errors.email}
                     />
-                    <TextField
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type={showPassword ? "text" : "password"}
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <FiLock className="text-gray-400" />
-                                </InputAdornment>
-                            ),
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        edge="end"
-                                        size="small"
-                                    >
-                                        {showPassword ? <FiEyeOff /> : <FiEye />}
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                        error={formik.touched.password && Boolean(formik.errors.password)}
-                        helperText={formik.touched.password && formik.errors.password}
-                    />
+                    <div className="flex flex-col gap-2">
+                        <TextField
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type={showPassword ? "text" : "password"}
+                            value={formik.values.password}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <FiLock className="text-gray-400" />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            edge="end"
+                                            size="small"
+                                        >
+                                            {showPassword ? <FiEyeOff /> : <FiEye />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                            error={formik.touched.password && Boolean(formik.errors.password)}
+                            helperText={formik.touched.password && formik.errors.password}
+                        />
+                    </div>
                     <div className="flex justify-end text-sm mt-1">
                         <button
                             type="button"

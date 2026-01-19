@@ -64,17 +64,17 @@ export const AdminRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/*" element={<DashboardLayout />} >
-        <Route index element={<Navigate to="profile" replace />} />
-        <Route path="profile" element={<div><ProfileRoutes /></div>} />
-        <Route path="experience/*" element={<div><ExperienceRoutes /></div>} />
-        <Route path="education/*" element={<div><EducationRoutes /></div>} />
-        <Route path="projects/*" element={<div><ProjectRoutes /></div>} />
-        <Route path="skills/*" element={<div><SkillRoutes /></div>} />
-        <Route path="contact-us/*" element={<div><ContactUsRoutes /></div>} />
-        <Route path="settings/*" element={<div><SettingRoutes /></div>} />
-        <Route path="navlinks/*" element={<div><NavLinkRoutes /></div>} />
-        <Route path="color-themes/*" element={<div><ColorThemeRoutes /></div>} />
-        <Route path="templates/*" element={<div><TemplateRoutes /></div>} />
+        <Route index element={<Navigate to="admin/profile" replace />} />
+        <Route path="admin/profile" element={<div><ProfileRoutes /></div>} />
+        <Route path="admin/experience/*" element={<div><ExperienceRoutes /></div>} />
+        <Route path="admin/education/*" element={<div><EducationRoutes /></div>} />
+        <Route path="admin/projects/*" element={<div><ProjectRoutes /></div>} />
+        <Route path="admin/skills/*" element={<div><SkillRoutes /></div>} />
+        <Route path="admin/contact-us/*" element={<div><ContactUsRoutes /></div>} />
+        <Route path="admin/settings/*" element={<div><SettingRoutes /></div>} />
+        <Route path="admin/navlinks/*" element={<div><NavLinkRoutes /></div>} />
+        <Route path="admin/color-themes/*" element={<div><ColorThemeRoutes /></div>} />
+        <Route path="admin/templates/*" element={<div><TemplateRoutes /></div>} />
       </Route>
     </Routes>
   );

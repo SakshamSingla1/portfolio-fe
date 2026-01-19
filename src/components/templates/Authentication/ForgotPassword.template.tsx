@@ -13,14 +13,12 @@ interface ForgotPasswordProps {
     setAuthState: (authState: AUTH_STATE) => void;
 }
 
-/* ---------------------- Validation Schema ---------------------- */
 const validationSchema = Yup.object({
     email: Yup.string()
         .email("Invalid email address")
         .required("Email is required"),
 });
 
-/* ---------------------- Forgot Password Component ---------------------- */
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setAuthState }) => {
     const authService = useAuthService();
     const { showSnackbar } = useSnackbar();
@@ -52,19 +50,15 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setAuthState }) => {
     return (
         <div className="w-full">
             <div className="p-8">
-
-                {/* ------------------ Header ------------------ */}
                 <div className="text-center mb-6 flex flex-col items-center">
                     <div className="p-3 rounded-full bg-green-100 text-green-600 text-3xl flex items-center justify-center mb-3 shadow-sm">
                         <FiLock />
                     </div>
-
                     <h2 className="text-2xl text-green-800 font-bold tracking-tight">Forgot Password</h2>
                     <p className="text-gray-600 mt-1">
                         Enter your email to receive a password reset link.
                     </p>
                 </div>
-                {/* ------------------ Forgot Password Form ------------------ */}
                 <div className="flex flex-col gap-6">
                     <TextField
                         fullWidth
@@ -83,8 +77,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setAuthState }) => {
                         error={formik.touched.email && Boolean(formik.errors.email)}
                         helperText={formik.touched.email && formik.errors.email}
                     />
-
-                    {/* Submit */}
                     <div className="flex justify-center items-center">
                         <Button
                             label="Send Reset Link"
@@ -93,15 +85,10 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setAuthState }) => {
                             disabled={isLoading}
                         />
                     </div>
-
-                    {/* Back to Login */}
                     <div className="text-center mt-5">
                         <p className="text-sm text-gray-600">
                             Remember your password?{" "}
-                            <span
-                                className="text-green-600 cursor-pointer font-medium hover:underline"
-                                onClick={() => setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL)}
-                            >
+                            <span className="text-green-600 cursor-pointer font-medium hover:underline" onClick={() => setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL)}>
                                 Sign in
                             </span>
                         </p>

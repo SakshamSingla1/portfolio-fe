@@ -16,7 +16,6 @@ export const PasswordStrengthMeter = ({ password }: { password: string }) => {
         { label: 'Strong', color: 'bg-blue-500' },
         { label: 'Very Strong', color: 'bg-green-500' }
       ];
-  
       return {
         strength: (strength / 5) * 100,
         ...strengthMap[Math.min(strength - 1, 4)]
