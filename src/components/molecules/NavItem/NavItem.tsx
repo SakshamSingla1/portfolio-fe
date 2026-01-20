@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 export interface INavItemProps {
@@ -18,26 +18,15 @@ const NavItem: React.FC<INavItemProps> = ({
     collapsed,
     colors,
 }) => {
-    const [isMobile, setIsMobile] = useState<boolean>(false);
-
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
-        return () => window.removeEventListener("resize", checkMobile);
-    }, []);
-
     return (
         <Link
             to={to}
             className="group relative flex items-center p-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02]"
             style={{
-                background: active && !isMobile ? `linear-gradient(to right, ${colors.primary50}, ${colors.primary100})` : "",
+                background: active ? `linear-gradient(to right, ${colors.primary50}, ${colors.primary100})` : "",
                 color: active ? colors.primary700 : colors.neutral800,
                 justifyContent: collapsed ? "center" : "flex-start",
-                borderLeft: active && !isMobile ? `4px solid ${colors.primary500}` : "",
+                borderLeft: active ? `4px solid ${colors.primary500}` : "",
             }}
             title={collapsed ? label : ""}
         >
