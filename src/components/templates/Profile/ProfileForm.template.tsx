@@ -14,6 +14,7 @@ import { useSnackbar } from "../../../hooks/useSnackBar";
 import { IoMdCloudUpload } from "react-icons/io";
 import DocumentUpload from "../../atoms/DocumentUpload/DocumentUpload";
 import { useResumeService, type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
+import { usePublicResumeService } from "../../../services/usePublicResumeService";
 
 const SectionCard = ({ title, subtitle, icon: Icon, actions, children,}: {
   title: string;
@@ -65,6 +66,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
   const profileService = useProfileService();
   const colorThemeService = useColorThemeService();
   const resumeService = useResumeService();
+  const publicResumeService = usePublicResumeService();
 
   const [isUploading, setIsUploading] = useState<{
     profile: boolean;
@@ -156,6 +158,16 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     if (res.status === HTTP_STATUS.OK) {
       setColorThemes(res.data.data.content || []);
     }
+  };
+
+  const handleViewResume = async () => {
+    const url = publicResumeService.getViewResumeUrl();
+    window.open(url, "_blank");
+  };
+
+  const handleDownloadResume = async () => {
+    const url = publicResumeService.getDownloadResumeUrl();
+    window.location.href = url;
   };
 
   const themeOptions = useMemo<AutoCompleteOption[]>(
@@ -434,19 +446,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
             <Button
               label="View Resume"
               variant="primaryContained"
-              onClick={() =>
-                window.open(
-                  `/api/v1/public/resume/${formik.values.userName}/view`,
-                  "_blank"
-                )
-              }
+              onClick={handleViewResume}
             />
             <Button
               label="Download Resume"
               variant="secondaryContained"
-              onClick={() =>
-                (window.location.href = `/api/v1/public/resume/${formik.values.userName}/download`)
-              }
+              onClick={handleDownloadResume}
             />
           </div>
         )}
