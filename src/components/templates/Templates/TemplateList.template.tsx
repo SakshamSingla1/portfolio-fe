@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
-import { Status, StatusOptions, type IPagination } from "../../../utils/types";
+import { StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
