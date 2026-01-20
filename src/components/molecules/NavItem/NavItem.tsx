@@ -96,8 +96,8 @@ const NavItem: React.FC<INavItemProps> = ({
                                 <div
                                     key={i}
                                     style={{
-                                        width: 16,
-                                        height: 16,
+                                        width: 4,
+                                        height: 4,
                                         backgroundColor: colors.primary500,
                                         borderRadius: "50%",
                                         animation: "pulse 1s infinite",

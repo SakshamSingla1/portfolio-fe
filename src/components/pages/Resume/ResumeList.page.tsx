@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, Status, type IPagination } from '../../../utils/types';
+import { HTTP_STATUS, type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import { useResumeService , type ResumeUploadResponse , type ResumeSearchParams} from '../../../services/useResumeService';
+import { useResumeService , type DocumentUploadResponse , type ResumeSearchParams} from '../../../services/useResumeService';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import ResumeTable from '../../templates/Resume/ResumeTable.template';
@@ -13,6 +13,7 @@ const ResumeListPage: React.FC = () => {
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
+        status: searchParams.get("status") || "",
     };
 
     const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
@@ -21,16 +22,16 @@ const ResumeListPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [resumes, setResumesTo] = useState<ResumeUploadResponse[]>([]);
+    const [resumes, setResumesTo] = useState<DocumentUploadResponse[]>([]);
 
     const refreshResumes = async (page: string, size: string) => {
         const params: ResumeSearchParams = {
             page: page,
             size: size,
             sortDir: "DESC",
-            sortBy: "uploadedAt",
+            sortBy: "updatedAt",
             search: filters?.search,
-            status: Status.DELETED,
+            status: filters?.status,
         };
         await resumeService.getByProfile(params)
             .then((res) => {
@@ -79,9 +80,10 @@ const ResumeListPage: React.FC = () => {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            status: filters.status ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, filters.status, pagination]);
 
     return (
         <div>

@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useColors } from "../../../utils/types";
-import { type DocumentUploadResponse } from "../../../services/useProfileService";
+import { type DocumentUploadResponse } from "../../../services/useResumeService";
 import {FiUpload,FiCheck,FiAlertCircle,FiInfo,FiTrash2} from "react-icons/fi";
 import {FaFilePdf,FaFileExcel,FaFilePowerpoint,FaFileWord,FaFileCsv} from "react-icons/fa";
 import type { IconType } from "react-icons";
 
 interface DocumentValue {
-  id?: number;
+  id?: string;
   name: string;
   url: string;
 }

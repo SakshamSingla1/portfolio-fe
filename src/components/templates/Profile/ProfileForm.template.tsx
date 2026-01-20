@@ -11,6 +11,9 @@ import { useColorThemeService, type ColorTheme, type ColorThemeFilterRequest} fr
 import type { ProfileRequest, ImageUploadResponse,} from "../../../services/useProfileService";
 import { Status, useColors, HTTP_STATUS } from "../../../utils/types";
 import { useSnackbar } from "../../../hooks/useSnackBar";
+import { IoMdCloudUpload } from "react-icons/io";
+import DocumentUpload from "../../atoms/DocumentUpload/DocumentUpload";
+import { useResumeService, type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
 
 const SectionCard = ({ title, subtitle, icon: Icon, actions, children,}: {
   title: string;
@@ -25,7 +28,7 @@ const SectionCard = ({ title, subtitle, icon: Icon, actions, children,}: {
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-lg shrink-0" style={{ backgroundColor: colors.primary50 }}>
-            <Icon className="w-6 h-6" style={{ color: colors.primary600 }} />
+            <Icon className="w-8 h-8" style={{ color: colors.primary600 }} />
           </div>
           <div>
             <h3 className="text-base sm:text-lg font-semibold" style={{ color: colors.neutral900 }}>
@@ -58,15 +61,25 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
   onEditClick,
 }) => {
   const { showSnackbar } = useSnackbar();
+
   const profileService = useProfileService();
   const colorThemeService = useColorThemeService();
+  const resumeService = useResumeService();
 
-  const [isUploadingProfile, setIsUploadingProfile] = useState(false);
-  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploading, setIsUploading] = useState<{
+    profile: boolean;
+    logo: boolean;
+    resume: boolean;
+  }>({
+    profile: false,
+    logo: false,
+    resume: false,
+  });
   const [colorThemes, setColorThemes] = useState<ColorTheme[]>([]);
+  const [activeResume, setActiveResume] = useState<DocumentUploadResponse | null>(null);
 
   const uploadProfileImage = async (file: File): Promise<ImageUploadResponse> => {
-    setIsUploadingProfile(true);
+    setIsUploading(prev => ({ ...prev, profile: true }));
     try {
       const response = await profileService.uploadProfileImage(file);
       if (response.status === HTTP_STATUS.OK) {
@@ -80,12 +93,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
       showSnackbar("error", "Profile image upload failed");
       throw new Error();
     } finally {
-      setIsUploadingProfile(false);
+      setIsUploading(prev => ({ ...prev, profile: false }));
     }
   };
 
   const uploadLogo = async (file: File): Promise<ImageUploadResponse> => {
-    setIsUploadingLogo(true);
+    setIsUploading(prev => ({ ...prev, logo: true }));
     try {
       const response = await profileService.uploadLogo(file);
       if (response.status === HTTP_STATUS.OK) {
@@ -99,7 +112,36 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
       showSnackbar("error", "Logo upload failed");
       throw new Error();
     } finally {
-      setIsUploadingLogo(false);
+      setIsUploading(prev => ({ ...prev, logo: false }));
+    }
+  };
+
+  const uploadResume = async (
+    file: File
+  ): Promise<DocumentUploadResponse> => {
+    setIsUploading((s) => ({ ...s, resume: true }));
+    try {
+      const res = await resumeService.uploadResume(file);
+      if (res.status === HTTP_STATUS.OK) {
+        showSnackbar("success", "Resume uploaded");
+        await loadActiveResume();
+        return res.data.data;
+      }
+      throw new Error();
+    } finally {
+      setIsUploading((s) => ({ ...s, resume: false }));
+    }
+  };
+
+  const loadActiveResume = async () => {
+    const params: ResumeSearchParams = {
+      page: "0",
+      size: "1",
+      status: Status.ACTIVE,
+    };
+    const res = await resumeService.getByProfile(params);
+    if (res.status === HTTP_STATUS.OK) {
+      setActiveResume(res.data.data.content?.[0] || null);
     }
   };
 
@@ -110,13 +152,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
       search,
       status: Status.ACTIVE,
     };
-    try {
-      const response = await colorThemeService.getColorTheme(params);
-      if (response.status === HTTP_STATUS.OK) {
-        setColorThemes(response.data.data.content || []);
-      }
-    } catch {
-      setColorThemes([]);
+    const res = await colorThemeService.getColorTheme(params);
+    if (res.status === HTTP_STATUS.OK) {
+      setColorThemes(res.data.data.content || []);
     }
   };
 
@@ -132,6 +170,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
   useEffect(() => {
     loadColorThemes();
   }, []);
+
+  useEffect(() => {
+    if (formik.values.userName) {
+      loadActiveResume();
+    }
+  }, [formik.values.userName]);
 
   return (
     <div className="pb-6 space-y-6">
@@ -157,11 +201,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                 formik.setFieldValue("profileImagePublicId", value?.publicId || "");
               }}
               onUpload={uploadProfileImage}
-              disabled={!isEditMode || isUploadingProfile}
+              disabled={!isEditMode || isUploading.profile}
               maxSize={5}
               aspectRatio="square"
               helperText={
-                isUploadingProfile
+                isUploading.profile
                   ? "Uploading..."
                   : "JPG / PNG · Max 5MB"
               }
@@ -181,11 +225,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                 formik.setFieldValue("logoPublicId", value?.publicId || "");
               }}
               onUpload={uploadLogo}
-              disabled={!isEditMode || isUploadingLogo}
+              disabled={!isEditMode || isUploading.logo}
               maxSize={5}
               aspectRatio="wide"
               helperText={
-                isUploadingLogo
+                isUploading.logo
                   ? "Uploading..."
                   : "Brand logo · Max 5MB"
               }
@@ -340,7 +384,6 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               ),
             }}
           />
-
           <div className="md:col-span-2">
             <TextFieldV2
               label="Website"
@@ -358,6 +401,55 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
             />
           </div>
         </div>
+      </SectionCard>
+      {/* Resume */}
+      <SectionCard
+        title="Resume"
+        subtitle="Upload your resume to showcase your skills"
+        icon={IoMdCloudUpload}
+      >
+        <DocumentUpload
+          label="Upload Resume"
+          accept=".pdf,.doc,.docx"
+          disabled={!isEditMode || isUploading.resume}
+          value={
+            activeResume
+              ? {
+                  id: activeResume.id,
+                  name: activeResume.fileName,
+                  url: activeResume.fileUrl,
+                }
+              : null
+          }
+          onUpload={uploadResume}
+          onChange={(value) => {
+            if (value === null) {
+              setActiveResume(null);
+            }
+          }}
+        />
+
+        {formik.values.userName && activeResume && (
+          <div className="flex gap-3 mt-4">
+            <Button
+              label="View Resume"
+              variant="primaryContained"
+              onClick={() =>
+                window.open(
+                  `/api/v1/public/resume/${formik.values.userName}/view`,
+                  "_blank"
+                )
+              }
+            />
+            <Button
+              label="Download Resume"
+              variant="secondaryContained"
+              onClick={() =>
+                (window.location.href = `/api/v1/public/resume/${formik.values.userName}/download`)
+              }
+            />
+          </div>
+        )}
       </SectionCard>
       {isEditMode && (
         <div className="pt-6">

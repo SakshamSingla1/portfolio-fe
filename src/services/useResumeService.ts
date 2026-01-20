@@ -10,12 +10,12 @@ export const RESUME_URLS = {
   DELETE: "/resume/:resumeId",
 };
 
-export interface ResumeUploadResponse {
+export interface DocumentUploadResponse {
   id: string;
   fileName: string;
   fileUrl: string;
   status: string;
-  uploadedAt: string;
+  updatedAt: string;
 }
 
 export interface ResumeSearchParams {
@@ -39,7 +39,7 @@ export const useResumeService = () => {
       const formData = new FormData();
       formData.append("file", file);
       return request(
-          API_METHOD.PUT,
+          API_METHOD.POST,
           replaceUrlParams(RESUME_URLS.UPLOAD, { profileId: user?.id }),
           user,
           formData
