@@ -81,7 +81,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         `${enumToNormalKey(navlink.role)} - ${enumToNormalKey(navlink.name)} (${navlink.index})`,
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
-        navlink.status === StatusOptions.find(option => option.value === Status.ACTIVE)?.value ? 'Active' : 'Inactive',
+        StatusOptions.find((status) => status.value === navlink.status)?.label,
         Action(navlink.role ?? "", navlink.index ?? "")
     ])
 
@@ -90,7 +90,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
         { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {} },
+        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ]
 

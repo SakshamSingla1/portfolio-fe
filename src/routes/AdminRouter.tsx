@@ -14,6 +14,7 @@ import axiosRetry from '../axios-retry';
 import axios from 'axios';
 import useRouteValidate from '../hooks/useRouteValidate';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ResumeRoutes from './AdminRoutes/ResumeRouter';
 
 export const AdminRouter: React.FC = () => {
 
@@ -75,6 +76,7 @@ export const AdminRouter: React.FC = () => {
         <Route path="admin/navlinks/*" element={<div><NavLinkRoutes /></div>} />
         <Route path="admin/color-themes/*" element={<div><ColorThemeRoutes /></div>} />
         <Route path="admin/templates/*" element={<div><TemplateRoutes /></div>} />
+        <Route path="admin/resumes/*" element={<div><ResumeRoutes /></div>} />
       </Route>
     </Routes>
   );
