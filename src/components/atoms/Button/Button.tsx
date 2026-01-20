@@ -2,8 +2,7 @@ import React, { useMemo } from "react";
 import MuiButton, { type ButtonProps as MuiButtonProps } from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { createUseStyles } from "react-jss";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
-import { getColor } from "../../../utils/helper";
+import { useColors } from "../../../utils/types";
 
 type CustomVariant = 
   | "primaryContained" 
@@ -179,19 +178,8 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   ...props
 }) => {
-  const { defaultTheme } = useAuthenticatedUser();
 
-  const colors = {
-    primary300: getColor(defaultTheme, "primary300") || "#10b981",
-    neutral50: getColor(defaultTheme, "neutral50") || "#FAFAFA",
-    neutral200: getColor(defaultTheme, "neutral200") || "#eeeeee",
-    neutral400: getColor(defaultTheme, "neutral400") || "#aaaaaa",
-    neutral700: getColor(defaultTheme, "neutral700") || "#555",
-    neutral900: getColor(defaultTheme, "neutral900") || "#222",
-    secondary50: getColor(defaultTheme, "secondary50") || "#FFFDE7",
-    secondary200: getColor(defaultTheme, "secondary200") || "#FFECB3",
-    secondary400: getColor(defaultTheme, "secondary400") || "#FFC107",
-  };
+  const colors = useColors();
 
   const styles = useStyles(colors);
 

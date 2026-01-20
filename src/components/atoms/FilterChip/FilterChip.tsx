@@ -11,10 +11,9 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import TextField from "../../atoms/TextField/TextField";
-import Button from "../../atoms/Button/Button";
-import { getColor } from "../../../utils/helper";
+import Button from "../../atoms/Button/Button"; 
+import { useColors } from "../../../utils/types";
 
 export interface FilterChipOption {
   label: string;
@@ -39,10 +38,6 @@ interface FilterChipV2Props
   width?: string | number;
   height?: string | number;
 }
-
-/* ============================
-   ENHANCED SELECT STYLING
-============================ */
 
 const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
   width: "100%",
@@ -98,10 +93,6 @@ const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
   },
 }));
 
-/* ============================
-   MENU STYLING
-============================ */
-
 const MenuProps = {
   PaperProps: {
     style: {
@@ -137,10 +128,6 @@ const ActionsContainer = styled("div")<{ colors: any }>(({ colors }) => ({
   zIndex: 1,
 }));
 
-/* ============================
-   COMPONENT
-============================ */
-
 const FilterChipV2: React.FC<FilterChipV2Props> = ({
   options,
   value = [],
@@ -154,24 +141,9 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
   height = "auto",
   ...props
 }) => {
-  const { defaultTheme } = useAuthenticatedUser();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const colors = {
-    primary50: getColor(defaultTheme, "primary50") ?? "#EEF2FF",
-    primary100: getColor(defaultTheme, "primary100") ?? "#DBE4FF",
-    primary300: getColor(defaultTheme, "primary300") ?? "#A5B4FC",
-    primary500: getColor(defaultTheme, "primary500") ?? "#6366F1",
-    primary700: getColor(defaultTheme, "primary700") ?? "#4338CA",
-
-    neutral0: getColor(defaultTheme, "neutral0") ?? "#FFFFFF",
-    neutral50: getColor(defaultTheme, "neutral50") ?? "#F9FAFB",
-    neutral100: getColor(defaultTheme, "neutral100") ?? "#F3F4F6",
-    neutral200: getColor(defaultTheme, "neutral200") ?? "#E5E7EB",
-    neutral400: getColor(defaultTheme, "neutral400") ?? "#9CA3AF",
-    neutral700: getColor(defaultTheme, "neutral700") ?? "#374151",
-    neutral800: getColor(defaultTheme, "neutral800") ?? "#1F2937",
-  };
+  const colors = useColors();
 
   const filteredOptions = useMemo(() => {
     if (!searchTerm) return options;

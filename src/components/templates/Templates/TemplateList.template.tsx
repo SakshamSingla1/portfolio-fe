@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
-import { type IPagination } from "../../../utils/types";
+import { Status, StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
@@ -10,6 +10,7 @@ import { type TemplateResponse, type TemplateFilterRequest } from "../../../serv
 import { FiEdit, FiEye, FiSearch, FiPlus, FiChevronUp, FiChevronDown, FiFilter } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
+import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 
 interface TemplateListTableTemplateProps {
     templates: TemplateResponse[];
@@ -70,7 +71,7 @@ const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ t
         template.type,
         DateUtils.dateTimeSecondToDate(template.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(template.updatedAt ?? ""),
-        template.status,
+        template.status === StatusOptions.find(option => option.value === Status.ACTIVE)?.value ? 'Active' : 'Inactive',
         Action(template.name ?? "")
     ])
 
@@ -81,7 +82,7 @@ const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ t
         { label: "Type", key: "type", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Status", key: "status", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {} },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ]
 

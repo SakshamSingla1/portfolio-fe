@@ -1,17 +1,18 @@
-import React, { useEffect, useRef, useMemo } from "react";
-import type { TemplateRequest, TemplateResponse } from "../../../services/useTemplateService";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
-import { MODE } from "../../../utils/constant";
-import JoditEditor from "jodit-react";
-import { useNavigate } from "react-router-dom";
 import Select from "../../atoms/Select/Select";
-import { ADMIN_ROUTES } from "../../../utils/constant";
-import { makeRoute } from "../../../utils/helper";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
-import { StatusOptions,Status } from "../../../utils/types";
+import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+
+import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
+import { makeRoute } from "../../../utils/helper";
+import { StatusOptions, Status } from "../../../utils/types";
+import type { TemplateRequest, TemplateResponse } from "../../../services/useTemplateService";
 
 interface TemplateFormProps {
   onSubmit: (values: TemplateRequest) => void;
@@ -25,7 +26,7 @@ const validationSchema = Yup.object({
   subject: Yup.string().required("Subject is required"),
   body: Yup.string().required("Body is required"),
   type: Yup.string().required("Type is required"),
-  active: Yup.string().required("Active status is required"),
+  status: Yup.string().required("Status is required"),
 });
 
 const templateTypes = [
@@ -41,20 +42,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
   loading = false,
 }) => {
   const navigate = useNavigate();
-  const editor = useRef(null);
-
-  const joditConfig = useMemo(
-    () => ({
-      readonly: mode === MODE.VIEW,
-      placeholder: "Start typing template content...",
-      height: 320,
-      toolbarAdaptive: false,
-      toolbarSticky: true,
-      buttons:
-        "bold,italic,underline,strikethrough,|,ul,ol,|,outdent,indent,|,font,fontsize,|,align,|,link,|,undo,redo",
-    }),
-    [mode]
-  );
 
   const formik = useFormik<TemplateRequest>({
     initialValues: {
@@ -69,10 +56,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
     enableReinitialize: true,
   });
 
-  const handleBodyChange = (content: string) => {
-    formik.setFieldValue("body", content);
-  };
-
   useEffect(() => {
     if (template) {
       formik.setValues(template);
@@ -80,107 +63,110 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
   }, [template]);
 
   return (
-    <div className="w-full mx-auto px-3 sm:px-6 py-6 space-y-8">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
-          {mode === MODE.VIEW
-            ? "View Template"
-            : mode === MODE.EDIT
-            ? "Edit Template"
-            : "Create New Template"}
+    <div className="mb-8">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          {mode === MODE.ADD ? "Create Template" : mode === MODE.EDIT ? "Edit Template" : "Template Details"}
         </h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-gray-600">
           Manage email, SMS, and notification templates
         </p>
       </div>
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6 space-y-6">
-        <TextField
-          fullWidth
-          label="Template Name"
-          name="name"
-          value={formik.values.name}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.name && Boolean(formik.errors.name)}
-          helperText={formik.touched.name && formik.errors.name}
-          disabled={mode === MODE.VIEW}
-        />
-        <Select
-          label="Template Type"
-          name="type"
-          value={formik.values.type}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.type && Boolean(formik.errors.type)}
-          helperText={
-            formik.touched.type && formik.errors.type
-              ? formik.errors.type
-              : ""
-          }
-          disabled={mode === MODE.VIEW}
-          options={templateTypes}
-          fullWidth
-          required
-        />
-        <TextField
-          fullWidth
-          label="Subject"
-          name="subject"
-          value={formik.values.subject}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.subject && Boolean(formik.errors.subject)}
-          helperText={formik.touched.subject && formik.errors.subject}
-          disabled={mode === MODE.VIEW}
-        />
-      </div>
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6 space-y-3">
-        <div className="text-sm font-medium text-gray-700">
-          Template Body
-        </div>
-        <JoditEditor
-          ref={editor}
-          value={formik.values.body}
-          config={joditConfig}
-          onBlur={handleBodyChange}
-        />
-
-        {formik.touched.body && formik.errors.body && (
-          <div className="text-red-600 text-xs mt-1">
-            {formik.errors.body}
+      <div className="space-y-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+            Basic Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TextField
+              label="Template Name"
+              name="name"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.name && Boolean(formik.errors.name)}
+              helperText={formik.touched.name && formik.errors.name}
+              disabled={mode === MODE.VIEW}
+            />
+            <Select
+              label="Template Type"
+              name="type"
+              placeholder="Select template type"
+              options={templateTypes}
+              value={formik.values.type}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.type && Boolean(formik.errors.type)}
+              helperText={String(formik.touched.type && formik.errors.type)}
+              disabled={mode === MODE.VIEW}
+              required
+            />
           </div>
-        )}
-      </div>
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
-        <CustomRadioGroup
-          label="Template Status"
-          name="status"
-          value={formik.values.status}
-          onChange={(e) =>
-            formik.setFieldValue("status", e.target.value)
-          }
-          options={StatusOptions}
-          disabled={mode === MODE.VIEW}
-        />
-      </div>
-      <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 pt-4">
-        <Button
-          onClick={() => navigate(makeRoute(ADMIN_ROUTES.TEMPLATES, {}))}
-          variant="tertiaryContained"
-          label="Cancel"
-          disabled={loading}
-          className="w-full sm:w-auto"
-        />
-
-        {mode !== MODE.VIEW && (
-          <Button
-            label={mode === MODE.ADD ? "Create Template" : "Update Template"}
-            onClick={() => formik.handleSubmit()}
-            variant="primaryContained"
-            disabled={loading}
-            className="w-full sm:w-auto"
+          <div className="mt-6">
+            <TextField
+              label="Subject"
+              name="subject"
+              value={formik.values.subject}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.subject && Boolean(formik.errors.subject)}
+              helperText={formik.touched.subject && formik.errors.subject}
+              disabled={mode === MODE.VIEW}
+              fullWidth
+            />
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+            Template Body
+          </h3>
+          <RichTextEditor
+            value={formik.values.body}
+            onChange={(content) => formik.setFieldValue("body", content)}
+            readonly={mode === MODE.VIEW}
           />
-        )}
+          {formik.touched.body && formik.errors.body && (
+            <div className="mt-2 text-sm text-red-600">
+              {formik.errors.body}
+            </div>
+          )}
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+            Status
+          </h3>
+          <CustomRadioGroup
+            label="Template Status"
+            name="status"
+            value={formik.values.status}
+            onChange={(e) =>
+              formik.setFieldValue("status", e.target.value)
+            }
+            options={StatusOptions}
+            disabled={mode === MODE.VIEW}
+          />
+        </div>
+        <div className="flex justify-between gap-3 pt-4">
+          <Button
+            label="Cancel"
+            variant="tertiaryContained"
+            onClick={() =>
+              navigate(makeRoute(ADMIN_ROUTES.TEMPLATES, {}))
+            }
+            disabled={loading}
+          />
+          {mode !== MODE.VIEW && (
+            <Button
+              label={mode === MODE.ADD ? "Add" : "Update"}
+              variant="primaryContained"
+              onClick={() => formik.handleSubmit()}
+              disabled={loading || !formik.isValid}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
