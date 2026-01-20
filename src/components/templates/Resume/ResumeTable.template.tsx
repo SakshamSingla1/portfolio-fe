@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
-import { StatusOptions, type IPagination } from "../../../utils/types";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { makeRoute } from "../../../utils/helper";
+import { HTTP_STATUS, StatusOptions, type IPagination } from "../../../utils/types";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
 import Table from "../../organisms/TableV1/TableV1";
-import { type ResumeUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
-import { FiEye, FiSearch, FiChevronDown, FiChevronUp, FiFilter} from "react-icons/fi";
-import { ADMIN_ROUTES } from "../../../utils/constant";
+import { type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
+import { FiEye, FiSearch, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
-// import { CgUnblock } from "react-icons/cg";
-// import { MdDelete } from "react-icons/md";
+import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
+import { CgUnblock } from "react-icons/cg";
+import { MdDelete } from "react-icons/md";
+import { useResumeService } from "../../../services/useResumeService";
+import { useSnackbar } from "../../../hooks/useSnackBar";
+import { DateUtils } from "../../../utils/helper";
 
 interface ResumeTableTemplateProps {
-    resumes: ResumeUploadResponse[];
+    resumes: DocumentUploadResponse[];
     pagination: IPagination;
     handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
@@ -23,36 +24,79 @@ interface ResumeTableTemplateProps {
 }
 
 const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const { showSnackbar } = useSnackbar();
+
+    const resumeService = useResumeService();
+
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [showFilters, setShowFilters] = useState<boolean>(false);
 
-    const handleView = (id: string) => {
-        const query = {
-            page: searchParams.get("page") || "",
-            size: searchParams.get("size") || "",
-            search: searchParams.get("search") || "",
+    const handleActivateResume = async(id: string) => {
+        try { 
+            const response = await resumeService.activateResume({ resumeId: id });
+            if(response.status === HTTP_STATUS.OK) {
+                showSnackbar('success','Resume activated successfully');
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error(error);
         }
-        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query, params: { id: id } }));
     }
 
-    const Action = (id: string) => {
+    const handleView = (url: string,status: string) => {
+        if(status === 'DELETED') {
+            showSnackbar('error','Cannot view deleted resume');
+            return;
+        }
+        window.open(url, '_blank');
+    }
+
+    const handleDeleteResume = async(id: string) => {
+        try { 
+            const response = await resumeService.deleteResume(id);
+            if(response.status === HTTP_STATUS.OK) {
+                showSnackbar('success','Resume deleted successfully');
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const Action = (resume: DocumentUploadResponse) => {
         return (
-            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
+            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`}>
+                <button onClick={() => handleView(resume.fileUrl, resume.status)} className="w-6 h-6">
                     <FiEye />
                 </button>
+                {resume.status === 'INACTIVE' && (
+                    <button
+                        onClick={() => handleActivateResume(resume.id)}
+                        className="w-6 h-6"
+                        title="Activate"
+                    >
+                        <CgUnblock />
+                    </button>
+                )}
+                {resume.status !== 'DELETED' && (
+                    <button
+                        onClick={() => handleDeleteResume(resume.id)}
+                        className="w-6 h-6"
+                        title="Delete"
+                    >
+                        <MdDelete />
+                    </button>
+                )}
             </div>
         );
     };
 
-    const getRecords = () => resumes?.map((resume: ResumeUploadResponse, index) => [
+    const getRecords = () => resumes?.map((resume: DocumentUploadResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         resume.fileName,
         StatusOptions.find((status) => status.value === resume.status)?.label,
-        resume.uploadedAt,
-        Action(resume.id ?? "")
+        DateUtils.dateTimeSecondToDate(resume.updatedAt ?? ""),
+        Action(resume)
     ])
 
     const getTableColumns = () => [
@@ -116,11 +160,24 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
                             {showFilters && (
-                                <div className="space-y-3 p-4">
+                                <div className="flex flex-col gap-4">
+                                    <AutoCompleteInput
+                                        label=""
+                                        placeHolder="Select Status"
+                                        options={StatusOptions}
+                                        value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                                        onChange={(option: any) => {
+                                            if (option) {
+                                                handleFiltersChange("status", option.value);
+                                            } else {
+                                                handleFiltersChange("status", "");
+                                            }
+                                        }}
+                                        onSearch={() => { }}
+                                    />
                                     <TextField
-                                        label='Search'
+                                        label=''
                                         variant="outlined"
                                         placeholder="Search..."
                                         value={filters.search}
@@ -137,7 +194,23 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
                             )}
                         </div>
                     ) : (
-                        <>
+                        <div className="flex gap-4">
+                            <div className="w-[250px]">
+                                <AutoCompleteInput
+                                    label=""
+                                    placeHolder="Select Status"
+                                    options={StatusOptions}
+                                    value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                                    onChange={(option: any) => {
+                                        if (option) {
+                                            handleFiltersChange("status", option.value);
+                                        } else {
+                                            handleFiltersChange("status", "");
+                                        }
+                                    }}
+                                    onSearch={() => { }}
+                                />
+                            </div>
                             <div className="w-[250px]">
                                 <TextField
                                     label=''
@@ -154,7 +227,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
                                     fullWidth
                                 />
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>

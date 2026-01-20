@@ -14,14 +14,9 @@ const useRouteValidate = () => {
     setNavlinks,
     setDefaultTheme
   } = useAuthenticatedUser();
-
   const currentPath = location.pathname;
-
-  // ✅ Normalize allowed routes + add /admin base
   const allowedRoutes = useMemo(() => {
     const routes = new Set<string>();
-
-    // base admin route
     routes.add("/admin");
 
     if (navlinks?.length) {
@@ -32,21 +27,15 @@ const useRouteValidate = () => {
         routes.add(path);
       });
     }
-
+    
     return Array.from(routes);
   }, [navlinks]);
 
   useEffect(() => {
-    // ⛔ Not logged in or public routes
     if (!user) return;
     if (currentPath === "/" || currentPath === "/sign-in") return;
-
-    // ✅ SUPER_ADMIN bypass
     if (user.role === ROLES.SUPER_ADMIN) return;
-
-    // ⛔ Wait until permissions load
     if (!allowedRoutes.length) return;
-
     const isValid = allowedRoutes.some(route =>
       currentPath === route || currentPath.startsWith(`${route}/`)
     );
