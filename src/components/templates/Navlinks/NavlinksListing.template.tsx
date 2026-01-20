@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
-import { RoleOptions, StatusOptions, type IPagination } from "../../../utils/types";
+import { RoleOptions, Status, StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
@@ -12,6 +12,7 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
 import Select from "../../atoms/Select/Select";
 import { enumToNormalKey } from "../../../utils/helper";
+import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 
 interface INavlinkListTableTemplateProps {
     navlinks: NavlinkResponse[];
@@ -80,7 +81,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         `${enumToNormalKey(navlink.role)} - ${enumToNormalKey(navlink.name)} (${navlink.index})`,
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
-        navlink.status,
+        navlink.status === StatusOptions.find(option => option.value === Status.ACTIVE)?.value ? 'Active' : 'Inactive',
         Action(navlink.role ?? "", navlink.index ?? "")
     ])
 
@@ -89,7 +90,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
         { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {} },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ]
 

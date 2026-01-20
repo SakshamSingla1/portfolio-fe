@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
 import * as Yup from "yup";
@@ -7,15 +7,15 @@ import Button from "../../atoms/Button/Button";
 import DatePicker from "../../atoms/DatePicker/DatePicker";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { titleModification } from "../../../utils/helper";
-import { type Project, type ProjectResponse, WorkStatusType,WorkStatusOptions } from "../../../services/useProjectService";
+import { type Project, type ProjectResponse, WorkStatusType, WorkStatusOptions } from "../../../services/useProjectService";
 import { useSkillService, type SkillDropdown } from "../../../services/useSkillService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
 // import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
-import JoditEditor from 'jodit-react';
 import { HTTP_STATUS } from '../../../utils/types';
 import { useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object().shape({
     projectName: Yup.string()
@@ -56,79 +56,19 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
 
-    const descriptionEditor = useRef(null);
-
-    const joditConfiguration = useMemo(() => {
-        return {
-            readonly: mode === MODE.VIEW,
-            placeholder: "Start typing your description here...",
-            buttons: [
-                'bold', 'italic', 'underline', 'strikethrough', '|',
-                'ul', 'ol', '|',
-                'outdent', 'indent', '|',
-                'font', 'fontsize', 'paragraph', '|',
-                'image', 'link', '|',
-                'align', '|',
-                'undo', 'redo', '|',
-                'source'
-            ],
-            style: {
-                font: '14px Inter, sans-serif',
-                color: '#1F2937',
-                background: '#FFFFFF',
-            },
-            height: 300,
-            minHeight: 200,
-            maxHeight: 600,
-            toolbarButtonSize: 'middle' as const,
-            showCharsCounter: false,
-            showWordsCounter: false,
-            showXPathInStatusbar: false,
-            theme: 'default',
-            uploader: {
-                insertImageAsBase64URI: true
-            },
-            controls: {
-                font: {
-                    list: {
-                        'Inter, sans-serif': 'Inter',
-                        'Arial, sans-serif': 'Arial',
-                        'Georgia, serif': 'Georgia',
-                        'Impact, Charcoal, sans-serif': 'Impact',
-                        'Tahoma, Geneva, sans-serif': 'Tahoma',
-                        'Times New Roman, serif': 'Times New Roman',
-                        'Verdana, Geneva, sans-serif': 'Verdana'
-                    }
-                },
-                fontSize: {
-                    list: ['8', '10', '12', '14', '16', '18', '24', '30', '36', '48']
-                }
-            },
-            extraButtons: [],
-            textIcons: false,
-            toolbarAdaptive: true,
-            showPlaceholder: true,
-            spellcheck: true,
-            colors: {
-                greyscale: ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#D7D7D7', '#F4F5F7', '#FFFFFF'],
-                palette: ['#3AA8F5', '#6C757D', '#6F42C1', '#E83E8C', '#FD7E14', '#20C997', '#28A745', '#FFC107', '#DC3545']
-            }
-        };
-    }, [mode]);
-
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
     const formik = useFormik<Project>({
         initialValues: {
-            profileId:String(user?.id),
-     projectName:"",
-    projectDescription:"",
-    projectLink:"",
-    projectStartDate:"",
-    projectEndDate:"",
-    workStatus:"",
-    projectImageUrl:"",
-    skillIds:[],
+            profileId: String(user?.id),
+            projectName: "",
+            projectDescription: "",
+            projectLink: "",
+            projectStartDate: "",
+            projectEndDate: "",
+            workStatus: "",
+            projectImageUrl: "",
+            skillIds: [],
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
@@ -166,6 +106,19 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         }
     }
 
+    const skillOptions = useMemo(() => {
+        return skills.map((skill) => ({
+            label: <div className="flex items-center gap-2">
+                <img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>,
+            title: skill.logoName,
+            value: skill.id,
+        }))
+    }, [skills])
+
+    const selectedSkills = useMemo(() => {
+        return skills.filter(skill => formik.values.skillIds.includes(skill.id));
+    }, [skills, formik.values.skillIds]);
+
     useEffect(() => {
         if (projects) {
             formik.setFieldValue("projectName", projects.projectName || "");
@@ -183,42 +136,16 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         loadSkillsDropdown();
     }, []);
 
-    useEffect(() => {
-        console.log(formik)
-    }, [formik])
-
-    const skillOptions = useMemo(() => {
-        return skills.map((skill) => ({
-            label: <div className="flex items-center gap-2">
-                <img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>,
-            title: skill.logoName,
-            value: skill.id,
-        }))
-    }, [skills])
-
-    const selectedSkills = useMemo(() => {
-        return skills.filter(skill => formik.values.skillIds.includes(skill.id));
-    }, [skills, formik.values.skillIds]);
-
     return (
-        <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
-            <div className="mb-8 pb-6 border-b border-gray-200">
+        <div className="mb-8">
+            <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD
-                        ? "Create New Project"
-                        : mode === MODE.EDIT
-                            ? "Edit Project"
-                            : "Project Details"}
+                    {mode === MODE.ADD ? "Create New Project" : mode === MODE.EDIT ? "Edit Project" : "Project Details"}
                 </h2>
                 <p className="text-gray-600">
-                    {mode === MODE.ADD
-                        ? "Add a new project to your portfolio"
-                        : mode === MODE.EDIT
-                            ? "Update your project information"
-                            : "View project details"}
+                    {mode === MODE.ADD ? "Add a new project to your portfolio" : mode === MODE.EDIT ? "Update your project information" : "View project details"}
                 </p>
             </div>
-
             <div className="space-y-8 transition-opacity duration-200" style={{ opacity: isSkillsLoading ? 0.7 : 1 }}>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -392,17 +319,10 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
                             Job Description
                         </h3>
-                        <JoditEditor
-                            ref={descriptionEditor}
-                            value={formik.values.projectDescription ?? ""}
-                            onChange={(newContent) => {
-                                formik.setFieldValue("projectDescription", newContent);
-                            }}
-                            config={joditConfiguration}
-                            onBlur={(newContent) => {
-                                formik.setFieldTouched("projectDescription", true);
-                                formik.setFieldValue("projectDescription", newContent);
-                            }}
+                        <RichTextEditor
+                            value={formik.values.projectDescription}
+                            onChange={(value) => formik.setFieldValue("projectDescription", value)}
+                            readonly={mode === MODE.VIEW}
                         />
                         {formik.errors.projectDescription && formik.touched.projectDescription && (
                             <div className="mt-2 text-sm text-red-600">
@@ -413,31 +333,20 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                 </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <div className="mt-8 flex justify-between gap-3">
+                <Button
+                    label="Cancel"
+                    variant="tertiaryContained"
+                    onClick={onClose}
+                />
+                {mode !== MODE.VIEW && (
                     <Button
-                        label="Cancel"
-                        variant="tertiaryContained"
-                        onClick={onClose}
-                        className="w-full sm:w-auto"
+                        label={mode === MODE.ADD ? "Add" : "Update"}
+                        variant="primaryContained"
+                        onClick={() => formik.handleSubmit()}
+                        disabled={formik.isSubmitting || !formik.isValid}
                     />
-                    {mode !== MODE.VIEW && (
-                        <Button
-                            label={
-                                formik.isSubmitting
-                                    ? mode === MODE.ADD
-                                        ? "Creating Project..."
-                                        : "Updating Project..."
-                                    : mode === MODE.ADD
-                                        ? "Create Project"
-                                        : "Update Project"
-                            }
-                            variant="primaryContained"
-                            onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting || !formik.isValid}
-                        />
-                    )}
-                </div>
+                )}
             </div>
         </div>
     );

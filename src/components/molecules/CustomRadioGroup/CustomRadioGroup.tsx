@@ -1,8 +1,7 @@
 import React from 'react';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { createUseStyles } from 'react-jss';
-import { useAuthenticatedUser } from '../../../hooks/useAuthenticatedUser';
-import { getColor } from '../../../utils/helper';
+import { useColors } from '../../../utils/types';
 
 interface CustomRadioGroupProps {
   name: string;
@@ -59,15 +58,7 @@ const CustomRadioGroup: React.FC<CustomRadioGroupProps> = ({
   required = false,
   options,
 }) => {
-  const { defaultTheme } = useAuthenticatedUser();
-
-  const colors = {
-    primary300: getColor(defaultTheme, 'primary300') || '#10b981',
-    neutral200: getColor(defaultTheme, 'neutral200') || '#eeeeee',
-    neutral400: getColor(defaultTheme, 'neutral400') || '#aaaaaa',
-    neutral700: getColor(defaultTheme, 'neutral700') || '#555',
-    secondary400: getColor(defaultTheme, 'secondary400') || '#FFC107',
-  };
+  const colors = useColors();
 
   const classes = useStyles(colors);
 

@@ -446,3 +446,10 @@ export const ROLES = {
     ADMIN: 'ADMIN',
     SUPER_ADMIN: 'SUPER_ADMIN',
 };
+
+export const RESOURCE_STATUS = {
+    ACTIVE: "Active",
+    INACTIVE: "Inactive",
+    BLOCKED: "Blocked",
+    DELETED: "Deleted",
+}

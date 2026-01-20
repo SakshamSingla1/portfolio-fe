@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState , useMemo} from "react";
 import TextField from "../../atoms/TextField/TextField";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { titleModification } from "../../../utils/helper";
@@ -10,11 +10,11 @@ import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
 import { EmploymentStatus, type ExperienceRequest, type ExperienceResponse } from "../../../services/useExperienceService";
 import { useFormik } from "formik";
-import JoditEditor from "jodit-react";
 import { HTTP_STATUS } from "../../../utils/types";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 export const employmentStatusOptions = [
     { label: "Current", value: EmploymentStatus.CURRENT },
@@ -60,66 +60,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     const { user } = useAuthenticatedUser();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
-
-    const descriptionEditor = useRef(null);
-
-    const joditConfiguration = useMemo(() => {
-        return {
-            readonly: mode === MODE.VIEW,
-            placeholder: "Start typing your description here...",
-            buttons: [
-                'bold', 'italic', 'underline', 'strikethrough', '|',
-                'ul', 'ol', '|',
-                'outdent', 'indent', '|',
-                'font', 'fontsize', 'paragraph', '|',
-                'image', 'link', '|',
-                'align', '|',
-                'undo', 'redo', '|',
-                'source'
-            ],
-            style: {
-                font: '14px Inter, sans-serif',
-                color: '#1F2937',
-                background: '#FFFFFF',
-            },
-            height: 300,
-            minHeight: 200,
-            maxHeight: 600,
-            toolbarButtonSize: 'middle' as const,
-            showCharsCounter: false,
-            showWordsCounter: false,
-            showXPathInStatusbar: false,
-            theme: 'default',
-            uploader: {
-                insertImageAsBase64URI: true
-            },
-            controls: {
-                font: {
-                    list: {
-                        'Inter, sans-serif': 'Inter',
-                        'Arial, sans-serif': 'Arial',
-                        'Georgia, serif': 'Georgia',
-                        'Impact, Charcoal, sans-serif': 'Impact',
-                        'Tahoma, Geneva, sans-serif': 'Tahoma',
-                        'Times New Roman, serif': 'Times New Roman',
-                        'Verdana, Geneva, sans-serif': 'Verdana'
-                    }
-                },
-                fontSize: {
-                    list: ['8', '10', '12', '14', '16', '18', '24', '30', '36', '48']
-                }
-            },
-            extraButtons: [],
-            textIcons: false,
-            toolbarAdaptive: true,
-            showPlaceholder: true,
-            spellcheck: true,
-            colors: {
-                greyscale: ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#D7D7D7', '#F4F5F7', '#FFFFFF'],
-                palette: ['#3AA8F5', '#6C757D', '#6F42C1', '#E83E8C', '#FD7E14', '#20C997', '#28A745', '#FFC107', '#DC3545']
-            }
-        };
-    }, [mode]);
 
     const onClose = () => navigate(ADMIN_ROUTES.EXPERIENCE);
 
@@ -198,8 +138,8 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     }, [formik]);
 
     return (
-        <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
-            <div className="mb-8 pb-6 border-b border-gray-200">
+        <div className="mb-8">
+            <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                     {mode === MODE.ADD ? "Add New Experience" : mode === MODE.EDIT ? "Edit Experience" : "Experience Details"}
                 </h2>
@@ -351,17 +291,10 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
                             Job Description
                         </h3>
-                        <JoditEditor
-                            ref={descriptionEditor}
-                            value={formik.values.description ?? ""}
-                            onChange={(newContent) => {
-                                formik.setFieldValue("description", newContent);
-                            }}
-                            config={joditConfiguration}
-                            onBlur={(newContent) => {
-                                formik.setFieldTouched("description", true);
-                                formik.setFieldValue("description", newContent);
-                            }}
+                        <RichTextEditor
+                            value={formik.values.description}
+                            onChange={(value) => formik.setFieldValue("description", value)}
+                            readonly={mode === MODE.VIEW}
                         />
                         {formik.errors.description && formik.touched.description && (
                             <div className="mt-2 text-sm text-red-600">
@@ -371,7 +304,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                     </div>
                 </div>
             </div>
-            <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
+            <div className="mt-8 flex justify-between gap-3">
                 <Button
                     label="Cancel"
                     variant="tertiaryContained"
@@ -379,7 +312,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                 />
                 {mode !== MODE.VIEW && (
                     <Button
-                        label={mode === MODE.ADD ? "Add Experience" : "Update Experience"}
+                        label={mode === MODE.ADD ? "Add" : "Update"}
                         variant="primaryContained"
                         onClick={() => formik.handleSubmit()}
                         disabled={!formik.isValid || formik.isSubmitting}

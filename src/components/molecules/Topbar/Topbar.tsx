@@ -1,13 +1,15 @@
 import React, { useMemo } from "react";
 import { createUseStyles } from "react-jss";
 import { FiChevronRight } from "react-icons/fi";
+import { IoMdLogOut } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
-import { getBreadcrumbsFromUrl, getColor } from "../../../utils/helper";
+import { getBreadcrumbsFromUrl } from "../../../utils/helper";
+import { useColors } from "../../../utils/types";
 
 const useStyles = createUseStyles({
   topbar: (c: any) => ({
-    height: 64, // Fixed height
+    height: 64,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -18,7 +20,7 @@ const useStyles = createUseStyles({
     position: "sticky",
     top: 0,
     zIndex: 50,
-    flexShrink: 0, // Prevents shrinking
+    flexShrink: 0,
   }),
 
   left: {
@@ -27,24 +29,8 @@ const useStyles = createUseStyles({
     gap: 12,
     flex: 1,
     overflow: "hidden",
-    minHeight: 64, // Ensure minimum height
+    minHeight: 64,
   },
-
-  menuBtn: (c: any) => ({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "transparent",
-    border: "none",
-    cursor: "pointer",
-    padding: 4,
-    borderRadius: 6,
-    color: c.neutral800,
-    transition: "all 0.2s",
-    "&:hover": {
-      background: c.neutral50,
-    },
-  }),
 
   breadcrumbs: {
     display: "flex",
@@ -97,51 +83,33 @@ const useStyles = createUseStyles({
     gap: 12,
   },
 
-  iconBtn: (c: any) => ({
+  logoutBtn: (c: any) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: 32,
-    height: 32,
-    borderRadius: "50%",
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     cursor: "pointer",
-    background: c.neutral50,
-    border: `1px solid ${c.neutral200}`,
-    color: c.neutral800,
-    transition: "all 0.2s",
+    background: c.error50,
+    border: `1px solid ${c.error200}`,
+    color: c.error600,
+    transition: "all 0.25s ease",
+
     "&:hover": {
-      background: c.neutral200,
+      background: c.error200,
+      color: c.error500,
+      boxShadow: `0 6px 14px ${c.error500}30`,
+      transform: "scale(1.05)",
     },
-  }),
 
-  profileMenu: {
-    position: "relative",
-  },
+    "&:active": {
+      transform: "scale(0.97)",
+    },
 
-  dropdown: (c: any) => ({
-    position: "absolute",
-    top: 40,
-    right: 0,
-    background: c.neutral0,
-    border: `1px solid ${c.neutral200}`,
-    borderRadius: 6,
-    boxShadow: `0 4px 12px ${c.neutral200}`,
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    minWidth: 120,
-    zIndex: 100,
-  }),
-
-  dropdownItem: (c: any) => ({
-    padding: "6px 12px",
-    cursor: "pointer",
-    fontSize: 13,
-    color: c.neutral800,
-    borderRadius: 4,
-    transition: "all 0.2s",
-    "&:hover": {
-      background: c.neutral50,
+    "&:focus-visible": {
+      outline: `2px solid ${c.error500}`,
+      outlineOffset: 2,
     },
   }),
 });
@@ -149,20 +117,28 @@ const useStyles = createUseStyles({
 const Topbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { defaultTheme } = useAuthenticatedUser();
+  const { logout } = useAuthenticatedUser();
 
-  const colors = {
-    primary50: getColor(defaultTheme, "primary50") ?? "#EEF2FF",
-    primary500: getColor(defaultTheme, "primary500") ?? "#6366F1",
-    primary700: getColor(defaultTheme, "primary700") ?? "#4338CA",
-    neutral0: "#FFFFFF",
-    neutral50: getColor(defaultTheme, "neutral50") ?? "#F9FAFB",
-    neutral200: getColor(defaultTheme, "neutral200") ?? "#E5E7EB",
-    neutral800: getColor(defaultTheme, "neutral800") ?? "#1F2937",
+  const colors = useColors();
+  const classes = useStyles(colors);
+
+  const breadcrumbs = useMemo(
+    () => getBreadcrumbsFromUrl(location.pathname),
+    [location.pathname]
+  );
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
-  const classes = useStyles(colors);
-  const breadcrumbs = useMemo(() => getBreadcrumbsFromUrl(location.pathname), [location.pathname]);
+  const getDashboardPath = (crumbLabel: string) => {
+    const role = "admin";
+    if (crumbLabel.toLowerCase() === role || crumbLabel.toLowerCase() === "admin") {
+      return `/${role}/profile`;
+    }
+    return "";
+  };
 
   return (
     <header className={classes.topbar}>
@@ -170,20 +146,41 @@ const Topbar: React.FC = () => {
         <nav className={classes.breadcrumbs} aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;
+            const dashboardPath = getDashboardPath(crumb.label);
             return (
               <React.Fragment key={crumb.path}>
                 {isLast ? (
                   <span className={classes.crumbCurrent}>{crumb.label}</span>
                 ) : (
-                  <button className={classes.crumbBtn} onClick={() => navigate(crumb.path)}>
+                  <button
+                    className={classes.crumbBtn}
+                    onClick={() =>
+                      navigate(dashboardPath || crumb.path)
+                    }
+                  >
                     {crumb.label}
                   </button>
                 )}
-                {!isLast && <span className={classes.separator}><FiChevronRight size={12} /></span>}
+                {!isLast && (
+                  <span className={classes.separator}>
+                    <FiChevronRight size={12} />
+                  </span>
+                )}
               </React.Fragment>
             );
           })}
         </nav>
+      </div>
+
+      <div className={classes.right}>
+        <button
+          className={classes.logoutBtn}
+          onClick={handleLogout}
+          title="Logout"
+          aria-label="Logout"
+        >
+          <IoMdLogOut size={18} />
+        </button>
       </div>
     </header>
   );

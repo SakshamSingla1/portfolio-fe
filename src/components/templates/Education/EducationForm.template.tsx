@@ -5,12 +5,12 @@ import Button from "../../atoms/Button/Button";
 import Select from "../../atoms/Select/Select";
 import { GradeType, type Education } from "../../../services/useEducationService";
 import { InputAdornment } from "@mui/material";
-import { useRef, useMemo, useEffect } from "react";
-import JoditEditor from "jodit-react";
+import { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useNavigate } from "react-router-dom";
+import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -47,66 +47,6 @@ interface EducationFormProps {
 const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, education }) => {
     const navigate = useNavigate();
     const { user } = useAuthenticatedUser();
-
-    const descriptionEditor = useRef(null);
-
-    const joditConfiguration = useMemo(() => {
-        return {
-            readonly: mode === MODE.VIEW,
-            placeholder: "Start typing your description here...",
-            buttons: [
-                'bold', 'italic', 'underline', 'strikethrough', '|',
-                'ul', 'ol', '|',
-                'outdent', 'indent', '|',
-                'font', 'fontsize', 'paragraph', '|',
-                'image', 'link', '|',
-                'align', '|',
-                'undo', 'redo', '|',
-                'source'
-            ],
-            style: {
-                font: '14px Inter, sans-serif',
-                color: '#1F2937',
-                background: '#FFFFFF',
-            },
-            height: 300,
-            minHeight: 200,
-            maxHeight: 600,
-            toolbarButtonSize: 'middle' as const,
-            showCharsCounter: false,
-            showWordsCounter: false,
-            showXPathInStatusbar: false,
-            theme: 'default',
-            uploader: {
-                insertImageAsBase64URI: true
-            },
-            controls: {
-                font: {
-                    list: {
-                        'Inter, sans-serif': 'Inter',
-                        'Arial, sans-serif': 'Arial',
-                        'Georgia, serif': 'Georgia',
-                        'Impact, Charcoal, sans-serif': 'Impact',
-                        'Tahoma, Geneva, sans-serif': 'Tahoma',
-                        'Times New Roman, serif': 'Times New Roman',
-                        'Verdana, Geneva, sans-serif': 'Verdana'
-                    }
-                },
-                fontSize: {
-                    list: ['8', '10', '12', '14', '16', '18', '24', '30', '36', '48']
-                }
-            },
-            extraButtons: [],
-            textIcons: false,
-            toolbarAdaptive: true,
-            showPlaceholder: true,
-            spellcheck: true,
-            colors: {
-                greyscale: ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#D7D7D7', '#F4F5F7', '#FFFFFF'],
-                palette: ['#3AA8F5', '#6C757D', '#6F42C1', '#E83E8C', '#FD7E14', '#20C997', '#28A745', '#FFC107', '#DC3545']
-            }
-        };
-    }, [mode]);
 
     const onClose = () => navigate(ADMIN_ROUTES.EDUCATION);
 
@@ -151,14 +91,10 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
             formik.setFieldValue("gradeType", education.grade?.trim().split(" ")[1] || "");
         }
     }, [education]);
-
-    useEffect(() => {
-        console.log("formik", formik);
-    }, [formik]);
-
+    
     return (
-        <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
-            <div className="mb-8 pb-6 border-b border-gray-200">
+        <div className="mb-8">
+            <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                     {mode === MODE.ADD ? "Add Education" : mode === MODE.EDIT ? "Edit Education" : "Education Details"}
                 </h2>
@@ -298,17 +234,10 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
                             Job Description
                         </h3>
-                        <JoditEditor
-                            ref={descriptionEditor}
-                            value={formik.values.description ?? ""}
-                            onChange={(newContent) => {
-                                formik.setFieldValue("description", newContent);
-                            }}
-                            config={joditConfiguration}
-                            onBlur={(newContent) => {
-                                formik.setFieldTouched("description", true);
-                                formik.setFieldValue("description", newContent);
-                            }}
+                        <RichTextEditor
+                            value={formik.values.description}
+                            onChange={(value) => formik.setFieldValue("description", value)}
+                            readonly={mode === MODE.VIEW}
                         />
                         {formik.errors.description && formik.touched.description && (
                             <div className="mt-2 text-sm text-red-600">
@@ -317,7 +246,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         )}
                     </div>
                 </div>
-                <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
+                <div className="mt-8 flex justify-between gap-3">
                     <Button
                         label="Cancel"
                         variant="tertiaryContained"
@@ -325,7 +254,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     />
                     {mode !== MODE.VIEW && (
                         <Button
-                            label={mode === MODE.ADD ? "Add Education" : "Update Education"}
+                            label={mode === MODE.ADD ? "Add" : "Update"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
                             disabled={formik.isSubmitting || !formik.isValid}

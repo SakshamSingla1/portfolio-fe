@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import Topbar from "../components/molecules/Topbar/Topbar";
+import MobileBottomBar from "../components/molecules/Sidebar/BottomMenubar";
 import { createUseStyles } from "react-jss";
-import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
-import { getColor } from "../utils/helper";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Outlet } from "react-router-dom";
+import { useColors } from "../utils/types";
 
 const useStyles = createUseStyles({
   layoutWrapper: (c: any) => ({
@@ -14,10 +14,12 @@ const useStyles = createUseStyles({
     background: c.neutral50,
     color: c.neutral800,
   }),
+
   sidebarWrapper: {
     position: "relative",
     transition: "width 0.28s ease",
   },
+
   collapseBtn: (c: any) => ({
     position: "absolute",
     top: "50%",
@@ -39,6 +41,7 @@ const useStyles = createUseStyles({
       background: c.neutral200,
     },
   }),
+
   contentWrapper: (c: any) => ({
     flexGrow: 1,
     background: c.neutral0,
@@ -49,32 +52,28 @@ const useStyles = createUseStyles({
     overflow: "hidden",
     position: "relative",
   }),
+
   mainContent: {
     flexGrow: 1,
     padding: 24,
     overflow: "auto",
+    paddingBottom: 24,
+    '@media (max-width: 767px)': {
+      paddingBottom: 88,
+    },
   },
 });
 
 const DashboardLayout: React.FC = () => {
-  const { defaultTheme } = useAuthenticatedUser();
-  const colors = {
-    primary50: getColor(defaultTheme, "primary50") ?? "#EEF2FF",
-    primary500: getColor(defaultTheme, "primary500") ?? "#6366F1",
-    primary700: getColor(defaultTheme, "primary700") ?? "#4338CA",
-    neutral0: "#FFFFFF",
-    neutral50: getColor(defaultTheme, "neutral50") ?? "#F9FAFB",
-    neutral200: getColor(defaultTheme, "neutral200") ?? "#E5E7EB",
-    neutral800: getColor(defaultTheme, "neutral800") ?? "#1F2937",
-  };
 
+  const colors = useColors();
   const classes = useStyles(colors);
 
-  const [collapsed, setCollapsed] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const handleToggleSidebar = () => {
-    setCollapsed((prev) => !prev);
+    setCollapsed(prev => !prev);
   };
 
   useEffect(() => {
@@ -82,8 +81,8 @@ const DashboardLayout: React.FC = () => {
       setIsMobile(window.innerWidth < 768);
     };
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
@@ -94,19 +93,24 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <div className={classes.layoutWrapper}>
-      <div
-        className={classes.sidebarWrapper}
-        style={{ width: collapsed ? 64 : 240 }}
-      >
-        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-        {!isMobile && <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
-          {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
-        </div>}
-      </div>
+      {!isMobile && (
+        <div
+          className={classes.sidebarWrapper}
+          style={{ width: collapsed ? 64 : 240 }}
+        >
+          <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+          <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
+            {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
+          </div>
+        </div>
+      )}
       <div className={classes.contentWrapper}>
         <Topbar />
-        <div className={classes.mainContent}><Outlet /></div>
+        <div className={classes.mainContent}>
+          <Outlet />
+        </div>
       </div>
+      {isMobile && <MobileBottomBar />}
     </div>
   );
 };

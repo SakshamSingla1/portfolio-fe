@@ -104,26 +104,14 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         loadLogoDropdown();
     }, []);
 
-    useEffect(() => {
-        console.log(formik);
-    }, [formik]);
-
     return (
-        <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100">
-            <div className="mb-8 pb-6 border-b border-gray-200">
+        <div className="mb-8">
+            <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD
-                        ? "Add New Skill"
-                        : mode === MODE.EDIT
-                            ? "Edit Skill"
-                            : "Skill Details"}
+                    {mode === MODE.ADD ? "Add New Skill" : mode === MODE.EDIT ? "Edit Skill" : "Skill Details"}
                 </h2>
                 <p className="text-gray-600">
-                    {mode === MODE.ADD
-                        ? "Add a new skill to your portfolio"
-                        : mode === MODE.EDIT
-                            ? "Update your skill information"
-                            : "View skill details"}
+                    {mode === MODE.ADD ? "Add a new skill to your portfolio" : mode === MODE.EDIT ? "Update your skill information" : "View skill details"}
                 </p>
             </div>
 
@@ -158,8 +146,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                 </div>
                             )}
                         </div>
-
-                        {/* Logo Preview */}
                         <div className="flex items-center md:justify-end">
                             {(selectedLogo) ? (
                                 <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -181,8 +167,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                         </div>
                     </div>
                 </div>
-
-                {/* Classification Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
@@ -202,7 +186,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                 formik.setFieldValue("level", newValue);
                             }}
                         />
-
                         <Select
                             name="category"
                             label="Skill Category"
@@ -214,13 +197,11 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                         />
                     </div>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
+                <div className="flex justify-between gap-3">
                     <Button label="Cancel" variant="tertiaryContained" onClick={onClose} />
                     {mode !== MODE.VIEW && (
                         <Button
-                            label={mode === MODE.ADD ? "Add Skill" : "Update Skill"}
+                            label={mode === MODE.ADD ? "Add" : "Update"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
                             disabled={formik.isSubmitting || !formik.isValid}
