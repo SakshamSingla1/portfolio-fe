@@ -19,6 +19,14 @@ export interface ImageUploadResponse {
     publicId: string;
 }
 
+export interface DocumentUploadResponse {
+  id: number;
+  fileName: string;
+  fileUrl: string;
+  status: string;
+  uploadedAt: string;
+}
+
 export interface ProfileRequest {
     fullName: string;
     userName: string;
