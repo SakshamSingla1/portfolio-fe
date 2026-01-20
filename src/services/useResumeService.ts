@@ -14,6 +14,7 @@ export interface DocumentUploadResponse {
   id: string;
   fileName: string;
   fileUrl: string;
+  publicId: string;
   status: string;
   updatedAt: string;
 }
