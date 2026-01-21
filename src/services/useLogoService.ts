@@ -24,7 +24,7 @@ export type LogoCategoryType =
   | "OTHER";
 
 export interface Logo {
-  id?: number | null;
+  id?: string | null;
   name: string;
   url: string;
   category?: LogoCategoryType;
@@ -38,8 +38,8 @@ export interface LogoRequest {
 
 export interface LogoFilterParams {
     search?: string;
-    page?: number;
-    size?: number;
+    page?: string;
+    size?: string;
     sortDir?: string;
     sortBy?: string;
 }

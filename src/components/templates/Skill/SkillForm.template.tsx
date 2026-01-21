@@ -4,7 +4,7 @@ import Select from "../../atoms/Select/Select";
 import { MODE, SKILL_CATEGORY_OPTIONS, SKILL_LEVEL_OPTIONS } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
 import { OptionToValue, titleModification } from "../../../utils/helper";
-import { useLogoService, type Logo } from "../../../services/useLogoService";
+import { useLogoService, type Logo, type LogoFilterParams } from "../../../services/useLogoService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -60,16 +60,19 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     });
 
     const loadLogoDropdown = async (searchTerm?: string) => {
+        const params : LogoFilterParams = {
+            search: searchTerm || "",
+            page: "0",
+            size: "10"
+        };
         try {
-            const response = await logoService.getAll({
-                search: searchTerm
-            });
+            const response = await logoService.getAll(params);
             if (response?.status === HTTP_STATUS.OK) {
                 const fetchedLogos = response?.data?.data?.content || [];
                 setLogos(fetchedLogos);
 
                 if (formik.values.logoId) {
-                    const existing = fetchedLogos.find((l: Logo) => l.id === Number(formik.values.logoId));
+                    const existing = fetchedLogos.find((l: Logo) => l.id === String(formik.values.logoId));
                     if (existing) setSelectedLogo(existing);
                 }
             }

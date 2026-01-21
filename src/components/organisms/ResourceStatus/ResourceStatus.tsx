@@ -22,11 +22,23 @@ const ResourceStatus: React.FC<ResourceStatusProps> = ({ status, colourMap }) =>
         [RESOURCE_STATUS.BLOCKED]: colors.error50,
         [RESOURCE_STATUS.DELETED]: colors.error50,
     };
+
+    const STATUS_BORDER_COLOR = {
+        [RESOURCE_STATUS.ACTIVE]: colors.success500,
+        [RESOURCE_STATUS.INACTIVE]: colors.warning500,
+        [RESOURCE_STATUS.BLOCKED]: colors.error500,
+        [RESOURCE_STATUS.DELETED]: colors.error500,
+    };
+    
     const getStatusColor = (status: string) => {
         return colourMap ? colourMap[status] : STATUS_COLOR[status];
     };
     const getBackgroundColor = (status: string) => {
         return colourMap ? colourMap[status] : STATUS_BACKGROUND_COLOR[status];
+    };
+
+    const getBorderColor = (status: string) => {
+        return colourMap ? colourMap[status] : STATUS_BORDER_COLOR[status];
     };
     
     return (
@@ -39,6 +51,7 @@ const ResourceStatus: React.FC<ResourceStatusProps> = ({ status, colourMap }) =>
                 fontSize: '12px',
                 fontWeight: 500,
                 textTransform: 'capitalize',
+                border: `1px solid ${getBorderColor(status)}`,
             }}
         >
             {status}

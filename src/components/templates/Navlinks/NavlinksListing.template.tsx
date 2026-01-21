@@ -65,7 +65,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
 
     const Action = (role: string, index: string) => {
         return (
-            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
+            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
                 <button onClick={() => handleEdit(role, index)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>

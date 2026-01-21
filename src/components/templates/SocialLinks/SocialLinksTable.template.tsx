@@ -1,45 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
-import { type IPagination } from "../../../utils/types";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { makeRoute } from "../../../utils/helper";
+import { StatusOptions, type IPagination } from "../../../utils/types";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
 import Table from "../../organisms/TableV1/TableV1";
-import { type SkillResponse, type SkillFilterParams } from "../../../services/useSkillService";
-import { FiEdit, FiEye, FiSearch, FiPlus, FiFilter, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import { FiEye,FiEdit, FiSearch,FiPlus, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
+import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
+import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
+import { DateUtils, enumToNormalKey } from "../../../utils/helper";
+import type { SocialLinkResponse , SocialLinkFilterParams} from "../../../services/useSocialLinkService";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { makeRoute } from "../../../utils/helper";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
-import { convertToCamelCase } from "../../../utils/helper";
 
-interface SkillTableTemplateProps {
-    skills: SkillResponse[];
+interface SocialLinksTableTemplateProps {
+    socialLinks: SocialLinkResponse[];
     pagination: IPagination;
     handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
-    filters: SkillFilterParams;
+    filters: SocialLinkFilterParams;
 }
 
-const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
-    const navigate = useNavigate();
+const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ socialLinks, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
     const [isMobile, setIsMobile] = useState<boolean>(false);
-        const [showFilters, setShowFilters] = useState<boolean>(false);
-    
-    const handleAddSkill = () => {
-        navigate(makeRoute(
-            ADMIN_ROUTES.SKILL_ADD,{}
-        ));
-    }
+    const [showFilters, setShowFilters] = useState<boolean>(false);
 
     const handleEdit = (id: string) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
+            status: searchParams.get("status") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.SKILL_EDIT, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_EDIT, { query, params: { id: id } }));
     }
 
     const handleView = (id: string) => {
@@ -47,8 +45,13 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
+            status: searchParams.get("status") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.SKILL_VIEW, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_VIEW, { query, params: { id: id } }));
+    }
+
+    const handleAddSocialLink = () => {
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_ADD, {}));
     }
 
     const Action = (id: string) => {
@@ -64,23 +67,21 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
         );
     };
 
-    const getRecords = () => skills?.map((skill: SkillResponse, index) => [
+    const getRecords = () => socialLinks?.map((socialLink: SocialLinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
-        skill.logoName,
-        <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-            <img src={skill.logoUrl} alt={skill.logoName} className='w-10 h-10' />
-        </div>,
-        skill.level,
-        convertToCamelCase(skill.category),
-        Action(skill.id ?? "")
+        enumToNormalKey(socialLink.platform),
+        StatusOptions.find((status) => status.value === socialLink.status)?.label,
+        DateUtils.dateTimeSecondToDate(socialLink.createdAt ?? ""),
+        DateUtils.dateTimeSecondToDate(socialLink.updatedAt ?? ""),
+        Action(socialLink.id)
     ])
 
     const getTableColumns = () => [
         { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Logo", key: "logo", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Level", key: "level", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Category", key: "category", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Platform", key: "platform", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
+        { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ]
 
@@ -116,13 +117,13 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">
-                            Skill List
+                            Social Links List
                         </h1>
                     </div>
                     <Button 
-                        onClick={handleAddSkill}
+                        onClick={handleAddSocialLink}
                         variant={isMobile ? "primaryText" : "primaryContained"}
-                        label={isMobile ? "" : "Add New Skill"}
+                        label={isMobile ? "" : "Add New Social Link"}
                         startIcon={isMobile ? <FiPlus /> : ""}
                         className={isMobile ? 'w-12 h-12 rounded-full' : ''}
                     />
@@ -144,11 +145,24 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
                             {showFilters && (
-                                <div className="space-y-3 p-4">
+                                <div className="flex flex-col gap-4">
+                                    <AutoCompleteInput
+                                        label=""
+                                        placeHolder="Select Status"
+                                        options={StatusOptions}
+                                        value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                                        onChange={(option: any) => {
+                                            if (option) {
+                                                handleFiltersChange("status", option.value);
+                                            } else {
+                                                handleFiltersChange("status", "");
+                                            }
+                                        }}
+                                        onSearch={() => { }}
+                                    />
                                     <TextField
-                                        label='Search'
+                                        label=''
                                         variant="outlined"
                                         placeholder="Search..."
                                         value={filters.search}
@@ -165,7 +179,23 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
                             )}
                         </div>
                     ) : (
-                        <>
+                        <div className="flex gap-4">
+                            <div className="w-[250px]">
+                                <AutoCompleteInput
+                                    label=""
+                                    placeHolder="Select Status"
+                                    options={StatusOptions}
+                                    value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                                    onChange={(option: any) => {
+                                        if (option) {
+                                            handleFiltersChange("status", option.value);
+                                        } else {
+                                            handleFiltersChange("status", "");
+                                        }
+                                    }}
+                                    onSearch={() => { }}
+                                />
+                            </div>
                             <div className="w-[250px]">
                                 <TextField
                                     label=''
@@ -182,7 +212,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
                                     fullWidth
                                 />
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>
@@ -190,4 +220,4 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
         </div>
     )
 }
-export default SkillTableTemplate;
+export default SocialLinksTableTemplate;
