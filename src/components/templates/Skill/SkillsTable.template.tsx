@@ -53,7 +53,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
 
     const Action = (id: string) => {
         return (
-            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
+            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
                 <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>
@@ -67,7 +67,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
     const getRecords = () => skills?.map((skill: SkillResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         skill.logoName,
-        <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
+        <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
             <img src={skill.logoUrl} alt={skill.logoName} className='w-10 h-10' />
         </div>,
         skill.level,

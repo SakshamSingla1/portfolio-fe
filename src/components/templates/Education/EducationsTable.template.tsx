@@ -60,7 +60,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
 
     const Action = (id: string) => {
         return (
-            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
+            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
                 <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>
