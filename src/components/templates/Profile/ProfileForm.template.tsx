@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { InputAdornment } from "@mui/material";
 import type { FormikProps } from "formik";
-import { FiUser,FiMail,FiGithub,FiLinkedin,FiGlobe,FiMapPin,FiPhone,FiBriefcase,FiImage,FiInfo} from "react-icons/fi";
+import { FiUser,FiMail,FiMapPin,FiPhone,FiBriefcase,FiImage,FiInfo} from "react-icons/fi";
 import TextFieldV2 from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
@@ -368,53 +368,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               inputProps={{ maxLength: 500 }}
             />
           </div>
-          <TextFieldV2
-            label="GitHub"
-            name="githubUrl"
-            value={formik.values.githubUrl}
-            onChange={formik.handleChange}
-            disabled={!isEditMode}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FiGithub />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextFieldV2
-            label="LinkedIn"
-            name="linkedinUrl"
-            value={formik.values.linkedinUrl}
-            onChange={formik.handleChange}
-            disabled={!isEditMode}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FiLinkedin />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <div className="md:col-span-2">
-            <TextFieldV2
-              label="Website"
-              name="websiteUrl"
-              value={formik.values.websiteUrl}
-              onChange={formik.handleChange}
-              disabled={!isEditMode}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FiGlobe />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
         </div>
       </SectionCard>
-      {/* Resume */}
       <SectionCard
         title="Resume"
         subtitle="Upload your resume to showcase your skills"
