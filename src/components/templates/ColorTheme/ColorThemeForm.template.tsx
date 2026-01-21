@@ -211,7 +211,6 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
                               color
                             )
                           }
-                          showInput
                           disabled={mode === MODE.VIEW}
                         />
                       </div>

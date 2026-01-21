@@ -143,7 +143,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                             ),
                         }}
                         error={formik.touched.email && Boolean(formik.errors.email)}
-                        helperText={formik.touched.email && formik.errors.email}
+                        helperText={formik.touched.email && formik.errors.email ? String(formik.errors.email) : ""}
                     />
                     <div className="flex flex-col gap-2">
                         <TextField
@@ -174,7 +174,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                                 )
                             }}
                             error={formik.touched.password && Boolean(formik.errors.password)}
-                            helperText={formik.touched.password && formik.errors.password}
+                            helperText={formik.touched.password && formik.errors.password ? String(formik.errors.password) : ""}
                         />
                     </div>
                     <div className="flex justify-end text-sm mt-1">

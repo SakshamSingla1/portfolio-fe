@@ -2,7 +2,6 @@ import TextField from "../../atoms/TextField/TextField";
 import { DEGREE_OPTIONS, MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { titleModification } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
-import Select from "../../atoms/Select/Select";
 import { GradeType, type Education } from "../../../services/useEducationService";
 import { InputAdornment } from "@mui/material";
 import { useEffect } from "react";
@@ -11,6 +10,7 @@ import * as Yup from "yup";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -121,17 +121,16 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             }}
                             disabled={mode === MODE.VIEW}
                         />
-                        <Select
+                        <AutoCompleteInput
                             label="Degree"
-                            placeholder='Select degree'
+                            placeHolder="Search and select a degree"
                             options={DEGREE_OPTIONS}
-                            value={formik.values.degree}
-                            error={formik.touched.degree && Boolean(formik.errors.degree)}
-                            onChange={(value: string | number) => {
-                                const newValue = typeof value === 'string' ? titleModification(value) : value;
-                                formik.setFieldValue('degree', newValue);
+                            value={DEGREE_OPTIONS.find(option => option.value === formik.values.degree) || null}
+                            onSearch={() => { }}
+                            onChange={(value: any) => {
+                                formik.setFieldValue("degree", value?.value ?? null);
                             }}
-                            disabled={mode === MODE.VIEW}
+                            isDisabled={mode === MODE.VIEW}
                         />
                     </div>
                 </div>
@@ -163,17 +162,16 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             }}
                             disabled={mode === MODE.VIEW}
                         />
-                        <Select
+                        <AutoCompleteInput
                             label="Grade Type"
-                            placeholder='Select grade type'
+                            placeHolder="Search and select a grade type"
                             options={GradeType}
-                            value={formik.values.gradeType}
-                            error={formik.touched.gradeType && Boolean(formik.errors.gradeType)}
-                            onChange={(value: string | number) => {
-                                const newValue = typeof value === 'string' ? titleModification(value) : value;
-                                formik.setFieldValue('gradeType', newValue);
+                            value={GradeType.find(option => option.value === formik.values.gradeType) || null}
+                            onSearch={() => { }}
+                            onChange={value => {
+                                formik.setFieldValue('gradeType', value?.value ?? '');
                             }}
-                            disabled={mode === MODE.VIEW}
+                            isDisabled={false}
                         />
                         <TextField
                             label="Grade"

@@ -61,7 +61,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
             onChange={passwordForm.handleChange}
             onBlur={passwordForm.handleBlur}
             error={passwordForm.touched.oldPassword && Boolean(passwordForm.errors.oldPassword)}
-            helperText={passwordForm.touched.oldPassword && passwordForm.errors.oldPassword}
+            helperText={passwordForm.touched.oldPassword && passwordForm.errors.oldPassword ? String(passwordForm.errors.oldPassword) : ""}
             className="bg-gray-50"
             InputProps={{
               startAdornment: (
@@ -98,7 +98,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
             onChange={passwordForm.handleChange}
             onBlur={passwordForm.handleBlur}
             error={passwordForm.touched.newPassword && Boolean(passwordForm.errors.newPassword)}
-            helperText={passwordForm.touched.newPassword && passwordForm.errors.newPassword}
+            helperText={passwordForm.touched.newPassword && passwordForm.errors.newPassword ? String(passwordForm.errors.newPassword) : ""}
             className="bg-gray-50"
             InputProps={{
               startAdornment: (

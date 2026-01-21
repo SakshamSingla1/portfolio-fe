@@ -121,7 +121,7 @@ const LoginWithPhone: React.FC<LoginWithPhoneProps> = ({ setAuthState, setPhone,
               ),
             }}
             error={formik.touched.phone && Boolean(formik.errors.phone)}
-            helperText={formik.touched.phone && formik.errors.phone}
+            helperText={formik.touched.phone && formik.errors.phone ? String(formik.errors.phone) : ""}
           />
           <div className="flex justify-center items-center">
             <Button

@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import {
   Select as MuiSelect,
   MenuItem,
-  type SelectProps as MuiSelectProps,
   InputAdornment,
   Checkbox,
   ListItemText,
@@ -15,13 +14,16 @@ import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import { useColors } from "../../../utils/types";
 
+/* =======================
+   Types
+======================= */
+
 export interface FilterChipOption {
   label: string;
   value: string | number;
 }
 
-interface FilterChipV2Props
-  extends Omit<MuiSelectProps, "onChange" | "value"> {
+interface FilterChipV2Props {
   options: FilterChipOption[];
   value: FilterChipOption[];
   onChange: (selected: FilterChipOption[], clearWithCrossIcon?: boolean) => void;
@@ -35,24 +37,23 @@ interface FilterChipV2Props
 }
 
 /* =======================
-   Styled Components
+   Styled Select (FIXED)
 ======================= */
 
 const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
   width: "100%",
 
-  "& .MuiSelect-select": {
-    minHeight: "40px",
-    padding: "8px 12px",
+  "& .MuiInputBase-root": {
+    minHeight: 40,
+    padding: "0 12px",
     display: "flex",
     alignItems: "center",
-    gap: "6px",
+    flexWrap: "wrap",
 
     backgroundColor: colors.neutral50,
     border: `1px solid ${colors.neutral200}`,
-    borderRadius: "12px",
-    fontSize: "16px",
-    fontWeight: 400,
+    borderRadius: 12,
+    fontSize: 16,
     color: colors.neutral900,
 
     transition: "all 0.2s ease-in-out",
@@ -71,52 +72,16 @@ const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
     border: "none",
   },
 
-  "&.Mui-disabled .MuiSelect-select": {
+  "&.Mui-disabled .MuiInputBase-root": {
     backgroundColor: colors.neutral100,
     borderColor: colors.neutral200,
     color: colors.neutral500,
-    cursor: "not-allowed",
   },
 
-  "&.Mui-error .MuiSelect-select": {
+  "&.Mui-error .MuiInputBase-root": {
     borderColor: colors.error500,
     backgroundColor: colors.error50,
   },
-}));
-
-const MenuProps = (colors: any) => ({
-  PaperProps: {
-    style: {
-      maxHeight: 300,
-      marginTop: 8,
-      borderRadius: 12,
-      border: `1px solid ${colors.neutral200}`,
-      boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
-    },
-  },
-  MenuListProps: {
-    style: { padding: 0 },
-  },
-});
-
-const SearchContainer = styled("div")<{ colors: any }>(({ colors }) => ({
-  padding: "10px 16px",
-  position: "sticky",
-  top: 0,
-  zIndex: 1,
-  backgroundColor: colors.neutral0,
-  borderBottom: `1px solid ${colors.neutral200}`,
-}));
-
-const ActionsContainer = styled("div")<{ colors: any }>(({ colors }) => ({
-  display: "flex",
-  justifyContent: "space-between",
-  padding: "10px 16px",
-  position: "sticky",
-  bottom: 0,
-  zIndex: 1,
-  backgroundColor: colors.neutral0,
-  borderTop: `1px solid ${colors.neutral200}`,
 }));
 
 /* =======================
@@ -134,7 +99,6 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
   enableSearch = true,
   width = "100%",
   height = "auto",
-  ...props
 }) => {
   const colors = useColors();
   const [searchTerm, setSearchTerm] = useState("");
@@ -145,6 +109,22 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
       opt.label.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [options, searchTerm]);
+
+  const menuProps = useMemo(
+    () => ({
+      PaperProps: {
+        sx: {
+          maxHeight: 300,
+          mt: 1,
+          borderRadius: 2,
+          border: `1px solid ${colors.neutral200}`,
+          boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
+        },
+      },
+      MenuListProps: { sx: { p: 0 } },
+    }),
+    [colors]
+  );
 
   const handleChange = (event: any) => {
     const selectedValues = event.target.value as (string | number)[];
@@ -161,16 +141,14 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
     );
   };
 
-  const renderValue = (selected: unknown) => {
-    const selectedValues = Array.isArray(selected) ? selected : [];
-
-    if (!selectedValues.length) {
+  const renderValue = (selected: any) => {
+    if (!selected.length) {
       return <span style={{ color: colors.neutral400 }}>{placeholder}</span>;
     }
 
     return (
-      <Box sx={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-        {selectedValues.slice(0, 3).map((val) => {
+      <Box sx={{ display: "flex", gap: 0.75, flexWrap: "wrap" }}>
+        {selected.slice(0, 3).map((val: any) => {
           const opt = options.find((o) => o.value === val);
           if (!opt) return null;
 
@@ -182,8 +160,8 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
                 alignItems: "center",
                 px: 1,
                 py: 0.25,
-                fontSize: "12px",
-                borderRadius: "12px",
+                fontSize: 12,
+                borderRadius: 12,
                 backgroundColor: colors.primary50,
                 color: colors.primary700,
                 border: `1px solid ${colors.primary300}`,
@@ -201,19 +179,19 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
             </Box>
           );
         })}
-        {selectedValues.length > 3 && (
+        {selected.length > 3 && (
           <Box
             sx={{
               px: 1,
               py: 0.25,
-              fontSize: "12px",
-              borderRadius: "12px",
+              fontSize: 12,
+              borderRadius: 12,
               backgroundColor: colors.neutral100,
               color: colors.neutral700,
               border: `1px solid ${colors.neutral200}`,
             }}
           >
-            +{selectedValues.length - 3} more
+            +{selected.length - 3} more
           </Box>
         )}
       </Box>
@@ -228,19 +206,31 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
         onChange={handleChange}
         displayEmpty
         renderValue={renderValue}
-        MenuProps={MenuProps(colors)}
+        MenuProps={menuProps}
         colors={colors}
-        {...props}
       >
         {enableSearch && (
-          <SearchContainer colors={colors}>
+          <Box
+            sx={{
+              p: "10px 16px",
+              position: "sticky",
+              top: 0,
+              zIndex: 1,
+              backgroundColor: colors.neutral50,
+              borderBottom: `1px solid ${colors.neutral200}`,
+            }}
+          >
             <TextField
               fullWidth
               size="small"
               placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (["ArrowDown", "ArrowUp"].includes(e.key)) {
+                  e.stopPropagation();
+                }
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -249,22 +239,30 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
                 ),
               }}
             />
-          </SearchContainer>
+          </Box>
         )}
 
         {filteredOptions.map((opt) => (
-          <MenuItem key={String(opt.value)} value={opt.value}>
+          <MenuItem key={opt.value} value={opt.value}>
             <Checkbox
               size="small"
-              checked={value.some(
-                (v) => String(v.value) === String(opt.value)
-              )}
+              checked={value.some((v) => String(v.value) === String(opt.value))}
             />
             <ListItemText primary={opt.label} />
           </MenuItem>
         ))}
 
-        <ActionsContainer colors={colors}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            p: "10px 16px",
+            position: "sticky",
+            bottom: 0,
+            backgroundColor: colors.neutral50,
+            borderTop: `1px solid ${colors.neutral200}`,
+          }}
+        >
           <Button
             variant="tertiaryText"
             size="small"
@@ -276,7 +274,7 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
           <Button variant="primaryText" size="small">
             {applyButtonLabel}
           </Button>
-        </ActionsContainer>
+        </Box>
       </StyledSelect>
     </Box>
   );

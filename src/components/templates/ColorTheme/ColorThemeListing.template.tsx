@@ -7,11 +7,11 @@ import { InputAdornment } from "@mui/material";
 import Table from "../../organisms/TableV1/TableV1";
 import { type ColorTheme, type ColorThemeFilterRequest } from "../../../services/useColorThemeService";
 import { makeRoute, DateUtils } from "../../../utils/helper";
-import { FiEdit, FiEye, FiSearch, FiFilter, FiPlus, FiChevronDown , FiChevronUp} from "react-icons/fi";
+import { FiEdit, FiEye, FiSearch, FiFilter, FiPlus, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
-import Select from "../../atoms/Select/Select";
 import { StatusOptions } from "../../../utils/types";
+import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 interface ColorThemeListingTemplateProps {
     colorThemes: ColorTheme[];
@@ -39,7 +39,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 768);
         };
-        
+
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
@@ -74,16 +74,16 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     };
 
     const Action = (themeName: string) => (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-            <button 
-                onClick={() => handleEdit(themeName)} 
+        <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
+            <button
+                onClick={() => handleEdit(themeName)}
                 className="w-6 h-6"
                 title="Edit"
             >
                 <FiEdit />
             </button>
-            <button 
-                onClick={() => handleView(themeName)} 
+            <button
+                onClick={() => handleView(themeName)}
                 className='w-6 h-6'
                 title="View"
             >
@@ -103,48 +103,48 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
         ]);
 
     const getTableColumns = () => [
-        { 
-            label: "Sr No.", 
-            key: "srNo", 
-            type: "number" as ColumnType, 
+        {
+            label: "Sr No.",
+            key: "srNo",
+            type: "number" as ColumnType,
             props: {},
             priority: "low" as const,
             hideOnMobile: true
         },
-        { 
-            label: "Theme Name", 
-            key: "themeName", 
-            type: "string" as ColumnType, 
+        {
+            label: "Theme Name",
+            key: "themeName",
+            type: "string" as ColumnType,
             props: {},
             priority: "high" as const
         },
-        { 
-            label: "Created Date", 
-            key: "createdAt", 
-            type: "date" as ColumnType, 
+        {
+            label: "Created Date",
+            key: "createdAt",
+            type: "date" as ColumnType,
             props: {},
             priority: "medium" as const
         },
-        { 
-            label: "Last Modified", 
-            key: "updatedAt", 
-            type: "date" as ColumnType, 
+        {
+            label: "Last Modified",
+            key: "updatedAt",
+            type: "date" as ColumnType,
             props: {},
             priority: "medium" as const,
             hideOnMobile: true
         },
-        { 
-            label: "Updated By", 
-            key: "updatedBy", 
-            type: "string" as ColumnType, 
+        {
+            label: "Updated By",
+            key: "updatedBy",
+            type: "string" as ColumnType,
             props: {},
             priority: "low" as const,
             hideOnMobile: true
         },
-        { 
-            label: "Action", 
-            key: "action", 
-            type: "custom" as ColumnType, 
+        {
+            label: "Action",
+            key: "action",
+            type: "custom" as ColumnType,
             props: {},
             priority: "high" as const
         },
@@ -175,7 +175,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                             Color Theme List
                         </h1>
                     </div>
-                    <Button 
+                    <Button
                         onClick={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_ADD, {}))}
                         variant={isMobile ? "primaryText" : "primaryContained"}
                         label={isMobile ? "" : "Add New Color Theme"}
@@ -201,16 +201,19 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
+
                             {showFilters && (
                                 <div className="space-y-3 p-4">
-                                    <Select
+                                    <AutoCompleteInput
                                         label="Status"
+                                        placeHolder="Search and select a status"
                                         options={StatusOptions}
-                                        value={filters.status || ""}
-                                        onChange={(value) => handleFiltersChange("status", value)}
-                                        fullWidth
-                                        placeholder="Select Status"
+                                        value={StatusOptions.find(option => option.value === filters.status) || null}
+                                        onSearch={() => { }}
+                                        onChange={value => {
+                                            handleFiltersChange("status", value?.value ?? null);
+                                        }}
+                                        isDisabled={false}
                                     />
                                     <TextField
                                         label='Search'
@@ -232,13 +235,16 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                     ) : (
                         <>
                             <div className="w-[250px]">
-                                <Select
-                                    label=""
+                                <AutoCompleteInput
+                                    label="Status"
+                                    placeHolder="Search and select a status"
                                     options={StatusOptions}
-                                    value={filters.status || ""}
-                                    onChange={(value) => handleFiltersChange("status", value)}
-                                    fullWidth
-                                    placeholder="Select Status"
+                                    value={StatusOptions.find(option => option.value === filters.status) || null}
+                                    onSearch={() => { }}
+                                    onChange={value => {
+                                        handleFiltersChange("status", value?.value ?? null);
+                                    }}
+                                    isDisabled={false}
                                 />
                             </div>
                             <div className="w-[250px]">
@@ -262,9 +268,9 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 </div>
             </div>
             <div>
-                <Table 
-                    schema={getSchema()} 
-                    records={getRecords()} 
+                <Table
+                    schema={getSchema()}
+                    records={getRecords()}
                 />
             </div>
         </div>

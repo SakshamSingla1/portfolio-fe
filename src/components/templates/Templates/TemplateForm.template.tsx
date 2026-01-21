@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
-import Select from "../../atoms/Select/Select";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
@@ -13,6 +12,7 @@ import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { makeRoute } from "../../../utils/helper";
 import { StatusOptions, Status } from "../../../utils/types";
 import type { TemplateRequest, TemplateResponse } from "../../../services/useTemplateService";
+import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 interface TemplateFormProps {
   onSubmit: (values: TemplateRequest) => void;
@@ -86,21 +86,19 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={formik.touched.name && Boolean(formik.errors.name)}
-              helperText={formik.touched.name && formik.errors.name}
+              helperText={formik.touched.name && formik.errors.name ? String(formik.errors.name) : ""}
               disabled={mode === MODE.VIEW}
             />
-            <Select
+            <AutoCompleteInput
               label="Template Type"
-              name="type"
-              placeholder="Select template type"
+              placeHolder="Search and select a template type"
               options={templateTypes}
-              value={formik.values.type}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.type && Boolean(formik.errors.type)}
-              helperText={String(formik.touched.type && formik.errors.type)}
-              disabled={mode === MODE.VIEW}
-              required
+              value={templateTypes.find(option => option.value === formik.values.type) || null}
+              onSearch={() => { }}
+              onChange={value => {
+                formik.setFieldValue("type", value?.value ?? null);
+              }}
+              isDisabled={false}
             />
           </div>
           <div className="mt-6">
@@ -111,7 +109,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={formik.touched.subject && Boolean(formik.errors.subject)}
-              helperText={formik.touched.subject && formik.errors.subject}
+              helperText={formik.touched.subject && formik.errors.subject ? String(formik.errors.subject) : ""}
               disabled={mode === MODE.VIEW}
               fullWidth
             />
