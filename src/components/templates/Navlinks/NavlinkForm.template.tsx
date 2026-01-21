@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import Button from '../../atoms/Button/Button';
 import TextField from '../../atoms/TextField/TextField';
-import Select from '../../atoms/Select/Select';
 import CustomRadioGroup from '../../molecules/CustomRadioGroup/CustomRadioGroup';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -10,6 +9,7 @@ import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
 import { Status, ROLES, RoleOptions } from '../../../utils/types';
 import { formatToEnumKey, makeRoute } from '../../../utils/helper';
 import { type NavlinkRequest, type NavlinkResponse } from '../../../services/useNavlinkService';
+import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 
 interface NavlinkFormTemplateProps {
   onSubmit: (values: NavlinkRequest) => void;
@@ -88,7 +88,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
               }
               disabled={mode === MODE.VIEW}
               error={formik.touched.name && Boolean(formik.errors.name)}
-              helperText={formik.touched.name && formik.errors.name}
+              helperText={formik.touched.name && formik.errors.name ? String(formik.errors.name) : ''}
             />
             <TextField
               label="Path"
@@ -97,7 +97,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
               {...formik.getFieldProps('path')}
               disabled={mode === MODE.VIEW}
               error={formik.touched.path && Boolean(formik.errors.path)}
-              helperText={formik.touched.path && formik.errors.path}
+              helperText={formik.touched.path && formik.errors.path ? String(formik.errors.path) : ''}
             />
             <TextField
               label="Index"
@@ -107,22 +107,19 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
               {...formik.getFieldProps('index')}
               disabled={mode === MODE.VIEW}
               error={formik.touched.index && Boolean(formik.errors.index)}
-              helperText={formik.touched.index && formik.errors.index}
+              helperText={formik.touched.index && formik.errors.index ? String(formik.errors.index) : ''}
               inputProps={{ min: 0 }}
             />
-            <Select
+            <AutoCompleteInput
               label="Role"
-              placeholder="Select role"
+              placeHolder="Search and select a role"
               options={RoleOptions}
-              value={formik.values.role}
-              error={formik.touched.role && Boolean(formik.errors.role)}
-              helperText={
-                formik.touched.role && formik.errors.role ? formik.errors.role : ''
-              }
-              onChange={(value) =>
-                formik.setFieldValue('role', value)
-              }
-              disabled={mode === MODE.VIEW}
+              value={RoleOptions.find(option => option.value === formik.values.role) || null}
+              onSearch={() => { }}
+              onChange={value => {
+                formik.setFieldValue('role', value?.value ?? null);
+              }}
+              isDisabled={mode === MODE.VIEW}
             />
           </div>
         </div>

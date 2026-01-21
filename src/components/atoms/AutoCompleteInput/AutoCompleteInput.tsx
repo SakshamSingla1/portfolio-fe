@@ -1,255 +1,251 @@
-import React, { useMemo } from 'react';
-import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autocomplete';
-import { ClearIcon } from '@mui/x-date-pickers';
-import { createUseStyles } from 'react-jss';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ErrorMessage from '../../atoms/ErrorMessage/ErrorMessage';
-import { useDebounce } from '../../../utils/helper';
-import { DEBOUNCE_TIME } from '../../../utils/constant';
-import TextField from '../TextField/TextField';
-import { useColors } from '../../../utils/types';
+import React, { useMemo, useCallback, useState } from "react";
+import Autocomplete, {
+    type AutocompleteChangeReason,
+} from "@mui/material/Autocomplete";
+import CircularProgress from "@mui/material/CircularProgress";
+import { ClearIcon } from "@mui/x-date-pickers";
+import { createUseStyles } from "react-jss";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+
+import { useDebounce } from "../../../utils/helper";
+import { DEBOUNCE_TIME } from "../../../utils/constant";
+import TextField from "../TextField/TextField";
+import { useColors } from "../../../utils/types";
 
 export interface AutoCompleteOption {
-  label: string | React.ReactNode;
-  value: number | string;
-  title?: string;
-  icon?: React.ReactNode;
+    label: string | React.ReactNode;
+    value: number | string;
+    title?: string;
+    icon?: React.ReactNode;
 }
 
 interface AutoCompleteInputProps {
-  label?: string;
-  options: AutoCompleteOption[];
-  onSearch: (value: string) => void;
-  onChange: (option: AutoCompleteOption | null) => void;
-  isDisabled?: boolean;
-  value?: AutoCompleteOption | null;
-  error?: boolean;
-  helperText?: string;
-  id?: string;
-  placeHolder?: string;
-  onBlur?: () => void;
-  className?: string;
-  loading?: boolean;
+    label?: string;
+    options: AutoCompleteOption[];
+    onSearch: (value: string) => void;
+    onChange: (option: AutoCompleteOption | null) => void;
+    isDisabled?: boolean;
+    value?: AutoCompleteOption | null;
+    error?: boolean;
+    helperText?: string;
+    id?: string;
+    placeHolder?: string;
+    onBlur?: () => void;
+    className?: string;
+    loading?: boolean;
 }
 
-const useStyles = (colors: any) => createUseStyles({
-  container: {
-    width: '100%',
-    '&.disabled': {
-      opacity: 0.7,
-    }
-  },
-  label: {
-    color: colors.neutral700,
-    fontSize: "12px",
-    fontWeight: 400,
-    lineHeight: "16px",
-    marginLeft: "8px",
-  },
-  autoComplete: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '8px',
-      backgroundColor: colors.white,
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: colors.primary300,
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: colors.primary500,
-        boxShadow: `0 0 0 3px ${colors.primary100}`,
-      },
-      '&.Mui-disabled': {
-        backgroundColor: colors.neutral100,
-      },
+const useStyles = createUseStyles({
+    container: {
+        width: "100%",
+        "&.disabled": {
+            opacity: 0.6,
+            pointerEvents: "none",
+        },
     },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: colors.neutral200,
-      borderWidth: '1px',
-    },
-    '& .MuiInputBase-input': {
-      padding: '12px 16px',
-      fontSize: '14px',
-      lineHeight: '20px',
-      color: colors.neutral900,
-      '&::placeholder': {
-        color: colors.neutral400,
-        opacity: 1,
-      },
-    },
-  },
-  option: {
-    padding: '8px 16px',
-    fontSize: '14px',
-    lineHeight: '20px',
-    color: colors.neutral900,
-    '&:hover': {
-      backgroundColor: colors.primary50,
-    },
-    '&.Mui-focused': {
-      backgroundColor: colors.primary50,
-    }
-  },
-  error: {
-    borderColor: colors.error500,
-    '&:hover': {
-      borderColor: colors.error500,
-    }
-  },
-  helperText: {
-    marginTop: '4px',
-    fontSize: '12px',
-    lineHeight: '16px',
-    color: colors.neutral500,
-  },
-  errorText: {
-    color: colors.error500,
-  }
+
+    autoComplete: (colors: any) => ({
+        "& .MuiOutlinedInput-root": {
+            backgroundColor: colors.neutral50,
+            borderRadius: "4px",
+            paddingRight: "8px",
+            height: "52px",
+
+            "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: colors.neutral200,
+            },
+
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: colors.primary300,
+            },
+
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: colors.primary500,
+                boxShadow: `0 0 0 3px ${colors.primary100}`,
+            },
+
+            "&.Mui-disabled": {
+                backgroundColor: colors.neutral100,
+                borderColor: colors.neutral200,
+                color: colors.neutral500,
+                cursor: "not-allowed",
+            },
+
+            "&.Mui-error .MuiOutlinedInput-notchedOutline": {
+                borderColor: colors.error500,
+                boxShadow: `0 0 0 2px ${colors.error100}`,
+            },
+        },
+    }),
+
+    option: (colors: any) => ({
+        padding: "10px 16px",
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        fontSize: "14px",
+        cursor: "pointer",
+
+        "&[aria-selected='true']": {
+            backgroundColor: colors.primary50,
+        },
+
+        "&.Mui-focused, &:hover": {
+            backgroundColor: colors.primary100,
+        },
+    }),
+
+    helperText: (colors: any) => ({
+        marginTop: 4,
+        fontSize: 12,
+        color: colors.neutral500,
+    }),
+
+    errorText: (colors: any) => ({
+        color: colors.error600,
+    }),
 });
 
 const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
-  label,
-  options,
-  onSearch,
-  onChange,
-  isDisabled = false,
-  value = null,
-  error = false,
-  helperText = '',
-  placeHolder = '',
-  id,
-  onBlur,
-  className = '',
-  loading = false,
-}) => {
-  const colors = useColors();
-  const classes = useStyles(colors)();
-
-  const handleInputChange = (
-    _event: React.SyntheticEvent,
-    value: AutoCompleteOption | null, 
-    reason: AutocompleteChangeReason, 
-  ) => {
-    if (reason === 'selectOption' || reason === 'removeOption' || reason === 'clear') {
-      onChange(value);
-    }
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    onSearch(e.target.value);
-  };
-
-  const handleClearValue = () => {
-    onSearch("");
-  };
-
-  const debouncedSearch = useMemo(
-    () => useDebounce((value: string) => {
-      onSearch(value);
-    }, DEBOUNCE_TIME.DEFAULT),
-    [onSearch]
-  );
-
-  const defaultProps = useMemo(() => ({
+    label,
     options,
-    getOptionLabel: (option: AutoCompleteOption) => {
-      return typeof option.title === 'string' && option.title.trim() !== '' 
-        ? option.title 
-        : String(option.label ?? '');
-    },
-    isOptionEqualToValue: (option: AutoCompleteOption, value: AutoCompleteOption) =>
-      option.value === value.value,
-  }), [options]);
+    onSearch,
+    onChange,
+    isDisabled = false,
+    value = null,
+    error = false,
+    helperText = "",
+    placeHolder = "",
+    id,
+    onBlur,
+    className = "",
+    loading = false,
+}) => {
+    const colors = useColors();
+    const classes = useStyles(colors);
+    const [open, setOpen] = useState(false);
 
-  return (
-    <div className={`${classes.container} ${isDisabled ? 'disabled' : ''} ${className}`}>
-      {label && (
-        <label htmlFor={id} className={classes.label}>
-          {label}
-        </label>
-      )}
-      <Autocomplete
-        id={id ?? label}
-        {...defaultProps}
-        fullWidth
-        disabled={isDisabled}
-        loading={loading}
-        loadingText="Loading..."
-        clearOnBlur={false}
-        clearOnEscape
-        disableClearable={!value}
-        className={`${classes.autoComplete} ${error ? classes.error : ''}`}
-        popupIcon={
-          <ExpandMoreIcon 
-            style={{ 
-              color: isDisabled ? colors.neutral400 : colors.neutral600 
-            }} 
-          />
-        }
-        clearIcon={
-          value ? (
-            <ClearIcon 
-              onClick={handleClearValue} 
-              style={{ 
-                color: isDisabled ? colors.neutral400 : colors.neutral600,
-                fontSize: '18px',
-              }} 
+    const debouncedSearch = useMemo(
+        () =>
+            useDebounce((val: string) => {
+                onSearch(val);
+            }, DEBOUNCE_TIME.DEFAULT),
+        [onSearch]
+    );
+
+    const handleChange = useCallback(
+        (
+            _: React.SyntheticEvent,
+            val: AutoCompleteOption | null,
+            reason: AutocompleteChangeReason
+        ) => {
+            if (["selectOption", "clear", "removeOption"].includes(reason)) {
+                onChange(val);
+            }
+        },
+        [onChange]
+    );
+
+    const handleInputChange = useCallback(
+        (_: React.SyntheticEvent, val: string, reason: string) => {
+            if (reason === "input") {
+                debouncedSearch(val);
+            }
+        },
+        [debouncedSearch]
+    );
+
+    const handleClear = () => {
+        onChange(null);
+        onSearch("");
+    };
+
+    const autoCompleteProps = useMemo(
+        () => ({
+            options,
+            getOptionLabel: (option: AutoCompleteOption) =>
+                typeof option.title === "string" && option.title.trim()
+                    ? option.title
+                    : String(option.label ?? ""),
+            isOptionEqualToValue: (
+                o: AutoCompleteOption,
+                v: AutoCompleteOption
+            ) => o.value === v.value,
+        }),
+        [options]
+    );
+
+    return (
+        <div
+            className={`${classes.container} ${
+                isDisabled ? "disabled" : ""
+            } ${className}`}
+        >
+            <Autocomplete
+                {...autoCompleteProps}
+                id={id ?? label ?? "autocomplete"}
+                fullWidth
+                open={open}
+                onOpen={() => setOpen(true)}
+                onClose={() => setOpen(false)}
+                value={value}
+                disabled={isDisabled}
+                loading={loading}
+                clearOnBlur={false}
+                disableClearable={!value}
+                popupIcon={open ? <FiChevronUp /> : <FiChevronDown />}
+                clearIcon={
+                    value ? (
+                        <ClearIcon
+                            onClick={handleClear}
+                            style={{
+                                fontSize: 16,
+                                color: colors.neutral600,
+                                cursor: "pointer",
+                            }}
+                        />
+                    ) : null
+                }
+                className={classes.autoComplete}
+                onChange={handleChange}
+                onInputChange={handleInputChange}
+                onBlur={onBlur}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label={label}
+                        placeholder={placeHolder}
+                        error={error}
+                        helperText={helperText}
+                        InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                                <>
+                                    {loading && (
+                                        <CircularProgress
+                                            size={16}
+                                            sx={{ mr: 1 }}
+                                        />
+                                    )}
+                                    {params.InputProps.endAdornment}
+                                </>
+                            ),
+                        }}
+                    />
+                )}
+                renderOption={(props, option) => (
+                    <li {...props} className={classes.option}>
+                        {option.icon && <span>{option.icon}</span>}
+                        {option.label}
+                    </li>
+                )}
             />
-          ) : null
-        }
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            placeholder={placeHolder}
-            label=""
-            onChange={handleSearch}
-            error={error}
-            helperText={helperText}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading ? (
-                    <div style={{ padding: '0 8px' }}>Loading...</div>
-                  ) : (
-                    params.InputProps.endAdornment
-                  )}
-                </>
-              ),
-            }}
-          />
-        )}
-        renderOption={(props, option) => (
-          <li 
-            {...props} 
-            className={classes.option}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
-            {option.icon && (
-              <span style={{ display: 'flex', marginRight: '8px' }}>
-                {option.icon}
-              </span>
+
+            {helperText && !error && (
+                <div className={classes.helperText}>{helperText}</div>
             )}
-            {option.label}
-          </li>
-        )}
-        onChange={handleInputChange}
-        onInputChange={(_event, value, reason) => {
-          if (reason === 'input') {
-            debouncedSearch(value);
-          }
-        }}
-        value={value}
-        onBlur={onBlur}
-      />
-      {helperText && !error && (
-        <div className={classes.helperText}>{helperText}</div>
-      )}
-      {error && helperText && <ErrorMessage message={helperText} />}
-    </div>
-  );
+        </div>
+    );
 };
 
 export default React.memo(AutoCompleteInput);

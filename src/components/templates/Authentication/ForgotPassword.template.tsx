@@ -75,7 +75,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setAuthState }) => {
                             ),
                         }}
                         error={formik.touched.email && Boolean(formik.errors.email)}
-                        helperText={formik.touched.email && formik.errors.email}
+                        helperText={formik.touched.email && formik.errors.email ? String(formik.errors.email) : ""}
                     />
                     <div className="flex justify-center items-center">
                         <Button

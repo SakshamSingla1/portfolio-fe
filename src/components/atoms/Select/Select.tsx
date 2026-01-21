@@ -1,187 +1,179 @@
-import React, { useState } from 'react';
-import { createUseStyles } from "react-jss";
-import { Select as MuiSelect, MenuItem, type SelectProps as MuiSelectProps } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Select as MuiSelect,
+  MenuItem,
+  type SelectProps as MuiSelectProps,
+} from "@mui/material";
+import { styled } from "@mui/system";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import downArrowIcon from "../../../assets/icons/downArrowFilled.svg";
-import { capitalizeFirstLetter } from '../../../utils/helper';
+import { capitalizeFirstLetter } from "../../../utils/helper";
+import { useColors } from "../../../utils/types";
 
-const useStyles = createUseStyles((theme: any) => ({
-    input: {
-        border: "1px solid",
-        borderColor: theme.palette.border.neutral.neutral200,
-        fontSize: "16px",
-        fontWeight: 500,
-        borderRadius: "12px",
-        color: theme.palette.text.neutral.neutral800,
-        marginTop: "4px",
-        "&:hover": {
-            borderColor: theme.palette.border.primary.primary300,
-            background: "white",
-            borderWidth: "1px",
-            outline: "none",
-        },
-        "& .MuiOutlinedInput-notchedOutline": {
-            outline: "none",
-            borderWidth: 0,
-            borderColor: theme.palette.border.primary.primary300,
-        },
-        "&:focus-within": {
-            outline: "none",
-            borderColor: `${theme.palette.border.primary.primary300} !important`,
-            borderWidth: 2,
-        },
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            outline: "none",
-            borderWidth: 0,
-            borderColor: `${theme.palette.border.primary.primary300} !important`,
-        },
-        "& .MuiInputBase-input": {
-            padding: "13px 12px !important",
-        },
+/* =======================
+   Styled Select
+======================= */
+
+const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
+  width: "100%",
+
+  "& .MuiInputBase-root": {
+    minHeight: 52,
+    padding: "0 12px",
+    display: "flex",
+    alignItems: "center",
+
+    backgroundColor: colors.neutral50,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: 12,
+    fontSize: 16,
+    color: colors.neutral900,
+
+    transition: "all 0.2s ease-in-out",
+
+    "&:hover": {
+      borderColor: colors.primary300,
     },
-    label: {
-        color: theme.palette.text.neutral.neutral700,
-        fontSize: "16px",
-        fontWeight: 400,
-        lineHeight: "16px"
+
+    "&.Mui-focused": {
+      borderColor: colors.primary500,
+      boxShadow: `0 0 0 3px ${colors.primary100}`,
     },
-    placeholder: {
-        color: `${theme.palette.text.neutral.neutral200} !important`,
-        fontWeight: 400
-    },
-    icon: {
-        right: 8,
-        position: "absolute",
-        top: "50%",
-        transform: "translateY(-50%)",
-        pointerEvents: "none",
-        transition: "transform 0.3s ease",
-    },
-    iconOpen: {
-        transform: "translateY(-50%) rotate(180deg)",
-    },
-    "@media (max-width: 767px)": {
-        input: {
-            border: "1px solid",
-            borderColor: theme.palette.border.neutral.neutral200,
-            fontSize: "14px",
-            fontWeight: 400,
-            borderRadius: "6px",
-            color: theme.palette.text.neutral.neutral800,
-            "&:hover": {
-                borderColor: theme.palette.border.primary.primary300,
-                borderWidth: 1,
-                outline: "none",
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-                outline: "none",
-                borderWidth: 0,
-                borderColor: theme.palette.border.primary.primary300,
-            },
-            "&:focus-within": {
-                outline: "none",
-                borderColor: `${theme.palette.border.primary.primary300} !important`,
-                borderWidth: "2px !important",
-            },
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                outline: "none",
-                borderWidth: 0,
-                borderColor: `${theme.palette.border.primary.primary300} !important`,
-            },
-            "& .MuiInputBase-input": {
-            },
-        },
-        label: {
-            color: theme.palette.text.neutral.neutral700,
-            fontSize: "14px",
-            fontWeight: 400,
-            lineHeight: "16.1px"
-        },
-    },
+  },
+
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+
+  "&.Mui-disabled .MuiInputBase-root": {
+    backgroundColor: colors.neutral100,
+    borderColor: colors.neutral200,
+    color: colors.neutral500,
+  },
+
+  "&.Mui-error .MuiInputBase-root": {
+    borderColor: colors.error500,
+    backgroundColor: colors.error50,
+  },
+
+  "& .MuiSelect-select": {
+    padding: "13px 12px",
+    display: "flex",
+    alignItems: "center",
+  },
 }));
 
+/* =======================
+   Types
+======================= */
+
 interface Option {
-    value: string | number;
-    label: string | React.ReactNode;
+  value: string | number;
+  label: string | React.ReactNode;
 }
 
-interface SelectProps extends Omit<MuiSelectProps, 'label' | 'onChange' | 'onBlur' | 'onFocus'> {
-    options: Option[];
-    label: string;
-    helperText?: string;
-    disableCapitalization?: boolean;
-    disableArrow?: boolean;
-    placeholder?: string;
-    onChange?: (value: number) => void;
-    onBlur?: (value: string | number | null) => void;
-    onFocus?: (value: string | number | null) => void;
+interface SelectProps
+  extends Omit<MuiSelectProps, "label" | "onChange"> {
+  options: Option[];
+  label?: string;
+  helperText?: string;
+  placeholder?: string;
+  disableCapitalization?: boolean;
+  disableArrow?: boolean;
+  onChange?: (value: string | number) => void;
 }
+
+/* =======================
+   Component
+======================= */
 
 const Select: React.FC<SelectProps> = ({
-    options,
-    label,
-    helperText,
-    disableCapitalization = false,
-    disableArrow = false,
-    onChange,
-    onBlur,
-    onFocus,
-    ...props
+  options,
+  label,
+  helperText,
+  placeholder = "Select",
+  disableCapitalization = false,
+  disableArrow = false,
+  value,
+  onChange,
+  error,
+  disabled,
+  ...props
 }) => {
-    const classes = useStyles();
-    const [open, setOpen] = useState(false);
+  const colors = useColors();
+  const [open, setOpen] = useState(false);
 
-    const renderValue = () => {
-        if (props.value && typeof props.value === 'string') {
-            const value = props.value as string;
-            return disableCapitalization
-                ? value.replace(/_/g, " ")
-                : value.split("_").map((el) => capitalizeFirstLetter(el)).join(" ");
+  const renderValue = (selected: any) => {
+    if (selected === "" || selected === undefined || selected === null) {
+      return <span style={{ color: colors.neutral400 }}>{placeholder}</span>;
+    }
+
+    if (typeof selected === "string") {
+      return disableCapitalization
+        ? selected.replace(/_/g, " ")
+        : selected
+            .split("_")
+            .map((el) => capitalizeFirstLetter(el))
+            .join(" ");
+    }
+
+    return selected;
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {label && (
+        <label
+          style={{
+            color: colors.neutral700,
+            fontSize: 14,
+            fontWeight: 500,
+            marginLeft: 8,
+          }}
+        >
+          {label}
+        </label>
+      )}
+
+      <StyledSelect
+        {...props}
+        value={value ?? ""}
+        error={error}
+        disabled={disabled}
+        displayEmpty
+        renderValue={renderValue}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        onChange={(e) => onChange?.(e.target.value as string | number)}
+        colors={colors}
+        IconComponent={
+          disableArrow
+            ? () => null
+            : () => (
+                <img
+                  src={downArrowIcon}
+                  alt="Arrow"
+                  width={20}
+                  height={20}
+                  style={{
+                    marginRight: 8,
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s ease",
+                  }}
+                />
+              )
         }
-        return <span className={`${classes.placeholder} !font-normal`}>{props.placeholder}</span>;
-    };
+      >
+        {options.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </StyledSelect>
 
-    return (
-        <div className={`flex flex-col w-full relative ${props.disabled ? 'pointer-events-none select-none' : ''}`}>
-            {label && (<div className={classes.label}>{label}</div>)}
-            <MuiSelect
-                id={`select-${label}`}
-                {...props}
-                className={classes.input}
-                displayEmpty
-                renderValue={renderValue}
-                onOpen={() => setOpen(true)}
-                onClose={() => setOpen(false)}
-                onChange={(e) => onChange?.(e.target.value as number)}   // ✅ map event → value
-                onBlur={(e) => onBlur?.(e.target.value as string | number)}
-                onFocus={(e) => onFocus?.(e.target.value as string | number)}
-                IconComponent={disableArrow ? () => null : (iconProps) => {
-                    const { className, ...otherProps } = iconProps;
-                    return (
-                        <img
-                            {...otherProps}
-                            className={`${className} ${classes.icon} ${open ? classes.iconOpen : ''}`}
-                            src={downArrowIcon}
-                            alt="Down Arrow"
-                            style={{
-                                width: '20px',
-                                height: '20px',
-                                transition: 'transform 0.2s',
-                                transform: open ? 'rotate(180deg)' : 'rotate(0)'
-                            }}
-                        />
-                    );
-                }}
-            >
-                {options.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                    </MenuItem>
-                ))}
-            </MuiSelect>
-            {props.error && <ErrorMessage message={helperText} />}
-        </div>
-    );
+      {error && helperText && <ErrorMessage message={helperText} />}
+    </div>
+  );
 };
 
 export default Select;
