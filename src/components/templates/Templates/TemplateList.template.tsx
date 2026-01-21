@@ -53,7 +53,7 @@ const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ t
 
     const Action = (name: string) => {
         return (
-            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
+            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
                 <button onClick={() => handleEdit(name)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>

@@ -74,7 +74,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     };
 
     const Action = (themeName: string) => (
-            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`} title=''>
+            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
             <button 
                 onClick={() => handleEdit(themeName)} 
                 className="w-6 h-6"

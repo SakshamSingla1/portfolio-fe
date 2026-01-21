@@ -65,7 +65,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
 
     const Action = (resume: DocumentUploadResponse) => {
         return (
-            <div className={`flex ${isMobile ? 'justify-end' : 'justify-center'} space-x-2`}>
+            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`}>
                 <button onClick={() => handleView(resume.fileUrl, resume.status)} className="w-6 h-6">
                     <FiEye />
                 </button>
