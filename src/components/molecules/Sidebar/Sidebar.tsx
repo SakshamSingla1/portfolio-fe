@@ -13,7 +13,7 @@ import {
   FaLink,
   FaPaintRoller,
 } from "react-icons/fa";
-import { IoNotifications , IoDocuments } from "react-icons/io5";
+import { IoNotifications , IoDocuments, IoLinkSharp } from "react-icons/io5";
 import { createUseStyles } from "react-jss";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { enumToNormalKey} from "../../../utils/helper";
@@ -44,6 +44,7 @@ const iconMap: Record<string, JSX.Element> = {
   SETTINGS: <FaCog />,
   NAVLINKS: <FaLink />,
   RESUMES: <IoDocuments />,
+  SOCIAL_LINKS: <IoLinkSharp />,
 };
 
 const useStyles = createUseStyles({

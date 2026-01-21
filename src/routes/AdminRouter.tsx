@@ -15,6 +15,7 @@ import axios from 'axios';
 import useRouteValidate from '../hooks/useRouteValidate';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ResumeRoutes from './AdminRoutes/ResumeRouter';
+import SocialLinkRoutes from './AdminRoutes/SocialLinkRoutes';
 
 export const AdminRouter: React.FC = () => {
 
@@ -77,6 +78,7 @@ export const AdminRouter: React.FC = () => {
         <Route path="admin/color-themes/*" element={<div><ColorThemeRoutes /></div>} />
         <Route path="admin/templates/*" element={<div><TemplateRoutes /></div>} />
         <Route path="admin/resumes/*" element={<div><ResumeRoutes /></div>} />
+        <Route path="admin/social-links/*" element={<div><SocialLinkRoutes /></div>} />
       </Route>
     </Routes>
   );

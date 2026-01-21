@@ -64,7 +64,11 @@ export const ADMIN_ROUTES = {
     COLOR_THEME_VIEW: "/admin/color-themes/:themeName",
 
     RESUMES: "/admin/resumes",
-    RESUME_VIEW: "/admin/resumes/:id",
+
+    SOCIAL_LINKS: "/admin/social-links",
+    SOCIAL_LINKS_ADD: "/admin/social-links/add",
+    SOCIAL_LINKS_EDIT: "/admin/social-links/:id/edit",
+    SOCIAL_LINKS_VIEW: "/admin/social-links/:id",
 }
 
 export const MODE = {
@@ -456,3 +460,42 @@ export const RESOURCE_STATUS = {
     BLOCKED: "Blocked",
     DELETED: "Deleted",
 }
+
+
+export const SocialLinkPlatform = {
+    GITHUB: "GITHUB",
+    GITLAB: "GITLAB",   
+    BITBUCKET: "BITBUCKET",
+    LINKEDIN: "LINKEDIN",
+    STACKOVERFLOW: "STACKOVERFLOW",
+    LEETCODE: "LEETCODE",
+    HACKERRANK: "HACKERRANK",
+    CODECHEF: "CODECHEF",
+    CODEFORCES: "CODEFORCES",
+    PORTFOLIO: "PORTFOLIO",
+    RESUME: "RESUME",
+    TWITTER: "TWITTER",
+    X: "X",
+    INSTAGRAM: "INSTAGRAM",
+    FACEBOOK: "FACEBOOK",
+    OTHER: "OTHER"
+} as const;
+
+export const SocialLinkPlatformOptions : Option[] = [
+    { label: "Github", value: SocialLinkPlatform.GITHUB },
+    { label: "Gitlab", value: SocialLinkPlatform.GITLAB },
+    { label: "Bitbucket", value: SocialLinkPlatform.BITBUCKET },
+    { label: "LinkedIn", value: SocialLinkPlatform.LINKEDIN },
+    { label: "StackOverflow", value: SocialLinkPlatform.STACKOVERFLOW },
+    { label: "Leetcode", value: SocialLinkPlatform.LEETCODE },
+    { label: "HackerRank", value: SocialLinkPlatform.HACKERRANK },
+    { label: "CodeChef", value: SocialLinkPlatform.CODECHEF },
+    { label: "CodeForces", value: SocialLinkPlatform.CODEFORCES },
+    { label: "Portfolio", value: SocialLinkPlatform.PORTFOLIO },
+    { label: "Resume", value: SocialLinkPlatform.RESUME },
+    { label: "Twitter", value: SocialLinkPlatform.TWITTER },
+    { label: "X", value: SocialLinkPlatform.X },
+    { label: "Instagram", value: SocialLinkPlatform.INSTAGRAM },
+    { label: "Facebook", value: SocialLinkPlatform.FACEBOOK },
+    { label: "Other", value: SocialLinkPlatform.OTHER }
+] as const;
