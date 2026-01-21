@@ -1,34 +1,44 @@
-import React from 'react'
-import { createUseStyles } from 'react-jss';
+import React from "react";
+import { createUseStyles } from "react-jss";
+import { useColors } from "../../../utils/types";
 
-const useStyles = createUseStyles((theme: any) => ({
-    errorBig: {
-        color: theme.palette.text.secondary.secondary500,
-        position: 'absolute',
-        marginTop: '95px'
-    },
-    errorSmall: {
-        color: theme.palette.text.secondary.secondary500,
-        position: 'absolute',
-        marginTop: '70px'
-    },
+const useStyles = createUseStyles({
+    errorBig: (colors: any) => ({
+        color: colors.error600,
+        position: "absolute",
+        marginTop: "95px",
+        fontSize: "12px",
+        lineHeight: "16px",
+    }),
+
+    errorSmall: (colors: any) => ({
+        color: colors.error600,
+        position: "absolute",
+        marginTop: "70px",
+        fontSize: "12px",
+        lineHeight: "16px",
+    }),
+
     "@media (max-width: 767px)": {
-        errorSmall: {
-            color: "#EF0000",
-            position:'relative',marginTop:'0px',
-        },
-}
-}));
+        errorSmall: (colors: any) => ({
+            color: colors.error600,
+            position: "relative",
+            marginTop: "4px",
+        }),
+    },
+});
 
 interface ErrorMessageProps {
-    message?: string
+    message?: string;
 }
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ message }) => {
-    const classes = useStyles();
-    return (
-        <div className={`${classes.errorSmall} text-xs`}>{message}</div>
-    )
-}
+    const colors = useColors();
+    const classes = useStyles(colors);
 
-export default ErrorMessage
+    if (!message) return null;
+
+    return <div className={classes.errorSmall}>{message}</div>;
+};
+
+export default ErrorMessage;
