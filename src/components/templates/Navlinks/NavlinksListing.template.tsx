@@ -10,9 +10,9 @@ import { type NavlinkResponse, type NavlinkFilterRequest } from "../../../servic
 import { FiEdit, FiEye, FiSearch, FiFilter, FiChevronUp, FiChevronDown, FiPlus } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
-import Select from "../../atoms/Select/Select";
 import { enumToNormalKey } from "../../../utils/helper";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
+import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 interface INavlinkListTableTemplateProps {
     navlinks: NavlinkResponse[];
@@ -158,23 +158,29 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
                             {showFilters && (
                                 <div className="space-y-3 p-4">
                                     <div className={`w-[250px]`}>
-                                        <Select
-                                            label="Role"
-                                            options={RoleOptions}
-                                            value={filters.role || ""}
-                                            onChange={(e) => handleFiltersChange("role", e)}
-                                            fullWidth
-                                            placeholder="Select Role"
+                                        <AutoCompleteInput
+                                            label="Status"
+                                            placeHolder="Search and select a status"
+                                            options={StatusOptions}
+                                            value={StatusOptions.find(option => option.value === filters.status) || null}
+                                            onSearch={() => { }}
+                                            onChange={value => {
+                                                handleFiltersChange("status", value?.value ?? null);
+                                            }}
+                                            isDisabled={false}
                                         />
                                     </div>
                                     <div className="w-[250px]">
-                                        <Select
-                                            label="Status"
-                                            options={StatusOptions}
-                                            value={filters.status || ""}
-                                            onChange={(e) => handleFiltersChange("status", e)}
-                                            fullWidth
-                                            placeholder="Select Status"
+                                        <AutoCompleteInput
+                                            label="Role"
+                                            placeHolder="Search and select a role"
+                                            options={RoleOptions}
+                                            value={RoleOptions.find(option => option.value === filters.role) || null}
+                                            onSearch={() => { }}
+                                            onChange={value => {
+                                                handleFiltersChange("role", value?.value ?? null);
+                                            }}
+                                            isDisabled={false}
                                         />
                                     </div>
                                     <TextField
@@ -197,23 +203,29 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
                     ) : (
                         <>
                             <div className={`w-[250px]`}>
-                                <Select
+                                <AutoCompleteInput
                                     label="Role"
+                                    placeHolder="Search and select a role"
                                     options={RoleOptions}
-                                    value={filters.role || ""}
-                                    onChange={(e) => handleFiltersChange("role", e)}
-                                    fullWidth
-                                    placeholder="Select Role"
+                                    value={RoleOptions.find(option => option.value === filters.role) || null}
+                                    onSearch={() => { }}
+                                    onChange={value => {
+                                        handleFiltersChange("role", value?.value ?? null);
+                                    }}
+                                    isDisabled={false}
                                 />
                             </div>
                             <div className="w-[250px]">
-                                <Select
+                                <AutoCompleteInput
                                     label="Status"
+                                    placeHolder="Search and select a status"
                                     options={StatusOptions}
-                                    value={filters.status || ""}
-                                    onChange={(e) => handleFiltersChange("status", e)}
-                                    fullWidth
-                                    placeholder="Select Status"
+                                    value={StatusOptions.find(option => option.value === filters.status) || null}
+                                    onSearch={() => { }}
+                                    onChange={value => {
+                                        handleFiltersChange("status", value?.value ?? null);
+                                    }}
+                                    isDisabled={false}
                                 />
                             </div>
                             <div className="w-[250px]">

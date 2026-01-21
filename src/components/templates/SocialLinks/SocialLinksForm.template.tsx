@@ -99,7 +99,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             {...formik.getFieldProps('url')}
                             disabled={mode === MODE.VIEW}
                             error={formik.touched.url && Boolean(formik.errors.url)}
-                            helperText={formik.touched.url && formik.errors.url}
+                            helperText={formik.touched.url && formik.errors.url ? String(formik.errors.url) : ""}
                         />
                         <TextField
                             label="Index"
@@ -109,7 +109,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             {...formik.getFieldProps('order')}
                             disabled={mode === MODE.VIEW}
                             error={formik.touched.order && Boolean(formik.errors.order)}
-                            helperText={formik.touched.order && formik.errors.order}
+                            helperText={formik.touched.order && formik.errors.order ? String(formik.errors.order) : ""}
                         />
                     </div>
                 </div>

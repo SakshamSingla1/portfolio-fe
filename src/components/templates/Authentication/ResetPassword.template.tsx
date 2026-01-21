@@ -107,7 +107,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
               )
             }}
             error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
-            helperText={formik.touched.newPassword && formik.errors.newPassword}
+            helperText={formik.touched.newPassword && formik.errors.newPassword ? String(formik.errors.newPassword) : ""}
           />
           <div>
             <TextField
@@ -143,7 +143,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
               }
               helperText={
                 formik.touched.confirmPassword &&
-                formik.errors.confirmPassword
+                formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""
               }
             />
             <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />
