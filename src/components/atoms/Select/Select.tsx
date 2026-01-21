@@ -35,6 +35,7 @@ const useStyles = createUseStyles({
         fontWeight: 400,
         color: colors.neutral900,
         transition: "all 0.2s ease-in-out",
+        height: "52px",
 
         "&:hover": {
             borderColor: colors.primary300,
