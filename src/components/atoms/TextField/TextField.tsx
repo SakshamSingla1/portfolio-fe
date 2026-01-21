@@ -50,7 +50,6 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
       border: "none",
     },
 
-    /* Error */
     "& .Mui-error .MuiInputBase-root": {
       backgroundColor: colors.error50,
       borderColor: colors.error500,
@@ -58,7 +57,6 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
   })
 );
 
-/* ---------- Wrapper ---------- */
 
 interface Props extends Omit<TextFieldProps, "label" | "helperText" | "error"> {
   label?: string;
