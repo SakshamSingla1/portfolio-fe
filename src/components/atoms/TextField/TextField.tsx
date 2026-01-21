@@ -4,103 +4,86 @@ import { createUseStyles } from "react-jss";
 import { useColors } from "../../../utils/types";
 
 const useStyles = createUseStyles({
+    wrapper: {
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        position: "relative",
+        gap: "6px",
+    },
+
     label: (colors: any) => ({
         color: colors.neutral700,
-        fontSize: "16px",
-        fontWeight: 400,
+        fontSize: "14px",
+        fontWeight: 500,
         lineHeight: "16px",
         marginLeft: "8px",
     }),
 
     textField: (colors: any) => ({
         "& .MuiInputBase-root": {
+            backgroundColor: colors.neutral50,
             border: `1px solid ${colors.neutral200}`,
+            borderRadius: "4px",
             fontSize: "16px",
-            fontWeight: 400,
-            borderRadius: "12px",
+            transition: "all 0.2s ease-in-out",
 
             "&:hover": {
                 borderColor: colors.primary300,
-                outline: "none",
+            },
+
+            "&:focus-within": {
+                borderColor: colors.primary500,
+                boxShadow: `0 0 0 3px ${colors.primary100}`,
             },
 
             "& .MuiInputBase-input": {
                 padding: "13px 12px",
+                color: colors.neutral900,
+
                 "&::placeholder": {
-                    color: `${colors.neutral900} !important`,
+                    color: colors.neutral400,
                 },
+
                 "&:-webkit-autofill": {
-                    WebkitBoxShadow: `0 0 0 1000px inherit inset !important`,
-                    WebkitTextFillColor: `${colors.neutral700} !important`,
+                    WebkitBoxShadow: `0 0 0 1000px ${colors.neutral50} inset`,
+                    WebkitTextFillColor: colors.neutral900,
                     borderRadius: "12px",
-                    transition: "background-color 5000s ease-in-out 0s",
                 },
             },
 
             "& .MuiOutlinedInput-notchedOutline": {
-                borderWidth: 0,
+                border: "none",
             },
 
-            "&:focus-within": {
-                borderColor: colors.primary300,
-                borderWidth: 2,
-            },
-
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderWidth: 0,
-            },
-
-            "& .Mui-disabled": {
-                color: `${colors.neutral900} !important`,
+            "&.Mui-disabled": {
+                backgroundColor: colors.neutral100,
                 borderColor: colors.neutral200,
+                color: colors.neutral500,
+                cursor: "not-allowed",
             },
         },
 
+        /* Error State */
         "& .Mui-error": {
-            border: "1px solid",
-            borderColor: colors.secondary200,
-            backgroundColor: colors.secondary50,
-            color: colors.secondary400,
+            borderColor: colors.error500,
+            backgroundColor: colors.error50,
         },
     }),
 
     readOnlyInput: (colors: any) => ({
         "& .MuiInputBase-input[readonly]": {
-            backgroundColor: colors.neutral50,
-            color: `${colors.neutral900} !important`,
+            backgroundColor: colors.neutral100,
+            color: `${colors.neutral700} !important`,
+            cursor: "default",
         },
     }),
 
-    "@media (max-width: 767px)": {
-        textField: (colors: any) => ({
-            "& .MuiInputBase-root": {
-                border: `1px solid ${colors.neutral200}`,
-                fontSize: "14px",
-                borderRadius: "6px",
-
-                "& .MuiInputBase-input": {
-                    padding: "13px 12px",
-                    "&::placeholder": {
-                        color: `${colors.neutral400} !important`,
-                    },
-                },
-            },
-
-            "& .Mui-error": {
-                borderColor: colors.secondary200,
-                borderRadius: "6px",
-                backgroundColor: colors.secondary50,
-                color: colors.secondary400,
-            },
-        }),
-
-        label: (colors: any) => ({
-            color: colors.neutral700,
-            fontSize: "14px",
-            lineHeight: "16px",
-            marginLeft: "8px",
-        }),
-    },
+    helperText: (colors: any) => ({
+        fontSize: "12px",
+        marginLeft: "8px",
+        color: colors.error600,
+    }),
 });
 
 const TextField = styled((props: TextFieldProps) => {
@@ -109,11 +92,13 @@ const TextField = styled((props: TextFieldProps) => {
 
     return (
         <div
-            className={`flex flex-col w-auto relative ${
+            className={`${classes.wrapper} ${
                 props.disabled ? "pointer-events-none select-none" : ""
             }`}
         >
-            {props.label && <div className={classes.label}>{props.label}</div>}
+            {props.label && (
+                <label className={classes.label}>{props.label}</label>
+            )}
 
             <MuiTextField
                 {...props}
@@ -125,7 +110,7 @@ const TextField = styled((props: TextFieldProps) => {
             />
 
             {props.error && props.helperText && (
-                <p className="text-red-500">{props.helperText}</p>
+                <p className={classes.helperText}>{props.helperText}</p>
             )}
         </div>
     );

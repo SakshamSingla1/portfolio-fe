@@ -349,23 +349,23 @@ const useStyles = createUseStyles((colors: any) => ({
 function TablePaginationActions(props: any) {
   const { count, page, rowsPerPage, onPageChange } = props;
   const colors = useColors();
-  
+
   const handleFirstPageButtonClick = (event: any) => {
     onPageChange(event, 0);
   };
-  
+
   const handleBackButtonClick = (event: any) => {
     onPageChange(event, page - 1);
   };
-  
+
   const handleNextButtonClick = (event: any) => {
     onPageChange(event, page + 1);
   };
-  
+
   const handleLastPageButtonClick = (event: any) => {
     onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
   };
-  
+
   return (
     <div style={{ display: 'flex' }}>
       <IconButton
@@ -404,29 +404,29 @@ function TablePaginationActions(props: any) {
   );
 }
 
-const TableV1: React.FC<TableProps> = ({ 
-  schema, 
-  records, 
-  className, 
+const TableV1: React.FC<TableProps> = ({
+  schema,
+  records,
+  className,
   onRowClick,
 }) => {
   const colors = useColors();
   const classes = useStyles({ theme: colors });
   const [isMobile, setIsMobile] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
-  
-  const { total, isVisible, currentPage, limit, handleChangePage = () => {}, handleChangeRowsPerPage = () => {} } = schema.pagination;
-  
+
+  const { total, isVisible, currentPage, limit, handleChangePage = () => { }, handleChangeRowsPerPage = () => { } } = schema.pagination;
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
+
   const toggleCardExpansion = (rowIndex: number) => {
     setExpandedCards(prev => {
       const newSet = new Set(prev);
@@ -451,19 +451,19 @@ const TableV1: React.FC<TableProps> = ({
       })
       .slice(0, maxColumns);
   };
-  
+
   const centerColumns: number[] = [];
   schema.columns.forEach((col, index) => {
     if (["status", "action"].includes(col.key)) centerColumns.push(index);
   });
-  
+
   const getCellView = (data: any, columnProps: TableColumn) => {
     const { type, component, props } = columnProps;
-  
+
     if (type === "custom" && component) {
       return component({ value: data, ...props });
     }
-  
+
     switch (type) {
       case "number": return <NumberCell data={data} props={props} />;
       case "date": return <DateCell data={data} props={props} />;
@@ -472,22 +472,22 @@ const TableV1: React.FC<TableProps> = ({
       default: return <StringCell data={data} props={props} />;
     }
   };
-  
+
   const mobileView = schema.mobileView || 'cards';
   const mobileColumns = getMobileColumns();
-  
+
   const renderMobileCard = (row: any[], rowIndex: number) => {
     const primaryColumn = schema.columns.find(col => col.priority === 'high') || schema.columns[0];
     const primaryValue = getCellView(row[schema.columns.indexOf(primaryColumn)], primaryColumn);
     const isExpanded = expandedCards.has(rowIndex);
-    
+
     return (
       <div
         key={rowIndex}
         className={classes.mobileCard}
         style={{ position: 'relative' }}
       >
-        <div 
+        <div
           className={classes.mobileCardHeader}
           onClick={() => toggleCardExpansion(rowIndex)}
           style={{ cursor: 'pointer', userSelect: 'none' }}
@@ -499,17 +499,17 @@ const TableV1: React.FC<TableProps> = ({
             {primaryValue}
           </div>
           <div className={classes.mobileCardDropdownArrow}>
-            <span 
+            <span
               style={{
                 display: 'inline-block'
               }}
             >
-              { isExpanded ? <FiChevronUp /> : <FiChevronDown /> }
+              {isExpanded ? <FiChevronUp /> : <FiChevronDown />}
             </span>
           </div>
         </div>
-        
-        <div 
+
+        <div
           className={classes.mobileCardContent}
           style={{
             maxHeight: isExpanded ? '500px' : '0',
@@ -535,7 +535,7 @@ const TableV1: React.FC<TableProps> = ({
       </div>
     );
   };
-  
+
   return (
     <div className={`${classes.tableContainer} ${className}`}>
       {schema.title && (
@@ -578,8 +578,8 @@ const TableV1: React.FC<TableProps> = ({
             <tbody className={classes.tableBody}>
               {records.length === 0 ? (
                 <tr>
-                  <td 
-                    colSpan={(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).length} 
+                  <td
+                    colSpan={(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).length}
                     className={classes.emptyState}
                   >
                     No records found
@@ -587,7 +587,7 @@ const TableV1: React.FC<TableProps> = ({
                 </tr>
               ) : (
                 records.map((row, rowIndex) => (
-                  <tr 
+                  <tr
                     key={rowIndex}
                     className={clsx(
                       schema.hover && 'hover:opacity-90',
@@ -615,7 +615,7 @@ const TableV1: React.FC<TableProps> = ({
           </table>
         </div>
       )}
-      
+
       {isVisible && (
         <div className={classes.pagination}>
           <TablePagination

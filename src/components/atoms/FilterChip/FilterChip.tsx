@@ -7,12 +7,12 @@ import {
   Checkbox,
   ListItemText,
   styled,
-  Box
+  Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import TextField from "../../atoms/TextField/TextField";
-import Button from "../../atoms/Button/Button"; 
+import Button from "../../atoms/Button/Button";
 import { useColors } from "../../../utils/types";
 
 export interface FilterChipOption {
@@ -30,50 +30,40 @@ interface FilterChipV2Props
   clearButtonLabel?: string;
   applyButtonLabel?: string;
   enableSearch?: boolean;
-  enableRangeFilter?: boolean;
-  rangeLabel?: string;
-  rangeMinPlaceholder?: string;
-  rangeMaxPlaceholder?: string;
-  rangeApplyLabel?: string;
   width?: string | number;
   height?: string | number;
 }
+
+/* =======================
+   Styled Components
+======================= */
 
 const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
   width: "100%",
 
   "& .MuiSelect-select": {
-    padding: "8px 12px",
     minHeight: "40px",
+    padding: "8px 12px",
     display: "flex",
     alignItems: "center",
+    gap: "6px",
 
+    backgroundColor: colors.neutral50,
     border: `1px solid ${colors.neutral200}`,
     borderRadius: "12px",
     fontSize: "16px",
     fontWeight: 400,
-    color: colors.neutral800,
-    backgroundColor: colors.neutral0,
+    color: colors.neutral900,
 
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-
-    transition: "all 0.2s ease",
+    transition: "all 0.2s ease-in-out",
 
     "&:hover": {
       borderColor: colors.primary300,
-      backgroundColor: colors.neutral50,
     },
 
     "&.Mui-focused": {
       borderColor: colors.primary500,
-      boxShadow: `0 0 0 2px ${colors.primary100}`,
-    },
-
-    "&:focus-visible": {
-      outline: "none",
-      boxShadow: `0 0 0 3px ${colors.primary200}`,
+      boxShadow: `0 0 0 3px ${colors.primary100}`,
     },
   },
 
@@ -83,37 +73,38 @@ const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
 
   "&.Mui-disabled .MuiSelect-select": {
     backgroundColor: colors.neutral100,
-    color: colors.neutral400,
+    borderColor: colors.neutral200,
+    color: colors.neutral500,
     cursor: "not-allowed",
   },
 
   "&.Mui-error .MuiSelect-select": {
-    borderColor: "#EF4444",
-    boxShadow: "0 0 0 1px rgba(239,68,68,0.2)",
+    borderColor: colors.error500,
+    backgroundColor: colors.error50,
   },
 }));
 
-const MenuProps = {
+const MenuProps = (colors: any) => ({
   PaperProps: {
     style: {
       maxHeight: 300,
       marginTop: 8,
       borderRadius: 12,
-      border: "1px solid #E5E7EB",
+      border: `1px solid ${colors.neutral200}`,
       boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
     },
   },
   MenuListProps: {
     style: { padding: 0 },
   },
-};
+});
 
 const SearchContainer = styled("div")<{ colors: any }>(({ colors }) => ({
   padding: "10px 16px",
-  backgroundColor: colors.neutral0,
   position: "sticky",
   top: 0,
   zIndex: 1,
+  backgroundColor: colors.neutral0,
   borderBottom: `1px solid ${colors.neutral200}`,
 }));
 
@@ -121,12 +112,16 @@ const ActionsContainer = styled("div")<{ colors: any }>(({ colors }) => ({
   display: "flex",
   justifyContent: "space-between",
   padding: "10px 16px",
-  borderTop: `1px solid ${colors.neutral200}`,
-  backgroundColor: colors.neutral0,
   position: "sticky",
   bottom: 0,
   zIndex: 1,
+  backgroundColor: colors.neutral0,
+  borderTop: `1px solid ${colors.neutral200}`,
 }));
+
+/* =======================
+   Component
+======================= */
 
 const FilterChipV2: React.FC<FilterChipV2Props> = ({
   options,
@@ -141,9 +136,8 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
   height = "auto",
   ...props
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-
   const colors = useColors();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredOptions = useMemo(() => {
     if (!searchTerm) return options;
@@ -167,18 +161,16 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
     );
   };
 
-  const renderValue = (selected: any) => {
-    if (!selected.length) {
-      return (
-        <span style={{ color: colors.neutral400 }}>
-          {placeholder}
-        </span>
-      );
+  const renderValue = (selected: unknown) => {
+    const selectedValues = Array.isArray(selected) ? selected : [];
+
+    if (!selectedValues.length) {
+      return <span style={{ color: colors.neutral400 }}>{placeholder}</span>;
     }
 
     return (
       <Box sx={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-        {selected.slice(0, 3).map((val: any) => {
+        {selectedValues.slice(0, 3).map((val) => {
           const opt = options.find((o) => o.value === val);
           if (!opt) return null;
 
@@ -209,7 +201,7 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
             </Box>
           );
         })}
-        {selected.length > 3 && (
+        {selectedValues.length > 3 && (
           <Box
             sx={{
               px: 1,
@@ -221,7 +213,7 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
               border: `1px solid ${colors.neutral200}`,
             }}
           >
-            +{selected.length - 3} more
+            +{selectedValues.length - 3} more
           </Box>
         )}
       </Box>
@@ -236,7 +228,7 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
         onChange={handleChange}
         displayEmpty
         renderValue={renderValue}
-        MenuProps={MenuProps}
+        MenuProps={MenuProps(colors)}
         colors={colors}
         {...props}
       >
@@ -263,8 +255,10 @@ const FilterChipV2: React.FC<FilterChipV2Props> = ({
         {filteredOptions.map((opt) => (
           <MenuItem key={String(opt.value)} value={opt.value}>
             <Checkbox
-              checked={value.some((v) => String(v.value) === String(opt.value))}
               size="small"
+              checked={value.some(
+                (v) => String(v.value) === String(opt.value)
+              )}
             />
             <ListItemText primary={opt.label} />
           </MenuItem>

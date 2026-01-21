@@ -9,7 +9,7 @@ const SocialLinkRoutes = () => {
         <Routes>
             <Route index element={<ListingSocialLinksPage />} />
             <Route path="add" element={<AddSocialLinkPage />} />
-            <Route path="edit/:id" element={<EditSocialLinkPage />} />
+            <Route path=":id/edit" element={<EditSocialLinkPage />} />
             <Route path=":id" element={<ViewSocialLinkPage />} />
         </Routes>
     );

@@ -88,7 +88,9 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             onChange={value => {
                                 formik.setFieldValue("platform", value?.value ?? null);
                             }}
-                            isDisabled={mode === MODE.VIEW}
+                            error={formik.touched.platform && Boolean(formik.errors.platform)}
+                            helperText={formik.touched.platform && formik.errors.platform ? String(formik.errors.platform) : ""}
+                            isDisabled={mode !== MODE.ADD}
                         />
                         <TextField
                             label="Url"
