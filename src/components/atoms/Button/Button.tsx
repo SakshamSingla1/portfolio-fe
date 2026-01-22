@@ -1,222 +1,128 @@
 import React, { useMemo } from "react";
 import MuiButton, { type ButtonProps as MuiButtonProps } from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import { createUseStyles } from "react-jss";
+import { styled } from "@mui/system";
 import { useColors } from "../../../utils/types";
 
-type CustomVariant = 
-  | "primaryContained" 
-  | "secondaryContained" 
-  | "tertiaryContained" 
-  | "primaryText" 
-  | "secondaryText" 
-  | "underlined" 
+type CustomVariant =
+  | "primaryContained"
+  | "secondaryContained"
+  | "tertiaryContained"
+  | "primaryText"
+  | "secondaryText"
+  | "underlined"
   | "tertiaryText";
 
 type CustomSize = "extraSmall" | "small" | "medium" | "large";
 
-const useStyles = createUseStyles({
-  root: {
-    minWidth: "auto",
-    padding: "0px",
-    lineHeight: "1 !important",
-    "&:hover": {
-      backgroundColor: "transparent",
-    },
-    "&.Mui-disabled": {
-      opacity: 0.6,
-    },
-  },
-  iconButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 28,
-    height: 40,
-    borderRadius: "45px",
-    padding: "8px",
-  },
-  iconWithText: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-  label: {
-    textTransform: "capitalize",
-    fontWeight: 500,
-  },
-  // Size variants
-  extraSmall: {
-    minHeight: 32,
-    padding: "4px 12px",
-    fontSize: "14px",
-    borderRadius: "4px",
-  },
-  small: {
-    minHeight: 36,
-    padding: "6px 16px",
-    fontSize: "14px",
-    borderRadius: "4px",
-  },
-  medium: {
-    minHeight: 40,
-    padding: "8px 20px",
-    fontSize: "16px",
-    borderRadius: "6px",
-  },
-  large: {
-    minHeight: 48,
-    padding: "12px 24px",
-    fontSize: "16px",
-    borderRadius: "8px",
-  },
-  // Variant styles
-  primaryContained: (colors: any) => ({
-    color: colors.neutral50,
-    backgroundColor: colors.primary300,
-    "&:hover": {
-      backgroundColor: `${colors.primary300}E6`, // 90% opacity
-    },
-    "&:active": {
-      backgroundColor: `${colors.primary300}CC`, // 80% opacity
-    },
-    "&.Mui-disabled": {
-      backgroundColor: colors.neutral200,
-      color: colors.neutral400,
-    },
-  }),
-  secondaryContained: (colors: any) => ({
-    color: colors.primary300,
-    backgroundColor: colors.neutral50,
-    border: `1px solid ${colors.primary300}`,
-    "&:hover": {
-      backgroundColor: `${colors.neutral50}E6`,
-    },
-    "&:active": {
-      backgroundColor: `${colors.neutral200}CC`,
-    },
-    "&.Mui-disabled": {
-      borderColor: colors.neutral200,
-      color: colors.neutral400,
-    },
-  }),
-  tertiaryContained: (colors: any) => ({
-    color: colors.primary300,
-    backgroundColor: colors.neutral50,
-    border: `1px solid ${colors.neutral200}`,
-    "&:hover": {
-      backgroundColor: colors.neutral50,
-      borderColor: colors.primary300,
-    },
-    "&.Mui-disabled": {
-      color: colors.neutral400,
-      borderColor: colors.neutral200,
-    },
-  }),
-  primaryText: (colors: any) => ({
-    color: colors.primary300,
-    backgroundColor: "transparent",
-    textDecoration: "none",
-    "&:hover": {
-      textDecoration: "underline",
-      backgroundColor: "transparent",
-    },
-    "&.Mui-disabled": {
-      color: colors.neutral400,
-    },
-  }),
-  secondaryText: (colors: any) => ({
-    color: colors.neutral700,
-    backgroundColor: "transparent",
-    textDecoration: "none",
-    "&:hover": {
-      color: colors.primary300,
-      textDecoration: "underline",
-      backgroundColor: "transparent",
-    },
-    "&.Mui-disabled": {
-      color: colors.neutral400,
-    },
-  }),
-tertiaryText: (colors: any) => ({
-  color: colors.neutral700,
-  '&:hover': {
-    backgroundColor: colors.neutral50,
-  }
-}),
-  underlined: (colors: any) => ({
-    color: colors.neutral700,
-    backgroundColor: "transparent",
-    textDecoration: "underline",
-    "&:hover": {
-      color: colors.primary300,
-      backgroundColor: "transparent",
-    },
-    "&.Mui-disabled": {
-      color: colors.neutral400,
-    },
-  }),
-});
-
 interface ButtonProps extends Omit<MuiButtonProps, "variant" | "size"> {
-  variant: CustomVariant;
-  label?: string | React.ReactNode;
+  variant?: CustomVariant;
+  label?: React.ReactNode;
   isLoading?: boolean;
   iconButton?: React.ReactNode;
   size?: CustomSize;
   buttonWithImg?: boolean;
 }
 
+const StyledButton = styled(MuiButton)<{
+  $variant: CustomVariant;
+  $size: CustomSize;
+  colors: any;
+}>(({ colors, $variant, $size }) => ({
+  textTransform: "capitalize",
+  fontWeight: 500,
+  lineHeight: 1,
+  minWidth: "auto",
+
+  ...( {
+    extraSmall: { minHeight: 32, padding: "4px 12px", fontSize: 14, borderRadius: 4 },
+    small: { minHeight: 36, padding: "6px 16px", fontSize: 14, borderRadius: 4 },
+    medium: { minHeight: 40, padding: "8px 20px", fontSize: 16, borderRadius: 6 },
+    large: { minHeight: 48, padding: "12px 24px", fontSize: 16, borderRadius: 8 },
+  }[$size]),
+
+  ...( {
+    primaryContained: {
+      backgroundColor: colors.primary300,
+      color: colors.neutral50,
+      "&:hover": { backgroundColor: colors.primary300 },
+    },
+
+    secondaryContained: {
+      backgroundColor: colors.neutral50,
+      color: colors.primary300,
+      border: `1px solid ${colors.primary300}`,
+    },
+
+    tertiaryContained: {
+      backgroundColor: colors.neutral50,
+      color: colors.primary300,
+      border: `1px solid ${colors.neutral200}`,
+    },
+
+    primaryText: {
+      color: colors.primary300,
+      "&:hover": { textDecoration: "underline" },
+    },
+
+    secondaryText: {
+      color: colors.neutral700,
+      "&:hover": { color: colors.primary300 },
+    },
+
+    tertiaryText: {
+      color: colors.neutral700,
+      "&:hover": { backgroundColor: colors.neutral50 },
+    },
+
+    underlined: {
+      color: colors.neutral700,
+      textDecoration: "underline",
+    },
+  }[$variant]),
+
+  "&.Mui-disabled": {
+    opacity: 0.6,
+  },
+}));
+
 const Button: React.FC<ButtonProps> = ({
   variant = "primaryContained",
-  label,
-  isLoading = false,
-  iconButton,
   size = "medium",
-  buttonWithImg = false,
-  className = "",
-  disabled = false,
+  label,
+  iconButton,
+  isLoading,
+  buttonWithImg,
+  disabled,
   ...props
 }) => {
-
   const colors = useColors();
 
-  const styles = useStyles(colors);
-
-  const buttonContent = useMemo(() => {
-    if (isLoading) {
-      return <CircularProgress size={20} color="inherit" />;
-    }
-
-    if (buttonWithImg && (iconButton || label)) {
+  const content = useMemo(() => {
+    if (isLoading) return <CircularProgress size={18} color="inherit" />;
+    if (buttonWithImg)
       return (
-        <span className={styles.iconWithText}>
+        <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
           {iconButton}
-          {label && <span>{label}</span>}
+          {label}
         </span>
       );
-    }
-
     return iconButton || label;
-  }, [isLoading, buttonWithImg, iconButton, label, styles]);
+  }, [isLoading, buttonWithImg, iconButton, label]);
 
   return (
-    <MuiButton
+    <StyledButton
+      colors={colors}
+      $variant={variant}
+      $size={size}
       variant="text"
-      className={`
-        ${styles.root} 
-        ${styles[variant]} 
-        ${styles[size]} 
-        ${styles.label} 
-        ${className}
-      `}
-      disabled={disabled || isLoading}
       disableRipple
       disableElevation
+      disabled={disabled || isLoading}
       {...props}
     >
-      {buttonContent}
-    </MuiButton>
+      {content}
+    </StyledButton>
   );
 };
 

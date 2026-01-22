@@ -1,96 +1,87 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
-import { RoleOptions, StatusOptions, type IPagination } from "../../../utils/types";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { DateUtils, makeRoute } from "../../../utils/helper";
+import { StatusOptions, type IPagination } from "../../../utils/types";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
 import Table from "../../organisms/TableV1/TableV1";
-import { type NavlinkResponse, type NavlinkFilterRequest } from "../../../services/useNavlinkService";
-import { FiEdit, FiEye, FiSearch, FiFilter, FiChevronUp, FiChevronDown, FiPlus } from "react-icons/fi";
-import { ADMIN_ROUTES } from "../../../utils/constant";
-import Button from "../../atoms/Button/Button";
-import { enumToNormalKey } from "../../../utils/helper";
+import { FiEye,FiEdit, FiSearch,FiPlus, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
+import { DateUtils, enumToNormalKey } from "../../../utils/helper";
+import type { SocialLinkResponse , SocialLinkFilterParams} from "../../../services/useSocialLinkService";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { makeRoute } from "../../../utils/helper";
+import { ADMIN_ROUTES } from "../../../utils/constant";
+import Button from "../../atoms/Button/Button";
 
-interface INavlinkListTableTemplateProps {
-    navlinks: NavlinkResponse[];
+interface SocialLinksTableTemplateProps {
+    socialLinks: SocialLinkResponse[];
     pagination: IPagination;
     handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
-    filters: NavlinkFilterRequest;
+    filters: SocialLinkFilterParams;
 }
 
-const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ navlinks, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
-    const navigate = useNavigate();
+const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ socialLinks, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [showFilters, setShowFilters] = useState<boolean>(false);
 
-    const handleAddNavlink = () => {
-        navigate(makeRoute(ADMIN_ROUTES.NAVLINKS_ADD, {}));
-    }
-
-    const handleEdit = (role: string, index: string) => {
+    const handleEdit = (id: string) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
-            role: searchParams.get("role") || "",
+            status: searchParams.get("status") || "",
         }
-        navigate(
-            makeRoute(ADMIN_ROUTES.NAVLINKS_EDIT, {
-                params: { role, index },
-                query: query
-            })
-        );
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_EDIT, { query, params: { id: id } }));
     }
 
-    const handleView = (role: string, index: string) => {
+    const handleView = (id: string) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
-            role: searchParams.get("role") || "",
+            status: searchParams.get("status") || "",
         }
-        navigate(
-            makeRoute(ADMIN_ROUTES.NAVLINKS_VIEW, {
-                params: { role, index },
-                query: query
-            })
-        );
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_VIEW, { query, params: { id: id } }));
     }
 
-    const Action = (role: string, index: string) => {
+    const handleAddSocialLink = () => {
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_ADD, {}));
+    }
+
+    const Action = (id: string) => {
         return (
             <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(role, index)} className={`w-6 h-6`}>
+                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>
-                <button onClick={() => handleView(role, index)} className={`w-6 h-6`}>
+                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
                     <FiEye />
                 </button>
             </div>
         );
     };
 
-    const getRecords = () => navlinks?.map((navlink: NavlinkResponse, index) => [
+    const getRecords = () => socialLinks?.map((socialLink: SocialLinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
-        `${enumToNormalKey(navlink.role)} - ${enumToNormalKey(navlink.name)} (${navlink.index})`,
-        DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
-        DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
-        StatusOptions.find((status) => status.value === navlink.status)?.label,
-        Action(navlink.role ?? "", navlink.index ?? "")
+        enumToNormalKey(socialLink.platform),
+        StatusOptions.find((status) => status.value === socialLink.status)?.label,
+        DateUtils.dateTimeSecondToDate(socialLink.createdAt ?? ""),
+        DateUtils.dateTimeSecondToDate(socialLink.updatedAt ?? ""),
+        Action(socialLink.id)
     ])
 
     const getTableColumns = () => [
         { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Platform", key: "platform", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
         { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
+        { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ]
 
@@ -126,13 +117,13 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">
-                            Navlink List
+                            Social Links List
                         </h1>
                     </div>
-                    <Button
-                        onClick={handleAddNavlink}
+                    <Button 
+                        onClick={handleAddSocialLink}
                         variant={isMobile ? "primaryText" : "primaryContained"}
-                        label={isMobile ? "" : "Add New Navlink"}
+                        label={isMobile ? "" : "Add New Social Link"}
                         startIcon={isMobile ? <FiPlus /> : ""}
                         className={isMobile ? 'w-12 h-12 rounded-full' : ''}
                     />
@@ -154,37 +145,24 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-
                             {showFilters && (
-                                <div className="space-y-3 p-4">
-                                    <div className={`w-[250px]`}>
-                                        <AutoCompleteInput
-                                            label="Status"
-                                            placeHolder="Search and select a status"
-                                            options={StatusOptions}
-                                            value={StatusOptions.find(option => option.value === filters.status) || null}
-                                            onSearch={() => { }}
-                                            onChange={value => {
-                                                handleFiltersChange("status", value?.value ?? null);
-                                            }}
-                                            isDisabled={false}
-                                        />
-                                    </div>
-                                    <div className="w-[250px]">
-                                        <AutoCompleteInput
-                                            label="Role"
-                                            placeHolder="Search and select a role"
-                                            options={RoleOptions}
-                                            value={RoleOptions.find(option => option.value === filters.role) || null}
-                                            onSearch={() => { }}
-                                            onChange={value => {
-                                                handleFiltersChange("role", value?.value ?? null);
-                                            }}
-                                            isDisabled={false}
-                                        />
-                                    </div>
+                                <div className="flex flex-col gap-4">
+                                    <AutoCompleteInput
+                                        label=""
+                                        placeHolder="Select Status"
+                                        options={StatusOptions}
+                                        value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                                        onChange={(option: any) => {
+                                            if (option) {
+                                                handleFiltersChange("status", option.value);
+                                            } else {
+                                                handleFiltersChange("status", "");
+                                            }
+                                        }}
+                                        onSearch={() => { }}
+                                    />
                                     <TextField
-                                        label='Search'
+                                        label=''
                                         variant="outlined"
                                         placeholder="Search..."
                                         value={filters.search}
@@ -201,31 +179,21 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
                             )}
                         </div>
                     ) : (
-                        <>
-                            <div className={`w-[250px]`}>
-                                <AutoCompleteInput
-                                    label="Role"
-                                    placeHolder="Search and select a role"
-                                    options={RoleOptions}
-                                    value={RoleOptions.find(option => option.value === filters.role) || null}
-                                    onSearch={() => { }}
-                                    onChange={value => {
-                                        handleFiltersChange("role", value?.value ?? null);
-                                    }}
-                                    isDisabled={false}
-                                />
-                            </div>
+                        <div className="flex gap-4">
                             <div className="w-[250px]">
                                 <AutoCompleteInput
-                                    label="Status"
-                                    placeHolder="Search and select a status"
+                                    label=""
+                                    placeHolder="Select Status"
                                     options={StatusOptions}
-                                    value={StatusOptions.find(option => option.value === filters.status) || null}
-                                    onSearch={() => { }}
-                                    onChange={value => {
-                                        handleFiltersChange("status", value?.value ?? null);
+                                    value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                                    onChange={(option: any) => {
+                                        if (option) {
+                                            handleFiltersChange("status", option.value);
+                                        } else {
+                                            handleFiltersChange("status", "");
+                                        }
                                     }}
-                                    isDisabled={false}
+                                    onSearch={() => { }}
                                 />
                             </div>
                             <div className="w-[250px]">
@@ -244,7 +212,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
                                     fullWidth
                                 />
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>
@@ -252,4 +220,4 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         </div>
     )
 }
-export default NavlinkListTableTemplate;
+export default SocialLinksTableTemplate;

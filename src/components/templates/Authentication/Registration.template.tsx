@@ -106,7 +106,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
                             ),
                         }}
                         error={formik.touched.fullName && !!formik.errors.fullName}
-                        helperText={formik.touched.fullName && formik.errors.fullName}
+                        helperText={formik.touched.fullName && formik.errors.fullName ? String(formik.errors.fullName) : ""}
                     />
                     <TextField
                         fullWidth
@@ -123,7 +123,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
                             ),
                         }}
                         error={formik.touched.email && !!formik.errors.email}
-                        helperText={formik.touched.email && formik.errors.email}
+                        helperText={formik.touched.email && formik.errors.email ? String(formik.errors.email) : ""}
                     />
                     <TextField
                         fullWidth
@@ -140,7 +140,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
                             ),
                         }}
                         error={formik.touched.phone && !!formik.errors.phone}
-                        helperText={formik.touched.phone && formik.errors.phone}
+                        helperText={formik.touched.phone && formik.errors.phone ? String(formik.errors.phone) : ""}
                     />
                     <TextField
                         fullWidth
@@ -170,7 +170,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
                             )
                         }}
                         error={formik.touched.password && Boolean(formik.errors.password)}
-                        helperText={formik.touched.password && formik.errors.password}
+                        helperText={formik.touched.password && formik.errors.password ? String(formik.errors.password) : ""}
                     />
 
                     <div>
@@ -207,7 +207,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
                             }
                             helperText={
                                 formik.touched.confirmPassword &&
-                                formik.errors.confirmPassword
+                                formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""
                             }
                         />
                         <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />

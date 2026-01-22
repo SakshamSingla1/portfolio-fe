@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import Button from "../../atoms/Button/Button";
-import Select from "../../atoms/Select/Select";
 import { MODE, SKILL_CATEGORY_OPTIONS, SKILL_LEVEL_OPTIONS } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
-import { OptionToValue, titleModification } from "../../../utils/helper";
 import { useLogoService, type Logo, type LogoFilterParams } from "../../../services/useLogoService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import * as Yup from "yup";
@@ -176,27 +174,27 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                         Classification
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Select
-                            name="level"
+                        <AutoCompleteInput
                             label="Skill Level"
-                            placeholder="Select Skill Level"
+                            placeHolder="Search and select a skill level"
                             options={SKILL_LEVEL_OPTIONS}
-                            value={formik.values.level}
-                            error={formik.touched.level && Boolean(formik.errors.level)}
-                            disabled={mode === MODE.VIEW}
-                            onChange={(value: string | number) => {
-                                const newValue = typeof value === "string" ? titleModification(value) : value;
-                                formik.setFieldValue("level", newValue);
+                            value={SKILL_LEVEL_OPTIONS.find(option => option.value === formik.values.level) || null}
+                            onSearch={() => { }}
+                            onChange={value => {
+                                formik.setFieldValue("level", value?.value ?? null);
                             }}
+                            isDisabled={false}
                         />
-                        <Select
-                            name="category"
+                        <AutoCompleteInput
                             label="Skill Category"
-                            placeholder="Select Skill Category"
+                            placeHolder="Search and select a skill category"
                             options={SKILL_CATEGORY_OPTIONS}
-                            value={OptionToValue(SKILL_CATEGORY_OPTIONS, selectedLogo?.category || "")}
-                            error={formik.touched.level && Boolean(formik.errors.level)}
-                            disabled={true}
+                            value={SKILL_CATEGORY_OPTIONS.find(option => option.value === selectedLogo?.category) || null}
+                            onSearch={() => { }}
+                            onChange={value => {
+                                formik.setFieldValue("category", value?.value ?? null);
+                            }}
+                            isDisabled={true}
                         />
                     </div>
                 </div>

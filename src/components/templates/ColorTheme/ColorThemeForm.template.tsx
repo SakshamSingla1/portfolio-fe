@@ -149,7 +149,7 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
                 key={gIndex}
                 className="border border-gray-200 rounded-xl p-4 space-y-4"
               >
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex items-end justify-between gap-3">
                   <TextField
                     label="Group Name"
                     value={group.groupName}
@@ -188,31 +188,32 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
                     )}
                   </div>
                   {group.colorShades.map((shade, sIndex) => (
-                    <div key={sIndex} className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                      <TextField
-                        label="Color Name"
-                        value={shade.colorName}
-                        onChange={(e) =>
-                          formik.setFieldValue(
-                            `palette.colorGroups.${gIndex}.colorShades.${sIndex}.colorName`,
-                            e.target.value
-                          )
-                        }
-                        disabled={mode === MODE.VIEW}
-                        fullWidth
-                      />
-                      <ColorPickerField
-                        label="Color Code"
-                        value={shade.colorCode}
-                        onChange={(color) =>
-                          formik.setFieldValue(
-                            `palette.colorGroups.${gIndex}.colorShades.${sIndex}.colorCode`,
-                            color
-                          )
-                        }
-                        showInput
-                        disabled={mode === MODE.VIEW}
-                      />
+                    <div className="flex items-center gap-4">
+                      <div key={sIndex} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <TextField
+                          label="Color Name"
+                          value={shade.colorName}
+                          onChange={(e) =>
+                            formik.setFieldValue(
+                              `palette.colorGroups.${gIndex}.colorShades.${sIndex}.colorName`,
+                              e.target.value
+                            )
+                          }
+                          disabled={mode === MODE.VIEW}
+                          fullWidth
+                        />
+                        <ColorPickerField
+                          label="Color Code"
+                          value={shade.colorCode}
+                          onChange={(color) =>
+                            formik.setFieldValue(
+                              `palette.colorGroups.${gIndex}.colorShades.${sIndex}.colorCode`,
+                              color
+                            )
+                          }
+                          disabled={mode === MODE.VIEW}
+                        />
+                      </div>
                       {mode !== MODE.VIEW && (
                         <div className="flex items-start justify-end">
                           <button

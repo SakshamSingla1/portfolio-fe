@@ -1,134 +1,125 @@
 import MuiTextField, { type TextFieldProps } from "@mui/material/TextField";
 import { styled } from "@mui/system";
-import { createUseStyles } from "react-jss";
 import { useColors } from "../../../utils/types";
 
-const useStyles = createUseStyles({
-    label: (colors: any) => ({
-        color: colors.neutral700,
-        fontSize: "16px",
-        fontWeight: 400,
-        lineHeight: "16px",
-        marginLeft: "8px",
-    }),
+/* ---------- Styled TextField ---------- */
 
-    textField: (colors: any) => ({
-        "& .MuiInputBase-root": {
-            border: `1px solid ${colors.neutral200}`,
-            fontSize: "16px",
-            fontWeight: 400,
-            borderRadius: "12px",
+const StyledTextField = styled(MuiTextField)<{ colors: any }>(
+  ({ colors }) => ({
+    width: "100%",
 
-            "&:hover": {
-                borderColor: colors.primary300,
-                outline: "none",
-            },
+    "& .MuiInputBase-root": {
+      backgroundColor: colors.neutral50,
+      border: `1px solid ${colors.neutral200}`,
+      borderRadius: 4,
+      fontSize: 16,
+      transition: "all 0.2s ease-in-out",
 
-            "& .MuiInputBase-input": {
-                padding: "13px 12px",
-                "&::placeholder": {
-                    color: `${colors.neutral900} !important`,
-                },
-                "&:-webkit-autofill": {
-                    WebkitBoxShadow: `0 0 0 1000px inherit inset !important`,
-                    WebkitTextFillColor: `${colors.neutral700} !important`,
-                    borderRadius: "12px",
-                    transition: "background-color 5000s ease-in-out 0s",
-                },
-            },
+      "&:hover": {
+        borderColor: colors.primary300,
+      },
 
-            "& .MuiOutlinedInput-notchedOutline": {
-                borderWidth: 0,
-            },
+      "&.Mui-focused": {
+        borderColor: colors.primary500,
+        boxShadow: `0 0 0 3px ${colors.primary100}`,
+      },
 
-            "&:focus-within": {
-                borderColor: colors.primary300,
-                borderWidth: 2,
-            },
+      "&.Mui-disabled": {
+        backgroundColor: colors.neutral100,
+        borderColor: colors.neutral200,
+        color: colors.neutral500,
+        cursor: "not-allowed",
+      },
 
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderWidth: 0,
-            },
+      "& input": {
+        padding: "13px 12px",
+        color: colors.neutral900,
 
-            "& .Mui-disabled": {
-                color: `${colors.neutral900} !important`,
-                borderColor: colors.neutral200,
-            },
+        "&::placeholder": {
+          color: colors.neutral400,
         },
 
-        "& .Mui-error": {
-            border: "1px solid",
-            borderColor: colors.secondary200,
-            backgroundColor: colors.secondary50,
-            color: colors.secondary400,
+        "&:-webkit-autofill": {
+          WebkitBoxShadow: `0 0 0 1000px ${colors.neutral50} inset`,
+          WebkitTextFillColor: colors.neutral900,
         },
-    }),
-
-    readOnlyInput: (colors: any) => ({
-        "& .MuiInputBase-input[readonly]": {
-            backgroundColor: colors.neutral50,
-            color: `${colors.neutral900} !important`,
-        },
-    }),
-
-    "@media (max-width: 767px)": {
-        textField: (colors: any) => ({
-            "& .MuiInputBase-root": {
-                border: `1px solid ${colors.neutral200}`,
-                fontSize: "14px",
-                borderRadius: "6px",
-
-                "& .MuiInputBase-input": {
-                    padding: "13px 12px",
-                    "&::placeholder": {
-                        color: `${colors.neutral400} !important`,
-                    },
-                },
-            },
-
-            "& .Mui-error": {
-                borderColor: colors.secondary200,
-                borderRadius: "6px",
-                backgroundColor: colors.secondary50,
-                color: colors.secondary400,
-            },
-        }),
-
-        label: (colors: any) => ({
-            color: colors.neutral700,
-            fontSize: "14px",
-            lineHeight: "16px",
-            marginLeft: "8px",
-        }),
+      },
     },
-});
 
-const TextField = styled((props: TextFieldProps) => {
-    const colors = useColors();
-    const classes = useStyles(colors);
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: "none",
+    },
 
-    return (
-        <div
-            className={`flex flex-col w-auto relative ${
-                props.disabled ? "pointer-events-none select-none" : ""
-            }`}
+    "& .Mui-error .MuiInputBase-root": {
+      backgroundColor: colors.error50,
+      borderColor: colors.error500,
+    },
+  })
+);
+
+
+interface Props extends Omit<TextFieldProps, "label" | "helperText" | "error"> {
+  label?: string;
+  helperText?: string;
+  error?: boolean;
+}
+
+const TextField: React.FC<Props> = ({
+  label,
+  helperText,
+  error,
+  InputProps,
+  ...props
+}) => {
+  const colors = useColors();
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "6px",
+        width: "100%",
+      }}
+    >
+      {label && (
+        <label
+          style={{
+            color: colors.neutral700,
+            fontSize: 14,
+            fontWeight: 500,
+            marginLeft: 8,
+          }}
         >
-            {props.label && <div className={classes.label}>{props.label}</div>}
+          {label}
+        </label>
+      )}
 
-            <MuiTextField
-                {...props}
-                label=""
-                helperText={null}
-                className={`${classes.textField} ${
-                    props.InputProps?.readOnly ? classes.readOnlyInput : ""
-                }`}
-            />
+      <StyledTextField
+        {...props}
+        colors={colors}
+        label=""
+        error={error}
+        helperText={null}
+        InputProps={{
+          ...InputProps,
+          readOnly: InputProps?.readOnly,
+        }}
+      />
 
-            {props.error && props.helperText && (
-                <p className="text-red-500">{props.helperText}</p>
-            )}
-        </div>
-    );
-})``;
+      {error && helperText && (
+        <span
+          style={{
+            fontSize: 12,
+            marginLeft: 8,
+            color: colors.error600,
+          }}
+        >
+          {helperText}
+        </span>
+      )}
+    </div>
+  );
+};
 
 export default TextField;
