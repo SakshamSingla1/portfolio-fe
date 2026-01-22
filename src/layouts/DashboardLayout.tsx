@@ -51,6 +51,7 @@ const useStyles = createUseStyles({
     height: "100vh",
     overflow: "hidden",
     position: "relative",
+    paddingTop: 64,
   }),
 
   mainContent: {
