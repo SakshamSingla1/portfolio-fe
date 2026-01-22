@@ -3,7 +3,7 @@ import { useColors } from "../../../utils/types";
 import { type ImageUploadResponse } from "../../../services/useProfileService";
 import { FiUpload, FiX, FiImage, FiZoomIn, FiCheck, FiAlertCircle, FiInfo, FiTrash2 } from "react-icons/fi";
 
-interface ImageValue {
+export interface ImageValue {
     url: string;
     publicId?: string;
 }

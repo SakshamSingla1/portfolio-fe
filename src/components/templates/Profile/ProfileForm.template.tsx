@@ -397,7 +397,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
         />
 
         {formik.values.userName && activeResume && (
-          <div className="flex gap-3 mt-4">
+          <div className="flex justify-between mt-4">
             <Button
               label="View Resume"
               variant="primaryContained"
