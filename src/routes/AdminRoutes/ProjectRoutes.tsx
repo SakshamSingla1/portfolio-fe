@@ -9,7 +9,7 @@ const ProjectRoutes = () => {
         <Routes>
             <Route index element={<ListingProjectsPage />} />
             <Route path="add" element={<AddProjectPage />} />
-            <Route path="edit/:id" element={<EditProjectPage />} />
+            <Route path=":id/edit" element={<EditProjectPage />} />
             <Route path=":id" element={<ViewProjectPage />} />
         </Routes>
     );
