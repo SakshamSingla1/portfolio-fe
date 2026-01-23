@@ -51,7 +51,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
         <p className="text-gray-500 text-sm">Update your account password securely.</p>
       </div>  
 
-      <form onSubmit={passwordForm.handleSubmit} className="space-y-6">
+      <div className="space-y-6">
         <div className="space-y-1">
           <TextField
             label="Old Password"
@@ -136,7 +136,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
             endIcon={<ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />}
           />
         </div>
-      </form>
+      </div>
     </motion.div>
   );
 };

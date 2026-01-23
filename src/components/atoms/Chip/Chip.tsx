@@ -6,6 +6,7 @@ import { useColors } from "../../../utils/types";
 interface ChipProps {
   label: string | ReactNode;
   onDelete: () => void;
+  disabled?: boolean;
 }
 
 const useStyles = createUseStyles({
@@ -64,21 +65,21 @@ const useStyles = createUseStyles({
   }),
 });
 
-const Chip: React.FC<ChipProps> = ({ label, onDelete }) => {
+const Chip: React.FC<ChipProps> = ({ label, onDelete, disabled }) => {
   const colors = useColors();
   const classes = useStyles(colors);
 
   return (
     <div className={classes.chip}>
       <span className={classes.label}>{label}</span>
-      <button
+      {!disabled && <button
         type="button"
         onClick={onDelete}
         className={classes.deleteBtn}
         aria-label={`Remove ${typeof label === "string" ? label : "item"}`}
       >
         <FaTimesCircle size={14} />
-      </button>
+      </button>}
     </div>
   );
 };
