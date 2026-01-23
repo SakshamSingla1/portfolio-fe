@@ -9,7 +9,7 @@ export const AUTH_URLS = {
     GET_ALL: "/project",
     GET_ALL_BY_ID: "/project/:id",
     GET_BY_PROFILE: "/project/profile/:profileId",
-    IMAGE_UPLOAD: "{projectId}/images",
+    IMAGE_UPLOAD: "/project/:profileId/images",
 };
 
 export const WorkStatusType = {
@@ -90,9 +90,10 @@ export const useProjectService = () => {
     const uploadProjectImage = (file: File) => {
         const formData = new FormData();
         formData.append("file", file);
+        const url = replaceUrlParams(AUTH_URLS.IMAGE_UPLOAD, { profileId: user?.id });
         return request(
-            API_METHOD.PUT,
-            replaceUrlParams(AUTH_URLS.IMAGE_UPLOAD, { profileId: user?.id }),
+            API_METHOD.POST,
+            url,
             user,
             formData
         );
