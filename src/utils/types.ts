@@ -164,3 +164,8 @@ export const NavlinkIconOptions = [
     { value: "FiFileText" },
     { value: "FiLogOut" },
 ]
+
+export interface ImageValue {
+    url: string;
+    publicId?: string;
+}

@@ -135,7 +135,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="relative">
-      <div className="relative" style={{ padding: isMobile ? "20px 16px" : "32px 24px" }}>
+      <div className="relative" style={{ padding: isMobile ? "20px 0px" : "32px 24px" }}>
         {!isEditMode && (
           isMobile ? (
             <button
@@ -166,7 +166,7 @@ const ProfilePage: React.FC = () => {
           Manage your personal & professional information
         </p>
       </div>
-      <div className="px-4 sm:px-6 pb-10">
+      <div className="pb-10">
         {isLoading ? (
           <div className="py-12 text-center text-sm text-gray-500">
             Loading profile…
