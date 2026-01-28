@@ -127,7 +127,6 @@ const useStyles = createUseStyles((colors: any) => ({
   tableBody: {
     '& tr': {
       transition: 'background-color 0.2s ease',
-      cursor: 'pointer',
       '&:hover': {
         backgroundColor: colors.primary50,
       },
@@ -143,6 +142,7 @@ const useStyles = createUseStyles((colors: any) => ({
       '@media (max-width: 768px)': {
         '&:hover': {
           backgroundColor: colors.primary100,
+          cursor: 'pointer',
         },
       },
     },
