@@ -55,9 +55,8 @@ const iconMap: Record<string, JSX.Element> = {
 
 const useStyles = createUseStyles({
   sidebar: (c: any) => ({
-    width: c.collapsed ? 64 : 240,
+    width: c.collapsed ? 72 : 240,
     background: c.neutral0,
-    borderRight: `1px solid ${c.neutral200}`,
     display: "flex",
     flexDirection: "column",
     height: "100%",

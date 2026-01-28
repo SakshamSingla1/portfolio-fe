@@ -28,7 +28,7 @@ const useStyles = createUseStyles({
     width: 28,
     height: 28,
     borderRadius: 14,
-    background: c.neutral0,
+    background: c.neutral50,
     border: `1px solid ${c.neutral200}`,
     display: "flex",
     alignItems: "center",
@@ -95,10 +95,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <div className={classes.layoutWrapper}>
       {!isMobile && (
-        <div
-          className={classes.sidebarWrapper}
-          style={{ width: collapsed ? 64 : 240 }}
-        >
+        <div className={classes.sidebarWrapper} style={{ width: collapsed ? 72 : 240 }}>
           <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
           <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
             {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
