@@ -3,11 +3,13 @@ import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { type SkillDropdown } from "./useSkillService";
+import type { ImageValue } from "../utils/types";
 
 export const AUTH_URLS = {
     GET_ALL: "/project",
     GET_ALL_BY_ID: "/project/:id",
     GET_BY_PROFILE: "/project/profile/:profileId",
+    IMAGE_UPLOAD: "/project/:profileId/images",
 };
 
 export const WorkStatusType = {
@@ -28,7 +30,7 @@ export interface Project {
     projectStartDate : string;
     projectEndDate : string;
     workStatus : string;
-    projectImageUrl : string;
+    projectImages : ImageValue[];
     skillIds : string[];
 }
 
@@ -40,7 +42,7 @@ export interface ProjectResponse {
     projectStartDate: string;
     projectEndDate: string;
     workStatus: string;
-    projectImageUrl: string;
+    projectImages: ImageValue[];
     skills: SkillDropdown[];
 }
 
@@ -85,6 +87,18 @@ export const useProjectService = () => {
         return request(API_METHOD.GET, url, user, null, { params });
     };
 
+    const uploadProjectImage = (file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const url = replaceUrlParams(AUTH_URLS.IMAGE_UPLOAD, { profileId: user?.id });
+        return request(
+            API_METHOD.POST,
+            url,
+            user,
+            formData
+        );
+    };
+
     return {
         getAll,
         getById,
@@ -92,6 +106,7 @@ export const useProjectService = () => {
         update,
         deleteProject,
         getByProfile,
+        uploadProjectImage,
     };
 };
 

@@ -1,44 +1,45 @@
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFormik } from "formik";
-import dayjs from "dayjs";
 import * as Yup from "yup";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import DatePicker from "../../atoms/DatePicker/DatePicker";
-import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
-import { titleModification } from "../../../utils/helper";
-import { type Project, type ProjectResponse, WorkStatusType, WorkStatusOptions } from "../../../services/useProjectService";
-import { useSkillService, type SkillDropdown } from "../../../services/useSkillService";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
-// import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
-import { HTTP_STATUS } from '../../../utils/types';
-import { useNavigate } from "react-router-dom";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
-const validationSchema = Yup.object().shape({
-    projectName: Yup.string()
-        .required('Project name is required')
-        .max(100, 'Project name is too long'),
-    projectDescription: Yup.string()
-        .max(500, 'Project description is too long'),
-    projectLink: Yup.string()
-        .required('Project link is required')
-        .url('Must be a valid URL'),
-    technologiesUsed: Yup.array()
-        .of(Yup.number())
-        .min(1, 'At least one technology is required'),
-    projectStartDate: Yup.date()
-        .required('Start date is required'),
+import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
+import { titleModification } from "../../../utils/helper";
+import { HTTP_STATUS, type ImageValue } from "../../../utils/types";
+
+import {
+    type Project,
+    type ProjectResponse,
+    WorkStatusOptions,
+    WorkStatusType,
+    useProjectService,
+} from "../../../services/useProjectService";
+import {
+    useSkillService,
+    type SkillDropdown,
+} from "../../../services/useSkillService";
+import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+import { FiTrash2 } from "react-icons/fi";
+
+const validationSchema = Yup.object({
+    projectName: Yup.string().required("Project name is required").max(100),
+    projectLink: Yup.string().required("Project link is required").url(),
+    projectDescription: Yup.string().max(500),
+    skillIds: Yup.array().of(Yup.string()).min(1, "Select at least one technology"),
+    projectStartDate: Yup.date().required("Start date is required"),
     projectEndDate: Yup.date()
-        .min(Yup.ref('projectStartDate'), 'End date must be after start date')
+        .min(Yup.ref("projectStartDate"), "End date must be after start date")
         .nullable(),
-    workStatus: Yup.string()
-        .required('Work status is required'),
-    projectImageUrl: Yup.string()
-        .url('Must be a valid URL')
-        .nullable()
+    workStatus: Yup.string().required("Work status is required"),
 });
 
 interface ProjectFormProps {
@@ -50,303 +51,333 @@ interface ProjectFormProps {
 const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => {
     const navigate = useNavigate();
     const { user } = useAuthenticatedUser();
-    const [isSkillsLoading, setIsSkillsLoading] = useState(false);
 
     const skillService = useSkillService();
+    const projectService = useProjectService();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
 
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
     const formik = useFormik<Project>({
         initialValues: {
-            profileId: String(user?.id),
+            profileId: user?.id?.toString() || "",
             projectName: "",
             projectDescription: "",
             projectLink: "",
             projectStartDate: "",
             projectEndDate: "",
-            workStatus: "",
-            projectImageUrl: "",
+            workStatus: WorkStatusType.CURRENT,
+            projectImages: [],
             skillIds: [],
         },
-        validationSchema: validationSchema,
+        validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
-            const payload = {
-                ...values,
-            };
             setSubmitting(true);
-            if (mode !== MODE.VIEW) {
-                await onSubmit(payload);
-            } else {
-                onClose();
-            }
+            if (mode !== MODE.VIEW) await onSubmit(values);
+            else onClose();
             setSubmitting(false);
         },
     });
 
-    const loadSkillsDropdown = async (searchTerm?: string) => {
-        try {
-            setIsSkillsLoading(true);
-            const response = await skillService.getByProfile({
-                search: searchTerm || "",
-            })
-            if (response?.status === HTTP_STATUS.OK) {
-                const skillsData = response?.data?.data?.content;
-                setSkills(Array.isArray(skillsData) ? skillsData : []);
-            } else {
-                setSkills([]);
-            }
-        }
-        catch (error) {
-            setSkills([]);
-            console.error('Failed to load skills:', error);
-        } finally {
-            setIsSkillsLoading(false);
-        }
-    }
-
-    const skillOptions = useMemo(() => {
-        return skills.map((skill) => ({
-            label: <div className="flex items-center gap-2">
-                <img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>,
-            title: skill.logoName,
-            value: skill.id,
-        }))
-    }, [skills])
-
-    const selectedSkills = useMemo(() => {
-        return skills.filter(skill => formik.values.skillIds.includes(skill.id));
-    }, [skills, formik.values.skillIds]);
+    useEffect(() => {
+        loadSkills();
+    }, []);
 
     useEffect(() => {
-        if (projects) {
-            formik.setFieldValue("projectName", projects.projectName || "");
-            formik.setFieldValue("projectDescription", projects.projectDescription || "");
-            formik.setFieldValue("projectLink", projects.projectLink || "");
-            formik.setFieldValue("skillIds", projects.skills.map((skill) => skill.id) || []);
-            formik.setFieldValue("projectStartDate", projects.projectStartDate || "");
-            formik.setFieldValue("projectEndDate", projects.projectEndDate || "");
-            formik.setFieldValue("workStatus", projects.workStatus || WorkStatusType.CURRENT);
-            formik.setFieldValue("projectImageUrl", projects.projectImageUrl || "");
-        }
+        if (!projects) return;
+        formik.setValues({
+            profileId: user?.id?.toString() || "",
+            projectName: projects.projectName || "",
+            projectDescription: projects.projectDescription || "",
+            projectLink: projects.projectLink || "",
+            projectStartDate: projects.projectStartDate || "",
+            projectEndDate: projects.projectEndDate || "",
+            workStatus: projects.workStatus || WorkStatusType.CURRENT,
+            projectImages: projects.projectImages || [],
+            skillIds: projects.skills?.map(s => s.id) || [],
+        });
     }, [projects]);
 
+    const loadSkills = async (search = "") => {
+        try {
+            const res = await skillService.getByProfile({ search });
+            setSkills(res?.status === HTTP_STATUS.OK ? res.data.data.content : []);
+        } catch {
+            setSkills([]);
+        }
+    };
+
+    const uploadProjectImage = async (file: File, index?: number) => {
+        setIsUploading(true);
+        try {
+            const response = await projectService.uploadProjectImage(file);
+            if (response.status === HTTP_STATUS.OK) {
+                addProjectImage(
+                    { url: response.data.data.url, publicId: response.data.data.publicId },
+                    index
+                );
+                return response.data.data;
+            }
+            throw new Error("Upload failed");
+        } catch {
+            throw new Error("Upload failed");
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const addProjectImage = (image: ImageValue | ImageValue[] | null, index?: number) => {
+        if (!image) return;
+        const imagesToAdd = Array.isArray(image) ? image : [image];
+        if (typeof index === "number") {
+            const updated = [...formik.values.projectImages];
+            updated[index] = imagesToAdd[0];
+            formik.setFieldValue("projectImages", updated);
+        } else {
+            formik.setFieldValue("projectImages", [
+                ...formik.values.projectImages,
+                ...imagesToAdd,
+            ]);
+        }
+    };
+
+    const skillOptions = useMemo(
+        () =>
+            skills.map(skill => ({
+                label: (
+                    <div className="flex items-center gap-2">
+                        <img src={skill.logoUrl} className="w-6 h-6" />
+                        {skill.logoName}
+                    </div>
+                ),
+                value: skill.id,
+                title: skill.logoName,
+            })),
+        [skills]
+    );
+
+    const selectedSkills = useMemo(
+        () => skills.filter(s => formik.values.skillIds.includes(s.id)),
+        [skills, formik.values.skillIds]
+    );
+
+    const removeProjectImage = (index: number) => {
+        const newImages = [...formik.values.projectImages];
+        newImages.splice(index, 1);
+        formik.setFieldValue("projectImages", newImages);
+    };
+
     useEffect(() => {
-        loadSkillsDropdown();
-    }, []);
+        console.log(formik);
+    }, [formik]);
 
     return (
         <div className="mb-8">
             <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Create New Project" : mode === MODE.EDIT ? "Edit Project" : "Project Details"}
+                    {mode === MODE.ADD
+                        ? "Add Project"
+                        : mode === MODE.EDIT
+                            ? "Edit Project"
+                            : "Project Details"}
                 </h2>
                 <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Add a new project to your portfolio" : mode === MODE.EDIT ? "Update your project information" : "View project details"}
+                    {mode === MODE.ADD
+                        ? "Showcase your work and contributions"
+                        : mode === MODE.EDIT
+                            ? "Update project details"
+                            : "View project information"}
                 </p>
             </div>
-            <div className="space-y-8 transition-opacity duration-200" style={{ opacity: isSkillsLoading ? 0.7 : 1 }}>
+
+            <div className="space-y-8">
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
                         Basic Information
                     </h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="space-y-16">
-                            <TextField
-                                label="Project Name"
-                                placeholder="Enter your project name"
-                                {...formik.getFieldProps("projectName")}
-                                error={formik.touched.projectName && Boolean(formik.errors.projectName)}
-                                helperText={formik.errors.projectName}
-                                disabled={mode === MODE.VIEW}
-                                onBlur={(event: any) => {
-                                    const newValue = titleModification(event.target.value.trim());
-                                    formik.setFieldValue("projectName", newValue);
-                                }}
-                            />
-                            <TextField
-                                label="Project Link"
-                                placeholder="https://your-project-url.com"
-                                {...formik.getFieldProps("projectLink")}
-                                error={formik.touched.projectLink && Boolean(formik.errors.projectLink)}
-                                helperText={formik.errors.projectLink}
-                                inputProps={{ readOnly: mode === MODE.VIEW }}
-                                onBlur={(event: any) => {
-                                    const newValue = event.target.value.trim();
-                                    formik.setFieldValue("projectLink", newValue);
-                                }}
-                            />
-                        </div>
 
-                        <div className="space-y-4">
-                            <div className="h-full">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Project Image
-                                </label>
-                                {/* <ImageUpload
-                                    uploadMode="single"
-                                    value={formik.values.projectImageUrl}
-                                    onChange={(url) => formik.setFieldValue('projectImageUrl', url)}
-                                    label="Upload Project Image"
-                                    disabled={mode === MODE.VIEW}
-                                    error={formik.touched.projectImageUrl && Boolean(formik.errors.projectImageUrl)}
-                                    helperText={formik.errors.projectImageUrl}
-                                    width="100%"
-                                    height="200px"
-                                /> */}
-                            </div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <TextField
+                            label="Project Name"
+                            {...formik.getFieldProps("projectName")}
+                            onChange={e =>
+                                formik.setFieldValue(
+                                    "projectName",
+                                    titleModification(e.target.value)
+                                )
+                            }
+                            error={formik.touched.projectName && Boolean(formik.errors.projectName)}
+                            disabled={mode === MODE.VIEW}
+                        />
+
+                        <TextField
+                            label="Project Link"
+                            {...formik.getFieldProps("projectLink")}
+                            error={formik.touched.projectLink && Boolean(formik.errors.projectLink)}
+                            disabled={mode === MODE.VIEW}
+                        />
                     </div>
                 </div>
 
-                {/* Technologies Section */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
                         Technologies Used
                     </h3>
-                    <div className="space-y-4">
-                        <AutoCompleteInput
-                            label="Search and Add Technologies"
-                            placeHolder="Type to search technologies (React, Node.js, Python...)"
-                            options={skillOptions}
-                            value={null}
-                            onChange={(selectedOption: any) => {
-                                if (selectedOption) {
-                                    if (!formik.values.skillIds.includes(selectedOption.value)) {
-                                        formik.setFieldValue("skillIds", [...formik.values.skillIds, selectedOption.value]);
-                                    } else {
-                                        console.log(`${selectedOption.title} is already added to the experience`);
-                                    }
-                                }
-                            }}
-                            onSearch={(value: string) => {
-                                loadSkillsDropdown(value);
-                            }}
-                            error={formik.touched.skillIds && Boolean(formik.errors.skillIds)}
-                            helperText={formik.errors.skillIds && formik.touched.skillIds ?
-                                Array.isArray(formik.errors.skillIds)
-                                    ? formik.errors.skillIds.join(', ')
-                                    : formik.errors.skillIds
-                                : "Search and select the technologies used in this experience"}
-                            isDisabled={mode === MODE.VIEW}
-                        />
-                        {(selectedSkills.length > 0 || formik.values.skillIds.length > 0) && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <p className="text-sm font-medium text-gray-700 mb-3">
-                                    Selected Technologies ({selectedSkills.length})
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                    {selectedSkills.map((skill) => (
-                                        mode !== MODE.VIEW ? (
-                                            <Chip
-                                                key={skill.id}
-                                                label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>}
-                                                onDelete={() => {
-                                                    const updatedTechs = formik.values.skillIds.filter((tech: any) => {
-                                                        const techId = typeof tech === 'object' && tech !== null && 'id' in tech ? tech.id : tech;
-                                                        return techId !== skill.id;
-                                                    });
-                                                    formik.setFieldValue("skillIds", updatedTechs);
-                                                }}
-                                            />
-                                        ) : (
-                                            <Chip
-                                                key={skill.id}
-                                                label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>}
-                                                onDelete={() => { }}
-                                            />
-                                        )
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                        Project Timeline
-                    </h3>
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <DatePicker
-                                label="Start Date"
-                                value={formik.values.projectStartDate ? dayjs(formik.values.projectStartDate) : null}
-                                onChange={(newValue) =>
-                                    formik.setFieldValue("projectStartDate", newValue?.toDate())
+                    <AutoCompleteInput
+                        label="Add Technology"
+                        options={skillOptions}
+                        value={null}
+                        onSearch={loadSkills}
+                        onChange={(o: any) => {
+                            if (o && !formik.values.skillIds.includes(o.value)) {
+                                formik.setFieldValue("skillIds", [
+                                    ...formik.values.skillIds,
+                                    o.value,
+                                ]);
+                            }
+                        }}
+                        isDisabled={mode === MODE.VIEW}
+                    />
+
+                    <div className="flex flex-wrap gap-2 mt-4">
+                        {selectedSkills.map(skill => (
+                            <Chip
+                                key={skill.id}
+                                label={
+                                    <div className="flex items-center gap-2">
+                                        <img src={skill.logoUrl} className="w-5 h-5" />
+                                        {skill.logoName}
+                                    </div>
                                 }
-                                error={!!formik.touched.projectStartDate && Boolean(formik.errors.projectStartDate)}
-                                helperText={typeof formik.errors.projectStartDate === 'string' ? formik.errors.projectStartDate : undefined}
-                                fullWidth
+                                onDelete={() =>
+                                    formik.setFieldValue(
+                                        "skillIds",
+                                        formik.values.skillIds.filter(id => id !== skill.id)
+                                    )
+                                }
                                 disabled={mode === MODE.VIEW}
                             />
-                            <DatePicker
-                                label="End Date"
-                                value={formik.values.projectEndDate ? dayjs(formik.values.projectEndDate) : null}
-                                onChange={(newValue) =>
-                                    formik.setFieldValue("projectEndDate", newValue?.toDate())
-                                }
-                                error={!!formik.touched.projectEndDate && Boolean(formik.errors.projectEndDate)}
-                                helperText={typeof formik.errors.projectEndDate === 'string' ? formik.errors.projectEndDate : undefined}
-                                fullWidth
-                                disabled={mode === MODE.VIEW || formik.values.workStatus === WorkStatusType.CURRENT}
-                            />
-                        </div>
-
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                            <AutoCompleteInput
-                                label="Work Status"
-                                placeHolder="Select Work Status"
-                                options={WorkStatusOptions}
-                                value={formik.values.workStatus ? WorkStatusOptions.find(option => option.value === formik.values.workStatus) : null}
-                                onChange={(option: any) => option && formik.setFieldValue("workStatus", option.value)}
-                                onSearch={() => { }}
-                                error={formik.touched.workStatus && Boolean(formik.errors.workStatus)}
-                                helperText={formik.touched.workStatus ? formik.errors.workStatus : "Select the work status"}
-                                isDisabled={mode === MODE.VIEW}
-                            />
-                        </div>
+                        ))}
                     </div>
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="mt-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                            Job Description
-                        </h3>
-                        <RichTextEditor
-                            value={formik.values.projectDescription}
-                            onChange={(value) => formik.setFieldValue("projectDescription", value)}
-                            readonly={mode === MODE.VIEW}
+                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                        Timeline
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <DatePicker
+                            label="Start Date"
+                            value={
+                                formik.values.projectStartDate
+                                    ? dayjs(formik.values.projectStartDate)
+                                    : null
+                            }
+                            onChange={v =>
+                                formik.setFieldValue("projectStartDate", v?.toDate())
+                            }
+                            disabled={mode === MODE.VIEW}
                         />
-                        {formik.errors.projectDescription && formik.touched.projectDescription && (
-                            <div className="mt-2 text-sm text-red-600">
-                                {formik.errors.projectDescription}
-                            </div>
-                        )}
+
+                        <DatePicker
+                            label="End Date"
+                            value={
+                                formik.values.projectEndDate
+                                    ? dayjs(formik.values.projectEndDate)
+                                    : null
+                            }
+                            onChange={v =>
+                                formik.setFieldValue("projectEndDate", v?.toDate())
+                            }
+                            disabled={mode === MODE.VIEW || formik.values.workStatus === WorkStatusType.CURRENT}
+                        />
+
+                        <AutoCompleteInput
+                            label="Work Status"
+                            options={WorkStatusOptions}
+                            value={WorkStatusOptions.find(
+                                o => o.value === formik.values.workStatus
+                            )}
+                            onSearch={() => { }}
+                            onChange={(o: any) =>
+                                formik.setFieldValue("workStatus", o.value)
+                            }
+                            isDisabled={mode === MODE.VIEW}
+                        />
                     </div>
                 </div>
-            </div>
 
-            <div className="mt-8 flex justify-between gap-3">
-                <Button
-                    label="Cancel"
-                    variant="tertiaryContained"
-                    onClick={onClose}
-                />
-                {mode !== MODE.VIEW && (
-                    <Button
-                        label={mode === MODE.ADD ? "Add" : "Update"}
-                        variant="primaryContained"
-                        onClick={() => formik.handleSubmit()}
-                        disabled={formik.isSubmitting || !formik.isValid}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3" aria-hidden="true" />
+                        Project Images
+                    </h3>
+                    {(formik.values.projectImages.length > 0 ? formik.values.projectImages : [null]).map((image, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <ImageUpload
+                                label={`Image ${index + 1}`}
+                                value={image}
+                                onChange={() => { }} // NO longer adds immediately
+                                onUpload={(file) => uploadProjectImage(file, index)} // only update after upload
+                                disabled={mode === MODE.VIEW || isUploading}
+                                maxSize={5}
+                                aspectRatio="wide"
+                                helperText="Project image · Max 5MB"
+                            />
+                            {formik.values.projectImages.length > 1 && mode !== MODE.VIEW && (
+                                <button
+                                    onClick={() => removeProjectImage(index)}
+                                    className="p-2 bg-red-50 text-red-500 rounded hover:bg-red-100"
+                                >
+                                    <FiTrash2 />
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                    {mode !== MODE.VIEW && (
+                        <Button
+                            label="Add Another Image"
+                            variant="primaryContained"
+                            onClick={() =>
+                                formik.setFieldValue("projectImages", [...formik.values.projectImages, null])
+                            }
+                            disabled={isUploading}
+                        />
+                    )}
+                </div>
+
+
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                        <div className="w-2 h-2 bg-pink-500 rounded-full mr-3" />
+                        Project Description
+                    </h3>
+
+                    <RichTextEditor
+                        value={formik.values.projectDescription}
+                        onChange={v => formik.setFieldValue("projectDescription", v)}
+                        readonly={mode === MODE.VIEW}
                     />
-                )}
+                </div>
+
+                <div className="flex justify-between gap-3">
+                    <Button label="Cancel" variant="tertiaryContained" onClick={onClose} />
+                    {mode !== MODE.VIEW && (
+                        <Button
+                            label={mode === MODE.ADD ? "Add" : "Update"}
+                            variant="primaryContained"
+                            onClick={() => formik.handleSubmit()}
+                            disabled={formik.isSubmitting || !formik.isValid}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

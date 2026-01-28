@@ -9,7 +9,7 @@ const SkillRoutes = () => {
         <Routes>
             <Route index element={<ListingSkillsPage />} />
             <Route path="add" element={<AddSkillPage />} />
-            <Route path="edit/:id" element={<EditSkillPage />} />
+            <Route path=":id/edit" element={<EditSkillPage />} />
             <Route path=":id" element={<ViewSkillPage />} />
         </Routes>
     );
