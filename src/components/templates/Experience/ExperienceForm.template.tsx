@@ -133,10 +133,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         loadSkills();
     }, []);
 
-    useEffect(() => {
-        console.log("formik", formik);
-    }, [formik]);
-
     return (
         <div className="mb-8">
             <div className="mb-8">

@@ -57,11 +57,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
             });
         }
     }, [socialLink]);
-
-    useEffect(() => {
-        console.log(formik);
-    }, [formik]);
-
+    
     return (
         <div className="mb-8">
             <div className="mb-8">
