@@ -74,6 +74,11 @@ export const ADMIN_ROUTES = {
     CERTIFICATIONS_ADD: "/admin/certifications/add",
     CERTIFICATIONS_EDIT: "/admin/certifications/:id/edit",
     CERTIFICATIONS_VIEW: "/admin/certifications/:id",
+
+    TESTIMONIALS: "/admin/testimonials",
+    TESTIMONIALS_ADD: "/admin/testimonials/add",
+    TESTIMONIALS_EDIT: "/admin/testimonials/:id/edit",
+    TESTIMONIALS_VIEW: "/admin/testimonials/:id",
 }
 
 export const MODE = {
