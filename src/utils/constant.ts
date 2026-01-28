@@ -79,6 +79,11 @@ export const ADMIN_ROUTES = {
     TESTIMONIALS_ADD: "/admin/testimonials/add",
     TESTIMONIALS_EDIT: "/admin/testimonials/:id/edit",
     TESTIMONIALS_VIEW: "/admin/testimonials/:id",
+
+    ACHIEVEMENTS: "/admin/achievements",
+    ACHIEVEMENTS_ADD: "/admin/achievements/add",
+    ACHIEVEMENTS_EDIT: "/admin/achievements/:id/edit",
+    ACHIEVEMENTS_VIEW: "/admin/achievements/:id",
 }
 
 export const MODE = {

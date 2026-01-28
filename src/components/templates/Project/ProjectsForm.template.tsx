@@ -81,25 +81,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         },
     });
 
-    useEffect(() => {
-        loadSkills();
-    }, []);
-
-    useEffect(() => {
-        if (!projects) return;
-        formik.setValues({
-            profileId: user?.id?.toString() || "",
-            projectName: projects.projectName || "",
-            projectDescription: projects.projectDescription || "",
-            projectLink: projects.projectLink || "",
-            projectStartDate: projects.projectStartDate || "",
-            projectEndDate: projects.projectEndDate || "",
-            workStatus: projects.workStatus || WorkStatusType.CURRENT,
-            projectImages: projects.projectImages || [],
-            skillIds: projects.skills?.map(s => s.id) || [],
-        });
-    }, [projects]);
-
     const loadSkills = async (search = "") => {
         try {
             const res = await skillService.getByProfile({ search });
@@ -170,8 +151,23 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     };
 
     useEffect(() => {
-        console.log(formik);
-    }, [formik]);
+        loadSkills();
+    }, []);
+
+    useEffect(() => {
+        if (!projects) return;
+        formik.setValues({
+            profileId: user?.id?.toString() || "",
+            projectName: projects.projectName || "",
+            projectDescription: projects.projectDescription || "",
+            projectLink: projects.projectLink || "",
+            projectStartDate: projects.projectStartDate || "",
+            projectEndDate: projects.projectEndDate || "",
+            workStatus: projects.workStatus || WorkStatusType.CURRENT,
+            projectImages: projects.projectImages || [],
+            skillIds: projects.skills?.map(s => s.id) || [],
+        });
+    }, [projects]);
 
     return (
         <div className="mb-8">
