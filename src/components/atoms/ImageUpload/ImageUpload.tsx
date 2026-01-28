@@ -152,12 +152,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     return (
         <div className={`space-y-2 ${className}`}>
             {label && (
-                <label className="flex items-center text-sm font-medium" style={{ color: colors.neutral800 }}>
+                <label style={{
+                    color: colors.neutral700,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    marginLeft: 8,
+                }}>
                     {label}
                     {required && <span className="ml-1" style={{ color: colors.error500 }}>*</span>}
                 </label>
             )}
-
             {!previewImage ? (
                 <div
                     className={`relative rounded-xl border-2 transition-all duration-300 ${

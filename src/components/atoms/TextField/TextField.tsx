@@ -2,14 +2,11 @@ import MuiTextField, { type TextFieldProps } from "@mui/material/TextField";
 import { styled } from "@mui/system";
 import { useColors } from "../../../utils/types";
 
-/* ---------- Styled TextField ---------- */
-
 const StyledTextField = styled(MuiTextField)<{ colors: any }>(
   ({ colors }) => ({
     width: "100%",
 
     "& .MuiInputBase-root": {
-      backgroundColor: colors.neutral50,
       border: `1px solid ${colors.neutral200}`,
       borderRadius: 4,
       fontSize: 16,

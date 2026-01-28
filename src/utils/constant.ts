@@ -69,6 +69,11 @@ export const ADMIN_ROUTES = {
     SOCIAL_LINKS_ADD: "/admin/social-links/add",
     SOCIAL_LINKS_EDIT: "/admin/social-links/:id/edit",
     SOCIAL_LINKS_VIEW: "/admin/social-links/:id",
+
+    CERTIFICATIONS: "/admin/certifications",
+    CERTIFICATIONS_ADD: "/admin/certifications/add",
+    CERTIFICATIONS_EDIT: "/admin/certifications/:id/edit",
+    CERTIFICATIONS_VIEW: "/admin/certifications/:id",
 }
 
 export const MODE = {

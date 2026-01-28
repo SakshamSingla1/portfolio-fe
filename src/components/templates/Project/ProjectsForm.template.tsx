@@ -324,8 +324,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             <ImageUpload
                                 label={`Image ${index + 1}`}
                                 value={image}
-                                onChange={() => { }} // NO longer adds immediately
-                                onUpload={(file) => uploadProjectImage(file, index)} // only update after upload
+                                onChange={() => { }}
+                                onUpload={(file) => uploadProjectImage(file, index)}
                                 disabled={mode === MODE.VIEW || isUploading}
                                 maxSize={5}
                                 aspectRatio="wide"
