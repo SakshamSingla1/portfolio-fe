@@ -129,11 +129,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     setIsEditMode(searchParams.get("mode") === MODE.EDIT);
   }, [searchParams]);
-
-  useEffect(() => {
-    console.log(formik);
-  }, [formik]);
-
+  
   return (
     <div className="relative">
       <div className="relative" style={{ padding: isMobile ? "20px 0px" : "32px 24px" }}>
