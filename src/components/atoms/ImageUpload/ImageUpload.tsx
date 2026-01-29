@@ -152,12 +152,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     return (
         <div className={`space-y-2 ${className}`}>
             {label && (
-                <label className="flex items-center text-sm font-medium" style={{ color: colors.neutral800 }}>
+                <label style={{
+                    color: colors.neutral700,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    marginLeft: 8,
+                }}>
                     {label}
                     {required && <span className="ml-1" style={{ color: colors.error500 }}>*</span>}
                 </label>
             )}
-
             {!previewImage ? (
                 <div
                     className={`relative rounded-xl border-2 transition-all duration-300 ${
@@ -316,6 +320,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                             <div className="absolute bottom-2 right-2 flex space-x-1 sm:space-x-2 z-10">
                                 {showPreview && (
                                     <button
+                                        type="button"
                                         onClick={handleZoom}
                                         className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-neutral700 flex items-center justify-center hover:bg-neutral100 transition-all duration-200 shadow-lg hover:scale-110"
                                         title="View full size"
@@ -325,6 +330,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                                 )}
                                 {!disabled && (
                                     <button
+                                        type="button"
                                         onClick={handleRemove}
                                         className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full text-white flex items-center justify-center hover:bg-error600 transition-all duration-200 shadow-lg hover:scale-110"
                                         title="Remove image"
@@ -395,6 +401,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                             className="w-full h-full max-w-full max-h-full object-contain rounded-xl shadow-2xl"
                         />
                         <button
+                            type="button"
                             onClick={() => setShowZoomModal(false)}
                             className="absolute top-2 right-2 sm:top-4 sm:right-4 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-white text-neutral700 flex items-center justify-center hover:bg-neutral100 transition-all duration-200 shadow-lg hover:scale-110"
                         >

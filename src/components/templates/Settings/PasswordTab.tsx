@@ -11,10 +11,9 @@ import { FiLock } from "react-icons/fi";
 
 interface PasswordTabProps {
   handleChangePasswordSubmit: (values: any) => void;
-  setFormStatus: React.Dispatch<React.SetStateAction<{ type: "success" | "error"; message: string } | null>>;
 }
 
-const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, setFormStatus }) => {
+const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit}) => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const passwordForm = useFormik({
@@ -26,10 +25,9 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
     onSubmit: (values, { resetForm }) => {
       try {
         handleChangePasswordSubmit(values);
-        setFormStatus({ type: "success", message: "Password updated successfully" });
         resetForm();
       } catch (error: any) {
-        setFormStatus({ type: "error", message: error.message || "Error changing password" });
+        console.error("Error changing password:", error);
       }
     },
   });
@@ -51,7 +49,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
         <p className="text-gray-500 text-sm">Update your account password securely.</p>
       </div>  
 
-      <form onSubmit={passwordForm.handleSubmit} className="space-y-6">
+      <div className="space-y-6">
         <div className="space-y-1">
           <TextField
             label="Old Password"
@@ -136,7 +134,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ handleChangePasswordSubmit, s
             endIcon={<ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />}
           />
         </div>
-      </form>
+      </div>
     </motion.div>
   );
 };

@@ -5,6 +5,7 @@ import { createUseStyles } from "react-jss";
 import { useColors } from "../../../utils/types";
 
 interface RichTextEditorProps {
+  label?: string;
   value: string;
   onChange: (content: string) => void;
   readonly?: boolean;
@@ -52,6 +53,7 @@ const useStyles = createUseStyles({
 });
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
+  label,
   value,
   onChange,
   readonly = false,
@@ -60,7 +62,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   minHeight = 200,
   maxHeight = 600,
   buttons,
-  onBlur,
   error,
   helperText,
   extraButtons = [],
@@ -113,21 +114,30 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   ]);
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
+      {label && (
+        <label style={{
+          color: colors.neutral700,
+          fontSize: 14,
+          fontWeight: 500,
+          marginLeft: 8,
+        }}>
+          {label}
+        </label>
+      )}
       <div className={`${classes.wrapper} ${error ? classes.error : ""}`}>
         <JoditEditor
           ref={editorRef}
           value={value}
-          onChange={onChange}
           config={config}
-          onBlur={onBlur}
+          onBlur={(content) => onChange(content)}
         />
       </div>
 
       {error && helperText && (
         <div className={classes.helperText}>{helperText}</div>
       )}
-    </>
+    </div>
   );
 };
 

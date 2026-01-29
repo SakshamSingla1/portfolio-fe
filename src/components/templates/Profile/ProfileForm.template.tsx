@@ -15,6 +15,7 @@ import { IoMdCloudUpload } from "react-icons/io";
 import DocumentUpload from "../../atoms/DocumentUpload/DocumentUpload";
 import { useResumeService, type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
 import { usePublicResumeService } from "../../../services/usePublicResumeService";
+import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const SectionCard = ({ title, subtitle, icon: Icon, actions, children,}: {
   title: string;
@@ -356,16 +357,10 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
-            <TextFieldV2
-              label="About Me"
-              name="aboutMe"
-              multiline
-              rows={4}
+            <RichTextEditor
               value={formik.values.aboutMe}
-              onChange={formik.handleChange}
-              disabled={!isEditMode}
-              helperText={`${formik.values.aboutMe?.length || 0}/500 characters`}
-              inputProps={{ maxLength: 500 }}
+              onChange={(value) => formik.setFieldValue("aboutMe", value)}
+              readonly={!isEditMode}
             />
           </div>
         </div>

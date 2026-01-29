@@ -27,9 +27,6 @@ const validationSchema = Yup.object({
   phone: Yup.string().required("Phone is required"),
   location: Yup.string().required("Location is required"),
   aboutMe: Yup.string().required("About is required"),
-  githubUrl: Yup.string().required("GitHub URL is required"),
-  linkedinUrl: Yup.string().required("LinkedIn URL is required"),
-  websiteUrl: Yup.string().required("Website URL is required"),
   profileImageUrl: Yup.string().required("Profile image is required"),
   profileImagePublicId: Yup.string().required(),
   logoUrl: Yup.string().required("Logo is required"),
@@ -132,7 +129,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     setIsEditMode(searchParams.get("mode") === MODE.EDIT);
   }, [searchParams]);
-
+  
   return (
     <div className="relative">
       <div className="relative" style={{ padding: isMobile ? "20px 0px" : "32px 24px" }}>

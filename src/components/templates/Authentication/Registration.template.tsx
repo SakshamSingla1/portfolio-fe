@@ -9,7 +9,7 @@ import { FiUserPlus } from "react-icons/fi";
 import { AUTH_STATE } from "../../../utils/types";
 import { userNameMaker } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { InputAdornment,IconButton } from "@mui/material";
 import { FiLock, FiEye, FiEyeOff, FiUser, FiMail, FiPhone } from "react-icons/fi";
 import { useSnackbar } from "../../../hooks/useSnackBar";
@@ -22,7 +22,6 @@ interface RegisterTemplateProps {
     setIsRegisterFlow: (isRegisterFlow: boolean) => void;
 }
 
-/* ---------------------- Validation Schema ---------------------- */
 const validationSchema = Yup.object({
     fullName: Yup.string().required("Name is required"),
     email: Yup.string().email("Enter a valid email").required("Email is required"),
@@ -31,7 +30,6 @@ const validationSchema = Yup.object({
     confirmPassword: Yup.string().required("Confirm Password is required").oneOf([Yup.ref("password")], "Passwords must match"),
 });
 
-/* ---------------------- Register Component ---------------------- */
 const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthState, setIsRegisterFlow }) => {
     const authService = useAuthService();
     const { showSnackbar } = useSnackbar();
@@ -74,10 +72,6 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
             }
         },
     });
-
-    useEffect(() => {
-        console.log(formik);
-    },[formik])
 
     return (
         <div className="w-full">

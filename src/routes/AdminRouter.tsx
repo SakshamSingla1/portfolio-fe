@@ -16,6 +16,9 @@ import useRouteValidate from '../hooks/useRouteValidate';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ResumeRoutes from './AdminRoutes/ResumeRouter';
 import SocialLinkRoutes from './AdminRoutes/SocialLinkRoutes';
+import CertificationRoutes from './AdminRoutes/CertificationRoutes';
+import TestimonialRoutes from './AdminRoutes/TestimonialRoutes';
+import AchievementRoutes from './AdminRoutes/AchievementRoutes';
 
 export const AdminRouter: React.FC = () => {
 
@@ -79,6 +82,9 @@ export const AdminRouter: React.FC = () => {
         <Route path="admin/templates/*" element={<div><TemplateRoutes /></div>} />
         <Route path="admin/resumes/*" element={<div><ResumeRoutes /></div>} />
         <Route path="admin/social-links/*" element={<div><SocialLinkRoutes /></div>} />
+        <Route path="admin/certifications/*" element={<div><CertificationRoutes /></div>} />
+        <Route path="admin/testimonials/*" element={<div><TestimonialRoutes /></div>} />
+        <Route path="admin/achievements/*" element={<div><AchievementRoutes /></div>} />
       </Route>
     </Routes>
   );

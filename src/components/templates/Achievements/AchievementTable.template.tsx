@@ -1,36 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { DateUtils, makeRoute } from "../../../utils/helper";
+import { makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
-import { type ProjectResponse, type ProjectFilterParams, WorkStatusType } from "../../../services/useProjectService";
-import { FiEdit, FiEye, FiSearch, FiPlus, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
+import TableV1 from "../../organisms/TableV1/TableV1";
+import { FiEdit, FiEye, FiSearch, FiPlus, FiFilter, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
-import type { SkillDropdown } from "../../../services/useSkillService";
+import type { Achievement, AchievementFilterParams } from "../../../services/useAchievementService";
+import { DateUtils } from "../../../utils/helper";
 
-interface ProjectsTableTemplateProps {
-    projects: ProjectResponse[];
+interface IAchievementsTableTemplateProps {
+    achievements: Achievement[];
     pagination: IPagination;
     handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
-    filters: ProjectFilterParams;
+    filters: AchievementFilterParams;
 }
 
-const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
+const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({ achievements, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [showFilters, setShowFilters] = useState<boolean>(false);
 
-    const handleAddProject = () => {
-        navigate(makeRoute(
-            ADMIN_ROUTES.PROJECTS_ADD, {}
-        ));
+    const handleAddAchievement = () => {
+        navigate(makeRoute(ADMIN_ROUTES.ACHIEVEMENTS_ADD, {}));
     }
 
     const handleEdit = (id: string) => {
@@ -39,7 +37,12 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_EDIT, { query, params: { id: id } }));
+        navigate(
+            makeRoute(ADMIN_ROUTES.ACHIEVEMENTS_EDIT, {
+                params: { id },
+                query: query
+            })
+        );
     }
 
     const handleView = (id: string) => {
@@ -48,7 +51,12 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query, params: { id: id } }));
+        navigate(
+            makeRoute(ADMIN_ROUTES.ACHIEVEMENTS_VIEW, {
+                params: { id },
+                query: query
+            })
+        );
     }
 
     const Action = (id: string) => {
@@ -64,35 +72,24 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
         );
     };
 
-    const getRecords = () => projects?.map((project: ProjectResponse, index) => [
-        pagination.currentPage * pagination.pageSize + index + 1,
-        project.projectName,
-        getTechImages(project.skills),
-        project.workStatus === WorkStatusType.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate || ""),
-        Action(project.id ?? "")
-    ])
-
-    const getTechImages = (skills: SkillDropdown[]) => {
-        const visibleSkills = skills.slice(0, 3);
-        const remaining = skills.length - 3;
-        return (
-            <div className={`flex items-center space-x-2 ${isMobile ? 'justify-end' : ''}`}>
-                {visibleSkills.map((skill) => (
-                    <img key={skill.logoName} src={skill.logoUrl} alt={skill.logoName} className="w-10 h-10" />
-                ))}
-                {remaining > 0 && (
-                    <span className="text-sm font-medium text-gray-500">+{remaining}</span>
-                )}
-            </div>
-        );
-    };
+    const getRecords = () =>
+        achievements.map((achievement, index) => [
+            pagination.currentPage * pagination.pageSize + index + 1,
+            `${achievement.title} - ${achievement.order}`,
+            achievement.issuer,
+            DateUtils.dateTimeSecondToDate(achievement.createdAt ?? ""),
+            DateUtils.dateTimeSecondToDate(achievement.updatedAt ?? ""),
+            Action(achievement.id ?? "")
+        ]
+    );
 
     const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: 'low' as const, hideOnMobile: true },
-        { label: "Project Name", key: "projectName", type: "text" as ColumnType, props: { className: '' }, priority: 'high' as const },
-        { label: "Technologies", key: "technologies", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-        { label: "Duration", key: "duration", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+        { label: "Issuer", key: "issuer", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+        { label: "Created At", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Updated At", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
     ]
 
     const getSchema = () => ({
@@ -127,13 +124,13 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">
-                            Project List
+                            Achievements List
                         </h1>
                     </div>
                     <Button
-                        onClick={handleAddProject}
+                        onClick={handleAddAchievement}
                         variant={isMobile ? "primaryText" : "primaryContained"}
-                        label={isMobile ? "" : "Add New Project"}
+                        label={isMobile ? "" : "Add New Achievement"}
                         startIcon={isMobile ? <FiPlus /> : ""}
                         className={isMobile ? 'w-12 h-12 rounded-full' : ''}
                     />
@@ -143,7 +140,8 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
                 <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
                     {isMobile ? (
                         <div className="w-full">
-                            <button onClick={() => setShowFilters(!showFilters)}
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
                                 className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
                             >
                                 <span className="flex items-center">
@@ -196,8 +194,8 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
                     )}
                 </div>
             </div>
-            <Table schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </div>
     )
 }
-export default ProjectsTableTemplate;
+export default AchievementsTableTemplate;

@@ -15,6 +15,9 @@ import {
   FaPaintRoller,
 } from "react-icons/fa";
 import { IoNotifications, IoDocuments, IoLinkSharp } from "react-icons/io5";
+import { GrCertificate } from "react-icons/gr";
+import { BsPersonVcard } from "react-icons/bs";
+import { GiAchievement } from "react-icons/gi";
 
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { enumToNormalKey } from "../../../utils/helper";
@@ -52,6 +55,9 @@ const iconMap: Record<string, JSX.Element> = {
   NAVLINKS: <FaLink />,
   RESUMES: <IoDocuments />,
   SOCIAL_LINKS: <IoLinkSharp />,
+  CERTIFICATIONS: <GrCertificate />,
+  TESTIMONIALS: <BsPersonVcard />,
+  ACHIEVEMENTS: <GiAchievement />,
 };
 
 /* ---------------------------------------------

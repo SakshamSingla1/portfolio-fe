@@ -14,6 +14,9 @@ import {
   FaPaintRoller,
 } from "react-icons/fa";
 import { IoNotifications , IoDocuments, IoLinkSharp } from "react-icons/io5";
+import { GrCertificate } from "react-icons/gr";
+import { BsPersonVcard } from "react-icons/bs";
+import { GiAchievement } from "react-icons/gi";
 import { createUseStyles } from "react-jss";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { enumToNormalKey} from "../../../utils/helper";
@@ -45,13 +48,15 @@ const iconMap: Record<string, JSX.Element> = {
   NAVLINKS: <FaLink />,
   RESUMES: <IoDocuments />,
   SOCIAL_LINKS: <IoLinkSharp />,
+  CERTIFICATIONS: <GrCertificate />,
+  TESTIMONIALS: <BsPersonVcard />,
+  ACHIEVEMENTS: <GiAchievement />,
 };
 
 const useStyles = createUseStyles({
   sidebar: (c: any) => ({
-    width: c.collapsed ? 64 : 240,
+    width: c.collapsed ? 72 : 240,
     background: c.neutral0,
-    borderRight: `1px solid ${c.neutral200}`,
     display: "flex",
     flexDirection: "column",
     height: "100%",
