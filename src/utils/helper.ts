@@ -216,3 +216,9 @@ export const enumToNormalKey = (enumKey: string): string => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
+
+export const sanitizeHtml = (html: string): string => {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || '';
+};

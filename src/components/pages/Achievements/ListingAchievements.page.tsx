@@ -5,6 +5,7 @@ import AchievementListTableTemplate from '../../templates/Achievements/Achieveme
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import { useAchievementService, type Achievement, type AchievementFilterParams } from '../../../services/useAchievementService';
+import AchievementCard from '../../public-view/Achievement.card';
 
 const AchievementListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -85,6 +86,14 @@ const AchievementListPage: React.FC = () => {
     return (
         <div>
             <AchievementListTableTemplate achievements={achievements} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {achievements.map((achievement) => (
+                    <AchievementCard
+                        key={achievement.id}
+                        achievement={achievement}
+                    />
+                ))}
+            </div>
         </div>
     )
 }
