@@ -19,9 +19,9 @@ import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup"
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object({
-    title: Yup.string().required("Title is required").max(100),
-    description: Yup.string().required("Description is required").max(100),
-    issuer: Yup.string().required("Issuer is required").max(100),
+    title: Yup.string().required("Title is required"),
+    description: Yup.string().required("Description is required"),
+    issuer: Yup.string().required("Issuer is required"),
     achievedAt: Yup.date().required("Achieved at is required"),
     proofUrl: Yup.string().url("Invalid URL"),
     proofPublicId: Yup.string().required("Proof public ID is required"),
@@ -102,6 +102,10 @@ const AchievementFormTemplate = ({
         });
     }, [achievement]);
 
+    useEffect(() => {
+        console.log(formik);
+    }, [formik]);
+
     return (
         <div className="mb-8">
             <div className="mb-8">
@@ -165,6 +169,12 @@ const AchievementFormTemplate = ({
                             onChange={(value) => formik.setFieldValue("description", value)}
                             readonly={mode === MODE.VIEW}
                         />
+                        {mode !== MODE.VIEW && (
+                            <p className="text-xs text-gray-500">
+                                Tip: Use bullet points to highlight key achievements for better
+                                readability in the achievement card.
+                            </p>
+                        )}
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">

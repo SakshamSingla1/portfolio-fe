@@ -17,10 +17,10 @@ import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup"
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object({
-    name: Yup.string().required("Name is required").max(100),
+    name: Yup.string().required("Name is required"),
     message: Yup.string().required("Message is required"),
-    role: Yup.string().required("Role is required").max(100),
-    company: Yup.string().required("Company is required").max(100),
+    role: Yup.string().required("Role is required"),
+    company: Yup.string().required("Company is required"),
     imageId: Yup.string().required("Image ID is required"),
     imageUrl: Yup.string().url("Invalid URL"),
     linkedInUrl: Yup.string().url("Invalid URL"),

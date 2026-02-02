@@ -18,8 +18,8 @@ import type { ImageUploadResponse } from "../../../services/useProfileService";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 
 const validationSchema = Yup.object({
-    title: Yup.string().required("Title is required").max(100),
-    issuer: Yup.string().required("Issuer is required").max(100),
+    title: Yup.string().required("Title is required"),
+    issuer: Yup.string().required("Issuer is required"),
     issueDate: Yup.date().required("Issue date is required"),
     expiryDate: Yup.date()
         .min(Yup.ref("issueDate"), "Expiry date must be after issue date")
