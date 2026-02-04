@@ -31,7 +31,7 @@ import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { FiTrash2 } from "react-icons/fi";
 
 const validationSchema = Yup.object({
-    projectName: Yup.string().required("Project name is required").max(100),
+    projectName: Yup.string().required("Project name is required"),
     projectLink: Yup.string().required("Project link is required").url(),
     projectDescription: Yup.string().max(500),
     skillIds: Yup.array().of(Yup.string()).min(1, "Select at least one technology"),
