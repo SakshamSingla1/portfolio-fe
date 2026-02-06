@@ -7,6 +7,7 @@ export const PROFILE_URLS = {
     GET_BY_ID: "/profile/:id",
     UPLOAD_PROFILE_IMAGE: "/profile/:id/upload/profile-image",
     UPLOAD_LOGO: "/profile/:id/upload/logo",
+    UPLOAD_ABOUT_ME_IMAGE: "/profile/:id/upload/about-me-image"
 }
 
 export const VerificationStatus = {
@@ -40,6 +41,8 @@ export interface ProfileRequest {
     websiteUrl: string;
     profileImageUrl?: string;
     profileImagePublicId?: string;
+    aboutMeImageUrl?: string;
+    aboutMeImagePublicId?: string;
     logoUrl?: string;
     logoPublicId?: string;
     themeName: string;
@@ -80,10 +83,22 @@ export const useProfileService = () => {
         );
     };
 
+    const uploadAboutMeImage = (file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        return request(
+            API_METHOD.PUT,
+            replaceUrlParams(PROFILE_URLS.UPLOAD_ABOUT_ME_IMAGE, { id: user?.id }),
+            user,
+            formData
+        );
+    };
+
     return {
         get,
         update,
         uploadProfileImage,
-        uploadLogo
+        uploadLogo,
+        uploadAboutMeImage
     }
 }

@@ -33,8 +33,11 @@ const validationSchema = Yup.object().shape({
         .required('Location is required')
         .max(100, 'Location is too long'),
     description: Yup.string()
+        .required('Description is required')
+        .min(120, 'Description must be at least 120 characters long')
         .max(500, 'Description is too long'),
     grade: Yup.string()
+        .required('Grade is required')
         .max(10, 'Grade is too long')
 });
 

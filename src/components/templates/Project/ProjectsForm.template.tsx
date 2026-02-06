@@ -65,6 +65,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             profileId: user?.id?.toString() || "",
             projectName: "",
             projectDescription: "",
+            githubRepositories: [],
             projectLink: "",
             projectStartDate: "",
             projectEndDate: "",
@@ -150,6 +151,26 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         formik.setFieldValue("projectImages", newImages);
     };
 
+    const addGithubRepo = () => {
+        formik.setFieldValue("githubRepositories", [
+            ...formik.values.githubRepositories,
+            "",
+        ]);
+    };
+
+    const updateGithubRepo = (index: number, value: string) => {
+        const updated = [...formik.values.githubRepositories];
+        updated[index] = value;
+        formik.setFieldValue("githubRepositories", updated);
+    };
+
+    const removeGithubRepo = (index: number) => {
+        const updated = [...formik.values.githubRepositories];
+        updated.splice(index, 1);
+        formik.setFieldValue("githubRepositories", updated);
+    };
+
+
     useEffect(() => {
         loadSkills();
     }, []);
@@ -160,6 +181,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             profileId: user?.id?.toString() || "",
             projectName: projects.projectName || "",
             projectDescription: projects.projectDescription || "",
+            githubRepositories: projects.githubRepositories || [],
             projectLink: projects.projectLink || "",
             projectStartDate: projects.projectStartDate || "",
             projectEndDate: projects.projectEndDate || "",
@@ -308,6 +330,47 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             isDisabled={mode === MODE.VIEW}
                         />
                     </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                        <div className="w-2 h-2 bg-red-500 rounded-full mr-3" />
+                        GitHub Repositories
+                    </h3>
+
+                    {(formik.values.githubRepositories.length
+                        ? formik.values.githubRepositories
+                        : [""]).map((repo, index) => (
+                            <div key={index} className="flex items-center gap-3 mb-3">
+                                <TextField
+                                    label={`Repository ${index + 1}`}
+                                    value={repo}
+                                    onChange={e =>
+                                        updateGithubRepo(index, e.target.value)
+                                    }
+                                    placeholder="https://github.com/username/repo"
+                                    disabled={mode === MODE.VIEW}
+                                    className="flex-1"
+                                />
+                                {formik.values.githubRepositories.length > 1 &&
+                                    mode !== MODE.VIEW && (
+                                        <button
+                                            onClick={() => removeGithubRepo(index)}
+                                            className="p-2 bg-red-50 text-red-500 rounded"
+                                        >
+                                            <FiTrash2 />
+                                        </button>
+                                    )}
+                            </div>
+                        ))}
+
+                    {mode !== MODE.VIEW && (
+                        <Button
+                            label="Add Repository"
+                            variant="primaryContained"
+                            onClick={addGithubRepo}
+                        />
+                    )}
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">

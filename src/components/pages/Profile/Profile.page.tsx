@@ -62,6 +62,8 @@ const ProfilePage: React.FC = () => {
       websiteUrl: "",
       profileImageUrl: "",
       profileImagePublicId: "",
+      aboutMeImageUrl: "",
+      aboutMeImagePublicId: "",
       logoUrl: "",
       logoPublicId: "",
       themeName: "",
