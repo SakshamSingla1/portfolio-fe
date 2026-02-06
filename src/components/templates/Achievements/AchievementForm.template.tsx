@@ -20,7 +20,7 @@ import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
-    description: Yup.string().required("Description is required"),
+    description: Yup.string().required("Description is required").min(120, "Description must be at least 120 characters long"),
     issuer: Yup.string().required("Issuer is required"),
     achievedAt: Yup.date().required("Achieved at is required"),
     proofUrl: Yup.string().url("Invalid URL"),
