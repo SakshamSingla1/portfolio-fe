@@ -455,14 +455,33 @@ export const DEBOUNCE_TIME = {
 }
 
 export const DEGREE_OPTIONS: Option[] = [
-    { value: 'HIGH_SCHOOL', label: '10th' },
-    { value: 'SENIOR_SECONDARY', label: '12th' },
-    { value: 'BACHELORS', label: 'Bachelors' },
-    { value: 'MASTERS', label: 'Masters' },
-    { value: 'DIPLOMA', label: 'Diploma' },
-    { value: 'PHD', label: 'PhD' },
-    { value: 'OTHER', label: 'Other' },
+  { value: 'HIGH_SCHOOL', label: '10th' },
+  { value: 'SENIOR_SECONDARY', label: '12th' },
+  { value: 'DIPLOMA', label: 'Diploma' },
+  { value: 'ADVANCED_DIPLOMA', label: 'Advanced Diploma' },
+  { value: 'CERTIFICATION', label: 'Certification' },
+  { value: 'ASSOCIATE', label: 'Associate Degree' },
+  { value: 'BACHELORS', label: 'Bachelors' },
+  { value: 'BTECH', label: 'Bachelor of Technology (B.Tech)' },
+  { value: 'BE', label: 'Bachelor of Engineering (B.E.)' },
+  { value: 'BSC', label: 'Bachelor of Science (B.Sc)' },
+  { value: 'BA', label: 'Bachelor of Arts (B.A)' },
+  { value: 'BCOM', label: 'Bachelor of Commerce (B.Com)' },
+  { value: 'BCA', label: 'Bachelor of Computer Applications (BCA)' },
+  { value: 'BBA', label: 'Bachelor of Business Administration (BBA)' },
+  { value: 'MASTERS', label: 'Masters' },
+  { value: 'MTECH', label: 'Master of Technology (M.Tech)' },
+  { value: 'ME', label: 'Master of Engineering (M.E.)' },
+  { value: 'MSC', label: 'Master of Science (M.Sc)' },
+  { value: 'MA', label: 'Master of Arts (M.A)' },
+  { value: 'MCOM', label: 'Master of Commerce (M.Com)' },
+  { value: 'MBA', label: 'Master of Business Administration (MBA)' },
+  { value: 'MCA', label: 'Master of Computer Applications (MCA)' },
+  { value: 'PHD', label: 'PhD' },
+  { value: 'POST_DOCTORATE', label: 'Post Doctorate' },
+  { value: 'OTHER', label: 'Other' },
 ];
+
 
 export const ROLES = {
     ADMIN: 'ADMIN',

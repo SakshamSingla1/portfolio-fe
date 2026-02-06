@@ -157,14 +157,6 @@ export const RoleOptions = [
     { value: ROLES.SUPER_ADMIN, label: "Super Admin" },
 ]
 
-export const NavlinkIconOptions = [
-    { value: "FiHome"},
-    { value: "FiUsers" },
-    { value: "FiSettings" },
-    { value: "FiFileText" },
-    { value: "FiLogOut" },
-]
-
 export interface ImageValue {
     url: string;
     publicId?: string;
