@@ -78,6 +78,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           {label}
         </label>
       )}
+
       <div className={`${classes.wrapper} ${error ? classes.error : ""}`}>
         <JoditEditor
           ref={setEditorRef}
