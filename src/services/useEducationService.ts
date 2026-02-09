@@ -12,7 +12,7 @@ export const EDUCATION_URLS = {
 
 export const GradeType = [
     { label: "CGPA", value: "CGPA" },
-    { label: "Percentage", value: "Percentage" },
+    { label: "Percentage", value: "%" },
     { label: "Grade", value: "Grade" },
 ];
 
