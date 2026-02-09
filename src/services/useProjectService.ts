@@ -6,10 +6,10 @@ import { type SkillDropdown } from "./useSkillService";
 import type { ImageValue } from "../utils/types";
 
 export const AUTH_URLS = {
-    GET_ALL: "/project",
-    GET_ALL_BY_ID: "/project/:id",
-    GET_BY_PROFILE: "/project/profile/:profileId",
-    IMAGE_UPLOAD: "/project/:profileId/images",
+    GET_ALL: "/projects",
+    GET_ALL_BY_ID: "/projects/:id",
+    GET_BY_PROFILE: "/projects/profile/:profileId",
+    IMAGE_UPLOAD: "/projects/:profileId/images",
 };
 
 export const WorkStatusType = {
@@ -26,6 +26,7 @@ export interface Project {
     profileId : string;
     projectName : string;
     projectDescription : string;
+    githubRepositories: string[];
     projectLink : string;
     projectStartDate : string;
     projectEndDate : string;
@@ -38,6 +39,7 @@ export interface ProjectResponse {
     id: string;
     projectName: string;
     projectDescription: string;
+    githubRepositories: string[];
     projectLink: string;
     projectStartDate: string;
     projectEndDate: string;

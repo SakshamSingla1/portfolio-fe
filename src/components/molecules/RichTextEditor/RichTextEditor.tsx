@@ -1,32 +1,25 @@
-import React, { useRef, useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import JoditEditor from "jodit-react";
-import type { IJodit } from "jodit/esm/types";
 import { createUseStyles } from "react-jss";
 import { useColors } from "../../../utils/types";
+import type { IJodit } from "jodit/esm/types";
 
 interface RichTextEditorProps {
   label?: string;
   value: string;
-  onChange: (content: string) => void;
-  readonly?: boolean;
+  onChange: (value: string) => void;
+  isEditMode?: boolean;
   placeholder?: string;
-  height?: number;
-  minHeight?: number;
-  maxHeight?: number;
-  buttons?: string[];
-  onFocus?: () => void;
-  onBlur?: () => void;
   error?: boolean;
   helperText?: string;
-  extraButtons?: string[];
 }
 
 const useStyles = createUseStyles({
   wrapper: (colors: any) => ({
     backgroundColor: colors.neutral50,
     border: `1px solid ${colors.neutral200}`,
-    borderRadius: "4px",
-    transition: "all 0.2s ease-in-out",
+    borderRadius: 4,
+    transition: "all 0.2s ease",
     overflow: "hidden",
 
     "&:hover": {
@@ -45,9 +38,8 @@ const useStyles = createUseStyles({
   }),
 
   helperText: (colors: any) => ({
-    marginTop: "6px",
-    fontSize: "12px",
-    lineHeight: "16px",
+    marginTop: 6,
+    fontSize: 12,
     color: colors.error600,
   }),
 });
@@ -56,84 +48,45 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   label,
   value,
   onChange,
-  readonly = false,
-  placeholder = "Start typing...",
-  height = 300,
-  minHeight = 200,
-  maxHeight = 600,
-  buttons,
+  isEditMode = true,
   error,
   helperText,
-  extraButtons = [],
 }) => {
   const editorRef = useRef<IJodit | null>(null);
   const colors = useColors();
   const classes = useStyles(colors);
 
-  const config = useMemo(() => {
-    return {
-      readonly,
-      placeholder,
-      height,
-      minHeight,
-      maxHeight,
-      toolbarAdaptive: true,
-      toolbarButtonSize: "middle" as const,
-      showCharsCounter: false,
-      showWordsCounter: false,
-      showXPathInStatusbar: false,
-      theme: "default",
-      colors: {
-        greyscale: ["#000000", "#434343", "#666666", "#999999", "#B7B7B7", "#D7D7D7", "#F4F5F7", "#FFFFFF"],
-        palette: ["#3AA8F5", "#6C757D", "#6F42C1", "#E83E8C", "#FD7E14", "#20C997", "#28A745", "#FFC107", "#DC3545"],
-      },
+  const setEditorRef = (editor: IJodit | null) => {
+    if (editor) {
+      editorRef.current = editor;
+    }
+  };
 
-      style: {
-        font: "14px Inter, sans-serif",
-      },
-
-      buttons:
-        buttons ||
-        [ "bold", "italic", "underline", "strikethrough", 
-          "|", "ul", "ol",
-          "|", "outdent", "indent",
-          "|", "font", "fontsize", "paragraph",
-          "|", "image", "link", "align",
-          "|", "undo", "redo",
-          "|", "source",
-        ].concat(extraButtons),
-    };
-  }, [
-    readonly,
-    placeholder,
-    height,
-    minHeight,
-    maxHeight,
-    buttons,
-    extraButtons,
-  ]);
+  const joditConfig = useMemo(() => ({ readonly: !isEditMode, placeholder: 'Start typing...', }), [isEditMode]);
 
   return (
     <div className="flex flex-col gap-2">
       {label && (
-        <label style={{
-          color: colors.neutral700,
-          fontSize: 14,
-          fontWeight: 500,
-          marginLeft: 8,
-        }}>
+        <label
+          style={{
+            color: colors.neutral700,
+            fontSize: 14,
+            fontWeight: 500,
+            marginLeft: 8,
+          }}
+        >
           {label}
         </label>
       )}
+
       <div className={`${classes.wrapper} ${error ? classes.error : ""}`}>
         <JoditEditor
-          ref={editorRef}
-          value={value}
-          config={config}
-          onBlur={(content) => onChange(content)}
+          ref={setEditorRef}
+          value={value || ""}
+          config={joditConfig as any}
+          onBlur={(newContent) => onChange(newContent)}
         />
       </div>
-
       {error && helperText && (
         <div className={classes.helperText}>{helperText}</div>
       )}

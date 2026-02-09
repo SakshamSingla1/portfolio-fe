@@ -20,7 +20,7 @@ import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
-    description: Yup.string().required("Description is required"),
+    description: Yup.string().required("Description is required").min(120, "Description is too short"),
     issuer: Yup.string().required("Issuer is required"),
     achievedAt: Yup.date().required("Achieved at is required"),
     proofUrl: Yup.string().url("Invalid URL"),
@@ -167,7 +167,7 @@ const AchievementFormTemplate = ({
                         <RichTextEditor
                             value={formik.values.description}
                             onChange={(value) => formik.setFieldValue("description", value)}
-                            readonly={mode === MODE.VIEW}
+                            isEditMode={mode !== MODE.VIEW}
                         />
                         {mode !== MODE.VIEW && (
                             <p className="text-xs text-gray-500">

@@ -73,10 +73,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     profile: boolean;
     logo: boolean;
     resume: boolean;
+    aboutMeImage: boolean;
   }>({
     profile: false,
     logo: false,
     resume: false,
+    aboutMeImage: false,
   });
   const [colorThemes, setColorThemes] = useState<ColorTheme[]>([]);
   const [activeResume, setActiveResume] = useState<DocumentUploadResponse | null>(null);
@@ -116,6 +118,25 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
       throw new Error();
     } finally {
       setIsUploading(prev => ({ ...prev, logo: false }));
+    }
+  };
+
+  const uploadAboutMeImage = async (file: File): Promise<ImageUploadResponse> => {
+    setIsUploading(prev => ({ ...prev, aboutMeImage: true }));
+    try {
+      const response = await profileService.uploadAboutMeImage(file);
+      if (response.status === HTTP_STATUS.OK) {
+        formik.setFieldValue("aboutMeImageUrl", response.data.data.url);
+        formik.setFieldValue("aboutMeImagePublicId", response.data.data.publicId);
+        showSnackbar("success", "About me image uploaded");
+        return response.data.data;
+      }
+      throw new Error();
+    } catch {
+      showSnackbar("error", "About me image upload failed");
+      throw new Error();
+    } finally {
+      setIsUploading(prev => ({ ...prev, aboutMeImage: false }));
     }
   };
 
@@ -190,6 +211,10 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     }
   }, [formik.values.userName]);
 
+  useEffect(() => {
+    console.log(formik);
+  }, [formik]);
+
   return (
     <div className="pb-6 space-y-6">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8">
@@ -219,6 +244,30 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               aspectRatio="square"
               helperText={
                 isUploading.profile
+                  ? "Uploading..."
+                  : "JPG / PNG · Max 5MB"
+              }
+            />
+            <ImageUpload
+              label="Profile Image 2"
+              value={
+                formik.values.aboutMeImageUrl
+                  ? {
+                      url: formik.values.aboutMeImageUrl,
+                      publicId: formik.values.aboutMeImagePublicId,
+                    }
+                  : null
+              }
+              onChange={(value) => {
+                formik.setFieldValue("aboutMeImageUrl", value?.url || "");
+                formik.setFieldValue("aboutMeImagePublicId", value?.publicId || "");
+              }}
+              onUpload={uploadAboutMeImage}
+              disabled={!isEditMode || isUploading.aboutMeImage}
+              maxSize={5}
+              aspectRatio="square"
+              helperText={
+                isUploading.aboutMeImage
                   ? "Uploading..."
                   : "JPG / PNG · Max 5MB"
               }
@@ -360,7 +409,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
             <RichTextEditor
               value={formik.values.aboutMe}
               onChange={(value) => formik.setFieldValue("aboutMe", value)}
-              readonly={!isEditMode}
+              isEditMode={isEditMode}
             />
           </div>
         </div>
