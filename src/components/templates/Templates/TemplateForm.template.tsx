@@ -123,7 +123,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
           <RichTextEditor
             value={formik.values.body}
             onChange={(content) => formik.setFieldValue("body", content)}
-            readonly={mode === MODE.VIEW}
+            isEditMode={mode !== MODE.VIEW}
           />
           {formik.touched.body && formik.errors.body && (
             <div className="mt-2 text-sm text-red-600">

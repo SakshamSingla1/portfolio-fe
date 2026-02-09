@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from "react";
 import JoditEditor from "jodit-react";
 import { createUseStyles } from "react-jss";
 import { useColors } from "../../../utils/types";
-import type { Jodit } from "jodit/esm";
+import type { IJodit } from "jodit/esm/types";
 
 interface RichTextEditorProps {
   label?: string;
@@ -52,11 +52,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   error,
   helperText,
 }) => {
-  const editorRef = useRef<Jodit | null>(null);
+  const editorRef = useRef<IJodit | null>(null);
   const colors = useColors();
   const classes = useStyles(colors);
 
-  const setEditorRef = (editor: Jodit | null) => {
+  const setEditorRef = (editor: IJodit | null) => {
     if (editor) {
       editorRef.current = editor;
     }
