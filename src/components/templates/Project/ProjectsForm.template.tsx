@@ -33,7 +33,7 @@ import { FiTrash2 } from "react-icons/fi";
 const validationSchema = Yup.object({
     projectName: Yup.string().required("Project name is required"),
     projectLink: Yup.string().required("Project link is required").url(),
-    projectDescription: Yup.string().max(500),
+    projectDescription: Yup.string().required("Project description is required").min(120, "Description is too short"),
     skillIds: Yup.array().of(Yup.string()).min(1, "Select at least one technology"),
     projectStartDate: Yup.date().required("Start date is required"),
     projectEndDate: Yup.date()
@@ -422,7 +422,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     <RichTextEditor
                         value={formik.values.projectDescription}
                         onChange={v => formik.setFieldValue("projectDescription", v)}
-                        readonly={mode === MODE.VIEW}
+                        isEditMode={mode !== MODE.VIEW}
                     />
                 </div>
 

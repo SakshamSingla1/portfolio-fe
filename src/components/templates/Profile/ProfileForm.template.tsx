@@ -409,7 +409,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
             <RichTextEditor
               value={formik.values.aboutMe}
               onChange={(value) => formik.setFieldValue("aboutMe", value)}
-              readonly={!isEditMode}
+              isEditMode={isEditMode}
             />
           </div>
         </div>

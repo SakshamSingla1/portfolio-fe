@@ -1,23 +1,17 @@
-import React, { useRef, useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import JoditEditor from "jodit-react";
-import type { IJodit } from "jodit/esm/types";
-import type { Config } from "jodit/esm/config";
 import { createUseStyles } from "react-jss";
 import { useColors } from "../../../utils/types";
+import type { Jodit } from "jodit/esm";
 
 interface RichTextEditorProps {
   label?: string;
   value: string;
-  onChange: (content: string) => void;
-  readonly?: boolean;
+  onChange: (value: string) => void;
+  isEditMode?: boolean;
   placeholder?: string;
-  height?: number;
-  minHeight?: number;
-  maxHeight?: number;
-  buttons?: string[];
   error?: boolean;
   helperText?: string;
-  extraButtons?: string[];
 }
 
 const useStyles = createUseStyles({
@@ -54,92 +48,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   label,
   value,
   onChange,
-  readonly = false,
-  placeholder = "Start typing...",
-  height = 300,
-  minHeight = 200,
-  maxHeight = 600,
-  buttons,
+  isEditMode = true,
   error,
   helperText,
-  extraButtons = [],
 }) => {
-  const editorRef = useRef<IJodit | null>(null);
+  const editorRef = useRef<Jodit | null>(null);
   const colors = useColors();
   const classes = useStyles(colors);
 
-  // 🚨 DO NOT generic-type useMemo with Config
-  const config = useMemo(() => {
-    const cfg: Partial<Config> = {
-      readonly,
-      placeholder,
-      height,
-      minHeight,
-      maxHeight,
+  const setEditorRef = (editor: Jodit | null) => {
+    if (editor) {
+      editorRef.current = editor;
+    }
+  };
 
-      toolbarAdaptive: false,
-      toolbarSticky: false,
-      toolbarButtonSize: "middle",
-
-      showCharsCounter: false,
-      showWordsCounter: false,
-      showXPathInStatusbar: false,
-
-      askBeforePasteHTML: false,
-      askBeforePasteFromWord: false,
-      processPasteHTML: true,
-      defaultActionOnPaste: "insert_as_html",
-
-      style: {
-        fontFamily: "Inter, sans-serif",
-        fontSize: "14px",
-        lineHeight: "1.6",
-      },
-
-      buttons:
-        buttons ??
-        [
-          "bold",
-          "italic",
-          "underline",
-          "strikethrough",
-          "|",
-          "ul",
-          "ol",
-          "|",
-          "outdent",
-          "indent",
-          "|",
-          "font",
-          "fontsize",
-          "paragraph",
-          "|",
-          "align",
-          "|",
-          "image",
-          "link",
-          "|",
-          "paste",
-          "pasteText",
-          "pasteWord",
-          "|",
-          "undo",
-          "redo",
-          "|",
-          "source",
-        ].concat(extraButtons),
-    };
-
-    return cfg;
-  }, [
-    readonly,
-    placeholder,
-    height,
-    minHeight,
-    maxHeight,
-    buttons,
-    extraButtons,
-  ]);
+  const joditConfig = useMemo(() => ({ readonly: !isEditMode, placeholder: 'Start typing...', }), [isEditMode]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -158,13 +81,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       <div className={`${classes.wrapper} ${error ? classes.error : ""}`}>
         <JoditEditor
-          ref={editorRef}
+          ref={setEditorRef}
           value={value || ""}
-          config={config as any}
-          onChange={onChange}
+          config={joditConfig as any}
+          onBlur={(newContent) => onChange(newContent)}
         />
       </div>
-
       {error && helperText && (
         <div className={classes.helperText}>{helperText}</div>
       )}

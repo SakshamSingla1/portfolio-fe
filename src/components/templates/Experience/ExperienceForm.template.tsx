@@ -26,14 +26,11 @@ export const employmentStatusOptions = [
 
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
-        .required('Company name is required')
-        .max(100, 'Company name is too long'),
+        .required('Company name is required'),
     jobTitle: Yup.string()
-        .required('Job title is required')
-        .max(100, 'Job title is too long'),
+        .required('Job title is required'),
     location: Yup.string()
-        .required('Location is required')
-        .max(100, 'Location is too long'),
+        .required('Location is required'),
     startDate: Yup.date()
         .required('Start date is required'),
     endDate: Yup.date()
@@ -43,7 +40,8 @@ const validationSchema = Yup.object().shape({
     employmentStatus: Yup.string()
         .required('Employment status is required'),
     description: Yup.string()
-        .max(500, 'Description is too long'),
+        .required('Description is required')
+        .min(120, 'Description is too short'),
     skillIds: Yup.array(Yup.string())
         .min(1, 'At least one skill is required'),
 });
@@ -290,7 +288,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         <RichTextEditor
                             value={formik.values.description}
                             onChange={(value) => formik.setFieldValue("description", value)}
-                            readonly={mode === MODE.VIEW}
+                            isEditMode={mode !== MODE.VIEW}
                         />
                         {formik.errors.description && formik.touched.description && (
                             <div className="mt-2 text-sm text-red-600">
