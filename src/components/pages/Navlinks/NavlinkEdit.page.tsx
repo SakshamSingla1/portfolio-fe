@@ -12,8 +12,7 @@ import { useSnackbar } from '../../../hooks/useSnackBar';
 const NavlinkEditPage: React.FC = () => {
     const navigate = useNavigate();
     const params = useParams();
-    const role = String(params.role);
-    const index = String(params.index);
+    const id = String(params.id);
     const { showSnackbar } = useSnackbar();
 
     const navlinkService = useNavlinkService();
@@ -22,7 +21,7 @@ const NavlinkEditPage: React.FC = () => {
 
     const updateNavlink = async (values: NavlinkRequest) => {
         try {
-            const response = await navlinkService.updateNavlink(role, index, values);
+            const response = await navlinkService.updateNavlink(id, values);
             if (response?.status === HTTP_STATUS.OK) {
                 navigate(makeRoute(ADMIN_ROUTES.NAVLINKS, {}));
                 showSnackbar('success', 'Navlink updated successfully');
@@ -33,9 +32,9 @@ const NavlinkEditPage: React.FC = () => {
         }
     };
 
-    const loadNavlink = async (role: string, index: string) => {
+    const loadNavlink = async () => {
         try {
-            const response = await navlinkService.getNavlinkByRoleIndex(role, index);
+            const response = await navlinkService.getNavlinkById(id);
             if (response?.status === HTTP_STATUS.OK) {
                 setNavlink(response.data.data);
             }
@@ -45,8 +44,8 @@ const NavlinkEditPage: React.FC = () => {
     };
 
     useEffect(() => {
-        loadNavlink(role, index);
-    }, [role, index]);
+        loadNavlink();
+    }, []);
 
     return (
         <div>

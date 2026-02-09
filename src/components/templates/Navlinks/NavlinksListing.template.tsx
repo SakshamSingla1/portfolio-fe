@@ -33,22 +33,23 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         navigate(makeRoute(ADMIN_ROUTES.NAVLINKS_ADD, {}));
     }
 
-    const handleEdit = (role: string, index: string) => {
+    const handleEdit = (id: string) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
             role: searchParams.get("role") || "",
         }
+        console.log(id);
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_EDIT, {
-                params: { role, index },
+                params: { id },
                 query: query
             })
         );
     }
 
-    const handleView = (role: string, index: string) => {
+    const handleView = (id: string) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -57,19 +58,19 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         }
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_VIEW, {
-                params: { role, index },
+                params: { id },
                 query: query
             })
         );
     }
 
-    const Action = (role: string, index: string) => {
+    const Action = (id: string) => {
         return (
             <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(role, index)} className={`w-6 h-6`}>
+                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
                     <FiEdit />
                 </button>
-                <button onClick={() => handleView(role, index)} className={`w-6 h-6`}>
+                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
                     <FiEye />
                 </button>
             </div>
@@ -78,16 +79,18 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
 
     const getRecords = () => navlinks?.map((navlink: NavlinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
-        `${enumToNormalKey(navlink.role)} - ${enumToNormalKey(navlink.name)} (${navlink.index})`,
+        `${enumToNormalKey(navlink.name)} (${navlink.index})`,
+        navlink.roles?.map((role) => enumToNormalKey(role)).join(", ") ?? "",
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
         StatusOptions.find((status) => status.value === navlink.status)?.label,
-        Action(navlink.role ?? "", navlink.index ?? "")
+        Action(navlink.id ?? "")
     ])
 
     const getTableColumns = () => [
         { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
         { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+        { label: "Roles", key: "roles", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },

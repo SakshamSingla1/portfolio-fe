@@ -50,8 +50,8 @@ export const ADMIN_ROUTES = {
 
     NAVLINKS: "/admin/navlinks",
     NAVLINKS_ADD: "/admin/navlinks/add",
-    NAVLINKS_EDIT: "/admin/navlinks/:role/:index/edit",
-    NAVLINKS_VIEW: "/admin/navlinks/:role/:index",
+    NAVLINKS_EDIT: "/admin/navlinks/:id/edit",
+    NAVLINKS_VIEW: "/admin/navlinks/:id",
 
     TEMPLATES: "/admin/templates",
     TEMPLATES_ADD: "/admin/templates/add",
