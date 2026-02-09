@@ -18,7 +18,7 @@ import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
-    message: Yup.string().required("Message is required"),
+    message: Yup.string().required("Message is required").min(10, "Message is too short"),
     role: Yup.string().required("Role is required"),
     company: Yup.string().required("Company is required"),
     imageId: Yup.string().required("Image ID is required"),
@@ -215,7 +215,7 @@ const TestimonialFormTemplate = ({
                             label="Message"
                             value={formik.values.message}
                             onChange={(value) => formik.setFieldValue("message", value)}
-                            readonly={mode === MODE.VIEW}
+                            isEditMode={mode !== MODE.VIEW}
                         />
                     </div>
                 </div>

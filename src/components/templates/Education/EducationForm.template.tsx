@@ -14,14 +14,11 @@ import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
-        .required('Institution is required')
-        .max(50, 'Institution name is too long'),
+        .required('Institution is required'),
     degree: Yup.string()
-        .required('Degree is required')
-        .max(50, 'Degree name is too long'),
+        .required('Degree is required'),
     fieldOfStudy: Yup.string()
-        .required('Field of study is required')
-        .max(50, 'Field of study is too long'),
+        .required('Field of study is required'),
     startYear: Yup.number()
         .required('Start year is required')
         .min(1900, 'Invalid year')
@@ -30,12 +27,12 @@ const validationSchema = Yup.object().shape({
         .min(Yup.ref('startYear'), 'End year must be after start year')
         .max(new Date().getFullYear() + 5, 'Invalid year'),
     location: Yup.string()
-        .required('Location is required')
-        .max(100, 'Location is too long'),
+        .required('Location is required'),
     description: Yup.string()
-        .max(500, 'Description is too long'),
+        .required('Description is required')
+        .min(120, 'Description is too short'),
     grade: Yup.string()
-        .max(10, 'Grade is too long')
+        .required('Grade is required')
 });
 
 interface EducationFormProps {
@@ -235,7 +232,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         <RichTextEditor
                             value={formik.values.description}
                             onChange={(value) => formik.setFieldValue("description", value)}
-                            readonly={mode === MODE.VIEW}
+                            isEditMode = {mode !== MODE.VIEW}
                         />
                         {formik.errors.description && formik.touched.description && (
                             <div className="mt-2 text-sm text-red-600">
