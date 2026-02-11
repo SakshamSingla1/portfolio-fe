@@ -49,12 +49,12 @@ export const useSkillService = () => {
 
     const getAll = () => {
         const url = replaceUrlParams(SKILL_URLS.SKILL, {});
-        return request(API_METHOD.GET, url, null, null, null, null);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const getById = (id: string | null) => {
         const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
-        return request(API_METHOD.GET, url, null, null, null, null);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const create = (skill: Skill) => {

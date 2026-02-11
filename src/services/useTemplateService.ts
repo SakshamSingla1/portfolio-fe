@@ -1,4 +1,5 @@
 import { request } from "."
+import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
 
@@ -35,13 +36,15 @@ export interface TemplateResponse {
 }
 
 export const useTemplateService = () => {
+    const { user } = useAuthenticatedUser();
+
     const getAllTemplates = (params: TemplateFilterRequest) =>
-        request(API_METHOD.GET, TEMPLATE_URLS.GET_TEMPLATES, null, null, { params });
+        request(API_METHOD.GET, TEMPLATE_URLS.GET_TEMPLATES, user, null, { params });
 
     const getTemplateByName = async (name: string) => {
         return request(API_METHOD.GET, 
             replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_NAME, { name }), 
-            null, 
+            user, 
             null
         );
     };
@@ -49,7 +52,7 @@ export const useTemplateService = () => {
     const createTemplate = async (template: TemplateRequest) => {
         return request(API_METHOD.POST, 
             TEMPLATE_URLS.GET_TEMPLATES, 
-            null, 
+            user, 
             template
         );
     };
@@ -57,7 +60,7 @@ export const useTemplateService = () => {
     const updateTemplate = async (name: string, template: TemplateRequest) => {
         return request(API_METHOD.PUT, 
             replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_NAME, { name }), 
-            null, 
+            user, 
             template
         );
     };
@@ -65,7 +68,7 @@ export const useTemplateService = () => {
     const deleteTemplate = async (name: string) => {
         return request(API_METHOD.DELETE, 
             replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_NAME, { name }), 
-            null, 
+            user, 
             null
         );
     };
