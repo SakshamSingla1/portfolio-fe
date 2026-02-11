@@ -93,6 +93,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
                 formik.setFieldValue('name', formatToEnumKey(e.target.value))
               }
               disabled={mode === MODE.VIEW}
+              required
               error={formik.touched.name && Boolean(formik.errors.name)}
               helperText={Boolean(formik.touched.name && formik.errors.name) ? formik.errors.name : ''}
             />
@@ -103,6 +104,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
               fullWidth
               {...formik.getFieldProps('path')}
               disabled={mode === MODE.VIEW}
+              required
               error={formik.touched.path && Boolean(formik.errors.path)}
               helperText={Boolean(formik.touched.path && formik.errors.path) ? formik.errors.path : ''}
             />
@@ -114,6 +116,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
               fullWidth
               {...formik.getFieldProps('index')}
               disabled={mode === MODE.VIEW}
+              required
               error={formik.touched.index && Boolean(formik.errors.index)}
               helperText={Boolean(formik.touched.index && formik.errors.index) ? formik.errors.index : ''}
               inputProps={{ min: 0 }}
@@ -165,7 +168,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
               label={mode === MODE.ADD ? 'Add' : 'Update'}
               variant="primaryContained"
               onClick={() => formik.handleSubmit()}
-              disabled={formik.isSubmitting || !formik.isValid}
+              disabled={formik.isSubmitting}
             />
           )}
         </div>

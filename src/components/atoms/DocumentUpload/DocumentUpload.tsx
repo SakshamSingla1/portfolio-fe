@@ -126,7 +126,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
           style={{ color: colors.neutral800 }}
         >
           {label}
-          {required && <span className="ml-1" style={{ color: colors.error500 }}>*</span>}
+          {required && <span className="ml-1" style={{ color: colors.error600 }}>*</span>}
         </label>
       )}
       {!value ? (

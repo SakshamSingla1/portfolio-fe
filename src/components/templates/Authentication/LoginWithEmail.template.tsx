@@ -192,7 +192,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                             onClick={() => formik.handleSubmit()}
                             variant="primaryContained"
                             className="w-1/2"
-                            disabled={isLoading || !formik.isValid}
+                            disabled={isLoading}
                         />
                     </div>
                     <div className="text-center mt-5">

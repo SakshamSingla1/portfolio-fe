@@ -85,9 +85,10 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
               value={formik.values.name}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              disabled={mode === MODE.VIEW}
+              required
               error={formik.touched.name && Boolean(formik.errors.name)}
               helperText={formik.touched.name && formik.errors.name ? String(formik.errors.name) : ""}
-              disabled={mode === MODE.VIEW}
             />
             <AutoCompleteInput
               label="Template Type"
@@ -98,7 +99,10 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
               onChange={value => {
                 formik.setFieldValue("type", value?.value ?? null);
               }}
-              isDisabled={false}
+              isDisabled={mode === MODE.VIEW}
+              required
+              error={formik.touched.type && Boolean(formik.errors.type)}
+              helperText={formik.touched.type && formik.errors.type ? String(formik.errors.type) : ""}
             />
           </div>
           <div className="mt-6">
@@ -108,6 +112,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
               value={formik.values.subject}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              required
               error={formik.touched.subject && Boolean(formik.errors.subject)}
               helperText={formik.touched.subject && formik.errors.subject ? String(formik.errors.subject) : ""}
               disabled={mode === MODE.VIEW}
@@ -121,9 +126,14 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
             Template Body
           </h3>
           <RichTextEditor
+            label="Body"
+            placeholder="Enter Template Body"
+            required
             value={formik.values.body}
             onChange={(content) => formik.setFieldValue("body", content)}
             isEditMode={mode !== MODE.VIEW}
+            error={formik.touched.body && Boolean(formik.errors.body)}
+            helperText={formik.touched.body && formik.errors.body ? String(formik.errors.body) : ""}
           />
           {formik.touched.body && formik.errors.body && (
             <div className="mt-2 text-sm text-red-600">
@@ -161,7 +171,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
               label={mode === MODE.ADD ? "Add" : "Update"}
               variant="primaryContained"
               onClick={() => formik.handleSubmit()}
-              disabled={loading || !formik.isValid}
+              disabled={loading}
             />
           )}
         </div>

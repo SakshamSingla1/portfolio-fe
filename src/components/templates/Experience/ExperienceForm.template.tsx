@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+import { useColors } from "../../../utils/types";
 
 export const employmentStatusOptions = [
     { label: "Current", value: EmploymentStatus.CURRENT },
@@ -35,13 +36,16 @@ const validationSchema = Yup.object().shape({
         .required('Start date is required'),
     endDate: Yup.date()
         .min(Yup.ref('startDate'), 'End date must be after start date')
-        .notRequired()
+        .when('employmentStatus', {
+            is: (value: string) => value === EmploymentStatus.CURRENT,
+            then: (schema) => schema.notRequired(),
+            otherwise: (schema) => schema.required('End date is required'),
+        })
         .nullable(),
     employmentStatus: Yup.string()
         .required('Employment status is required'),
     description: Yup.string()
-        .required('Description is required')
-        .min(120, 'Description is too short'),
+        .required('Description is required'),
     skillIds: Yup.array(Yup.string())
         .min(1, 'At least one skill is required'),
 });
@@ -56,6 +60,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     const skillService = useSkillService();
     const navigate = useNavigate();
     const { user } = useAuthenticatedUser();
+    const colors = useColors();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
 
@@ -153,25 +158,27 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             label="Company Name"
                             placeholder="Enter company name"
                             {...formik.getFieldProps("companyName")}
-                            error={formik.touched.companyName && Boolean(formik.errors.companyName)}
-                            helperText={formik.errors.companyName}
                             onBlur={(event: any) => {
                                 const newValue = titleModification(event.target.value);
                                 formik.setFieldValue('companyName', newValue);
                             }}
                             disabled={mode === MODE.VIEW}
+                            required={true}
+                            error={formik.touched.companyName && Boolean(formik.errors.companyName)}
+                            helperText={Boolean(formik.touched.companyName && formik.errors.companyName) ? formik.errors.companyName : ""}
                         />
                         <TextField
                             label="Job Title"
                             placeholder="Enter your job title"
                             {...formik.getFieldProps("jobTitle")}
-                            error={formik.touched.jobTitle && Boolean(formik.errors.jobTitle)}
-                            helperText={formik.errors.jobTitle}
                             onBlur={(event: any) => {
                                 const newValue = titleModification(event.target.value);
                                 formik.setFieldValue('jobTitle', newValue);
                             }}
                             disabled={mode === MODE.VIEW}
+                            required={true}
+                            error={formik.touched.jobTitle && Boolean(formik.errors.jobTitle)}
+                            helperText={Boolean(formik.touched.jobTitle && formik.errors.jobTitle) ? formik.errors.jobTitle : ""}
                         />
                     </div>
                     <div className="mt-6">
@@ -179,13 +186,14 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             label="Location"
                             placeholder="Enter work location (e.g., San Francisco, CA)"
                             {...formik.getFieldProps("location")}
-                            error={formik.touched.location && Boolean(formik.errors.location)}
-                            helperText={formik.errors.location}
                             onBlur={(event: any) => {
                                 const newValue = titleModification(event.target.value);
                                 formik.setFieldValue('location', newValue);
                             }}
                             disabled={mode === MODE.VIEW}
+                            required={true}
+                            error={formik.touched.location && Boolean(formik.errors.location)}
+                            helperText={Boolean(formik.touched.location && formik.errors.location) ? formik.errors.location : ""}
                         />
                     </div>
                 </div>
@@ -210,6 +218,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                                 }
                             }}
                             onSearch={(value: string) => loadSkills(value)}
+                            required={true}
                             error={formik.touched.skillIds && Boolean(formik.errors.skillIds)}
                             helperText={formik.errors.skillIds && formik.touched.skillIds ? Array.isArray(formik.errors.skillIds) ? formik.errors.skillIds.join(', ') : formik.errors.skillIds : "Search and select the technologies used in this experience"}
                             isDisabled={mode === MODE.VIEW}
@@ -249,19 +258,21 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                                 label="Start Date"
                                 value={formik.values.startDate ? dayjs(formik.values.startDate) : null}
                                 onChange={(newValue) => formik.setFieldValue("startDate", newValue?.format("YYYY-MM-DD"))}
-                                error={!!formik.touched.startDate && Boolean(formik.errors.startDate)}
-                                helperText={formik.errors.startDate}
                                 fullWidth
                                 disabled={mode === MODE.VIEW}
+                                required={true}
+                                error={formik.touched.startDate && Boolean(formik.errors.startDate)}
+                                helperText={Boolean(formik.touched.startDate && formik.errors.startDate) ? formik.errors.startDate : "Select the start date"}
                             />
                             <DatePicker
                                 label="End Date"
                                 value={formik.values.endDate ? dayjs(formik.values.endDate) : null}
                                 onChange={(newValue) => formik.setFieldValue("endDate", newValue?.format("YYYY-MM-DD"))}
-                                error={!!formik.touched.endDate && Boolean(formik.errors.endDate)}
-                                helperText={formik.errors.endDate}
                                 fullWidth
                                 disabled={mode === MODE.VIEW || formik.values.employmentStatus === EmploymentStatus.CURRENT}
+                                required={formik.values.employmentStatus !== EmploymentStatus.CURRENT}
+                                error={formik.touched.endDate && Boolean(formik.errors.endDate)}
+                                helperText={Boolean(formik.touched.endDate && formik.errors.endDate) ? formik.errors.endDate : "Select the end date"}
                             />
                         </div>
                         <div className="bg-blue-50 p-4 rounded-lg">
@@ -272,6 +283,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                                 value={formik.values.employmentStatus ? employmentStatusOptions.find(option => option.value === formik.values.employmentStatus) : null}
                                 onChange={(option: any) => option && formik.setFieldValue("employmentStatus", option.value)}
                                 onSearch={() => { }}
+                                required={true}
                                 error={formik.touched.employmentStatus && Boolean(formik.errors.employmentStatus)}
                                 helperText={formik.touched.employmentStatus ? formik.errors.employmentStatus : "Select the employment status"}
                                 isDisabled={mode === MODE.VIEW}
@@ -283,7 +295,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                     <div className="mt-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                            Job Description
+                            Job Description <span style={{ color: colors.error600 }}>*</span>
                         </h3>
                         <RichTextEditor
                             value={formik.values.description}
@@ -291,7 +303,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             isEditMode={mode !== MODE.VIEW}
                         />
                         {formik.errors.description && formik.touched.description && (
-                            <div className="mt-2 text-sm text-red-600">
+                            <div className="mt-2 text-xs" style={{ color: colors.error600 }}>
                                 {formik.errors.description}
                             </div>
                         )}
@@ -309,7 +321,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         label={mode === MODE.ADD ? "Add" : "Update"}
                         variant="primaryContained"
                         onClick={() => formik.handleSubmit()}
-                        disabled={!formik.isValid || formik.isSubmitting}
+                        disabled={formik.isSubmitting}
                     />
                 )}
             </div>

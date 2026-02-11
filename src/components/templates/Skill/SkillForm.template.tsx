@@ -139,6 +139,9 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                     );
                                     setSelectedLogo(logos.find(l => l.id === value?.value) || null);
                                 }}
+                                required={true}
+                                error={formik.touched.logoId && Boolean(formik.errors.logoId)}
+                                helperText={Boolean(formik.touched.logoId && formik.errors.logoId) ? formik.errors.logoId : ""}
                                 isDisabled={mode === MODE.VIEW}
                             />
                             {formik.errors.logoId && formik.touched.logoId && (
@@ -183,6 +186,9 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                             onChange={value => {
                                 formik.setFieldValue("level", value?.value ?? null);
                             }}
+                            required={true}
+                            error={formik.touched.level && Boolean(formik.errors.level)}
+                            helperText={Boolean(formik.touched.level && formik.errors.level) ? formik.errors.level : ""}
                             isDisabled={false}
                         />
                         <AutoCompleteInput
@@ -205,7 +211,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                             label={mode === MODE.ADD ? "Add" : "Update"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting || !formik.isValid}
+                            disabled={formik.isSubmitting}
                         />
                     )}
                 </div>

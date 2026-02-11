@@ -11,6 +11,7 @@ import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
+import { useColors } from "../../../utils/types";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -24,13 +25,13 @@ const validationSchema = Yup.object().shape({
         .min(1900, 'Invalid year')
         .max(new Date().getFullYear(), 'Invalid year'),
     endYear: Yup.number()
+        .required('End year is required')
         .min(Yup.ref('startYear'), 'End year must be after start year')
         .max(new Date().getFullYear() + 5, 'Invalid year'),
     location: Yup.string()
         .required('Location is required'),
     description: Yup.string()
-        .required('Description is required')
-        .min(120, 'Description is too short'),
+        .required('Description is required'),
     grade: Yup.string()
         .required('Grade is required')
 });
@@ -44,6 +45,7 @@ interface EducationFormProps {
 const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, education }) => {
     const navigate = useNavigate();
     const { user } = useAuthenticatedUser();
+    const colors = useColors();
 
     const onClose = () => navigate(ADMIN_ROUTES.EDUCATION);
 
@@ -111,12 +113,14 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             label="Institution"
                             placeholder='Enter institution name'
                             {...formik.getFieldProps("institution")}
-                            error={formik.touched.institution && Boolean(formik.errors.institution)}
                             onChange={(event: any) => {
                                 const newValue = titleModification(event.target.value);
                                 formik.setFieldValue('institution', newValue);
                             }}
+                            required={true}
                             disabled={mode === MODE.VIEW}
+                            error={formik.touched.institution && Boolean(formik.errors.institution)}
+                            helperText={Boolean(formik.touched.institution && formik.errors.institution) ? formik.errors.institution : ""}
                         />
                         <AutoCompleteInput
                             label="Degree"
@@ -127,6 +131,9 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             onChange={(value: any) => {
                                 formik.setFieldValue("degree", value?.value ?? null);
                             }}
+                            required={true}
+                            error={formik.touched.degree && Boolean(formik.errors.degree)}
+                            helperText={Boolean(formik.touched.degree && formik.errors.degree) ? formik.errors.degree : ""}
                             isDisabled={mode === MODE.VIEW}
                         />
                     </div>
@@ -141,23 +148,27 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             label="Field of Study"
                             placeholder='Enter field of study'
                             {...formik.getFieldProps("fieldOfStudy")}
-                            error={formik.touched.fieldOfStudy && Boolean(formik.errors.fieldOfStudy)}
                             onChange={(event: any) => {
                                 const newValue = titleModification(event.target.value);
                                 formik.setFieldValue('fieldOfStudy', newValue);
                             }}
+                            required={true}
                             disabled={mode === MODE.VIEW}
+                            error={formik.touched.fieldOfStudy && Boolean(formik.errors.fieldOfStudy)}
+                            helperText={Boolean(formik.touched.fieldOfStudy && formik.errors.fieldOfStudy) ? formik.errors.fieldOfStudy : ""}
                         />
                         <TextField
                             label="Location"
                             placeholder='City, Country'
                             {...formik.getFieldProps("location")}
-                            error={formik.touched.location && Boolean(formik.errors.location)}
                             onChange={(event: any) => {
                                 const newValue = event.target.value;
                                 formik.setFieldValue('location', newValue);
                             }}
+                            required={true}
                             disabled={mode === MODE.VIEW}
+                            error={formik.touched.location && Boolean(formik.errors.location)}
+                            helperText={Boolean(formik.touched.location && formik.errors.location) ? formik.errors.location : ""}
                         />
                         <AutoCompleteInput
                             label="Grade Type"
@@ -168,13 +179,15 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             onChange={value => {
                                 formik.setFieldValue('gradeType', value?.value ?? '');
                             }}
-                            isDisabled={false}
+                            required={true}
+                            isDisabled={mode === MODE.VIEW}
+                            error={formik.touched.gradeType && Boolean(formik.errors.gradeType)}
+                            helperText={Boolean(formik.touched.gradeType && formik.errors.gradeType) ? formik.errors.gradeType : ""}
                         />
                         <TextField
                             label="Grade"
                             placeholder='e.g., 8.75 or A+'
                             value={formik.values.grade}
-                            error={formik.touched.grade && Boolean(formik.errors.grade)}
                             onChange={(event: any) => {
                                 const newValue = event.target.value;
                                 formik.setFieldValue('grade', newValue);
@@ -187,7 +200,9 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                                     </InputAdornment>
                                 )
                             }}
-                            helperText={formik.values.gradeType && `Grade will be displayed as: ${formik.values.grade} ${formik.values.gradeType}`}
+                            required={true}
+                            error={formik.touched.grade && Boolean(formik.errors.grade)}
+                            helperText={Boolean(formik.touched.grade && formik.errors.grade) ? formik.errors.grade : ""}                       
                         />
                     </div>
                 </div>
@@ -201,25 +216,29 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             label="Start Year"
                             placeholder='e.g., 2019'
                             {...formik.getFieldProps("startYear")}
-                            error={formik.touched.startYear && Boolean(formik.errors.startYear)}
                             inputProps={{ maxLength: 4 }}
                             onChange={(event: any) => {
                                 const newValue = event.target.value;
                                 formik.setFieldValue('startYear', newValue);
                             }}
                             disabled={mode === MODE.VIEW}
+                            required={true}
+                            error={formik.touched.startYear && Boolean(formik.errors.startYear)}
+                            helperText={Boolean(formik.touched.startYear && formik.errors.startYear) ? formik.errors.startYear : ""}
                         />
                         <TextField
                             label="End Year"
                             placeholder='e.g., 2023'
                             {...formik.getFieldProps("endYear")}
-                            error={formik.touched.endYear && Boolean(formik.errors.endYear)}
                             inputProps={{ maxLength: 4 }}
                             onChange={(event: any) => {
                                 const newValue = event.target.value;
                                 formik.setFieldValue('endYear', newValue);
                             }}
                             disabled={mode === MODE.VIEW}
+                            required={true}
+                            error={formik.touched.endYear && Boolean(formik.errors.endYear)}
+                            helperText={Boolean(formik.touched.endYear && formik.errors.endYear) ? formik.errors.endYear : ""}
                         />
                     </div>
                 </div>
@@ -227,15 +246,19 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     <div className="mt-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                            Job Description
+                            Description <span style={{ color: colors.error600 }}>*</span>
                         </h3>
                         <RichTextEditor
+                            label="Description"
+                            placeholder="Enter Description"
                             value={formik.values.description}
                             onChange={(value) => formik.setFieldValue("description", value)}
                             isEditMode = {mode !== MODE.VIEW}
+                            required
                         />
-                        {formik.errors.description && formik.touched.description && (
-                            <div className="mt-2 text-sm text-red-600">
+                        {Boolean(formik.errors.description && formik.touched.description) && (
+                            <div className="mt-2 text-xs"
+                            style={{ color: colors.error600 }}>
                                 {formik.errors.description}
                             </div>
                         )}
@@ -252,7 +275,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             label={mode === MODE.ADD ? "Add" : "Update"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting || !formik.isValid}
+                            disabled={formik.isSubmitting}
                         />
                     )}
                 </div>

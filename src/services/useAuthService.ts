@@ -12,6 +12,8 @@ export const AUTH_URLS = {
     VALIDATE_RESET_TOKEN : "auth/validate-reset-token",
     RESET_PASSWORD : "auth/reset-password",
     CHANGE_PASSWORD : "auth/change-password",
+    REQUEST_EMAIL_CHANGE : "auth/request-email-change",
+    VERIFY_EMAIL_CHANGE : "auth/verify-email-change", 
 }
 
 export interface AuthRegisterDTO {
@@ -48,6 +50,15 @@ export interface ChangePasswordDTO {
     oldPassword: string;
     newPassword: string;
     confirmPassword: string;
+}
+
+export interface RequestEmailChangeDTO {
+    newEmail: string;
+}
+
+export interface VerifyEmailChangeDTO {
+    newEmail: string;
+    otp: string;
 }
 
 export const useAuthService = () => {
@@ -91,6 +102,14 @@ export const useAuthService = () => {
         return request(API_METHOD.PUT, AUTH_URLS.CHANGE_PASSWORD, user, data);
     }
 
+    const changeEmailRequest = async (data: RequestEmailChangeDTO) => {
+        return request(API_METHOD.POST, AUTH_URLS.REQUEST_EMAIL_CHANGE, user, data);
+    }
+
+    const changeEmailVerify = async (data: VerifyEmailChangeDTO) => {
+        return request(API_METHOD.PUT, AUTH_URLS.VERIFY_EMAIL_CHANGE, user, data);
+    }
+
     return {
         login,
         register,
@@ -101,5 +120,7 @@ export const useAuthService = () => {
         validateResetToken,
         resetPassword,
         changePassword,
+        changeEmailRequest,
+        changeEmailVerify,
     }
 }

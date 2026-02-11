@@ -12,6 +12,7 @@ interface RichTextEditorProps {
   placeholder?: string;
   error?: boolean;
   helperText?: string;
+  required?: boolean;
 }
 
 const useStyles = createUseStyles({
@@ -47,10 +48,12 @@ const useStyles = createUseStyles({
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
   label,
   value,
+  placeholder,
   onChange,
   isEditMode = true,
   error,
   helperText,
+  required = false,
 }) => {
   const editorRef = useRef<IJodit | null>(null);
   const colors = useColors();
@@ -62,7 +65,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  const joditConfig = useMemo(() => ({ readonly: !isEditMode, placeholder: 'Start typing...', }), [isEditMode]);
+  const joditConfig = useMemo(() => ({ readonly: !isEditMode, placeholder: placeholder || 'Start typing...', }), [isEditMode]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -76,6 +79,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           }}
         >
           {label}
+          {required && <span style={{ color: colors.error600 }}>*</span>}
         </label>
       )}
 

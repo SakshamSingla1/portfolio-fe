@@ -84,6 +84,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             onChange={value => {
                                 formik.setFieldValue("platform", value?.value ?? null);
                             }}
+                            required
                             error={formik.touched.platform && Boolean(formik.errors.platform)}
                             helperText={formik.touched.platform && formik.errors.platform ? String(formik.errors.platform) : ""}
                             isDisabled={mode !== MODE.ADD}
@@ -94,6 +95,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             fullWidth
                             {...formik.getFieldProps('url')}
                             disabled={mode === MODE.VIEW}
+                            required
                             error={formik.touched.url && Boolean(formik.errors.url)}
                             helperText={formik.touched.url && formik.errors.url ? String(formik.errors.url) : ""}
                         />
@@ -104,6 +106,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             fullWidth
                             {...formik.getFieldProps('order')}
                             disabled={mode === MODE.VIEW}
+                            required
                             error={formik.touched.order && Boolean(formik.errors.order)}
                             helperText={formik.touched.order && formik.errors.order ? String(formik.errors.order) : ""}
                         />
@@ -139,7 +142,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             label={mode === MODE.ADD ? 'Add' : 'Update'}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting || !formik.isValid}
+                            disabled={formik.isSubmitting}
                         />
                     )}
                 </div>

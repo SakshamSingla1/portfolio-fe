@@ -25,7 +25,7 @@ const validationSchema = Yup.object({
         .min(Yup.ref("issueDate"), "Expiry date must be after issue date")
         .nullable(),
     credentialId: Yup.string().required("Credential ID is required"),
-    credentialUrl: Yup.string().url("Invalid URL"),
+    credentialUrl: Yup.string().url("Invalid URL").required("Credential URL is required"),
     order: Yup.string().required("Order is required"),
     status: Yup.string().required("Status is required"),
 });
@@ -131,8 +131,9 @@ const CertificationFormTemplate = ({
                                     titleModification(e.target.value)
                                 )
                             }
+                            required={true}
                             error={formik.touched.title && Boolean(formik.errors.title)}
-                            helperText={String(formik.touched.title && formik.errors.title)}
+                            helperText={Boolean(formik.touched.title && formik.errors.title) ? formik.errors.title : ""}
                             disabled={mode === MODE.VIEW}
                         />
 
@@ -140,8 +141,9 @@ const CertificationFormTemplate = ({
                             label="Issuer"
                             placeholder="Enter Issuer"
                             {...formik.getFieldProps("issuer")}
+                            required={true}
                             error={formik.touched.issuer && Boolean(formik.errors.issuer)}
-                            helperText={String(formik.touched.issuer && formik.errors.issuer)}
+                            helperText={Boolean(formik.touched.issuer && formik.errors.issuer) ? formik.errors.issuer : ""}
                             disabled={mode === MODE.VIEW}
                         />
                     </div>
@@ -160,6 +162,9 @@ const CertificationFormTemplate = ({
                                 formik.setFieldValue("issueDate", v?.toDate())
                             }
                             disabled={mode === MODE.VIEW}
+                            required={true}
+                            error={formik.touched.issueDate && Boolean(formik.errors.issueDate)}
+                            helperText={Boolean(formik.touched.issueDate && formik.errors.issueDate) ? formik.errors.issueDate : ""}
                         />
                         <DatePicker
                             label="Expiry Date"
@@ -200,13 +205,16 @@ const CertificationFormTemplate = ({
                                     ? "Uploading..."
                                     : "Credential · Max 5MB"
                             }
+                            required={true}
+                            error={formik.touched.credentialUrl && Boolean(formik.errors.credentialUrl)}
                         />
                         <TextField
                             label="Order"
                             placeholder="Enter Order"
                             {...formik.getFieldProps("order")}
+                            required={true}
                             error={formik.touched.order && Boolean(formik.errors.order)}
-                            helperText={String(formik.touched.order && formik.errors.order)}
+                            helperText={Boolean(formik.touched.order && formik.errors.order) ? formik.errors.order : ""}
                             disabled={mode === MODE.VIEW}
                         />
                     </div>
@@ -236,7 +244,7 @@ const CertificationFormTemplate = ({
                             label={mode === MODE.ADD ? "Add" : "Update"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting || !formik.isValid}
+                            disabled={formik.isSubmitting}
                         />
                     )}
                 </div>
