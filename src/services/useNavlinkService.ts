@@ -1,6 +1,7 @@
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
+import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 export const NAVLINK_URLS = {
     BASE: "navlinks",
@@ -40,12 +41,13 @@ export interface NavlinkResponse {
 }
 
 export const useNavlinkService = () => {
+    const { user } = useAuthenticatedUser();
 
     const getAllNavlinks = (params: NavlinkFilterRequest) =>
         request(
             API_METHOD.GET,
             NAVLINK_URLS.BASE,
-            null,
+            user,
             null,
             { params }
         );
@@ -54,7 +56,7 @@ export const useNavlinkService = () => {
         request(
             API_METHOD.GET,
             replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
-            null,
+            user,
             null
         );
 
@@ -62,7 +64,7 @@ export const useNavlinkService = () => {
         request(
             API_METHOD.GET,
             replaceUrlParams(NAVLINK_URLS.BY_ROLE, { role }),
-            null,
+            user,
             null
         );
 
@@ -70,7 +72,7 @@ export const useNavlinkService = () => {
         request(
             API_METHOD.POST,
             NAVLINK_URLS.BASE,
-            null,
+            user,
             navlink
         );
 
@@ -78,7 +80,7 @@ export const useNavlinkService = () => {
         request(
             API_METHOD.PUT,
             replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
-            null,
+            user,
             navlink
         );
 
@@ -86,7 +88,7 @@ export const useNavlinkService = () => {
         request(
             API_METHOD.DELETE,
             replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
-            null,
+            user,
             null
         );
 

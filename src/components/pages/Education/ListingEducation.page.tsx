@@ -5,7 +5,6 @@ import EducationTable from '../../templates/Education/EducationsTable.template';
 import { useEducationService , type Education , type EducationFilterParams} from '../../../services/useEducationService';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
-import EducationCard from '../../public-view/Education.card';
 
 const ServiceListingPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -87,11 +86,6 @@ const ServiceListingPage: React.FC = () => {
     return (
         <div>
             <EducationTable educations={educations} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
-            {
-                educations.map((education) => (
-                    <EducationCard education={education} key={education.id} />
-                ))
-            }
         </div>
     )
 }

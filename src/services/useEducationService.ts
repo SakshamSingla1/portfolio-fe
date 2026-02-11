@@ -56,12 +56,12 @@ export const useEducationService = () => {
 
     const getById = (id: string | null) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id, profileId: String(user?.id) });
-        return request(API_METHOD.GET, url, null, null);
+        return request(API_METHOD.GET, url, user, null);
     };
 
     const getAllByProfile = (params : EducationFilterParams) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_ALL, { profileId: user?.id });
-        return request(API_METHOD.GET, url, null, null, {params});
+        return request(API_METHOD.GET, url, user, null, {params});
     };
 
     return {

@@ -41,12 +41,12 @@ export const useSocialLinkService = () => {
 
     const getAll = (params: SocialLinkFilterParams) => {
         const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK, {});
-        return request(API_METHOD.GET, url, null, null, { params: { ...params, profileId: user?.id } }, null);
+        return request(API_METHOD.GET, url, user, null, { params: { ...params, profileId: user?.id } }, null);
     };
 
     const getById = (id: string | null) => {
         const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
-        return request(API_METHOD.GET, url, null, null, null, null);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const create = (socialLink: SocialLink) => {
