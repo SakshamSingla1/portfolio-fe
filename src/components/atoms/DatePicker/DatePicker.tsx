@@ -25,6 +25,7 @@ interface DatePickerProps
     helperText?: string;
     fullWidth?: boolean;
     textFieldProps?: TextFieldProps;
+    required?: boolean;
 }
 
 const DatePicker: React.FC<DatePickerProps> = ({
@@ -33,6 +34,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
     helperText,
     fullWidth = true,
     textFieldProps,
+    required = false,
     ...props
 }) => {
     const colors = useColors();
@@ -44,7 +46,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                 className={`flex flex-col gap-1 w-auto relative ${props.disabled ? "pointer-events-none select-none" : ""
                     }`}
             >
-                {label && <div className={classes.label}>{label}</div>}
+                {label && <div className={classes.label}>{label} {required && <span style={{ color: colors.error600 }}>*</span>}</div>}
 
                 <MuiDatePicker
                     {...props}
@@ -64,7 +66,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
                             inputProps: {
                                 ...textFieldProps?.inputProps,
                                 disabled: true,
-                            }
+                            },
+                            required,
                         },
                         field: {
                             clearable: true,

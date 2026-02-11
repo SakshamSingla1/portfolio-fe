@@ -20,10 +20,10 @@ import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
-    description: Yup.string().required("Description is required").min(120, "Description is too short"),
+    description: Yup.string().required("Description is required"),
     issuer: Yup.string().required("Issuer is required"),
     achievedAt: Yup.date().required("Achieved at is required"),
-    proofUrl: Yup.string().url("Invalid URL"),
+    proofUrl: Yup.string().url("Invalid URL").required("Proof URL is required"),
     proofPublicId: Yup.string().required("Proof public ID is required"),
     order: Yup.string().required("Order is required"),
     status: Yup.string().required("Status is required"),
@@ -102,10 +102,6 @@ const AchievementFormTemplate = ({
         });
     }, [achievement]);
 
-    useEffect(() => {
-        console.log(formik);
-    }, [formik]);
-
     return (
         <div className="mb-8">
             <div className="mb-8">
@@ -134,6 +130,7 @@ const AchievementFormTemplate = ({
                                     titleModification(e.target.value)
                                 )
                             }
+                            required
                             error={formik.touched.title && Boolean(formik.errors.title)}
                             helperText={String(formik.touched.title && formik.errors.title)}
                             disabled={mode === MODE.VIEW}
@@ -143,6 +140,7 @@ const AchievementFormTemplate = ({
                             label="Issuer"
                             placeholder="Enter Issuer"
                             {...formik.getFieldProps("issuer")}
+                            required
                             error={formik.touched.issuer && Boolean(formik.errors.issuer)}
                             helperText={String(formik.touched.issuer && formik.errors.issuer)}
                             disabled={mode === MODE.VIEW}
@@ -162,12 +160,21 @@ const AchievementFormTemplate = ({
                             onChange={v =>
                                 formik.setFieldValue("achievedAt", v?.toDate())
                             }
+                            required
+                            error={formik.touched.achievedAt && Boolean(formik.errors.achievedAt)}
+                            helperText={Boolean(formik.touched.achievedAt && formik.errors.achievedAt) ? formik.errors.achievedAt : ""}
                             disabled={mode === MODE.VIEW}
                         />
+
                         <RichTextEditor
+                            label="Description"
+                            placeholder="Enter Description"
                             value={formik.values.description}
                             onChange={(value) => formik.setFieldValue("description", value)}
                             isEditMode={mode !== MODE.VIEW}
+                            error={formik.touched.description && Boolean(formik.errors.description)}
+                            helperText={Boolean(formik.touched.description && formik.errors.description) ? formik.errors.description : ""}
+                            required
                         />
                         {mode !== MODE.VIEW && (
                             <p className="text-xs text-gray-500">
@@ -206,13 +213,16 @@ const AchievementFormTemplate = ({
                                     ? "Uploading..."
                                     : "Proof · Max 5MB"
                             }
+                            error={Boolean(formik.touched.proofUrl && formik.errors.proofUrl)}
+                            required
                         />
                         <TextField
                             label="Order"
                             placeholder="Enter Order"
                             {...formik.getFieldProps("order")}
-                            error={formik.touched.order && Boolean(formik.errors.order)}
-                            helperText={String(formik.touched.order && formik.errors.order)}
+                            required
+                            error={Boolean(formik.touched.order && formik.errors.order)}
+                            helperText={Boolean(formik.touched.order && formik.errors.order) ? formik.errors.order : ""}
                             disabled={mode === MODE.VIEW}
                         />
                     </div>
@@ -242,7 +252,7 @@ const AchievementFormTemplate = ({
                             label={mode === MODE.ADD ? "Add" : "Update"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting || !formik.isValid}
+                            disabled={formik.isSubmitting}
                         />
                     )}
                 </div>

@@ -26,7 +26,11 @@ const validationSchema = Yup.object({
   title: Yup.string().required("Title is required"),
   phone: Yup.string().required("Phone is required"),
   location: Yup.string().required("Location is required"),
+<<<<<<< Updated upstream
   aboutMe: Yup.string().required("About is required").min(160, "About is too short"),
+=======
+  aboutMe: Yup.string().required("About is required"),
+>>>>>>> Stashed changes
   profileImageUrl: Yup.string().required("Profile image is required"),
   profileImagePublicId: Yup.string().required(),
   logoUrl: Yup.string().required("Logo is required"),

@@ -247,6 +247,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                   ? "Uploading..."
                   : "JPG / PNG · Max 5MB"
               }
+              error={Boolean(formik.errors.profileImageUrl && formik.touched.profileImageUrl)}
+              required={isEditMode}
             />
             <ImageUpload
               label="Profile Image 2"
@@ -271,6 +273,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                   ? "Uploading..."
                   : "JPG / PNG · Max 5MB"
               }
+              error={Boolean(formik.errors.aboutMeImageUrl && formik.touched.aboutMeImageUrl)}
+              required={isEditMode}
             />
             <ImageUpload
               label="Logo"
@@ -295,6 +299,8 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                   ? "Uploading..."
                   : "Brand logo · Max 5MB"
               }
+              error={Boolean(formik.errors.logoUrl && formik.touched.logoUrl)}
+              required={isEditMode}
             />
           </div>
         </SectionCard>
@@ -318,6 +324,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                     </InputAdornment>
                   ),
                 }}
+                error={Boolean(formik.errors.fullName && formik.touched.fullName)}
+                helperText={Boolean(formik.errors.fullName && formik.touched.fullName) ? formik.errors.fullName : ""}
+                required={isEditMode}
               />
             </div>
             <div className="md:col-span-2">
@@ -333,6 +342,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                     </InputAdornment>
                   ),
                 }}
+                required={isEditMode}
+                error={Boolean(formik.errors.email && formik.touched.email)}
+                helperText={Boolean(formik.errors.email && formik.touched.email) ? formik.errors.email : ""}
               />
             </div>
             <TextFieldV2
@@ -348,6 +360,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                   </InputAdornment>
                 ),
               }}
+              error={Boolean(formik.errors.title && formik.touched.title)}
+              helperText={Boolean(formik.errors.title && formik.touched.title) ? formik.errors.title : ""}
+              required={isEditMode}
             />
             <TextFieldV2
               label="Phone"
@@ -362,6 +377,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                   </InputAdornment>
                 ),
               }}
+              error={Boolean(formik.errors.phone && formik.touched.phone)}
+              helperText={Boolean(formik.errors.phone && formik.touched.phone) ? formik.errors.phone : ""}
+              required={isEditMode}
             />
             <div className="md:col-span-2">
               <TextFieldV2
@@ -377,6 +395,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                     </InputAdornment>
                   ),
                 }}
+                error={Boolean(formik.errors.location && formik.touched.location)}
+                helperText={Boolean(formik.errors.location && formik.touched.location) ? formik.errors.location : ""}
+                required={isEditMode}
               />
             </div>
             <div className="md:col-span-2">
@@ -394,6 +415,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                 }
                 onSearch={loadColorThemes}
                 isDisabled={!isEditMode}
+                error={Boolean(formik.errors.themeName && formik.touched.themeName)}
+                helperText={Boolean(formik.errors.themeName && formik.touched.themeName) ? formik.errors.themeName : ""}
+                required={isEditMode}
               />
             </div>
           </div>
@@ -407,9 +431,14 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <RichTextEditor
+              label="About Me"
+              placeholder="Tell about yourself"
               value={formik.values.aboutMe}
               onChange={(value) => formik.setFieldValue("aboutMe", value)}
               isEditMode={isEditMode}
+              required={isEditMode}
+              error={Boolean(formik.errors.aboutMe && formik.touched.aboutMe)}
+              helperText={Boolean(formik.errors.aboutMe && formik.touched.aboutMe) ? formik.errors.aboutMe : ""}
             />
           </div>
         </div>
@@ -438,6 +467,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               setActiveResume(null);
             }
           }}
+          required={isEditMode}
         />
 
         {formik.values.userName && activeResume && (
@@ -470,7 +500,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               variant="primaryContained"
               onClick={() => formik.handleSubmit()}
               loading={formik.isSubmitting}
-              disabled={!formik.isValid || !formik.dirty}
+              disabled={!formik.dirty}
             />
           </div>
         </div>

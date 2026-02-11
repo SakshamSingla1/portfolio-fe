@@ -59,12 +59,14 @@ interface Props extends Omit<TextFieldProps, "label" | "helperText" | "error"> {
   label?: string;
   helperText?: string;
   error?: boolean;
+  required?: boolean;
 }
 
 const TextField: React.FC<Props> = ({
   label,
   helperText,
   error,
+  required,
   InputProps,
   ...props
 }) => {
@@ -88,7 +90,7 @@ const TextField: React.FC<Props> = ({
             marginLeft: 8,
           }}
         >
-          {label}
+          {label} {required && <span style={{ color: colors.error600 }}>*</span>}
         </label>
       )}
 

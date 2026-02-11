@@ -244,7 +244,7 @@ const TestimonialFormTemplate = ({
                             label={mode === MODE.ADD ? "Add" : "Update"}
                             variant="primaryContained"
                             onClick={() => formik.handleSubmit()}
-                            disabled={formik.isSubmitting || !formik.isValid}
+                            disabled={formik.isSubmitting}
                         />
                     )}
                 </div>

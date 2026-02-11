@@ -33,6 +33,7 @@ interface AutoCompleteInputProps {
     onBlur?: () => void;
     className?: string;
     loading?: boolean;
+    required?: boolean;
 }
 
 const useStyles = createUseStyles({
@@ -119,6 +120,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     id,
     onBlur,
     className = "",
+    required = false,
     loading = false,
 }) => {
     const colors = useColors();
@@ -217,6 +219,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                         placeholder={placeHolder}
                         error={error}
                         helperText={helperText}
+                        required={required}
                         InputProps={{
                             ...params.InputProps,
                             endAdornment: (

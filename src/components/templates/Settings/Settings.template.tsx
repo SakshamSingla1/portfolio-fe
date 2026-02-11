@@ -1,16 +1,11 @@
 import React, { useState } from "react";
-import { FiLock } from "react-icons/fi";
+import { FiLock, FiShield } from "react-icons/fi";
 
 import { Tabs, type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import PasswordTab from "./PasswordTab";
+import ChangeEmailTab from "./ChangeEmailTab";
 
-interface SettingsTemplateProps {
-  handleChangePasswordSubmit: (values: any) => void;
-}
-
-const SettingsTemplate: React.FC<SettingsTemplateProps> = ({
-  handleChangePasswordSubmit,
-}) => {
+const SettingsTemplate: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("password");
 
   const tabs: ITabsSchema[] = [
@@ -19,11 +14,17 @@ const SettingsTemplate: React.FC<SettingsTemplateProps> = ({
       value: "password",
       icon: <FiLock />,
       component: (
-        <PasswordTab
-          handleChangePasswordSubmit={handleChangePasswordSubmit}
-        />
+        <PasswordTab />
       ),
     },
+    {
+      label: "Change Email",
+      value: "email",
+      icon: <FiShield />,
+      component: (
+        <ChangeEmailTab />
+      ),
+    }
   ];
 
   return (
