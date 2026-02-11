@@ -55,12 +55,12 @@ export const useExperienceService = () => {
 
   const getAllByProfile = (params : ExperienceFilterParams) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_PROFILE, { profileId: user?.id });
-    return request(API_METHOD.GET, url, null, null, {params});
+    return request(API_METHOD.GET, url, user, null, {params});
   };
 
   const getById = (id: string) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id : String(id) });
-    return request(API_METHOD.GET, url, null, null);
+    return request(API_METHOD.GET, url, user, null);
   };
 
   const create = (experience: ExperienceRequest) =>

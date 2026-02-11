@@ -53,7 +53,7 @@ export const useProfileService = () => {
 
     const get = () => {
         const url = replaceUrlParams(PROFILE_URLS.GET_BY_ID, { id: user?.id });
-        return request(API_METHOD.GET, url, null, null, null, null);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const update = (profile: ProfileRequest) => {

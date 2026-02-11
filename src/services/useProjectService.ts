@@ -61,12 +61,12 @@ export const useProjectService = () => {
 
     const getAll = () => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.GET, url, null, null, null, null);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const getById = (id: string | null) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
-        return request(API_METHOD.GET, url, null, null, null, null);
+        return request(API_METHOD.GET, url, user, null, null, null);
     };
 
     const create = (project: Project) => {

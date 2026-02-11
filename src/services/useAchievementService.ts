@@ -62,12 +62,12 @@ export const useAchievementService = () => {
 
     const getById = (id: string | null) => {
         const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.GET, url, null, null);
+        return request(API_METHOD.GET, url, user, null);
     };
 
     const getAll = (params : AchievementFilterParams) => {
         const url = ACHIEVEMENT_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, null, null, {params:{...params, profileId: user?.id}});
+        return request(API_METHOD.GET, url, user, null, {params:{...params, profileId: user?.id}});
     };
 
     const uploadImage = (file: File) => {
