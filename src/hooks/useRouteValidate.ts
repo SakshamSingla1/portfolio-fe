@@ -34,7 +34,7 @@ const useRouteValidate = () => {
   useEffect(() => {
     if (!user) return;
     if (currentPath === "/" || currentPath === "/sign-in") return;
-    if (user.role === ROLES.SUPER_ADMIN) return;
+    if (user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ADMIN) return;
     if (!allowedRoutes.length) return;
     const isValid = allowedRoutes.some(route =>
       currentPath === route || currentPath.startsWith(`${route}/`)

@@ -7,7 +7,9 @@ import Table from "../../organisms/TableV1/TableV1";
 import { type ContactUs, type ContactUsFilterParams } from "../../../services/useContactUsService";
 import { FiSearch } from "react-icons/fi";
 import { DateUtils } from "../../../utils/helper";
-import { FiFilter, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import { FiFilter, FiChevronUp, FiChevronDown, FiEye } from "react-icons/fi";
+import { capitalizeFirstLetter } from "../../../utils/helper"
+import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
 
 interface ContactUsTableTemplateProps {
     contactUs: ContactUs[];
@@ -16,19 +18,45 @@ interface ContactUsTableTemplateProps {
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
     filters: ContactUsFilterParams;
+    handleMarkRead: (id: string) => void;
 }
 
-const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contactUs, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
-    const [isMobile, setIsMobile] = useState(false);
-    const [showFilters, setShowFilters] = useState(false);
+const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contactUs, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters, handleMarkRead }) => {
+
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
+
+    const [selectedMessage, setSelectedMessage] = useState<ContactUs | null>(null);
+
+    const handleView = async (message: ContactUs) => {
+        setSelectedMessage(message);
+    }
+
+    const handleClose = () => {
+        setSelectedMessage(null);
+        if( selectedMessage?.status === 'UNREAD') {
+            handleMarkRead(selectedMessage.id ?? '');
+        }
+    }
+
+    const Action = (message: ContactUs) => {
+        return (
+            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
+                <button onClick={() => handleView(message)} className={`w-6 h-6`}>
+                    <FiEye />
+                </button>
+            </div>
+        );
+    };
     
     const getRecords = () => contactUs?.map((contactUs: ContactUs, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         contactUs.name,
         contactUs.email,
         contactUs.phone,
-        contactUs.message,
-        DateUtils.formatDateTimeToDateMonthYear(contactUs.createdAt)
+        capitalizeFirstLetter(contactUs.status),
+        DateUtils.formatDateTimeToDateMonthYear(contactUs.createdAt),
+        Action(contactUs)
     ])
 
     const getTableColumns = () => [
@@ -36,8 +64,9 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
         { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
         { label: "Email", key: "email", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
         { label: "Phone", key: "phone", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
-        { label: "Message", key: "message", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
+        { label: "Status", key: "status", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
         { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
+        { label: "Actions", key: "actions", type: "action" as ColumnType, props: { className: '' }, priority: "low" as const },
     ]
 
     const getSchema = () => ({
@@ -140,6 +169,9 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
                     records={getRecords()} 
                 />
             </div>
+            { selectedMessage && (
+                <MessageDetailModal message={selectedMessage} onClose={handleClose} />
+            )}
         </div>
     )
 }

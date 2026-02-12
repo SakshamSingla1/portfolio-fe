@@ -5,6 +5,7 @@ import { replaceUrlParams } from "../utils/helper";
 
 export const CONTACT_US_URLS = {
     GET_BY_PROFILE: "/contact-us/profile/:profileId",
+    MARK_AS_READ: "/contact-us/:id/mark-read",
 };
 
 export interface ContactUs {
@@ -13,6 +14,7 @@ export interface ContactUs {
     email: string;
     message: string;
     phone: string;
+    status: string;
     createdAt: string;
 }
 
@@ -40,8 +42,14 @@ export const useContactUsService = () => {
         return request(API_METHOD.GET, url, user, null, {params});
     };
 
+    const markAsRead = (id: string) => {
+        const url = replaceUrlParams(CONTACT_US_URLS.MARK_AS_READ, { id });
+        return request(API_METHOD.PATCH, url, user);
+    };
+
     return {
         getByProfile,
+        markAsRead,
     };
 };
 
