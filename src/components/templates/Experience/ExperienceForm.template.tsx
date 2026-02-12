@@ -295,7 +295,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                     <div className="mt-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                            Job Description <span style={{ color: colors.error600 }}>*</span>
+                            Job Description
                         </h3>
                         <RichTextEditor
                             value={formik.values.description}

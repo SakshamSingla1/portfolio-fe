@@ -199,7 +199,7 @@ const useStyles = createUseStyles((colors: any) => ({
     },
     '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
       margin: 0,
-      fontSize: '1.0rem',
+      fontSize: '0.75rem',
       color: colors.neutral700,
       '@media (max-width: 768px)': {
         textAlign: 'center',
@@ -367,11 +367,10 @@ function TablePaginationActions(props: any) {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div className="flex items-center justify-end">
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page"
         style={{ color: colors.primary700 }}
       >
         <FirstPageIcon />
@@ -379,7 +378,6 @@ function TablePaginationActions(props: any) {
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page"
         style={{ color: colors.primary700 }}
       >
         <KeyboardArrowLeft />
@@ -387,7 +385,6 @@ function TablePaginationActions(props: any) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
         style={{ color: colors.primary700 }}
       >
         <KeyboardArrowRight />
@@ -395,7 +392,6 @@ function TablePaginationActions(props: any) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
         style={{ color: colors.primary700 }}
       >
         <LastPageIcon />
@@ -628,7 +624,7 @@ const TableV1: React.FC<TableProps> = ({
             rowsPerPageOptions={isMobile ? [5, 10, 25] : [5, 10, 25, 50]}
             labelRowsPerPage={isMobile ? "Rows:" : "Rows per page:"}
             ActionsComponent={TablePaginationActions}
-            className="w-full"
+            className="flex items-center justify-end"
           />
         </div>
       )}

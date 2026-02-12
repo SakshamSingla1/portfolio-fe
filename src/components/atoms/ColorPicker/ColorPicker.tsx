@@ -1,9 +1,15 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+} from "react";
 import TextField from "../../atoms/TextField/TextField";
 import Popover from "@mui/material/Popover";
 import InputAdornment from "@mui/material/InputAdornment";
+import Button from "../../atoms/Button/Button";
 import { HexColorPicker } from "react-colorful";
-import { Check, ExpandMore } from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
 import { useColors } from "../../../utils/types";
 
 interface ColorPickerFieldProps
@@ -14,7 +20,22 @@ interface ColorPickerFieldProps
   value?: string;
   onChange?: (color: string) => void;
   disabled?: boolean;
+  showPresets?: boolean;
 }
+
+const PRESET_COLORS = [
+  "#6366F1",
+  "#EC4899",
+  "#10B981",
+  "#F59E0B",
+  "#EF4444",
+  "#0EA5E9",
+  "#8B5CF6",
+  "#111827",
+];
+
+const isValidHex = (hex: string) =>
+  /^#([0-9A-F]{3}){1,2}$/i.test(hex);
 
 const isColorLight = (color: string): boolean => {
   const hex = color.replace("#", "");
@@ -24,43 +45,69 @@ const isColorLight = (color: string): boolean => {
 };
 
 const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
-  value = "#ffffff",
+  value = "#6366F1",
   onChange,
   disabled = false,
+  showPresets = true,
   ...textFieldProps
 }) => {
   const colors = useColors();
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
+  const [tempColor, setTempColor] = useState(value);
+  const [recentColors, setRecentColors] = useState<string[]>([]);
 
-  const checkIconStyle = useMemo(
-    () => ({
-      color: isColorLight(value) ? colors.neutral900 : colors.neutral50,
-      fontSize: 16,
-    }),
-    [value, colors]
-  );
+  useEffect(() => {
+    if (!open) setTempColor(value);
+  }, [open, value]);
 
-  const swatchStyle = (size: number): React.CSSProperties => ({
-    width: size,
-    height: size,
-    backgroundColor: value,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: 4,
-  });
-
-  const handleOpen = () => {
-    if (!disabled) setOpen(true);
+  const handleApply = () => {
+    if (isValidHex(tempColor)) {
+      onChange?.(tempColor);
+      setRecentColors((prev) =>
+        [tempColor, ...prev.filter((c) => c !== tempColor)].slice(0, 6)
+      );
+      setOpen(false);
+    }
   };
 
-  const handleClose = () => setOpen(false);
+  const handleCancel = () => {
+    setTempColor(value);
+    setOpen(false);
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const val = e.target.value.startsWith("#")
+      ? e.target.value
+      : `#${e.target.value}`;
+    setTempColor(val);
+  };
+
+  const previewTextColor = useMemo(
+    () =>
+      isColorLight(tempColor)
+        ? colors.neutral900
+        : colors.neutral50,
+    [tempColor, colors]
+  );
+
+  const swatchStyle = (size: number, color: string) => ({
+    width: size,
+    height: size,
+    backgroundColor: color,
+    borderRadius: 6,
+    border: `1px solid ${colors.neutral200}`,
+    cursor: "pointer",
+  });
 
   return (
     <>
-      {/* CLICK TARGET */}
+      {/* Trigger */}
       <div
         ref={anchorRef}
-        onClick={handleOpen}
+        onClick={() => !disabled && setOpen(true)}
         style={{
           display: "inline-block",
           width: "100%",
@@ -76,84 +123,157 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
             readOnly: true,
             startAdornment: (
               <InputAdornment position="start">
-                <div style={swatchStyle(18)} />
+                <div style={swatchStyle(18, value)} />
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position="end">
                 <ExpandMore
                   style={{
+                    transform: open
+                      ? "rotate(180deg)"
+                      : "rotate(0deg)",
+                    transition: "0.2s",
                     color: colors.neutral600,
-                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.2s ease",
                   }}
                 />
               </InputAdornment>
             ),
           }}
-          inputProps={{
-            "aria-readonly": true,
-          }}
         />
       </div>
 
-      {/* POPOVER */}
+      {/* Popover */}
       <Popover
         open={open}
         anchorEl={anchorRef.current}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        onClose={handleCancel}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
         PaperProps={{
           sx: {
-            borderRadius: 2,
-            boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
+            borderRadius: 3,
+            padding: 2,
+            width: 280,
+            boxShadow:
+              "0 20px 40px rgba(0,0,0,0.15)",
           },
         }}
       >
         <div
           style={{
-            padding: 16,
-            backgroundColor: colors.neutral50,
-            borderRadius: 12,
-            border: `1px solid ${colors.neutral200}`,
             display: "flex",
             flexDirection: "column",
             gap: 16,
           }}
         >
+          {/* Live Preview */}
+          <div
+            style={{
+              background: tempColor,
+              padding: 16,
+              borderRadius: 10,
+              textAlign: "center",
+              color: previewTextColor,
+              fontWeight: 500,
+            }}
+          >
+            Preview
+          </div>
+
+          {/* Picker */}
           <HexColorPicker
-            color={value}
-            onChange={(c) => onChange?.(c)}
-            style={{ width: 250, height: 200 }}
+            color={tempColor}
+            onChange={setTempColor}
           />
 
+          {/* HEX Input */}
+          <TextField
+            value={tempColor}
+            onChange={handleInputChange}
+            error={!isValidHex(tempColor)}
+            helperText={
+              !isValidHex(tempColor)
+                ? "Invalid HEX"
+                : ""
+            }
+            inputProps={{
+              style: { fontFamily: "monospace" },
+            }}
+          />
+
+          {/* Presets */}
+          {showPresets && (
+            <>
+              <div style={{ fontSize: 13 }}>
+                Presets
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  flexWrap: "wrap",
+                }}
+              >
+                {PRESET_COLORS.map((color) => (
+                  <div
+                    key={color}
+                    style={swatchStyle(24, color)}
+                    onClick={() => setTempColor(color)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Recent */}
+          {recentColors.length > 0 && (
+            <>
+              <div style={{ fontSize: 13 }}>
+                Recent
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                }}
+              >
+                {recentColors.map((color) => (
+                  <div
+                    key={color}
+                    style={swatchStyle(24, color)}
+                    onClick={() => setTempColor(color)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Footer Buttons */}
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              gap: 12,
-              paddingTop: 12,
-              borderTop: `1px solid ${colors.neutral200}`,
+              justifyContent: "space-between",
+              marginTop: 8,
             }}
           >
-            <div
-              style={{
-                ...swatchStyle(24),
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Check style={checkIconStyle} />
-            </div>
-
-            <TextField
-              value={value}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                onChange?.(e.target.value)
-              }
-              inputProps={{ style: { fontFamily: "monospace" } }}
+            <Button
+              size="small"
+              variant="secondaryContained"
+              label="Cancel"
+              onClick={handleCancel}
+            />
+            <Button
+              size="small"
+              variant="primaryContained"
+              label="Apply"
+              onClick={handleApply}
             />
           </div>
         </div>

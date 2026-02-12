@@ -16,11 +16,9 @@ const validationSchema = Yup.object().shape({
         .nullable()
         .required('Skill Logo ID is required'),
     level: Yup.string()
-        .required('Skill Level is required')
-        .max(50, 'Skill Level is too long'),
+        .required('Skill Level is required'),
     category: Yup.string()
-        .required('Skill Category is required')
-        .max(50, 'Skill Category is too long'),
+        .required('Skill Category is required'),
 });
 
 interface SkillFormProps {
@@ -43,6 +41,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         initialValues: {
             logoId: "",
             level: SkillLevelType.BEGINNER,
+            category: "",
             profileId: user?.id?.toString() || "",
         },
         validationSchema: validationSchema,
@@ -91,13 +90,10 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     }));
 
     useEffect(() => {
-        formik.setFieldValue("category", selectedLogo?.category);
-    }, [selectedLogo]);
-
-    useEffect(() => {
         if (skill) {
             formik.setFieldValue("logoId", skill.logoId);
             formik.setFieldValue("level", skill.level);
+            formik.setFieldValue("category", skill.category);
         }
     }, [skill]);
 
@@ -189,18 +185,21 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                             required={true}
                             error={formik.touched.level && Boolean(formik.errors.level)}
                             helperText={Boolean(formik.touched.level && formik.errors.level) ? formik.errors.level : ""}
-                            isDisabled={false}
+                            isDisabled={mode === MODE.VIEW}
                         />
                         <AutoCompleteInput
                             label="Skill Category"
                             placeHolder="Search and select a skill category"
                             options={SKILL_CATEGORY_OPTIONS}
-                            value={SKILL_CATEGORY_OPTIONS.find(option => option.value === selectedLogo?.category) || null}
+                            value={SKILL_CATEGORY_OPTIONS.find(option => option.value === formik.values.category) || null}
                             onSearch={() => { }}
                             onChange={value => {
                                 formik.setFieldValue("category", value?.value ?? null);
                             }}
-                            isDisabled={true}
+                            required={true}
+                            error={formik.touched.category && Boolean(formik.errors.category)}
+                            helperText={Boolean(formik.touched.category && formik.errors.category) ? formik.errors.category : ""}
+                            isDisabled={mode === MODE.VIEW}
                         />
                     </div>
                 </div>

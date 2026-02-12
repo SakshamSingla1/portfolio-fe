@@ -18,6 +18,7 @@ export const SkillLevelType = {
 export interface Skill {
     logoId: string;
     level: string;
+    category: string;
     profileId: string;
 }
 

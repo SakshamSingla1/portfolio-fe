@@ -22,8 +22,8 @@ const validationSchema = Yup.object({
     role: Yup.string().required("Role is required"),
     company: Yup.string().required("Company is required"),
     imageId: Yup.string().required("Image ID is required"),
-    imageUrl: Yup.string().url("Invalid URL"),
-    linkedInUrl: Yup.string().url("Invalid URL"),
+    imageUrl: Yup.string().url("Invalid URL").required("Image URL is required"),
+    linkedInUrl: Yup.string().url("Invalid URL").required("Linked In URL is required"),
     order: Yup.string().required("Order is required"),
     status: Yup.string().required("Status is required"),
 });
@@ -131,6 +131,7 @@ const TestimonialFormTemplate = ({
                                     titleModification(e.target.value)
                                 )
                             }
+                            required={true}
                             error={formik.touched.name && Boolean(formik.errors.name)}
                             helperText={String(formik.touched.name && formik.errors.name)}
                             disabled={mode === MODE.VIEW}
@@ -140,6 +141,7 @@ const TestimonialFormTemplate = ({
                             label="Role"
                             placeholder="Enter Role"
                             {...formik.getFieldProps("role")}
+                            required={true}
                             error={formik.touched.role && Boolean(formik.errors.role)}
                             helperText={String(formik.touched.role && formik.errors.role)}
                             disabled={mode === MODE.VIEW}
@@ -149,6 +151,7 @@ const TestimonialFormTemplate = ({
                             label="Company"
                             placeholder="Enter Company"
                             {...formik.getFieldProps("company")}
+                            required={true}
                             error={formik.touched.company && Boolean(formik.errors.company)}
                             helperText={String(formik.touched.company && formik.errors.company)}
                             disabled={mode === MODE.VIEW}
@@ -167,6 +170,7 @@ const TestimonialFormTemplate = ({
                             label="LinkedIn URL"
                             placeholder="Enter LinkedIn URL"
                             {...formik.getFieldProps("linkedInUrl")}
+                            required={true}
                             error={formik.touched.linkedInUrl && Boolean(formik.errors.linkedInUrl)}
                             helperText={String(formik.touched.linkedInUrl && formik.errors.linkedInUrl)}
                             disabled={mode === MODE.VIEW}
@@ -194,6 +198,8 @@ const TestimonialFormTemplate = ({
                                     ? "Uploading..."
                                     : "Image · Max 5MB"
                             }
+                            required={true}
+                            error={formik.touched.imageUrl && Boolean(formik.errors.imageUrl)}
                         />
                     </div>
                 </div>
@@ -207,6 +213,7 @@ const TestimonialFormTemplate = ({
                             label="Order"
                             placeholder="Enter Order"
                             {...formik.getFieldProps("order")}
+                            required={true}
                             error={formik.touched.order && Boolean(formik.errors.order)}
                             helperText={String(formik.touched.order && formik.errors.order)}
                             disabled={mode === MODE.VIEW}
@@ -216,6 +223,9 @@ const TestimonialFormTemplate = ({
                             value={formik.values.message}
                             onChange={(value) => formik.setFieldValue("message", value)}
                             isEditMode={mode !== MODE.VIEW}
+                            required={true}
+                            error={formik.touched.message && Boolean(formik.errors.message)}
+                            helperText={String(formik.touched.message && formik.errors.message)}
                         />
                     </div>
                 </div>

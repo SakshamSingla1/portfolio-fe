@@ -246,7 +246,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     <div className="mt-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                            Description <span style={{ color: colors.error600 }}>*</span>
+                            Description
                         </h3>
                         <RichTextEditor
                             label="Description"
