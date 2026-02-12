@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Key, ArrowRight } from "lucide-react";
 import TextField from "../../../components/atoms/TextField/TextField";
 import Button from "../../../components/atoms/Button/Button";
 import { InputAdornment } from "@mui/material";
@@ -11,6 +10,7 @@ import { FiLock } from "react-icons/fi";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useAuthService } from "../../../services/useAuthService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
+import { FiEye, FiEyeOff, FiKey, FiArrowRight } from "react-icons/fi";
 
 const PasswordTab: React.FC = () => {
   const colors = useColors();
@@ -103,18 +103,13 @@ const PasswordTab: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.color = colors.neutral600)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = colors.neutral400)
-              }
-              aria-label="Toggle password visibility"
+              onMouseEnter={(e) => (e.currentTarget.style.color = colors.neutral600)}
+              onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral400)}
             >
               {showPassword[name] ? (
-                <Eye size={18} />
+                <FiEye size={18} />
               ) : (
-                <EyeOff size={18} />
+                <FiEyeOff size={18} />
               )}
             </button>
           </InputAdornment>
@@ -133,82 +128,39 @@ const PasswordTab: React.FC = () => {
         width: "100%",
       }}
     >
-      {/* Header */}
-      <div style={{ marginBottom: "32px" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            marginBottom: "8px",
-          }}
-        >
-          <div
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center justify-center p-2 rounded-xl"
             style={{
-              padding: "8px",
-              borderRadius: "8px",
               backgroundColor: colors.primary100,
               color: colors.primary600,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
             }}
           >
-            <Key size={20} />
+            <FiKey size={20} />
           </div>
-
-          <h3
-            style={{
-              fontSize: "22px",
-              fontWeight: 700,
-              color: colors.neutral900,
-              margin: 0,
-            }}
-          >
+          <h3 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>
             Change Password
           </h3>
         </div>
-
-        <p
-          style={{
-            fontSize: "14px",
-            color: colors.neutral500,
-            margin: 0,
-          }}
-        >
+        <p className="text-sm" style={{ color: colors.neutral500 }}>
           Update your account password securely.
         </p>
       </div>
-
-      {/* Form */}
-      <form
-        onSubmit={passwordForm.handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-      >
+      <div className="flex flex-col gap-2">
         {renderPasswordField("oldPassword", "Old Password")}
         {renderPasswordField("newPassword", "New Password")}
         {renderPasswordField("confirmPassword", "Confirm Password")}
-
-        <PasswordStrengthMeter
-          password={passwordForm.values.newPassword}
-        />
-
-        <Button
-          type="submit"
-          label={
-            passwordForm.isSubmitting
-              ? "Updating..."
-              : "Update Password"
-          }
-          variant="primaryContained"
-          disabled={
-            passwordForm.isSubmitting ||
-            !passwordForm.isValid ||
-            !passwordForm.dirty
-          }
-          endIcon={<ArrowRight size={16} />}
-        />
-      </form>
+        <PasswordStrengthMeter password={passwordForm.values.newPassword} />
+        <div className="flex items-center justify-center mt-4">
+          <Button
+            label={passwordForm.isSubmitting ? "Updating..." : "Update Password"}
+            variant="primaryContained"
+            disabled={passwordForm.isSubmitting}
+            endIcon={<FiArrowRight size={16} />}
+            onClick={() => passwordForm.handleSubmit()}
+          />
+        </div>
+      </div>
     </motion.div>
   );
 };

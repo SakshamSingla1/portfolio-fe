@@ -69,6 +69,23 @@ const ContactUsListPage: React.FC = () => {
         }));
     };
 
+    const handleMarkRead = async (id?: string) => {
+        if (!id) {
+            console.warn("Invalid ID");
+            return;
+        }
+        try {
+            const response = await contactUsService.markAsRead(id);
+            if (response.status === HTTP_STATUS.OK) {
+                setContactUs(prev => prev.map(item => item.id === id ? { ...item, status: "READ" } : item));
+                showSnackbar('success', 'Marked as read successfully');
+            }
+        } catch (error: any) {
+            console.log("Backend error:", error?.response?.data);
+            showSnackbar('error', 'Failed to mark as read');
+        }
+    };
+
     useEffect(() => {
         refreshTemplates(pagination.currentPage.toString(), pagination.pageSize.toString());
     }, [filters, pagination.currentPage, pagination.pageSize]);
@@ -84,7 +101,7 @@ const ContactUsListPage: React.FC = () => {
 
     return (
         <div>
-            <ContactUsTableTemplate contactUs={contactUs} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
+            <ContactUsTableTemplate contactUs={contactUs} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} handleMarkRead={handleMarkRead} />
         </div>
     )
 }
