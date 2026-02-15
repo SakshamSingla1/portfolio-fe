@@ -17,6 +17,7 @@ import { IoNotifications , IoDocuments, IoLinkSharp } from "react-icons/io5";
 import { GrCertificate } from "react-icons/gr";
 import { BsPersonVcard } from "react-icons/bs";
 import { GiAchievement } from "react-icons/gi";
+import { MdOutlineDashboard } from "react-icons/md";
 import { createUseStyles } from "react-jss";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { enumToNormalKey} from "../../../utils/helper";
@@ -51,6 +52,7 @@ const iconMap: Record<string, JSX.Element> = {
   CERTIFICATIONS: <GrCertificate />,
   TESTIMONIALS: <BsPersonVcard />,
   ACHIEVEMENTS: <GiAchievement />,
+  DASHBOARD: <MdOutlineDashboard />
 };
 
 const useStyles = createUseStyles({
