@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { type IDashboardSummary } from "../../../services/useDashboardService";
 import { useColors } from "../../../utils/types";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 import StatsTemplate from "./Stats.template";
 import ProfileCompletionTemplate from "./ProfileCompletion.template";
@@ -16,95 +17,107 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
     dashboardData,
 }) => {
     const colors = useColors();
-
-    const [isMobile, setIsMobile] = useState<boolean>(
-        window.innerWidth < 1024
-    );
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 1024);
-        };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
+    const isMobile = useIsMobile();
     const cardStyle = {
-        background: `linear-gradient(160deg, ${colors.neutral50}, ${colors.primary50})`,
-        border: `1px solid ${colors.primary200}`,
-        boxShadow: `0 8px 30px ${colors.primary100}40`,
+        background: `linear-gradient(to bottom, ${colors.neutral100}, ${colors.primary100})`,
+        border: `1px solid ${colors.primary300}`,
+        boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
     };
 
+    const SectionHeading = ({ title, rightContent }: {
+        title: string;
+        rightContent?: React.ReactNode;
+    }) => (
+        <div className="mb-6">
+            <div className="flex justify-between items-center">
+                <div className="text-sm font-semibold tracking-wide uppercase" style={{ color: colors.primary800 }}>
+                    {title}
+                </div>
+                {rightContent}
+            </div>
+            <div className="h-px mt-3" style={{ background: colors.neutral300 }} />
+        </div>
+    );
+
     const SkeletonBlock = ({ height }: { height: string }) => (
-        <div
-            className="rounded-xl animate-pulse"
-            style={{
-                height,
-                background: colors.neutral200,
-            }}
-        />
+        <div className="rounded-xl" style={{ height, background: colors.neutral200 }} />
     );
 
     const DashboardSkeleton = () => (
-        <div className={`grid gap-10 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`} >
+        <div className={`grid gap-10 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
             <div className={`${isMobile ? "" : "col-span-8"} space-y-10`}>
-                <div className="rounded-[28px] p-6 lg:p-8" style={cardStyle}>
-                    <SkeletonBlock height="28px" />
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-                        {Array.from({ length: 4 }).map((_, i) => (
-                            <SkeletonBlock key={i} height="120px" />
-                        ))}
-                    </div>
+                <div className="rounded-2xl p-6" style={cardStyle}>
+                    <SkeletonBlock height="200px" />
                 </div>
-                <div className={`flex gap-8 ${isMobile ? "flex-col" : "flex-row items-start"}`}>
-                    <div className={`${isMobile ? "w-full" : "w-1/2"} rounded-[28px] p-6 lg:p-8`} style={cardStyle}>
-                        <SkeletonBlock height="220px" />
+                <div className={`flex gap-8 ${isMobile ? "flex-col" : ""}`}>
+                    <div className="w-full rounded-2xl p-6" style={cardStyle}>
+                        <SkeletonBlock height="200px" />
                     </div>
-                    <div className={`${isMobile ? "w-full" : "w-1/2"} rounded-[28px] p-6 lg:p-8`} style={cardStyle}>
-                        <SkeletonBlock height="220px" />
+                    <div className="w-full rounded-2xl p-6" style={cardStyle}>
+                        <SkeletonBlock height="200px" />
                     </div>
                 </div>
             </div>
             <div className={`${isMobile ? "" : "col-span-4"} space-y-10`}>
-                <div className="rounded-[28px] p-6 lg:p-8" style={cardStyle}>
-                    <SkeletonBlock height="260px" />
+                <div className="rounded-2xl p-6" style={cardStyle}>
+                    <SkeletonBlock height="250px" />
                 </div>
-                <div className="rounded-[28px] p-6 lg:p-8" style={cardStyle}>
-                    <SkeletonBlock height="320px" />
+                <div className="rounded-2xl p-6" style={cardStyle}>
+                    <SkeletonBlock height="300px" />
                 </div>
             </div>
         </div>
     );
 
     return (
-        <div >
-            <div className={`mx-auto max-w-[1600px] ${isMobile ? "px-4 py-6" : "px-8 py-10"}`}>
-                {!dashboardData ? (<DashboardSkeleton />) : (
-                    <div className={`grid gap-10 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`} >
+        <div>
+            <div className={`mx-auto ${isMobile ? "px-4 py-6" : "px-8 py-10"}`}>
+                <div className="mb-12">
+                    <div className="text-2xl font-bold tracking-tight" style={{ color: colors.primary900 }}>
+                        Dashboard Overview
+                    </div>
+                </div>
+                {!dashboardData ? (
+                    <DashboardSkeleton />
+                ) : (
+                    <div className={`grid gap-10 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
                         <div className={`space-y-10 ${isMobile ? "" : "col-span-8"}`}>
-                            <div className="rounded-[28px] p-6 lg:p-8" style={cardStyle}>
-                                <div className="mb-6">
-                                    <div className="text-lg lg:text-xl font-semibold" style={{ color: colors.primary800 }}>
-                                        Dashboard Overview
-                                    </div>
-                                    <div className="h-px mt-3" style={{ background: colors.neutral200 }} />
-                                </div>
+                            <div className="rounded-2xl p-8" style={cardStyle}>
+                                <SectionHeading title="Statistics Summary" />
                                 <StatsTemplate stats={dashboardData.stats} />
                             </div>
-                            <div className={`flex gap-8 ${isMobile ? "flex-col" : "flex-row items-start"}`}>
-                                <div className={`${isMobile ? "w-full" : "w-1/2"} rounded-[28px] p-6 lg:p-8`} style={cardStyle}>
+                            <div className={`grid gap-8 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
+                                <div className="rounded-2xl p-8" style={cardStyle}>
+                                    <SectionHeading title="Recent Messages" rightContent={
+                                        <div className="px-3 py-1 text-xs font-semibold rounded-full" style={{
+                                            background: colors.primary100,
+                                            color: colors.primary700,
+                                        }}>
+                                            {dashboardData.recentMessages.length} Message
+                                            {dashboardData.recentMessages.length !== 1 ? "s" : ""}
+                                        </div>
+                                    }
+                                    />
                                     <RecentMessagesTemplate messages={dashboardData.recentMessages} />
                                 </div>
-                                <div className={`${isMobile ? "w-full" : "w-1/2"} rounded-[28px] p-6 lg:p-8`} style={cardStyle}>
+                                <div className="rounded-2xl p-8" style={cardStyle}>
+                                    <SectionHeading title="Quick Actions" />
                                     <QuickActionsTemplate />
                                 </div>
                             </div>
                         </div>
                         <div className={`space-y-10 ${isMobile ? "" : "col-span-4"}`}>
-                            <div className="rounded-[28px] p-6 lg:p-8" style={cardStyle}>
+                            <div className="rounded-2xl p-8" style={cardStyle}>
+                                <SectionHeading title="Profile Completion" />
                                 <ProfileCompletionTemplate profileCompletion={dashboardData.profileCompletion} />
                             </div>
-                            <div className="rounded-[28px] p-6 lg:p-8" style={cardStyle}>
+                            <div className="rounded-2xl p-8" style={cardStyle}>
+                                <SectionHeading title="Recent Activities" rightContent={
+                                    <div className="px-3 py-1 text-xs font-semibold rounded-full" style={{ background: colors.primary100, color: colors.primary700, }}>
+                                        {dashboardData.recentActivities.length} Update
+                                        {dashboardData.recentActivities.length !== 1 ? "s" : ""}
+                                    </div>
+                                } />
                                 <RecentActivitiesTemplate activities={dashboardData.recentActivities} />
                             </div>
                         </div>
