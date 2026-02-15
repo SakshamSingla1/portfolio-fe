@@ -10,6 +10,7 @@ import testimonialIcon from "../../../assets/icons/testimonial.png";
 import certificationIcon from "../../../assets/icons/certification.png";
 import messageIcon from "../../../assets/icons/messages.png";
 import unreadIcon from "../../../assets/icons/unread.png";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface StatsProps {
   stats: IStats;
@@ -34,75 +35,78 @@ interface StatsCardProps {
   isMobile: boolean;
 }
 
-/* ================= MODERN GRADIENT MAP ================= */
-
 const colorClasses = {
   indigo: {
     bg: "bg-gradient-to-br from-indigo-50 via-indigo-100 to-white",
     textLight: "text-indigo-600",
     textDark: "text-indigo-900",
     glow: "shadow-indigo-200/50",
+    border: "border-indigo-200",
   },
   blue: {
     bg: "bg-gradient-to-br from-blue-50 via-blue-100 to-white",
     textLight: "text-blue-600",
     textDark: "text-blue-900",
     glow: "shadow-blue-200/50",
+    border: "border-blue-200",
   },
   emerald: {
     bg: "bg-gradient-to-br from-emerald-50 via-emerald-100 to-white",
     textLight: "text-emerald-600",
     textDark: "text-emerald-900",
     glow: "shadow-emerald-200/50",
+    border: "border-emerald-200",
   },
   violet: {
     bg: "bg-gradient-to-br from-violet-50 via-violet-100 to-white",
     textLight: "text-violet-600",
     textDark: "text-violet-900",
     glow: "shadow-violet-200/50",
+    border: "border-violet-200",
   },
   amber: {
     bg: "bg-gradient-to-br from-amber-50 via-amber-100 to-white",
     textLight: "text-amber-600",
     textDark: "text-amber-900",
     glow: "shadow-amber-200/50",
+    border: "border-amber-200",
   },
   rose: {
     bg: "bg-gradient-to-br from-rose-50 via-rose-100 to-white",
     textLight: "text-rose-600",
     textDark: "text-rose-900",
     glow: "shadow-rose-200/50",
+    border: "border-rose-200",
   },
   cyan: {
     bg: "bg-gradient-to-br from-cyan-50 via-cyan-100 to-white",
     textLight: "text-cyan-600",
     textDark: "text-cyan-900",
     glow: "shadow-cyan-200/50",
+    border: "border-cyan-200",
   },
   purple: {
     bg: "bg-gradient-to-br from-purple-50 via-purple-100 to-white",
     textLight: "text-purple-600",
     textDark: "text-purple-900",
     glow: "shadow-purple-200/50",
+    border: "border-purple-200",
   },
   red: {
     bg: "bg-gradient-to-br from-red-50 via-red-100 to-white",
     textLight: "text-red-600",
     textDark: "text-red-900",
     glow: "shadow-red-200/50",
+    border: "border-red-200",
   },
 } as const;
 
-/* ================= COUNT UP ================= */
-
 const useCountUp = (value: number = 0) => {
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     let start = 0;
     const duration = 700;
     const increment = value / (duration / 16);
-
     const counter = setInterval(() => {
       start += increment;
       if (start >= value) {
@@ -112,14 +116,10 @@ const useCountUp = (value: number = 0) => {
         setCount(Math.floor(start));
       }
     }, 16);
-
     return () => clearInterval(counter);
   }, [value]);
-
   return count;
 };
-
-/* ================= STATS CARD ================= */
 
 const StatsCard: React.FC<StatsCardProps> = ({
   icon,
@@ -132,53 +132,18 @@ const StatsCard: React.FC<StatsCardProps> = ({
   const animatedValue = useCountUp(value);
 
   return (
-    <div
-      className={`
-        relative overflow-hidden rounded-2xl
-        ${theme.bg}
-        transition-all duration-300
-        hover:-translate-y-1 hover:shadow-xl ${theme.glow}
-        ${isMobile ? "p-5" : "p-7"}
-      `}
-    >
-      {/* Floating Background Illustration */}
-      <img
-        src={icon}
-        alt={label}
-        className={`
-          absolute right-0 top-0 bottom-0 pointer-events-none object-contain
-          ${isMobile ? "w-24 h-24" : "w-40 h-40"}
-        `}
-      />
-
-      {/* Content */}
+    <div className={`relative rounded-2xl ${theme.bg} ${theme.glow} border ${theme.border} ${isMobile ? "p-5" : "p-7"}`}>
+      <img src={icon} alt={label} className={`absolute right-0 top-0 bottom-0 pointer-events-none object-contain ${isMobile ? "w-24 h-24" : "w-40 h-40"}`} />
       <div className="relative z-10">
-        <p className={`text-xs font-semibold uppercase tracking-wide ${theme.textLight}`}>
-          {label}
-        </p>
-
-        <p className={`${isMobile ? "text-2xl" : "text-4xl"} font-bold mt-2 ${theme.textDark}`}>
-          {animatedValue}
-        </p>
+        <div className={`text-xs font-semibold uppercase tracking-wide ${theme.textLight}`}>{label}</div>
+        <div className={`${isMobile ? "text-2xl" : "text-4xl"} font-bold mt-2 ${theme.textDark}`}>{animatedValue}</div>
       </div>
     </div>
   );
 };
 
-/* ================= TEMPLATE ================= */
-
 const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
-  const [isMobile, setIsMobile] = useState<boolean>(
-    window.innerWidth < 768
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const isMobile = useIsMobile();
 
   const statsConfig = [
     { icon: skillsIcon, label: "Skills", value: stats?.totalSkills, color: "indigo" },
@@ -193,12 +158,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
   ] as const;
 
   return (
-    <div
-      className={`
-        grid gap-6
-        ${isMobile ? "grid-cols-1" : "grid-cols-3 xl:grid-cols-4"}
-      `}
-    >
+    <div className={`grid gap-6 ${isMobile ? "grid-cols-2" : "grid-cols-4"}`}>
       {statsConfig.map((item) => (
         <StatsCard
           key={item.label}

@@ -1,195 +1,153 @@
 import React, { useEffect, useState } from "react";
 import { useColors } from "../../../utils/types";
+import { useIsMobile } from "../../../hooks/useIsMobile";
+import type { IProfileCompletion } from "../../../services/useDashboardService";
 
 interface ProfileCompletionProps {
-    profileCompletion: {
-        percentage: number;
-        missingSections: string[];
-    };
+  profileCompletion: IProfileCompletion;
 }
 
-/* ===== Smooth Counter ===== */
+/* ---------- Smooth Count Animation ---------- */
 const useCountUp = (value: number) => {
-    const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0);
 
-    useEffect(() => {
-        let start = 0;
-        const duration = 800;
-        const increment = value / (duration / 16);
+  useEffect(() => {
+    let start = 0;
+    const duration = 1000;
+    const increment = value / (duration / 16);
 
-        const counter = setInterval(() => {
-            start += increment;
-            if (start >= value) {
-                setCount(value);
-                clearInterval(counter);
-            } else {
-                setCount(Math.floor(start));
-            }
-        }, 16);
+    const counter = setInterval(() => {
+      start += increment;
+      if (start >= value) {
+        setCount(value);
+        clearInterval(counter);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
 
-        return () => clearInterval(counter);
-    }, [value]);
+    return () => clearInterval(counter);
+  }, [value]);
 
-    return count;
+  return count;
 };
 
 const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({
-    profileCompletion,
+  profileCompletion,
 }) => {
-    const { percentage, missingSections } = profileCompletion;
-    const animatedProgress = useCountUp(percentage);
-    const colors = useColors();
+  const { percentage, missingSections } = profileCompletion;
 
-    const size = 120;
-    const stroke = 12;
-    const radius = size / 2 - stroke;
-    const circumference = 2 * Math.PI * radius;
-    const offset =
-        circumference - (animatedProgress / 100) * circumference;
+  const colors = useColors();
+  const isMobile = useIsMobile();
+  const animatedProgress = useCountUp(percentage);
 
-    const isComplete = percentage === 100;
+  const size = isMobile ? 100 : 140;
+  const stroke = isMobile ? 10 : 14;
+  const radius = size / 2 - stroke;
+  const circumference = 2 * Math.PI * radius;
+  const offset =
+    circumference - (animatedProgress / 100) * circumference;
 
-    return (
-        <div className="relative">
+  const isComplete = percentage === 100;
 
-            {/* ================= TOP SECTION ================= */}
-            <div className="relative p-6">
+  const getMessage = () => {
+    if (percentage === 100) return "You're Fully Optimized 🚀";
+    if (percentage >= 80) return "Just One More Push 💪";
+    if (percentage >= 50) return "You're Making Great Progress 🔥";
+    return "Let’s Strengthen Your Profile ✨";
+  };
 
-                <div className="flex justify-between items-start">
-
-                    {/* LEFT SIDE */}
-                    <div className="space-y-5 flex-1 pr-10">
-
-                        <div
-                            className="text-lg font-semibold"
-                            style={{ color: colors.primary900 }}
-                        >
-                            Profile Completion
-                        </div>
-
-                        <div className="flex items-end gap-3">
-                            <div
-                                className="text-4xl font-bold"
-                                style={{ color: colors.primary600 }}
-                            >
-                                {animatedProgress}%
-                            </div>
-                            <div
-                                className="text-base font-medium"
-                                style={{ color: colors.neutral600 }}
-                            >
-                                Complete
-                            </div>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div
-                            className="h-2 rounded-full overflow-hidden w-56"
-                            style={{ background: colors.neutral200 }}
-                        >
-                            <div
-                                className="h-full transition-all duration-700 ease-out rounded-full"
-                                style={{
-                                    width: `${animatedProgress}%`,
-                                    background: `linear-gradient(to right, ${colors.primary400}, ${colors.primary600})`,
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* ===== HORIZONTAL LINE ===== */}
-                <div
-                    className="absolute left-6 right-6 top-48 h-[2px] z-0"
-                    style={{
-                        background: `linear-gradient(to right, ${colors.primary200}, ${colors.primary400})`,
-                    }}
+  return (
+    <div className="relative rounded-3xl">
+      <div className="absolute inset-0" />
+      <div className={`relative ${isMobile ? "p-4" : "p-6"}`}>
+        <div className="flex justify-between items-start">
+          <div className="space-y-3 mt-8">
+            <div className="w-48 h-2 rounded-full overflow-hidden" style={{ background: colors.primary100 }}>
+              <div className="h-full transition-all duration-700" style={{ width: `${animatedProgress}%`, background: `linear-gradient(90deg, ${colors.primary400}, ${colors.primary600})` }} />
+            </div>
+            <div className="text-sm font-medium mt-2" style={{ color: colors.neutral600 }}>
+              {getMessage()}
+            </div>
+          </div>
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full blur-2xl opacity-30" style={{ background: `radial-gradient(circle, ${colors.primary400}, transparent 70%)` }} />
+            <div className="relative rounded-full flex items-center justify-center" style={{ width: `${size}px`, height: `${size}px`, background: "#fff", boxShadow: `0 20px 40px ${colors.primary400}30, inset 0 4px 8px rgba(255,255,255,0.6)`, }}>
+              <svg width={size} height={size}>
+                <defs>
+                  <linearGradient
+                    id="gradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor={colors.primary400} />
+                    <stop offset="100%" stopColor={colors.primary600} />
+                  </linearGradient>
+                </defs>
+                <circle
+                  stroke={colors.primary100}
+                  fill="transparent"
+                  strokeWidth={stroke}
+                  r={radius}
+                  cx={size / 2}
+                  cy={size / 2}
                 />
-
-                {/* ===== CIRCLE ON LINE (LIKE TIMELINE ICON) ===== */}
-                <div
-                    className="absolute right-6 top-28 translate-y-1/2 z-20 rounded-full flex items-center justify-center"
-                    style={{
-                        width: `${size + 12}px`,
-                        height: `${size + 12}px`,
-                        background: colors.neutral50,
-                    }}
+                <circle
+                  stroke="url(#gradient)"
+                  fill="transparent"
+                  strokeWidth={stroke}
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={offset}
+                  r={radius}
+                  cx={size / 2}
+                  cy={size / 2}
+                  transform={`rotate(-90 ${size / 2} ${
+                    size / 2
+                  })`}
+                  className="transition-all duration-700 ease-out"
+                />
+              </svg>
+              <div className="absolute text-2xl font-bold" style={{ color: colors.primary600 }}>
+                {animatedProgress}%
+              </div>
+              {isComplete && (
+                <div className="absolute -bottom-2 -right-2 text-white text-sm font-bold" style={{
+                    background: colors.success500,
+                    width: 36,
+                    height: 36,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: `0 6px 14px ${colors.success400}60`,
+                  }}
                 >
-                    <div
-                        className="rounded-full flex items-center justify-center"
-                        style={{
-                            width: `${size}px`,
-                            height: `${size}px`,
-                            boxShadow: `0 8px 24px ${colors.primary400}40`,
-                            background: "#ffffff",
-                        }}
-                    >
-                        <svg width={size} height={size}>
-                            <circle
-                                stroke={colors.primary100}
-                                fill="white"
-                                strokeWidth={stroke}
-                                r={radius}
-                                cx={size / 2}
-                                cy={size / 2}
-                            />
-
-                            {/* Progress */}
-                            <circle
-                                stroke={colors.primary500}
-                                fill="transparent"
-                                strokeWidth={stroke}
-                                strokeLinecap="round"
-                                strokeDasharray={circumference}
-                                strokeDashoffset={offset}
-                                r={radius}
-                                cx={size / 2}
-                                cy={size / 2}
-                                transform={`rotate(-90 ${size / 2} ${size / 2})`}
-                                className="transition-all duration-700 ease-out"
-                            />
-                        </svg>
-                    </div>
+                  ✓
                 </div>
+              )}
             </div>
-
-            {/* ================= BOTTOM SECTION ================= */}
-            <div className="pt-12 px-6 pb-6 space-y-4">
-
-                <div
-                    className="text-base font-semibold"
-                    style={{ color: colors.primary900 }}
-                >
-                    {isComplete ? "All Sections Completed 🎉" : "Needs Improvement"}
-                </div>
-
-                {isComplete ? (
-                    <div
-                        className="text-sm"
-                        style={{ color: colors.success600 }}
-                    >
-                        Your profile is fully optimized and complete.
-                    </div>
-                ) : (
-                    <ul className="space-y-3">
-                        {missingSections.map((section, index) => (
-                            <li
-                                key={index}
-                                className="flex items-center gap-3 text-sm"
-                                style={{ color: colors.neutral700 }}
-                            >
-                                <div
-                                    className="w-2.5 h-2.5 rounded-full"
-                                    style={{ background: colors.primary500 }}
-                                />
-                                {section}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+          </div>
         </div>
-    );
+      </div>
+      {!isComplete && (
+        <div className="px-6 pb-6">
+          <div className="text-sm font-semibold mb-3" style={{ color: colors.primary900 }}>
+            Improve by completing:
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {missingSections.map((section, index) => (
+              <div key={index} className="px-4 py-2 rounded-xl text-xs font-medium cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md" style={{ background: "#fff", color: colors.primary700, border: `1px solid ${colors.primary200}` }}>
+                {section}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default ProfileCompletionTemplate;
