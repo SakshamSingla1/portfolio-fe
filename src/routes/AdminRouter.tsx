@@ -19,6 +19,7 @@ import SocialLinkRoutes from './AdminRoutes/SocialLinkRoutes';
 import CertificationRoutes from './AdminRoutes/CertificationRoutes';
 import TestimonialRoutes from './AdminRoutes/TestimonialRoutes';
 import AchievementRoutes from './AdminRoutes/AchievementRoutes';
+import DashboardRoutes from './AdminRoutes/DashboardRoutes';
 
 export const AdminRouter: React.FC = () => {
 
@@ -85,6 +86,7 @@ export const AdminRouter: React.FC = () => {
         <Route path="admin/certifications/*" element={<div><CertificationRoutes /></div>} />
         <Route path="admin/testimonials/*" element={<div><TestimonialRoutes /></div>} />
         <Route path="admin/achievements/*" element={<div><AchievementRoutes /></div>} />
+        <Route path="admin/dashboard" element={<div><DashboardRoutes/></div>} />
       </Route>
     </Routes>
   );
