@@ -8,33 +8,15 @@ export const LOGO_URLS = {
   LOGO_BY_ID: "/logo/:id",
 };
 
-export type LogoCategoryType =
-  | "FRONTEND"
-  | "BACKEND"
-  | "PROGRAMMING"
-  | "TOOL"
-  | "DATABASE"
-  | "DEVOPS"
-  | "TESTING"
-  | "MOBILE"
-  | "CLOUD"
-  | "SECURITY"
-  | "DATA_SCIENCE"
-  | "UI_UX"
-  | "SOFT_SKILLS"
-  | "OTHER";
-
 export interface Logo {
   id?: string | null;
   name: string;
   url: string;
-  category?: LogoCategoryType;
 }
 
 export interface LogoRequest {
   name: string;
   url: string;
-  category?: LogoCategoryType | null;
 }
 
 export interface LogoFilterParams {
@@ -53,7 +35,7 @@ export const useLogoService = () => {
     return request(API_METHOD.GET, url, user, null, { params });
   };
 
-  const getById = (id: string) => {
+  const getById = (id: string | null) => {
     const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
     return request(API_METHOD.GET, url, user, null);
   };

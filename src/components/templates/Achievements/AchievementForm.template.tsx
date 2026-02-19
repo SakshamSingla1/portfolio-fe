@@ -7,7 +7,7 @@ import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import DatePicker from "../../atoms/DatePicker/DatePicker";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
-import { titleModification } from "../../../utils/helper";
+import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import { type Achievement, type AchievementRequest } from "../../../services/useAchievementService";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { Status, StatusOptions } from "../../../utils/types";
@@ -20,7 +20,11 @@ import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
 const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
-    description: Yup.string().required("Description is required"),
+    description: Yup.string().test(
+        "description-required",
+        "Description is required",
+        (value) => !isRichTextEmpty(value)
+    ),
     issuer: Yup.string().required("Issuer is required"),
     achievedAt: Yup.date().required("Achieved at is required"),
     proofUrl: Yup.string().url("Invalid URL").required("Proof URL is required"),
@@ -63,8 +67,12 @@ const AchievementFormTemplate = ({
         },
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
+            const payload = {
+                ...values,
+                description: isRichTextEmpty(values.description) ? "" : values.description,
+            };
             setSubmitting(true);
-            if (mode !== MODE.VIEW) await onSubmit(values);
+            if (mode !== MODE.VIEW) await onSubmit(payload);
             onClose();
             setSubmitting(false);
         },

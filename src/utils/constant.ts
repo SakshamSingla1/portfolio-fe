@@ -84,6 +84,11 @@ export const ADMIN_ROUTES = {
     ACHIEVEMENTS_ADD: "/admin/achievements/add",
     ACHIEVEMENTS_EDIT: "/admin/achievements/:id/edit",
     ACHIEVEMENTS_VIEW: "/admin/achievements/:id",
+
+    LOGO: "/admin/logos",
+    LOGO_ADD: "/admin/logos/add",
+    LOGO_EDIT: "/admin/logos/:id/edit",
+    LOGO_VIEW: "/admin/logos/:id",
 }
 
 export const MODE = {
