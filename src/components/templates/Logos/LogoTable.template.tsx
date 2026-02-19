@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/TableV1/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { makeRoute } from "../../../utils/helper";
+import { DateUtils, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
 import TableV1 from "../../organisms/TableV1/TableV1";
@@ -64,17 +64,21 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ logos, pagination
         );
     };
 
-    const getRecords = () => logos?.map((Logo: Logo, index) => [
+    const getRecords = () => logos?.map((logo: Logo, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
-        Logo.name,
-        Logo.url,
-        Action(Logo.id ?? "")
+        logo.name,
+        logo.url,
+        DateUtils.dateTimeSecondToDate(logo.createdAt ?? ""),
+        DateUtils.dateTimeSecondToDate(logo.updatedAt ?? ""),
+        Action(logo.id ?? "")
     ])
 
     const getTableColumns = () => [
         { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: 'low' as const, hideOnMobile: true },
         { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: 'high' as const },
         { label: "URL", key: "url", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+        { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+        { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: 'medium' as const },
     ]
 
