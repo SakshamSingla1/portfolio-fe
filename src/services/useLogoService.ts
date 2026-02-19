@@ -12,6 +12,8 @@ export interface Logo {
   id?: string | null;
   name: string;
   url: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LogoRequest {
