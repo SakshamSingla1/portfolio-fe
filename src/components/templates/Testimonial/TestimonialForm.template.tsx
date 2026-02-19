@@ -15,10 +15,15 @@ import { HTTP_STATUS } from "../../../utils/types";
 import type { ImageUploadResponse } from "../../../services/useProfileService";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+import { isRichTextEmpty } from "../../../utils/helper";
 
 const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
-    message: Yup.string().required("Message is required").min(10, "Message is too short"),
+    message: Yup.string().test(
+        "message-required",
+        "Message is required",
+        (value) => !isRichTextEmpty(value)
+    ),
     role: Yup.string().required("Role is required"),
     company: Yup.string().required("Company is required"),
     imageId: Yup.string().required("Image ID is required"),
@@ -63,8 +68,12 @@ const TestimonialFormTemplate = ({
         },
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
+            const payload = {
+                ...values,
+                message: isRichTextEmpty(values.message) ? "" : values.message,
+            };
             setSubmitting(true);
-            if (mode !== MODE.VIEW) await onSubmit(values);
+            if (mode !== MODE.VIEW) await onSubmit(payload);
             onClose();
             setSubmitting(false);
         },

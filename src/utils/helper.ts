@@ -222,3 +222,13 @@ export const sanitizeHtml = (html: string): string => {
   tempDiv.innerHTML = html;
   return tempDiv.textContent || tempDiv.innerText || '';
 };
+
+export const isRichTextEmpty = (value?: string) => {
+    if (!value) return true;
+    const plainText = value
+        .replace(/<[^>]*>/g, "")
+        .replace(/&nbsp;/g, "") 
+        .trim();
+
+    return plainText.length === 0;
+};

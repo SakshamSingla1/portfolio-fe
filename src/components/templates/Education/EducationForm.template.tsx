@@ -1,6 +1,6 @@
 import TextField from "../../atoms/TextField/TextField";
 import { DEGREE_OPTIONS, MODE, ADMIN_ROUTES } from "../../../utils/constant";
-import { titleModification } from "../../../utils/helper";
+import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
 import { GradeType, type Education } from "../../../services/useEducationService";
 import { InputAdornment } from "@mui/material";
@@ -31,7 +31,11 @@ const validationSchema = Yup.object().shape({
     location: Yup.string()
         .required('Location is required'),
     description: Yup.string()
-        .required('Description is required'),
+        .test(
+            "description-required",
+            "Description is required",
+            (value) => !isRichTextEmpty(value)
+        ),
     grade: Yup.string()
         .required('Grade is required')
 });
@@ -65,6 +69,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
         onSubmit: async (values, { setSubmitting }) => {
             const payload={
                 ...values,
+                description: isRichTextEmpty(values.description) ? "" : values.description,
                 grade: values.grade + " " + values.gradeType
             }
             setSubmitting(true);
