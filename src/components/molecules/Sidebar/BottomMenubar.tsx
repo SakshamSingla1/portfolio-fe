@@ -25,10 +25,6 @@ import { enumToNormalKey } from "../../../utils/helper";
 import { useColors } from "../../../utils/types";
 import NavItem from "../NavItem/NavItem";
 
-/* ---------------------------------------------
-   Helpers
---------------------------------------------- */
-
 const resolveRolePath = (rawPath: string, role?: string): string => {
   if (!rawPath || !role) return "";
   const cleanRole = role.toLowerCase();
@@ -61,10 +57,6 @@ const iconMap: Record<string, JSX.Element> = {
   ACHIEVEMENTS: <GiAchievement />,
   DASHBOARD: <MdOutlineDashboard />,
 };
-
-/* ---------------------------------------------
-   Styles
---------------------------------------------- */
 
 const useStyles = createUseStyles({
   bar: (c: any) => ({
@@ -128,10 +120,6 @@ const useStyles = createUseStyles({
     justifyContent: "center",
   },
 });
-
-/* ---------------------------------------------
-   Component
---------------------------------------------- */
 
 const MobileBottomBar = () => {
   const { user, navlinks } = useAuthenticatedUser();
