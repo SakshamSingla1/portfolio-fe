@@ -7,7 +7,6 @@ interface ProfileCompletionProps {
   profileCompletion: IProfileCompletion;
 }
 
-/* ---------- Smooth Count Animation ---------- */
 const useCountUp = (value: number) => {
   const [count, setCount] = useState(0);
 

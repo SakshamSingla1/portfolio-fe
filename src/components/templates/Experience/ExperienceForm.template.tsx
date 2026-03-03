@@ -1,7 +1,7 @@
 import React, { useEffect, useState , useMemo} from "react";
 import TextField from "../../atoms/TextField/TextField";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
-import { titleModification } from "../../../utils/helper";
+import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
 import DatePicker from "../../atoms/DatePicker/DatePicker";
 import dayjs from "dayjs";
@@ -44,8 +44,11 @@ const validationSchema = Yup.object().shape({
         .nullable(),
     employmentStatus: Yup.string()
         .required('Employment status is required'),
-    description: Yup.string()
-        .required('Description is required'),
+    description: Yup.string().test(
+        "description-required",
+        "Description is required",
+        (value) => !isRichTextEmpty(value)
+    ),
     skillIds: Yup.array(Yup.string())
         .min(1, 'At least one skill is required'),
 });
@@ -82,6 +85,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         onSubmit: async (values, { setSubmitting }) => {
             const payload = {
                 ...values,
+                description: isRichTextEmpty(values.description) ? "" : values.description,
             };
             setSubmitting(true);
             if (mode !== MODE.VIEW) {

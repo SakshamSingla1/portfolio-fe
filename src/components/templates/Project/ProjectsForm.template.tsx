@@ -11,7 +11,7 @@ import Chip from "../../atoms/Chip/Chip";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
-import { titleModification } from "../../../utils/helper";
+import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import { HTTP_STATUS, type ImageValue } from "../../../utils/types";
 import { type Project, type ProjectResponse, WorkStatusOptions, WorkStatusType, useProjectService, } from "../../../services/useProjectService";
 import { useSkillService, type SkillDropdown, } from "../../../services/useSkillService";
@@ -22,8 +22,11 @@ import { useColors } from "../../../utils/types";
 const validationSchema = Yup.object({
     projectName: Yup.string().required("Project name is required"),
     projectLink: Yup.string().required("Project link is required").url(),
-    projectDescription: Yup.string().required("Project description is required"),
-    skillIds: Yup.array().of(Yup.string()).min(1, "Select at least one technology"),
+    projectDescription: Yup.string().test(
+        "description-required",
+        "Description is required",
+        (value) => !isRichTextEmpty(value)
+    ), skillIds: Yup.array().of(Yup.string()).min(1, "Select at least one technology"),
     projectStartDate: Yup.date().required("Start date is required"),
     projectEndDate: Yup.date()
         .min(Yup.ref("projectStartDate"), "End date must be after start date")
@@ -75,8 +78,12 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         },
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
+            const payload = {
+                ...values,
+                projectDescription: isRichTextEmpty(values.projectDescription) ? "" : values.projectDescription,
+            };
             setSubmitting(true);
-            if (mode !== MODE.VIEW) await onSubmit(values);
+            if (mode !== MODE.VIEW) await onSubmit(payload);
             else onClose();
             setSubmitting(false);
         },
