@@ -20,8 +20,6 @@ interface TabsProps {
   selectedTabStyle?: string;
 }
 
-/* ---------------- Styled Components ---------------- */
-
 const StyledTabList = styled(TabList)({
   "& .MuiTabs-flexContainer": {
     display: "flex",
@@ -85,8 +83,6 @@ const LabelWrapper = styled("span")({
 const StyledTabPanel = styled(TabPanel)({
   padding: "12px 0",
 });
-
-/* ---------------- Component ---------------- */
 
 export const Tabs: React.FC<TabsProps> = ({
   schema,

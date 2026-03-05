@@ -55,8 +55,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
-
-                {/* Header */}
                 <div
                     className="flex items-start justify-between px-8 py-6 border-b"
                     style={{
@@ -97,11 +95,7 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                         <FiX size={20} />
                     </button>
                 </div>
-
-                {/* Scrollable Content */}
                 <div className="px-8 py-8 overflow-y-auto flex-1 space-y-8 custom-scroll">
-
-                    {/* Info Card */}
                     <div
                         className="rounded-2xl p-6"
                         style={{
@@ -133,8 +127,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                             </div>
                         )}
                     </div>
-
-                    {/* Message Section */}
                     <div>
                         <p
                             className="text-sm font-semibold mb-3 tracking-wide uppercase"
@@ -156,8 +148,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                         </div>
                     </div>
                 </div>
-
-                {/* Footer */}
                 <div
                     className="flex justify-end px-8 py-5 border-t"
                     style={{

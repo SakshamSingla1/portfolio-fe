@@ -103,7 +103,6 @@ const colorClasses = {
 
 const useCountUp = (value = 0) => {
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     let current = 0;
     const duration = 800;
@@ -121,7 +120,6 @@ const useCountUp = (value = 0) => {
 
     return () => clearInterval(timer);
   }, [value]);
-
   return count;
 };
 

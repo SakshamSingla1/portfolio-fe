@@ -25,9 +25,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
     boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
   };
 
-  /* =========================
-     Section Heading Component
-  ========================== */
   const SectionHeading = ({
     title,
     rightContent,
@@ -54,9 +51,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
     </div>
   );
 
-  /* =========================
-     Skeleton Block
-  ========================== */
   const SkeletonBlock = ({ height }: { height: string }) => (
     <div
       className="rounded-xl animate-pulse"
@@ -67,16 +61,12 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
     />
   );
 
-  /* =========================
-     Dashboard Skeleton
-  ========================== */
   const DashboardSkeleton = () => (
     <div
       className={`grid ${
         isMobile ? "grid-cols-1 gap-5" : "grid-cols-12 gap-10"
       }`}
     >
-      {/* Left */}
       <div className={isMobile ? "space-y-5" : "col-span-8 space-y-10"}>
         <div
           className={`rounded-2xl ${isMobile ? "p-4" : "p-8"}`}
@@ -104,8 +94,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Right */}
       <div className={isMobile ? "space-y-5" : "col-span-4 space-y-10"}>
         <div
           className={`rounded-2xl ${isMobile ? "p-4" : "p-8"}`}
@@ -124,9 +112,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
     </div>
   );
 
-  /* =========================
-     Main Render
-  ========================== */
   return (
     <div>
       <div
@@ -134,7 +119,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
           isMobile ? "px-1 py-2" : "px-8 py-10"
         }`}
       >
-        {/* Page Title */}
         <div className={isMobile ? "mb-6" : "mb-12"}>
           <div
             className={`font-bold tracking-tight ${
@@ -154,7 +138,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
               isMobile ? "grid-cols-1 gap-5" : "grid-cols-12 gap-10"
             }`}
           >
-            {/* LEFT SECTION */}
             <div
               className={
                 isMobile
@@ -162,7 +145,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
                   : "col-span-8 space-y-10"
               }
             >
-              {/* Stats */}
               <div
                 className={`rounded-2xl ${
                   isMobile ? "p-4" : "p-8"
@@ -173,7 +155,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
                 <StatsTemplate stats={dashboardData.stats} />
               </div>
 
-              {/* Messages + Quick Actions */}
               <div
                 className={`grid ${
                   isMobile
@@ -181,7 +162,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
                     : "grid-cols-2 gap-8"
                 }`}
               >
-                {/* Recent Messages */}
                 <div
                   className={`rounded-2xl ${
                     isMobile ? "p-4" : "p-8"
@@ -213,8 +193,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
                     messages={dashboardData.recentMessages}
                   />
                 </div>
-
-                {/* Quick Actions */}
                 <div
                   className={`rounded-2xl ${
                     isMobile ? "p-4" : "p-8"
@@ -226,8 +204,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
                 </div>
               </div>
             </div>
-
-            {/* RIGHT SECTION */}
             <div
               className={
                 isMobile
@@ -235,7 +211,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
                   : "col-span-4 space-y-10"
               }
             >
-              {/* Profile Completion */}
               <div
                 className={`rounded-2xl ${
                   isMobile ? "p-4" : "p-8"
@@ -249,8 +224,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
                   }
                 />
               </div>
-
-              {/* Recent Activities */}
               <div
                 className={`rounded-2xl ${
                   isMobile ? "p-4" : "p-8"

@@ -104,7 +104,6 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
 
   return (
     <>
-      {/* Trigger */}
       <div
         ref={anchorRef}
         onClick={() => !disabled && setOpen(true)}
@@ -143,7 +142,6 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
         />
       </div>
 
-      {/* Popover */}
       <Popover
         open={open}
         anchorEl={anchorRef.current}
@@ -173,7 +171,6 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
             gap: 16,
           }}
         >
-          {/* Live Preview */}
           <div
             style={{
               background: tempColor,
@@ -187,13 +184,10 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
             Preview
           </div>
 
-          {/* Picker */}
           <HexColorPicker
             color={tempColor}
             onChange={setTempColor}
           />
-
-          {/* HEX Input */}
           <TextField
             value={tempColor}
             onChange={handleInputChange}
@@ -208,7 +202,6 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
             }}
           />
 
-          {/* Presets */}
           {showPresets && (
             <>
               <div style={{ fontSize: 13 }}>
@@ -231,8 +224,6 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
               </div>
             </>
           )}
-
-          {/* Recent */}
           {recentColors.length > 0 && (
             <>
               <div style={{ fontSize: 13 }}>
@@ -254,8 +245,6 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
               </div>
             </>
           )}
-
-          {/* Footer Buttons */}
           <div
             style={{
               display: "flex",

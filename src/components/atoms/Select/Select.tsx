@@ -10,10 +10,6 @@ import downArrowIcon from "../../../assets/icons/downArrowFilled.svg";
 import { capitalizeFirstLetter } from "../../../utils/helper";
 import { useColors } from "../../../utils/types";
 
-/* =======================
-   Styled Select
-======================= */
-
 const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
   width: "100%",
 
@@ -63,10 +59,6 @@ const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
   },
 }));
 
-/* =======================
-   Types
-======================= */
-
 interface Option {
   value: string | number;
   label: string | React.ReactNode;
@@ -82,10 +74,6 @@ interface SelectProps
   disableArrow?: boolean;
   onChange?: (value: string | number) => void;
 }
-
-/* =======================
-   Component
-======================= */
 
 const Select: React.FC<SelectProps> = ({
   options,
