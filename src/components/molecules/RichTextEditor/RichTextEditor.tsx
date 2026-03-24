@@ -65,7 +65,23 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  const joditConfig = useMemo(() => ({ readonly: !isEditMode, placeholder: placeholder || 'Start typing...', }), [isEditMode]);
+  const joditConfig = useMemo(
+    () => ({
+      readonly: !isEditMode,
+      placeholder: placeholder || "Start typing...",
+
+      toolbarAdaptive: false,
+      showCharsCounter: false,
+      showWordsCounter: false,
+      showXPathInStatusbar: false,
+
+      cleanHTML: {
+        removeEmptyElements: true,
+        fillEmptyParagraph: false,
+      },
+    }),
+    [isEditMode, placeholder]
+  );
 
   return (
     <div className="flex flex-col gap-2">
@@ -79,7 +95,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           }}
         >
           {label}
-          {required && <span style={{ color: colors.error600 }}>*</span>}
+          {required && <span style={{ color: colors.error600 }}> *</span>}
         </label>
       )}
 
@@ -88,9 +104,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           ref={setEditorRef}
           value={value || ""}
           config={joditConfig as any}
-          onBlur={(newContent) => onChange(newContent)}
+          onChange={(newContent: string) => {
+            onChange(newContent);
+          }}
         />
       </div>
+
       {error && helperText && (
         <div className={classes.helperText}>{helperText}</div>
       )}
