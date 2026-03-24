@@ -1,117 +1,103 @@
-import React, { useMemo, useRef } from "react";
-import JoditEditor from "jodit-react";
+import React, { useState } from "react";
 import { createUseStyles } from "react-jss";
+import TextField from "../../atoms/TextField/TextField";
 import { useColors } from "../../../utils/types";
-import type { IJodit } from "jodit/esm/types";
 
 interface RichTextEditorProps {
   label?: string;
   value: string;
   onChange: (value: string) => void;
-  isEditMode?: boolean;
   placeholder?: string;
   error?: boolean;
   helperText?: string;
   required?: boolean;
+  isEditMode?: boolean;
 }
 
 const useStyles = createUseStyles({
-  wrapper: (colors: any) => ({
-    backgroundColor: colors.neutral50,
+  textarea: {
+    "& textarea": {
+      maxHeight: 140,   // ~6 lines
+      overflowY: "auto",
+      resize: "none",
+    },
+  },
+
+  preview: (colors: any) => ({
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 6,
     border: `1px solid ${colors.neutral200}`,
-    borderRadius: 4,
-    transition: "all 0.2s ease",
-    overflow: "hidden",
+    background: colors.neutral50,
+    color: colors.neutral900,
+    lineHeight: 1.6,
+
+    "& p": {
+      marginBottom: 12,
+    },
+
+    "& strong": {
+      fontWeight: 600,
+    },
+  }),
+
+  toggle: (colors: any) => ({
+    fontSize: 13,
+    cursor: "pointer",
+    color: colors.primary600,
+    marginTop: 6,
+    width: "fit-content",
 
     "&:hover": {
-      borderColor: colors.primary300,
+      textDecoration: "underline",
     },
-
-    "&:focus-within": {
-      borderColor: colors.primary500,
-      boxShadow: `0 0 0 3px ${colors.primary100}`,
-    },
-  }),
-
-  error: (colors: any) => ({
-    borderColor: colors.error500,
-    backgroundColor: colors.error50,
-  }),
-
-  helperText: (colors: any) => ({
-    marginTop: 6,
-    fontSize: 12,
-    color: colors.error600,
   }),
 });
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
   label,
   value,
-  placeholder,
   onChange,
-  isEditMode = true,
+  placeholder,
   error,
   helperText,
-  required = false,
+  required,
+  isEditMode,
 }) => {
-  const editorRef = useRef<IJodit | null>(null);
   const colors = useColors();
   const classes = useStyles(colors);
 
-  const setEditorRef = (editor: IJodit | null) => {
-    if (editor) {
-      editorRef.current = editor;
-    }
-  };
-
-  const joditConfig = useMemo(
-    () => ({
-      readonly: !isEditMode,
-      placeholder: placeholder || "Start typing...",
-
-      toolbarAdaptive: false,
-      showCharsCounter: false,
-      showWordsCounter: false,
-      showXPathInStatusbar: false,
-
-      cleanHTML: {
-        removeEmptyElements: true,
-        fillEmptyParagraph: false,
-      },
-    }),
-    [isEditMode, placeholder]
-  );
+  const [showPreview, setShowPreview] = useState(false);
 
   return (
-    <div className="flex flex-col gap-2">
-      {label && (
-        <label
-          style={{
-            color: colors.neutral700,
-            fontSize: 14,
-            fontWeight: 500,
-            marginLeft: 8,
-          }}
-        >
-          {label}
-          {required && <span style={{ color: colors.error600 }}> *</span>}
-        </label>
-      )}
-
-      <div className={`${classes.wrapper} ${error ? classes.error : ""}`}>
-        <JoditEditor
-          ref={setEditorRef}
-          value={value || ""}
-          config={joditConfig as any}
-          onChange={(newContent: string) => {
-            onChange(newContent);
-          }}
+    <div style={{ width: "100%" }}>
+      <div className={classes.textarea}>
+        <TextField
+          label={label}
+          required={required}
+          multiline
+          minRows={6}
+          placeholder={placeholder || "Write HTML content here..."}
+          value={value}
+          error={error}
+          helperText={helperText}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={!isEditMode}
         />
       </div>
 
-      {error && helperText && (
-        <div className={classes.helperText}>{helperText}</div>
+      <div
+        className={classes.toggle}
+        onClick={() => setShowPreview(!showPreview)}
+      >
+        {showPreview ? "Hide Preview" : "Show Preview"}
+      </div>
+
+      {showPreview && (
+        <div
+          className={classes.preview}
+          dangerouslySetInnerHTML={{ __html: value || "" }}
+        />
       )}
     </div>
   );
