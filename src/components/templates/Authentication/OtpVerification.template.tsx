@@ -24,7 +24,7 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
 }) => {
     const authService = useAuthService();
     const navigate = useNavigate();
-    const { setAuthenticatedUser, setDefaultTheme, setNavlinks } = useAuthenticatedUser();
+    const { setAuthenticatedUser, setDefaultTheme, setRolePermissions } = useAuthenticatedUser();
     const { showSnackbar } = useSnackbar();
 
     const [otp, setOtp] = useState("");
@@ -58,21 +58,24 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
                 if (response.status === HTTP_STATUS.OK) {
                     const user = response.data.data;
                     setAuthenticatedUser({
-                        id: user.id,
-                        fullName: user.fullName,
-                        userName: user.userName,
-                        email: user.email,
-                        phone: user.phone,
-                        role: user.role,
-                        status: user.status,
-                        emailVerified: user.emailVerified,
-                        phoneVerified: user.phoneVerified,
-                        token: user.token
-                    });
-                    setDefaultTheme(user.defaultTheme);
-                    setNavlinks(user.navLinks);
-                    navigate(`/admin/dashboard`);
-                    showSnackbar('success', 'Login successful!');
+                    id: user.id,
+                    fullName: user.fullName,
+                    userName: user.userName,
+                    email: user.email,
+                    phone: user.phone,
+                    roleId: user.roleId,
+                    roleName: user.roleName,
+                    status: user.status,
+                    emailVerified: user.emailVerified,
+                    phoneVerified: user.phoneVerified,
+                    token: user.token
+                });
+
+                setDefaultTheme(user.defaultTheme);
+                setRolePermissions(user.rolePermissions);
+
+                navigate(`/dashboard`);
+                showSnackbar('success', 'Login successful!');
                 }
             }
         } catch (error) {

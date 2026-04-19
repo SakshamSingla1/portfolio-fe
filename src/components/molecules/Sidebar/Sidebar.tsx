@@ -1,58 +1,49 @@
 import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import {
-  FaHome,
-  FaGraduationCap,
-  FaBriefcase,
-  FaCode,
-  FaCog,
-  FaEnvelope,
-  FaUser,
-  FaDumbbell,
-  FaGlobe,
-  FaLink,
-  FaPaintRoller,
-} from "react-icons/fa";
-import { IoNotifications , IoDocuments, IoLinkSharp } from "react-icons/io5";
-import { GrCertificate } from "react-icons/gr";
-import { BsPersonVcard } from "react-icons/bs";
-import { GiAchievement } from "react-icons/gi";
-import { MdOutlineDashboard } from "react-icons/md";
+import { TbLayoutDashboard, TbCode, TbUser, TbMessageChatbot, TbBell, TbShare, TbLink, TbUsers, TbSettings, TbHelp, TbIcons } from "react-icons/tb";
+import { FiBriefcase } from "react-icons/fi";
+import { LuGraduationCap, LuFolderKanban, LuAward, LuShieldCheck} from "react-icons/lu";
+import { FaRegAddressCard } from "react-icons/fa6";
+import { CgFileDocument } from "react-icons/cg";
+import { GoTrophy } from "react-icons/go";
+import { IoColorPaletteOutline } from "react-icons/io5";
 import { createUseStyles } from "react-jss";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { enumToNormalKey} from "../../../utils/helper";
 import NavItem from "../NavItem/NavItem";
 import { useColors } from "../../../utils/types";
 
-const resolveRolePath = (rawPath: string, role?: string): string => {
-  if (!rawPath || !role) return "";
-  const cleanRole = role.toLowerCase();
-  const cleanPath = rawPath.replace(/^\/+|\/+$/g, "");
-  if (cleanPath.startsWith(`${cleanRole}/`)) return `/${cleanPath}`;
-  if (cleanPath.includes("{role}"))
-    return `/${cleanPath.replace("{role}", cleanRole)}`;
-  return `/${cleanRole}/${cleanPath}`;
-};
+
+const navGroupSequence = {
+  OVERVIEW : 1,
+  CONTENT : 2,
+  EXTRAS : 3,
+  LINKS : 4,
+  ADMINISTRATION : 5,
+  SYSTEM : 6
+}
 
 const iconMap: Record<string, JSX.Element> = {
-  HOME: <FaHome />,
-  EDUCATION: <FaGraduationCap />,
-  EXPERIENCE: <FaBriefcase />,
-  SKILLS: <FaDumbbell />,
-  PROJECTS: <FaCode />,
-  PROFILE: <FaUser />,
-  GLOBE: <FaGlobe />,
-  CONTACT_US: <FaEnvelope />,
-  TEMPLATES: <IoNotifications />,
-  COLOR_THEMES: <FaPaintRoller />,
-  SETTINGS: <FaCog />,
-  NAVLINKS: <FaLink />,
-  RESUMES: <IoDocuments />,
-  SOCIAL_LINKS: <IoLinkSharp />,
-  CERTIFICATIONS: <GrCertificate />,
-  TESTIMONIALS: <BsPersonVcard />,
-  ACHIEVEMENTS: <GiAchievement />,
-  DASHBOARD: <MdOutlineDashboard />
+  EDUCATION: <LuGraduationCap />,
+  EXPERIENCE: <FiBriefcase />,
+  SKILLS: <TbCode />,
+  PROJECT: <LuFolderKanban />,
+  PROFILE: <TbUser />,
+  MESSAGES: <TbMessageChatbot />,
+  NOTIFICATIONS: <TbBell />,
+  THEMES: <IoColorPaletteOutline />,
+  SETTINGS: <TbSettings />,
+  NAV_LINKS: <TbLink />,
+  RESUMES: <CgFileDocument />,
+  SOCIAL_LINKS: <TbShare />,
+  CERTIFICATIONS: <LuAward />,
+  TESTIMONIALS: <FaRegAddressCard />,
+  ACHIEVEMENTS: <GoTrophy />,
+  DASHBOARD: <TbLayoutDashboard />,
+  USERS: <TbUsers />,
+  ROLES_AND_PERMISSIONS: <LuShieldCheck />,
+  HELP: <TbHelp />,
+  LOGOS: <TbIcons />
 };
 
 const useStyles = createUseStyles({
@@ -78,6 +69,18 @@ const useStyles = createUseStyles({
     flex: 1,
     overflowY: "auto",
     padding: "8px",
+  },
+  groupHeader: (c: any) => ({
+    padding: "12px 16px 8px",
+    fontSize: 11,
+    fontWeight: 600,
+    color: c.neutral500,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    display: c.collapsed ? "none" : "block",
+  }),
+  groupSection: {
+    marginBottom: 16,
   },
   footer: {
     padding: '0.5rem',
@@ -132,23 +135,47 @@ const Sidebar: React.FC<{
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
 }> = ({ collapsed }) => {
-  const { user, navlinks } = useAuthenticatedUser();
+  const { rolePermissions } = useAuthenticatedUser();
   const location = useLocation();
-
-  const effectiveRole = useMemo(() => {
-    return user?.role === 'SUPER_ADMIN' ? 'ADMIN' : user?.role;
-  }, [user?.role]);
 
   const colors = useColors();
 
   const classes = useStyles({ ...colors, collapsed });
 
-  const menuItems = useMemo(() => {
-    if (!Array.isArray(navlinks)) return [];
-    return [...navlinks].sort(
-      (a: any, b: any) => (a.index ?? 999) - (b.index ?? 999)
-    );
-  }, [navlinks]);
+  const groupedMenuItems = useMemo(() => {
+    if (!rolePermissions?.navLinks) return {};
+    
+    const groups: Record<string, any[]> = {};
+    
+    rolePermissions.navLinks.forEach((item: any) => {
+      const groupName = item.navGroup || 'General';
+      if (!groups[groupName]) {
+        groups[groupName] = [];
+      }
+      groups[groupName].push(item);
+    });
+    
+    const sortedGroups: Record<string, any[]> = {};
+    Object.keys(navGroupSequence).forEach((key) => {
+      if (groups[key]) {
+        sortedGroups[key] = groups[key];
+      }
+    });
+    Object.keys(groups).forEach((key) => {
+      if (!(key in navGroupSequence)) {
+        sortedGroups[key] = groups[key];
+      }
+    });
+    
+    // Sort items within each group
+    Object.keys(sortedGroups).forEach((groupName) => {
+      sortedGroups[groupName] = sortedGroups[groupName].sort(
+        (a: any, b: any) => (parseInt(a.index) ?? 999) - (parseInt(b.index) ?? 999)
+      );
+    });
+    
+    return sortedGroups;
+  }, [rolePermissions]);
 
   return (
     <aside className={classes.sidebar}>
@@ -157,26 +184,35 @@ const Sidebar: React.FC<{
       </div>
 
       <nav className={classes.nav}>
-        {menuItems.map((item: any) => {
-          if (!item?.path) return null;
+        {Object.entries(groupedMenuItems).map(([groupName, items]) => (
+          <div key={groupName} className={classes.groupSection}>
+            {!collapsed && (
+              <div className={classes.groupHeader}>
+                {enumToNormalKey(groupName)}
+              </div>
+            )}
+            {items.map((item: any) => {
+              if (!item?.path) return null;
 
-          const fullPath = resolveRolePath(item.path, effectiveRole);
-          const isActive =
-            location.pathname === fullPath ||
-            location.pathname.startsWith(`${fullPath}/`);
+              const fullPath = item.path.startsWith('/') ? item.path : `/${item.path}`;
+              const isActive =
+                location.pathname === fullPath ||
+                location.pathname.startsWith(`${fullPath}/`);
 
-          return (
-            <NavItem
-              key={item.name}
-              to={fullPath}
-              label={enumToNormalKey(item.name)}
-              icon={iconMap[item.name ?? "home"]}
-              active={isActive}
-              collapsed={collapsed}
-              colors={colors}
-            />
-          );
-        })}
+              return (
+                <NavItem
+                  key={item.name}
+                  to={fullPath}
+                  label={enumToNormalKey(item.name)}
+                  icon={iconMap[item.name ?? "home"]}
+                  active={isActive}
+                  collapsed={collapsed}
+                  colors={colors}
+                />
+              );
+            })}
+          </div>
+        ))}
       </nav>
     </aside>
   );

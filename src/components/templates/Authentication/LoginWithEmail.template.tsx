@@ -30,7 +30,7 @@ const validationSchema = Yup.object({
 const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
     const authService = useAuthService();
     const navigate = useNavigate();
-    const { setAuthenticatedUser, setDefaultTheme, setNavlinks } =
+    const { setAuthenticatedUser, setDefaultTheme, setRolePermissions } =
         useAuthenticatedUser();
     const [showPassword,setShowPassword] = useState<boolean>(false);
     
@@ -56,7 +56,8 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                     userName: user.userName,
                     email: user.email,
                     phone: user.phone,
-                    role: user.role,
+                    roleId: user.roleId,
+                    roleName: user.roleName,
                     status: user.status,
                     emailVerified: user.emailVerified,
                     phoneVerified: user.phoneVerified,
@@ -64,9 +65,9 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                 });
 
                 setDefaultTheme(user.defaultTheme);
-                setNavlinks(user.navLinks);
+                setRolePermissions(user.rolePermissions);
 
-                navigate(`/admin/dashboard`);
+                navigate(`/dashboard`);
                 showSnackbar('success', 'Login successful!');
             } catch (error) {
                 console.error("Login failed:", error);

@@ -27,24 +27,17 @@ export const useAuthenticatedUser = () => {
 
             context.setAuthenticatedUser(null);
             context.setDefaultTheme(null);
-            context.setNavlinks(null);
+            context.setRolePermissions(null);
             localStorage.removeItem("user");
             localStorage.removeItem("defaultTheme");
-            localStorage.removeItem("navlinks");
+            localStorage.removeItem("rolePermissions");
             localStorage.removeItem("reLoginTimestamp");
 
             alert("Session expired. Please log in again.");
             navigate("/");
         } 
-        else if (expired === null) {
-            context.setAuthenticatedUser(null);
-            context.setDefaultTheme(null);
-            context.setNavlinks(null);
-            localStorage.removeItem("user");
-            localStorage.removeItem("defaultTheme");
-            localStorage.removeItem("navlinks");
-            localStorage.removeItem("reLoginTimestamp");
-        }
+        // Don't clear authentication data when expired === null
+        // This handles cases where user data exists but reLoginTimestamp is not set yet
     }, [navigate]);
 
     return context;
