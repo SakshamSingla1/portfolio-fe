@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "./useAuthenticatedUser";
-import { ROLES } from "../utils/types";
+import type { ModulePermissionDTO } from "../services/useRoleService";
 
 const useRouteValidate = () => {
   const location = useLocation();
@@ -9,9 +9,9 @@ const useRouteValidate = () => {
 
   const {
     user,
-    navlinks,
+    rolePermissions,
     setAuthenticatedUser,
-    setNavlinks,
+    setRolePermissions,
     setDefaultTheme
   } = useAuthenticatedUser();
   const currentPath = location.pathname;
@@ -19,8 +19,8 @@ const useRouteValidate = () => {
     const routes = new Set<string>();
     routes.add("/admin");
 
-    if (navlinks?.length) {
-      navlinks.forEach(link => {
+    if (rolePermissions?.navLinks?.length) {
+      rolePermissions.navLinks.forEach((link: ModulePermissionDTO) => {
         const path = link.path.startsWith("/")
           ? link.path
           : `/${link.path}`;
@@ -29,12 +29,11 @@ const useRouteValidate = () => {
     }
     
     return Array.from(routes);
-  }, [navlinks]);
+  }, [rolePermissions]);
 
   useEffect(() => {
     if (!user) return;
     if (currentPath === "/" || currentPath === "/sign-in") return;
-    if (user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ADMIN) return;
     if (!allowedRoutes.length) return;
     const isValid = allowedRoutes.some(route =>
       currentPath === route || currentPath.startsWith(`${route}/`)
@@ -47,7 +46,7 @@ const useRouteValidate = () => {
       sessionStorage.clear();
 
       setAuthenticatedUser(null);
-      setNavlinks(null);
+      setRolePermissions(null);
       setDefaultTheme(null);
 
       navigate("/", { replace: true });
@@ -58,7 +57,7 @@ const useRouteValidate = () => {
     allowedRoutes,
     navigate,
     setAuthenticatedUser,
-    setNavlinks,
+    setRolePermissions,
     setDefaultTheme
   ]);
 };

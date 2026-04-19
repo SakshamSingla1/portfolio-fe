@@ -6,10 +6,9 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
-import { Status, ROLES, RoleOptions } from '../../../utils/types';
+import { Status } from '../../../utils/types';
 import { formatToEnumKey, makeRoute } from '../../../utils/helper';
 import { type NavlinkRequest, type NavlinkResponse } from '../../../services/useNavlinkService';
-import FilterChip from '../../atoms/FilterChip/FilterChip';
 
 interface NavlinkFormTemplateProps {
   onSubmit: (values: NavlinkRequest) => void;
@@ -38,7 +37,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
       name: navlink?.name || '',
       path: navlink?.path || '',
       icon: navlink?.icon || '',
-      roles: navlink?.roles || [ROLES.SUPER_ADMIN],
+      navGroup: navlink?.navGroup || '',
       status: navlink?.status || Status.ACTIVE,
     },
     validationSchema,
@@ -53,7 +52,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
         name: navlink.name || '',
         path: navlink.path || '',
         icon: navlink.icon || '',
-        roles: navlink.roles || [ROLES.SUPER_ADMIN],
+        navGroup: navlink.navGroup || '',
         status: navlink.status,
       });
     }
@@ -110,6 +109,20 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
             />
 
             <TextField
+              label="Nav Group"
+              placeholder="Navigation group"
+              fullWidth
+              {...formik.getFieldProps('navGroup')}
+              onBlur={(e) =>
+                formik.setFieldValue('navGroup', formatToEnumKey(e.target.value))
+              }
+              disabled={mode === MODE.VIEW}
+              required
+              error={formik.touched.navGroup && Boolean(formik.errors.navGroup)}
+              helperText={Boolean(formik.touched.navGroup && formik.errors.navGroup) ? formik.errors.navGroup : ''}
+            />
+
+            <TextField
               label="Index"
               placeholder="Navigation order"
               type="number"
@@ -120,17 +133,6 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
               error={formik.touched.index && Boolean(formik.errors.index)}
               helperText={Boolean(formik.touched.index && formik.errors.index) ? formik.errors.index : ''}
               inputProps={{ min: 0 }}
-            />
-
-            <FilterChip
-              label="Roles"
-              placeholder="Select"
-              options={RoleOptions}
-              value={RoleOptions.filter((opt) =>
-                formik.values.roles.includes(String(opt.value))
-              )}
-              onchange={(values) => formik.setFieldValue('roles', values.map((v: any) => v.value))}
-              minWidth="100px"
             />
           </div>
         </div>

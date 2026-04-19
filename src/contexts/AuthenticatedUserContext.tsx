@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState} from "react";
 import { type ColorTheme } from "../services/useColorThemeService";
-import type { NavlinkResponse } from "../services/useNavlinkService";
+import type { RolePermissionResponseDTO } from "../services/useRoleService";
 
 interface AuthenticatedUserProviderType {
     children: React.ReactNode;
@@ -12,7 +12,8 @@ export interface AuthenticatedUserType {
     userName: string;
     email: string;
     phone: string;
-    role: string;
+    roleId: string;
+    roleName: string;
     status: string;
     emailVerified: string;
     phoneVerified: string;
@@ -29,8 +30,8 @@ export interface AuthenticatedUserContextType {
     defaultTheme: ColorTheme | null;
     setDefaultTheme: (theme: ColorTheme | null) => void;
 
-    navlinks: NavlinkResponse[] | null;
-    setNavlinks: (navlinks: NavlinkResponse[] | null) => void;
+    rolePermissions: RolePermissionResponseDTO | null;
+    setRolePermissions: (rolePermissions: RolePermissionResponseDTO | null) => void;
 
     logout: () => void;
 }
@@ -45,8 +46,8 @@ export const AuthenticatedUserContext = React.createContext<AuthenticatedUserCon
     defaultTheme: null,
     setDefaultTheme: () => {},
 
-    navlinks: null,
-    setNavlinks: () => {},
+    rolePermissions: null,
+    setRolePermissions: () => {},
 
     logout: () => {},
 });
@@ -72,9 +73,9 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
         }
     });
 
-    const [navlinks, setNavlinks] = useState<NavlinkResponse[] | null>(() => {
+    const [rolePermissions, setRolePermissions] = useState<RolePermissionResponseDTO | null>(() => {
         try {
-            const stored = localStorage.getItem("navlinks");
+            const stored = localStorage.getItem("rolePermissions");
             return stored ? JSON.parse(stored) : null;
         } catch {
             return null;
@@ -96,18 +97,25 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
     }, [defaultTheme]);
 
     useEffect(() => {
-        if (navlinks) localStorage.setItem("navlinks", JSON.stringify(navlinks));
-        else localStorage.removeItem("navlinks");
-    }, [navlinks]);
+        if (rolePermissions) localStorage.setItem("rolePermissions", JSON.stringify(rolePermissions));
+        else localStorage.removeItem("rolePermissions");
+    }, [rolePermissions]);
 
     const logout = () => {
         setAuthenticatedUser(null);
         setDefaultTheme(null);
-        setNavlinks(null);
+        setRolePermissions(null);
         localStorage.removeItem("user");
         localStorage.removeItem("defaultTheme");
-        localStorage.removeItem("navlinks");
+        localStorage.removeItem("rolePermissions");
         localStorage.removeItem("reLoginTimestamp");
+    };
+
+    const setAuthenticatedUserWithTimestamp = (user: AuthenticatedUserType | null) => {
+        if (user && !localStorage.getItem("reLoginTimestamp")) {
+            localStorage.setItem("reLoginTimestamp", new Date().toISOString());
+        }
+        setAuthenticatedUser(user);
     };
 
     const providerValue = useMemo(
@@ -115,14 +123,14 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
             isAuthDialogActive,
             syncAuthDialogActive,
             user,
-            setAuthenticatedUser,
+            setAuthenticatedUser: setAuthenticatedUserWithTimestamp,
             defaultTheme,
             setDefaultTheme,
-            navlinks,
-            setNavlinks,
+            rolePermissions,
+            setRolePermissions,
             logout,
         }),
-        [isAuthDialogActive, user, defaultTheme, navlinks]
+        [isAuthDialogActive, user, defaultTheme, rolePermissions, setAuthenticatedUserWithTimestamp]
     );
 
     return (
