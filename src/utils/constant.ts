@@ -43,7 +43,7 @@ export const ADMIN_ROUTES = {
     SKILL_EDIT: "/admin/skills/:id/edit",
     SKILL_VIEW: "/admin/skills/:id",
     
-    CONTACT_US: "/admin/contact-us",
+    CONTACT_US: "/admin/messages",
 
     SETTINGS: "/admin/settings",
     MAIN_SITE: "/admin/main-site",
@@ -53,15 +53,15 @@ export const ADMIN_ROUTES = {
     NAVLINKS_EDIT: "/admin/navlinks/:id/edit",
     NAVLINKS_VIEW: "/admin/navlinks/:id",
 
-    TEMPLATES: "/admin/templates",
-    TEMPLATES_ADD: "/admin/templates/add",
-    TEMPLATES_EDIT: "/admin/templates/:name/edit",
-    TEMPLATES_VIEW: "/admin/templates/:name",
+    TEMPLATES: "/admin/notifications",
+    TEMPLATES_ADD: "/admin/notifications/add",
+    TEMPLATES_EDIT: "/admin/notifications/:name/edit",
+    TEMPLATES_VIEW: "/admin/notifications/:name",
 
-    COLOR_THEME: "/admin/color-themes",
-    COLOR_THEME_ADD: "/admin/color-themes/add",
-    COLOR_THEME_EDIT: "/admin/color-themes/:themeName/edit",
-    COLOR_THEME_VIEW: "/admin/color-themes/:themeName",
+    COLOR_THEME: "/admin/themes",
+    COLOR_THEME_ADD: "/admin/themes/add",
+    COLOR_THEME_EDIT: "/admin/hemes/:themeName/edit",
+    COLOR_THEME_VIEW: "/admin/themes/:themeName",
 
     RESUMES: "/admin/resumes",
 
@@ -89,6 +89,15 @@ export const ADMIN_ROUTES = {
     LOGO_ADD: "/admin/logos/add",
     LOGO_EDIT: "/admin/logos/:id/edit",
     LOGO_VIEW: "/admin/logos/:id",
+
+    USER: "/admin/users",
+    USER_EDIT: "/admin/users/:id/edit",
+    USER_VIEW: "/admin/users/:id",
+
+    ROLE: "/admin/roles-permissions",
+    ROLE_ADD: "/admin/roles-permissions/add",
+    ROLE_EDIT: "/admin/roles-permissions/:id/edit",
+    ROLE_VIEW: "/admin/roles-permissions/:id",
 }
 
 export const MODE = {

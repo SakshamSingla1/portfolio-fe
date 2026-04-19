@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import Topbar from "../components/molecules/Topbar/Topbar";
-import MobileBottomBar from "../components/molecules/Sidebar/BottomMenubar";
 import { createUseStyles } from "react-jss";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Outlet } from "react-router-dom";
@@ -59,9 +58,6 @@ const useStyles = createUseStyles({
     padding: 24,
     overflow: "auto",
     paddingBottom: 24,
-    '@media (max-width: 767px)': {
-      paddingBottom: 88,
-    },
   },
 });
 
@@ -94,21 +90,18 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <div className={classes.layoutWrapper}>
-      {!isMobile && (
-        <div className={classes.sidebarWrapper} style={{ width: collapsed ? 72 : 240 }}>
-          <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-          <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
-            {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
-          </div>
+      <div className={classes.sidebarWrapper} style={{ width: collapsed ? 72 : 240 }}>
+        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <div className={classes.collapseBtn} onClick={handleToggleSidebar}>
+          {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
         </div>
-      )}
+      </div>
       <div className={classes.contentWrapper}>
         <Topbar />
         <div className={classes.mainContent}>
           <Outlet />
         </div>
       </div>
-      {isMobile && <MobileBottomBar />}
     </div>
   );
 };

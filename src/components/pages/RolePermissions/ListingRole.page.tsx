@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, SORT_ENUM } from '../../../utils/types';
+import { HTTP_STATUS, type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import NavlinkListTableTemplate from '../../templates/Navlinks/NavlinksListing.template';
-import { useNavlinkService , type NavlinkResponse , type NavlinkFilterRequest} from '../../../services/useNavlinkService';
+import {  useRoleService , type RoleListResponseDTO , type GetAllRolesParams } from '../../../services/useRoleService';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
+import RoleTableTemplate from '../../templates/Roles/RoleTable.template';
 
-const NavlinkListPage: React.FC = () => {
+const ListingRolesPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const navlinkService = useNavlinkService();
+    const roleService = useRoleService();
     const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
+        role: searchParams.get("role") || "",
+        status: searchParams.get("status") || ""
     };
 
     const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
@@ -21,33 +23,31 @@ const NavlinkListPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [navlinks, setNavlinksTo] = useState<NavlinkResponse[]>([]);
+    const [roles, setRolesTo] = useState<RoleListResponseDTO[]>([]);
 
-    const refreshNavlinks = async (page: string, size: string) => {
-        try {
-            const params: NavlinkFilterRequest = {
-                page,
-                size,
-                sortDir: SORT_ENUM.ASC,
-                sortBy: "index",
-                search: filters?.search,
-                status: filters?.status
-            };
-            const res1 = await navlinkService.getAllNavlinks(params);
-            if (res1?.status === HTTP_STATUS.OK) {
-                const { totalElements, totalPages } = res1?.data?.data;
-                setPagination(prev => ({
-                    ...prev,
-                    totalPages,
-                    totalRecords: totalElements
-                }));
-                setNavlinksTo(res1?.data?.data?.content);
-            }
-        } catch (error) {
-            console.log(error);
-            setNavlinksTo([]);
-            showSnackbar('error', 'Failed to fetch navlinks');
-        }
+    const refreshRoles = async (page: number, size: number) => {
+        const params: GetAllRolesParams = {
+            page: page,
+            size: size,
+            status: filters?.status,
+            search: filters?.search,
+        };
+        await roleService.getAllRolesByCriteria(params)
+            .then((res) => {
+                if (res?.status === HTTP_STATUS.OK) {
+                    const { totalElements, totalPages } = res?.data?.data;
+                    setPagination({
+                        ...pagination,
+                        totalPages: totalPages,
+                        totalRecords: totalElements
+                    });
+                    setRolesTo(res?.data?.data?.content);
+                }
+            }).catch((error) => {
+                console.error("Error fetching roles:", error);
+                setRolesTo([]);
+                showSnackbar('error', 'Failed to load roles');
+            })
     }
 
     const handleFiltersChange = (name: string, value: any) => {
@@ -71,7 +71,7 @@ const NavlinkListPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshNavlinks(pagination.currentPage.toString(), pagination.pageSize.toString());
+        refreshRoles(pagination.currentPage, pagination.pageSize);
     }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
@@ -79,15 +79,17 @@ const NavlinkListPage: React.FC = () => {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            role: filters.role ?? "",
+            status: filters.status ?? ""
         };
         setSearchParams(params);
     }, [filters.search, pagination]);
 
     return (
         <div>
-            <NavlinkListTableTemplate navlinks={navlinks} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
+            <RoleTableTemplate users={roles} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
         </div>
     )
 }
 
-export default NavlinkListPage;
+export default ListingRolesPage;

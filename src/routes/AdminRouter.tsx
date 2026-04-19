@@ -21,6 +21,8 @@ import TestimonialRoutes from './AdminRoutes/TestimonialRoutes';
 import AchievementRoutes from './AdminRoutes/AchievementRoutes';
 import DashboardRoutes from './AdminRoutes/DashboardRoutes';
 import LogoRoutes from './AdminRoutes/LogoRoutes';
+import UserRoutes from './AdminRoutes/UserRoutes';
+import RoleRoutes from './AdminRoutes/RoleRoutes';
 
 export const AdminRouter: React.FC = () => {
 
@@ -71,24 +73,26 @@ export const AdminRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/*" element={<DashboardLayout />} >
-        <Route index element={<Navigate to="admin/profile" replace />} />
-        <Route path="admin/profile" element={<div><ProfileRoutes /></div>} />
-        <Route path="admin/experience/*" element={<div><ExperienceRoutes /></div>} />
-        <Route path="admin/education/*" element={<div><EducationRoutes /></div>} />
-        <Route path="admin/projects/*" element={<div><ProjectRoutes /></div>} />
-        <Route path="admin/skills/*" element={<div><SkillRoutes /></div>} />
-        <Route path="admin/contact-us/*" element={<div><ContactUsRoutes /></div>} />
-        <Route path="admin/settings/*" element={<div><SettingRoutes /></div>} />
-        <Route path="admin/navlinks/*" element={<div><NavLinkRoutes /></div>} />
-        <Route path="admin/color-themes/*" element={<div><ColorThemeRoutes /></div>} />
-        <Route path="admin/templates/*" element={<div><TemplateRoutes /></div>} />
-        <Route path="admin/resumes/*" element={<div><ResumeRoutes /></div>} />
-        <Route path="admin/social-links/*" element={<div><SocialLinkRoutes /></div>} />
-        <Route path="admin/certifications/*" element={<div><CertificationRoutes /></div>} />
-        <Route path="admin/testimonials/*" element={<div><TestimonialRoutes /></div>} />
-        <Route path="admin/achievements/*" element={<div><AchievementRoutes /></div>} />
-        <Route path="admin/dashboard" element={<div><DashboardRoutes/></div>} />
-        <Route path="admin/logos/*" element={<div><LogoRoutes /></div>} />
+        <Route index element={<Navigate to="profile" replace />} />
+        <Route path="profile" element={<div><ProfileRoutes /></div>} />
+        <Route path="experience/*" element={<div><ExperienceRoutes /></div>} />
+        <Route path="education/*" element={<div><EducationRoutes /></div>} />
+        <Route path="projects/*" element={<div><ProjectRoutes /></div>} />
+        <Route path="skills/*" element={<div><SkillRoutes /></div>} />
+        <Route path="messages/*" element={<div><ContactUsRoutes /></div>} />
+        <Route path="settings/*" element={<div><SettingRoutes /></div>} />
+        <Route path="navlinks/*" element={<div><NavLinkRoutes /></div>} />
+        <Route path="themes/*" element={<div><ColorThemeRoutes /></div>} />
+        <Route path="notifications/*" element={<div><TemplateRoutes /></div>} />
+        <Route path="resumes/*" element={<div><ResumeRoutes /></div>} />
+        <Route path="social-links/*" element={<div><SocialLinkRoutes /></div>} />
+        <Route path="certifications/*" element={<div><CertificationRoutes /></div>} />
+        <Route path="testimonials/*" element={<div><TestimonialRoutes /></div>} />
+        <Route path="achievements/*" element={<div><AchievementRoutes /></div>} />
+        <Route path="dashboard" element={<div><DashboardRoutes/></div>} />
+        <Route path="logos/*" element={<div><LogoRoutes /></div>} />
+        <Route path="users/*" element={<div><UserRoutes /></div>} />
+        <Route path="roles-permissions/*" element={<div><RoleRoutes /></div>} />
       </Route>
     </Routes>
   );
