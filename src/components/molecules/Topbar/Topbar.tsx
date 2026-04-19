@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { createUseStyles } from "react-jss";
 import { FiChevronRight } from "react-icons/fi";
-import { IoMdLogOut } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { getBreadcrumbsFromUrl } from "../../../utils/helper";
@@ -180,7 +179,7 @@ const Topbar: React.FC = () => {
           title="Logout"
           aria-label="Logout"
         >
-          <IoMdLogOut size={18} />
+          <FiChevronRight size={18} />
         </button>
       </div>
     </header>
