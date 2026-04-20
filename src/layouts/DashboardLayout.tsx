@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import { createUseStyles } from "react-jss";
 import {
-  FiChevronLeft, FiBell, FiSun, FiMoon,
-  FiLogOut, FiSettings, FiUser, FiSearch, FiLayout, FiChevronDown
+  FiBell, FiSun, FiMoon,
+  FiLogOut, FiSettings, FiUser, FiSearch, FiLayout, FiChevronDown, FiMenu
 } from "react-icons/fi";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,7 +15,8 @@ import { getBreadcrumbsFromUrl } from "../utils/helper";
 const useStyles = createUseStyles({
   layoutWrapper: (c: any) => ({
     display: "flex",
-    minHeight: "100vh",
+    height: "100vh",
+    width: "100vw",
     background: c.neutral50,
     color: c.neutral800,
     position: "relative",
@@ -61,39 +62,18 @@ const useStyles = createUseStyles({
     borderRadius: "50%",
   }),
 
-  sidebarWrapper: {
-    position: "sticky",
+  sidebarWrapper: (c: any) => ({
+    position: c.isMobile ? "fixed" : "sticky",
     top: 0,
+    left: 0,
     height: "100vh",
-    transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-    zIndex: 100,
+    flexShrink: 0,
+    transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+    zIndex: c.isMobile ? 200 : 100,
+    transform: c.isMobile ? (c.isSidebarOpen ? "translateX(0)" : "translateX(-100%)") : "translateX(0)",
     display: "flex",
     flexDirection: "column",
-  },
-
-  collapseBtn: (c: any) => ({
-    position: "absolute",
-    top: 32,
-    right: -14,
-    width: 28,
-    height: 28,
-    borderRadius: "50%",
-    background: c.neutral0,
-    border: `1px solid ${c.neutral200}80`,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    zIndex: 110,
-    boxShadow: `0 4px 12px ${c.neutral900}10`,
-    transition: "all 0.3s ease",
-    color: c.neutral600,
-    "&:hover": {
-      background: c.primary500,
-      color: "white",
-      borderColor: c.primary500,
-      transform: "scale(1.1)",
-    },
+    width: 260,
   }),
 
   contentWrapper: () => ({
@@ -101,7 +81,7 @@ const useStyles = createUseStyles({
     background: "transparent",
     display: "flex",
     flexDirection: "column",
-    minHeight: "100vh",
+    height: "100vh",
     overflow: "hidden",
     position: "relative",
     zIndex: 5,
@@ -276,33 +256,42 @@ const useStyles = createUseStyles({
     },
   }),
 
-  mainContent: {
+  mainContent: (c: any) => ({
     flexGrow: 1,
     padding: "12px 16px 20px",
     overflowX: "hidden",
     overflowY: "auto",
     position: "relative",
     zIndex: 1,
-  },
+    "&::-webkit-scrollbar": {
+      width: "6px",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "transparent",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      background: `${c.primary500}40`,
+      borderRadius: "10px",
+      "&:hover": {
+        background: `${c.primary500}60`,
+      },
+    },
+  }),
 });
 
 const DashboardLayout: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const colors = useColors();
-  const classes = useStyles(colors);
+  const classes = useStyles({ ...colors, isMobile, isSidebarOpen });
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthenticatedUser();
   const { isDark, setColorMode, isPreviewActive, activeThemeName, resetTheme } = useTheme();
 
-  const [collapsed, setCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const breadcrumbs = useMemo(() => getBreadcrumbsFromUrl(location.pathname), [location.pathname]);
-
-  const handleToggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   const handleLogout = () => {
     logout();
@@ -317,12 +306,16 @@ const DashboardLayout: React.FC = () => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) setCollapsed(true);
+      if (!mobile) setIsSidebarOpen(false);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (isMobile) setIsSidebarOpen(false);
+  }, [location.pathname, isMobile]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -358,25 +351,41 @@ const DashboardLayout: React.FC = () => {
         />
       </div>
 
-      <div className={classes.sidebarWrapper} style={{ width: collapsed ? 80 : 260 }}>
-        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-        <button
-          className={classes.collapseBtn}
-          onClick={handleToggleSidebar}
-          aria-label={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        >
+      <AnimatePresence>
+        {isMobile && isSidebarOpen && (
           <motion.div
-            animate={{ rotate: collapsed ? 180 : 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <FiChevronLeft size={18} />
-          </motion.div>
-        </button>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.3)",
+              backdropFilter: "blur(2px)",
+              zIndex: 150,
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <div className={classes.sidebarWrapper}>
+        <Sidebar collapsed={false} setCollapsed={() => { }} />
       </div>
 
       <div className={classes.contentWrapper}>
         <header className={classes.header}>
           <div className={classes.headerLeft}>
+            {isMobile && (
+              <button
+                className={classes.iconButton}
+                onClick={() => setIsSidebarOpen(true)}
+                style={{ marginRight: 8 }}
+                title="Open Menu"
+              >
+                <FiMenu size={20} />
+              </button>
+            )}
             <div className={classes.breadcrumbs}>
               <FiLayout size={16} style={{ color: colors.primary500 }} />
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

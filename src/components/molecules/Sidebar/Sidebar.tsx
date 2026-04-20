@@ -16,7 +16,6 @@ import NavItem from "../NavItem/NavItem";
 import { useColors } from "../../../utils/types";
 import { enumToNormalKey } from "../../../utils/helper";
 
-// Icon mapping for dynamic navigation items
 const getIconForItem = (itemName: string) => {
   const iconMap: Record<string, JSX.Element> = {
     EDUCATION: <LuGraduationCap />,
@@ -46,7 +45,7 @@ const getIconForItem = (itemName: string) => {
 const useStyles = createUseStyles({
   sidebar: (c: any) => ({
     width: c.collapsed ? 80 : 260,
-    background: `${c.neutral0}cc`,
+    background: c.neutral100,
     backdropFilter: "blur(20px)",
     display: "flex",
     flexDirection: "column",
