@@ -85,7 +85,7 @@ const useStyles = createUseStyles({
                 borderColor: colors.error500,
                 boxShadow: `0 0 0 3px ${colors.error50}`,
             },
-            
+
             "& .MuiAutocomplete-input": {
                 padding: "4px 8px !important",
             }
@@ -206,11 +206,6 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         [debouncedSearch]
     );
 
-    const handleClear = () => {
-        onChange(null);
-        onSearch("");
-    };
-
     const autoCompleteProps = useMemo(
         () => ({
             options,
@@ -228,9 +223,8 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 
     return (
         <div
-            className={`${classes.container} ${
-                isDisabled ? "disabled" : ""
-            } ${className}`}
+            className={`${classes.container} ${isDisabled ? "disabled" : ""
+                } ${className}`}
         >
             <Autocomplete
                 {...autoCompleteProps}

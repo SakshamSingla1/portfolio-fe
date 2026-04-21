@@ -66,7 +66,7 @@ const useStyles = createUseStyles({
 
     "&:hover": {
       borderColor: ({ colors }: StyleProps) => colors.primary300,
-      background: ({ colors, hasSelectedOptions }: StyleProps) => 
+      background: ({ colors, hasSelectedOptions }: StyleProps) =>
         hasSelectedOptions ? colors.primary100 : colors.neutral50,
     },
 
@@ -174,7 +174,7 @@ const useStyles = createUseStyles({
     margin: "4px 0",
     opacity: 0.6,
   },
-  
+
   menuItem: {
     margin: "4px 8px",
     borderRadius: "8px",
@@ -200,7 +200,6 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
   placeholder = "Select...",
   isSingleSelect = false,
   minWidth = "280px",
-  maxHeight = "320px",
   searchable = true,
   showSelectAll = true,
   MenuProps,
@@ -289,14 +288,14 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
           ...MenuProps,
           PaperProps: {
             ...MenuProps?.PaperProps,
-            sx: { 
-              maxHeight: "none", 
+            sx: {
+              maxHeight: "none",
               borderRadius: "12px",
               marginTop: "6px",
               border: `1px solid ${colors.neutral200}`,
               boxShadow: "0 10px 40px -10px rgba(0,0,0,0.1)",
               backgroundColor: colors.neutral0,
-              ...MenuProps?.PaperProps?.sx 
+              ...MenuProps?.PaperProps?.sx
             },
           },
         }}
@@ -348,9 +347,9 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
                 style={{ color: colors.primary500, padding: 0 }}
               />
             </ListItemIcon>
-            <ListItemText 
-              primary="Select All" 
-              primaryTypographyProps={{ style: { fontWeight: 600, fontSize: 14 } }} 
+            <ListItemText
+              primary="Select All"
+              primaryTypographyProps={{ style: { fontWeight: 600, fontSize: 14 } }}
             />
           </MenuItem>
         )}
@@ -374,23 +373,23 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
                     <Checkbox
                       checked={tempSelected.some((v) => v.value === option.value)}
                       size="small"
-                      style={{ 
+                      style={{
                         padding: 0,
-                        color: tempSelected.some((v) => v.value === option.value) 
-                          ? colors.primary500 
-                          : colors.neutral400 
+                        color: tempSelected.some((v) => v.value === option.value)
+                          ? colors.primary500
+                          : colors.neutral400
                       }}
                     />
                   </ListItemIcon>
                 )}
-                <ListItemText 
-                  primary={option.label} 
-                  primaryTypographyProps={{ 
-                    style: { 
+                <ListItemText
+                  primary={option.label}
+                  primaryTypographyProps={{
+                    style: {
                       fontSize: 14,
                       fontWeight: tempSelected.some((v) => v.value === option.value) ? 600 : 400
-                    } 
-                  }} 
+                    }
+                  }}
                 />
               </MenuItem>
             ))
