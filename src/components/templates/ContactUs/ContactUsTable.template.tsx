@@ -1,31 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
-import TextField from "../../atoms/TextField/TextField";
-import { InputAdornment } from '@mui/material';
 import TableV1 from "../../organisms/Table/TableV1";
-import { type ContactUs, type ContactUsFilterParams } from "../../../services/useContactUsService";
-import { FiSearch } from "react-icons/fi";
+import { type ContactUs } from "../../../services/useContactUsService";
 import { DateUtils } from "../../../utils/helper";
-import { FiFilter, FiChevronUp, FiChevronDown, FiEye } from "react-icons/fi";
+import { FiEye } from "react-icons/fi";
 import { capitalizeFirstLetter } from "../../../utils/helper"
 import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
 
 interface ContactUsTableTemplateProps {
     contactUs: ContactUs[];
     pagination: IPagination;
-    handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
-    filters: ContactUsFilterParams;
     handleMarkRead: (id: string) => void;
 }
 
-const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contactUs, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters, handleMarkRead }) => {
+const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contactUs, pagination, handlePaginationChange, handleRowsPerPageChange, handleMarkRead }) => {
 
     const [isMobile, setIsMobile] = useState<boolean>(false);
-    const [showFilters, setShowFilters] = useState<boolean>(false);
-
     const [selectedMessage, setSelectedMessage] = useState<ContactUs | null>(null);
 
     const handleView = async (message: ContactUs) => {
@@ -95,84 +88,15 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
     }, []);
 
     return (
-        <div className="grid gap-y-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Contact Us List
-                        </h1>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
-                    {isMobile ? (
-                        <div className="w-full">
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
-                            >
-                                <span className="flex items-center">
-                                    <FiFilter />
-                                    <span className="ml-2">Filters</span>
-                                </span>
-                                <span className="transform transition-transform">
-                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-                                </span>
-                            </button>
-
-                            {showFilters && (
-                                <div className="space-y-3 p-4">
-                                    <TextField
-                                        label='Search'
-                                        variant="outlined"
-                                        placeholder="Search..."
-                                        value={filters.search}
-                                        name='search'
-                                        onChange={(event) => {
-                                            handleFiltersChange("search", event.target.value)
-                                        }}
-                                        InputProps={{
-                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
-                                        }}
-                                        fullWidth
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            <div className="w-[250px]">
-                                <TextField
-                                    label=''
-                                    variant="outlined"
-                                    placeholder="Search...."
-                                    value={filters.search}
-                                    name='search'
-                                    onChange={(event) => {
-                                        handleFiltersChange("search", event.target.value)
-                                    }}
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                                    }}
-                                    fullWidth
-                                />
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-            <div>
-                <TableV1
-                    schema={getSchema()}
-                    records={getRecords()}
-                />
-            </div>
+        <>
+            <TableV1
+                schema={getSchema()}
+                records={getRecords()}
+            />
             {selectedMessage && (
                 <MessageDetailModal message={selectedMessage} onClose={handleClose} />
             )}
-        </div>
+        </>
     )
 }
 export default ContactUsTableTemplate;

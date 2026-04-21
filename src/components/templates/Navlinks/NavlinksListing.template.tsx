@@ -3,35 +3,24 @@ import { type ColumnType } from "../../organisms/Table/TableV1";
 import { StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
-import TextField from "../../atoms/TextField/TextField";
-import { InputAdornment } from '@mui/material';
 import TableV1 from "../../organisms/Table/TableV1";
-import { type NavlinkResponse, type NavlinkFilterRequest } from "../../../services/useNavlinkService";
-import { FiEdit, FiEye, FiSearch, FiFilter, FiChevronUp, FiChevronDown, FiPlus } from "react-icons/fi";
+import { type NavlinkResponse } from "../../../services/useNavlinkService";
+import { FiEdit, FiEye } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
-import Button from "../../atoms/Button/Button";
 import { enumToNormalKey } from "../../../utils/helper";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
-import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 interface INavlinkListTableTemplateProps {
     navlinks: NavlinkResponse[];
     pagination: IPagination;
-    handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
-    filters: NavlinkFilterRequest;
 }
 
-const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ navlinks, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
+const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ navlinks, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [isMobile, setIsMobile] = useState<boolean>(false);
-    const [showFilters, setShowFilters] = useState<boolean>(false);
-
-    const handleAddNavlink = () => {
-        navigate(makeRoute(ADMIN_ROUTES.NAVLINKS_ADD, {}));
-    }
 
     const handleEdit = (id: string) => {
         const query = {
@@ -119,109 +108,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
     }, []);
 
     return (
-        <div className="grid gap-y-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Navlink List
-                        </h1>
-                    </div>
-                    <Button
-                        onClick={handleAddNavlink}
-                        variant={isMobile ? "primaryText" : "primaryContained"}
-                        label={isMobile ? "" : "Add New Navlink"}
-                        startIcon={isMobile ? <FiPlus /> : ""}
-                        className={isMobile ? 'w-12 h-12 rounded-full' : ''}
-                    />
-                </div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
-                    {isMobile ? (
-                        <div className="w-full">
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
-                            >
-                                <span className="flex items-center">
-                                    <FiFilter />
-                                    <span className="ml-2">Filters</span>
-                                </span>
-                                <span className="transform transition-transform">
-                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-                                </span>
-                            </button>
-
-                            {showFilters && (
-                                <div className="space-y-3 p-4">
-                                    <div className={`w-[250px]`}>
-                                        <AutoCompleteInput
-                                            label="Status"
-                                            placeHolder="Search and select a status"
-                                            options={StatusOptions}
-                                            value={StatusOptions.find(option => option.value === filters.status) || null}
-                                            onSearch={() => { }}
-                                            onChange={value => {
-                                                handleFiltersChange("status", value?.value ?? null);
-                                            }}
-                                            isDisabled={false}
-                                        />
-                                    </div>
-                                    <TextField
-                                        label='Search'
-                                        variant="outlined"
-                                        placeholder="Search..."
-                                        value={filters.search}
-                                        name='search'
-                                        onChange={(event) => {
-                                            handleFiltersChange("search", event.target.value)
-                                        }}
-                                        InputProps={{
-                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
-                                        }}
-                                        fullWidth
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            <div className="w-[250px]">
-                                <AutoCompleteInput
-                                    label="Status"
-                                    placeHolder="Search and select a status"
-                                    options={StatusOptions}
-                                    value={StatusOptions.find(option => option.value === filters.status) || null}
-                                    onSearch={() => { }}
-                                    onChange={value => {
-                                        handleFiltersChange("status", value?.value ?? null);
-                                    }}
-                                    isDisabled={false}
-                                />
-                            </div>
-                            <div className="w-[250px]">
-                                <TextField
-                                    label=''
-                                    variant="outlined"
-                                    placeholder="Search...."
-                                    value={filters.search}
-                                    name='search'
-                                    onChange={(event) => {
-                                        handleFiltersChange("search", event.target.value)
-                                    }}
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                                    }}
-                                    fullWidth
-                                />
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-            <TableV1 schema={getSchema()} records={getRecords()} />
-        </div>
+        <TableV1 schema={getSchema()} records={getRecords()} />
     )
 }
 export default NavlinkListTableTemplate;

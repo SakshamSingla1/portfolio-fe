@@ -4,15 +4,17 @@ import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 const SKILL_URLS = {
-    SKILL : "/skill",
-    SKILL_BY_ID : "/skill/:id",
-    SKILL_BY_PROFILE_ID : "/skill/profile/:profileId",
+    SKILL: "/skill",
+    SKILL_BY_ID: "/skill/:id",
+    SKILL_BY_PROFILE_ID: "/skill/profile/:profileId",
+    SKILL_STATS: "/skill/stats",
 }
 
 export const SkillLevelType = {
-    BEGINNER : "Beginner",
-    INTERMEDIATE : "Intermediate",
-    ADVANCED : "Advanced",
+    BEGINNER: "Beginner",
+    INTERMEDIATE: "Intermediate",
+    ADVANCED: "Advanced",
+    EXPERT: "Expert",
 } as const;
 
 export interface Skill {
@@ -43,6 +45,13 @@ export interface SkillFilterParams {
     search?: string;
     sortDir?: string;
     sortBy?: string;
+}
+
+export interface SkillStats {
+    expertSkillCount: number;
+    advancedSkillCount: number;
+    intermediateSkillCount: number;
+    beginnerSkillCount: number;
 }
 
 export const useSkillService = () => {
@@ -78,6 +87,11 @@ export const useSkillService = () => {
         return request(API_METHOD.GET, url, user, null, { params });
     };
 
+    const getStats = () => {
+        const url = replaceUrlParams(SKILL_URLS.SKILL_STATS, {});
+        return request(API_METHOD.GET, url, user, null, null, null);
+    };
+
     return {
         getAll,
         getById,
@@ -85,6 +99,6 @@ export const useSkillService = () => {
         update,
         remove,
         getByProfile,
+        getStats,
     };
 }
-        

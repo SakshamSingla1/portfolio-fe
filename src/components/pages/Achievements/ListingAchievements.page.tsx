@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { HTTP_STATUS, type IPagination } from '../../../utils/types';
-import { initialPaginationValues } from '../../../utils/constant';
+import { initialPaginationValues, ADMIN_ROUTES } from '../../../utils/constant';
 import AchievementListTableTemplate from '../../templates/Achievements/AchievementTable.template';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import { useAchievementService, type Achievement, type AchievementFilterParams } from '../../../services/useAchievementService';
+import { makeRoute } from '../../../utils/helper';
+import Button from '../../atoms/Button/Button';
+import TextField from '../../atoms/TextField/TextField';
+import { InputAdornment } from '@mui/material';
+import { FiPlus, FiFilter, FiSearch, FiChevronUp, FiChevronDown } from "react-icons/fi";
 
 const AchievementListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const achievementService = useAchievementService();
     const { showSnackbar } = useSnackbar();
+    const navigate = useNavigate();
+
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -43,9 +52,9 @@ const AchievementListPage: React.FC = () => {
                     setAchievementsTo(res?.data?.data?.content);
                 }
             }).catch((error) => {
-                console.error("Error fetching experiences:", error);
+                console.error("Error fetching achievements:", error);
                 setAchievementsTo([]);
-                showSnackbar('error', 'Failed to load experiences');
+                showSnackbar('error', 'Failed to load achievements');
             })
     }
 
@@ -82,9 +91,103 @@ const AchievementListPage: React.FC = () => {
         setSearchParams(params);
     }, [filters.search, pagination]);
 
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const handleAddAchievement = () => {
+        navigate(makeRoute(ADMIN_ROUTES.ACHIEVEMENTS_ADD, {}));
+    }
+
     return (
-        <div>
-            <AchievementListTableTemplate achievements={achievements} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
+        <div className="grid gap-y-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800">
+                            Achievements List
+                        </h1>
+                    </div>
+                    <Button
+                        onClick={handleAddAchievement}
+                        variant={isMobile ? "primaryText" : "primaryContained"}
+                        label={isMobile ? "" : "Add New Achievement"}
+                        startIcon={isMobile ? <FiPlus /> : ""}
+                        className={isMobile ? 'w-12 h-12 rounded-full' : ''}
+                    />
+                </div>
+            </div>
+
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
+                    {isMobile ? (
+                        <div className="w-full">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
+                            >
+                                <span className="flex items-center">
+                                    <FiFilter />
+                                    <span className="ml-2">Filters</span>
+                                </span>
+                                <span className="transform transition-transform">
+                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
+                                </span>
+                            </button>
+
+                            {showFilters && (
+                                <div className="space-y-3 p-4">
+                                    <TextField
+                                        label='Search'
+                                        variant="outlined"
+                                        placeholder="Search..."
+                                        value={filters.search}
+                                        name='search'
+                                        onChange={(event) => {
+                                            handleFiltersChange("search", event.target.value)
+                                        }}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
+                                        }}
+                                        fullWidth
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            <div className="w-[250px]">
+                                <TextField
+                                    label=''
+                                    variant="outlined"
+                                    placeholder="Search...."
+                                    value={filters.search}
+                                    name='search'
+                                    onChange={(event) => {
+                                        handleFiltersChange("search", event.target.value)
+                                    }}
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
+                                    }}
+                                    fullWidth
+                                />
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            <AchievementListTableTemplate 
+                achievements={achievements} 
+                pagination={pagination} 
+                handlePaginationChange={handlePaginationChange} 
+                handleRowsPerPageChange={handleRowsPerPageChange} 
+            />
         </div>
     )
 }

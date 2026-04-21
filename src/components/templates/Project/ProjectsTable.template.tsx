@@ -3,35 +3,23 @@ import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
-import TextField from "../../atoms/TextField/TextField";
-import { InputAdornment } from '@mui/material';
 import TableV1 from "../../organisms/Table/TableV1";
-import { type ProjectResponse, type ProjectFilterParams, WorkStatusType } from "../../../services/useProjectService";
-import { FiEdit, FiEye, FiSearch, FiPlus, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
+import { type ProjectResponse, WorkStatusType } from "../../../services/useProjectService";
+import { FiEdit, FiEye } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
-import Button from "../../atoms/Button/Button";
 import type { SkillDropdown } from "../../../services/useSkillService";
 
 interface ProjectsTableTemplateProps {
     projects: ProjectResponse[];
     pagination: IPagination;
-    handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
-    filters: ProjectFilterParams;
 }
 
-const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
+const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [isMobile, setIsMobile] = useState<boolean>(false);
-    const [showFilters, setShowFilters] = useState<boolean>(false);
-
-    const handleAddProject = () => {
-        navigate(makeRoute(
-            ADMIN_ROUTES.PROJECTS_ADD, {}
-        ));
-    }
 
     const handleEdit = (id: string) => {
         const query = {
@@ -122,82 +110,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
     }, []);
 
     return (
-        <div className="grid gap-y-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Project List
-                        </h1>
-                    </div>
-                    <Button
-                        onClick={handleAddProject}
-                        variant={isMobile ? "primaryText" : "primaryContained"}
-                        label={isMobile ? "" : "Add New Project"}
-                        startIcon={isMobile ? <FiPlus /> : ""}
-                        className={isMobile ? 'w-12 h-12 rounded-full' : ''}
-                    />
-                </div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
-                    {isMobile ? (
-                        <div className="w-full">
-                            <button onClick={() => setShowFilters(!showFilters)}
-                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
-                            >
-                                <span className="flex items-center">
-                                    <FiFilter />
-                                    <span className="ml-2">Filters</span>
-                                </span>
-                                <span className="transform transition-transform">
-                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-                                </span>
-                            </button>
-
-                            {showFilters && (
-                                <div className="space-y-3 p-4">
-                                    <TextField
-                                        label='Search'
-                                        variant="outlined"
-                                        placeholder="Search..."
-                                        value={filters.search}
-                                        name='search'
-                                        onChange={(event) => {
-                                            handleFiltersChange("search", event.target.value)
-                                        }}
-                                        InputProps={{
-                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
-                                        }}
-                                        fullWidth
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            <div className="w-[250px]">
-                                <TextField
-                                    label=''
-                                    variant="outlined"
-                                    placeholder="Search...."
-                                    value={filters.search}
-                                    name='search'
-                                    onChange={(event) => {
-                                        handleFiltersChange("search", event.target.value)
-                                    }}
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                                    }}
-                                    fullWidth
-                                />
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-            <TableV1 schema={getSchema()} records={getRecords()} />
-        </div>
+        <TableV1 schema={getSchema()} records={getRecords()} />
     )
 }
 export default ProjectsTableTemplate;

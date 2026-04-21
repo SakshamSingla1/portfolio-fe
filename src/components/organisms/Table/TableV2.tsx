@@ -184,7 +184,8 @@ const useStyles = createUseStyles((colors: any) => ({
             borderRadius: '0.375rem',
             marginRight: "24px",
             height: "30px",
-            padding: '0 8px'
+            padding: '0 8px',
+            color: colors.neutral700 || '#333'
         },
         "& .MuiTablePagination-spacer": {
             flex: 0
@@ -636,6 +637,29 @@ const TableV2: React.FC<TableProps> = ({
                         showFirstButton={false}
                         labelRowsPerPage="Rows per page:"
                         ActionsComponent={TablePaginationActions}
+                        SelectProps={{
+                            MenuProps: {
+                                PaperProps: {
+                                    sx: {
+                                        backgroundColor: colors.neutral0,
+                                        color: colors.neutral800,
+                                        '& .MuiMenuItem-root': {
+                                            fontSize: '0.875rem',
+                                            '&:hover': {
+                                                backgroundColor: colors.neutral100,
+                                            },
+                                            '&.Mui-selected': {
+                                                backgroundColor: colors.primary50,
+                                                color: colors.primary700,
+                                                '&:hover': {
+                                                    backgroundColor: colors.primary100,
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        }}
                         className="flex items-center"
                     />
                 </div>

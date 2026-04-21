@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, SORT_ENUM } from '../../../utils/types';
-import { initialPaginationValues } from '../../../utils/constant';
+import { HTTP_STATUS, type IPagination, SORT_ENUM, StatusOptions } from '../../../utils/types';
+import { initialPaginationValues, ADMIN_ROUTES } from '../../../utils/constant';
 import NavlinkListTableTemplate from '../../templates/Navlinks/NavlinksListing.template';
-import { useNavlinkService , type NavlinkResponse , type NavlinkFilterRequest} from '../../../services/useNavlinkService';
-import { useSearchParams } from 'react-router-dom';
+import { useNavlinkService, type NavlinkResponse, type NavlinkFilterRequest } from '../../../services/useNavlinkService';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
+import { makeRoute } from '../../../utils/helper';
+import Button from '../../atoms/Button/Button';
+import TextField from '../../atoms/TextField/TextField';
+import { InputAdornment } from '@mui/material';
+import { FiPlus, FiFilter, FiSearch, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 
-const NavlinkListPage: React.FC = () => {
+const NavlinkListingPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navlinkService = useNavlinkService();
     const { showSnackbar } = useSnackbar();
+    const navigate = useNavigate();
+
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
+        status: searchParams.get("status") || "",
     };
 
     const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
@@ -79,15 +90,134 @@ const NavlinkListPage: React.FC = () => {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            status: filters.status ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, filters.status, pagination]);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const handleAddNavlink = () => {
+        navigate(makeRoute(ADMIN_ROUTES.NAVLINKS_ADD, {}));
+    }
 
     return (
-        <div>
-            <NavlinkListTableTemplate navlinks={navlinks} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
+        <div className="grid gap-y-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800">
+                            Navlinks List
+                        </h1>
+                    </div>
+                    <Button
+                        onClick={handleAddNavlink}
+                        variant={isMobile ? "primaryText" : "primaryContained"}
+                        label={isMobile ? "" : "Add New Navlink"}
+                        startIcon={isMobile ? <FiPlus /> : ""}
+                        className={isMobile ? 'w-12 h-12 rounded-full' : ''}
+                    />
+                </div>
+            </div>
+
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className={`${isMobile ? '' : 'flex justify-start items-end space-x-4'}`}>
+                    {isMobile ? (
+                        <div className="w-full">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
+                            >
+                                <span className="flex items-center">
+                                    <FiFilter />
+                                    <span className="ml-2">Filters</span>
+                                </span>
+                                <span className="transform transition-transform">
+                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
+                                </span>
+                            </button>
+
+                            {showFilters && (
+                                <div className="space-y-3 p-4">
+                                    <AutoCompleteInput
+                                        label="Status"
+                                        placeHolder="Search and select a status"
+                                        options={StatusOptions}
+                                        value={StatusOptions.find(option => option.value === filters.status) || null}
+                                        onSearch={() => { }}
+                                        onChange={value => {
+                                            handleFiltersChange("status", value?.value ?? null);
+                                        }}
+                                        isDisabled={false}
+                                    />
+                                    <TextField
+                                        label='Search'
+                                        variant="outlined"
+                                        placeholder="Search..."
+                                        value={filters.search}
+                                        name='search'
+                                        onChange={(event) => {
+                                            handleFiltersChange("search", event.target.value)
+                                        }}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
+                                        }}
+                                        fullWidth
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            <div className="w-[250px]">
+                                <AutoCompleteInput
+                                    label=""
+                                    placeHolder="Search and select a status"
+                                    options={StatusOptions}
+                                    value={StatusOptions.find(option => option.value === filters.status) || null}
+                                    onSearch={() => { }}
+                                    onChange={value => {
+                                        handleFiltersChange("status", value?.value ?? "");
+                                    }}
+                                    isDisabled={false}
+                                />
+                            </div>
+                            <div className="w-[250px]">
+                                <TextField
+                                    label=''
+                                    variant="outlined"
+                                    placeholder="Search...."
+                                    value={filters.search}
+                                    name='search'
+                                    onChange={(event) => {
+                                        handleFiltersChange("search", event.target.value)
+                                    }}
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
+                                    }}
+                                    fullWidth
+                                />
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            <NavlinkListTableTemplate 
+                navlinks={navlinks} 
+                pagination={pagination} 
+                handlePaginationChange={handlePaginationChange} 
+                handleRowsPerPageChange={handleRowsPerPageChange} 
+            />
         </div>
     )
 }
 
-export default NavlinkListPage;
+export default NavlinkListingPage;
