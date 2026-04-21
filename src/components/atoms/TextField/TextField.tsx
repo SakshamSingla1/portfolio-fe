@@ -15,10 +15,18 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
       "&:hover": {
         borderColor: colors.primary300,
       },
+      
+      "&:hover svg": {
+        color: colors.neutral700,
+      },
 
       "&.Mui-focused": {
         borderColor: colors.primary500,
         boxShadow: `0 0 0 3px ${colors.primary100}`,
+      },
+      
+      "&.Mui-focused svg": {
+        color: colors.primary500,
       },
 
       "&.Mui-disabled": {
@@ -28,6 +36,9 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
         "& input, & textarea": {
           "-webkit-text-fill-color": `${colors.neutral400} !important`,
           color: `${colors.neutral400} !important`,
+        },
+        "& svg": {
+          color: colors.neutral400,
         }
       },
 
@@ -43,6 +54,11 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
           WebkitBoxShadow: `0 0 0 1000px ${colors.neutral50} inset`,
           WebkitTextFillColor: colors.neutral900,
         },
+      },
+      
+      "& svg": {
+        color: colors.neutral500,
+        transition: "color 0.2s ease-in-out",
       },
     },
 

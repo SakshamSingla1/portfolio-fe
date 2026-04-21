@@ -65,11 +65,19 @@ const useStyles = createUseStyles({
             "&:hover .MuiOutlinedInput-notchedOutline": {
                 borderColor: colors.primary300,
             },
+            
+            "&:hover svg": {
+                color: colors.neutral700,
+            },
 
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                 borderColor: colors.primary500,
                 borderWidth: "1px",
                 boxShadow: `0 0 0 3px ${colors.primary100}`,
+            },
+            
+            "&.Mui-focused svg": {
+                color: colors.primary500,
             },
 
             "&.Mui-disabled": {
@@ -81,6 +89,9 @@ const useStyles = createUseStyles({
                     "-webkit-text-fill-color": `${colors.neutral400} !important`,
                     color: `${colors.neutral400} !important`,
                 },
+                "& svg": {
+                    color: colors.neutral400,
+                },
                 cursor: "not-allowed",
             },
 
@@ -91,6 +102,11 @@ const useStyles = createUseStyles({
 
             "& .MuiAutocomplete-input": {
                 padding: "4px 8px !important",
+            },
+            
+            "& svg": {
+                color: colors.neutral500,
+                transition: "color 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
             }
         },
 
