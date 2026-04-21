@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type ProjectResponse, type ProjectFilterParams, WorkStatusType } from "../../../services/useProjectService";
 import { FiEdit, FiEye, FiSearch, FiPlus, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
@@ -196,7 +196,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
                     )}
                 </div>
             </div>
-            <Table schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </div>
     )
 }

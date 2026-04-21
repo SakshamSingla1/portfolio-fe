@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from "@mui/material";
-import Table from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type ColorTheme, type ColorThemeFilterRequest } from "../../../services/useColorThemeService";
 import { makeRoute, DateUtils } from "../../../utils/helper";
 import { FiEdit, FiEye, FiSearch, FiFilter, FiPlus, FiChevronDown, FiChevronUp } from "react-icons/fi";

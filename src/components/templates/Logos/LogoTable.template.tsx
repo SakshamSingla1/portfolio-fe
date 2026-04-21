@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import TableV1 from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { FiEdit, FiEye, FiSearch } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
@@ -116,7 +116,7 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ logos, pagination
                             Logo List
                         </h1>
                     </div>
-                    <Button 
+                    <Button
                         onClick={handleAddLogo}
                         variant={isMobile ? "primaryText" : "primaryContained"}
                         label={isMobile ? "" : "Add New Logo"}
@@ -141,7 +141,7 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ logos, pagination
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
+
                             {showFilters && (
                                 <div className="space-y-3 p-4">
                                     <TextField

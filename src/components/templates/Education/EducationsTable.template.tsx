@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import TableV1 from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { FiEdit, FiEye, FiSearch, FiPlus, FiFilter, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import Button from "../../atoms/Button/Button";
@@ -39,7 +39,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
         navigate(
             makeRoute(ADMIN_ROUTES.EDUCATION_EDIT, {
                 params: { id },
-                query: query    
+                query: query
             })
         );
     }
@@ -124,7 +124,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
                             Education List
                         </h1>
                     </div>
-                    <Button 
+                    <Button
                         onClick={handleAddEducation}
                         variant={isMobile ? "primaryText" : "primaryContained"}
                         label={isMobile ? "" : "Add New Education"}
@@ -149,7 +149,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
+
                             {showFilters && (
                                 <div className="space-y-3 p-4">
                                     <TextField

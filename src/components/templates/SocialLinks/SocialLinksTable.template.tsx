@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV2";
 import { StatusOptions, type IPagination } from "../../../utils/types";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
-import { FiEye,FiEdit, FiSearch,FiPlus, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
+import TableV2 from "../../organisms/Table/TableV2";
+import { FiEye, FiEdit, FiSearch, FiPlus, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import { DateUtils, enumToNormalKey } from "../../../utils/helper";
-import type { SocialLinkResponse , SocialLinkFilterParams} from "../../../services/useSocialLinkService";
+import type { SocialLinkResponse, SocialLinkFilterParams } from "../../../services/useSocialLinkService";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import { ADMIN_ROUTES } from "../../../utils/constant";
@@ -29,6 +29,24 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
 
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [showFilters, setShowFilters] = useState<boolean>(false);
+
+    const [localRecords, setLocalRecords] = useState<Record<string, any>[]>([]);
+    const [selectedRows, setSelectedRows] = useState<Record<string, any>[]>([]);
+
+    useEffect(() => {
+        if (socialLinks) {
+            setLocalRecords(socialLinks.map((sl, index) => ({
+                id: sl.id,
+                serial: pagination.currentPage * pagination.pageSize + index + 1,
+                platform: enumToNormalKey(sl.platform),
+                status: sl.status,
+                createdAt: DateUtils.dateTimeSecondToDate(sl.createdAt ?? ""),
+                updatedAt: DateUtils.dateTimeSecondToDate(sl.updatedAt ?? ""),
+            })));
+        } else {
+            setLocalRecords([]);
+        }
+    }, [socialLinks, pagination]);
 
     const handleEdit = (id: string) => {
         const query = {
@@ -67,27 +85,18 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
         );
     };
 
-    const getRecords = () => socialLinks?.map((socialLink: SocialLinkResponse, index) => [
-        pagination.currentPage * pagination.pageSize + index + 1,
-        enumToNormalKey(socialLink.platform),
-        StatusOptions.find((status) => status.value === socialLink.status)?.label,
-        DateUtils.dateTimeSecondToDate(socialLink.createdAt ?? ""),
-        DateUtils.dateTimeSecondToDate(socialLink.updatedAt ?? ""),
-        Action(socialLink.id)
-    ])
-
     const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Platform", key: "platform", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+        { label: "Sr No.", key: "serial", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+        { label: "Platform", key: "platform", type: "string" as ColumnType, props: { className: '' }, priority: "high" as const },
         { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
-        { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
-    ]
+        { label: "Created At", key: "createdAt", type: "string" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Updated At", key: "updatedAt", type: "string" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Action", key: "id", component: ({ value }: { value: string }) => Action(value), type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+    ];
 
     const getSchema = () => ({
-        id: "1",
-        mobileView: isMobile ? "cards" as const : "responsive" as const,
+        id: "social-links-table",
+        rowKey: "id",
         pagination: {
             total: pagination.totalRecords,
             currentPage: pagination.currentPage,
@@ -120,7 +129,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
                             Social Links List
                         </h1>
                     </div>
-                    <Button 
+                    <Button
                         onClick={handleAddSocialLink}
                         variant={isMobile ? "primaryText" : "primaryContained"}
                         label={isMobile ? "" : "Add New Social Link"}
@@ -216,7 +225,15 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
                     )}
                 </div>
             </div>
-            <Table schema={getSchema()} records={getRecords()} />
+            <TableV2
+                schema={getSchema()}
+                records={localRecords}
+                setRecords={setLocalRecords}
+                showCheckboxes={true}
+                selected={selectedRows}
+                setSelected={setSelectedRows}
+                isRounded={true}
+            />
         </div>
     )
 }
