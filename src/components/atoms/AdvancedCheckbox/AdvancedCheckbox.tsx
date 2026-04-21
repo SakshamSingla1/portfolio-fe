@@ -13,8 +13,8 @@ const BpIcon = styled('span')<BpIconProps>(
     borderRadius: 4,
     width: width,
     height: height,
-    backgroundColor: '#fff',
-    border: '1px solid rgba(170, 167, 167, 1)',
+    backgroundColor: theme.palette.mode === 'dark' ? '#394b59' : '#fff',
+    border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(170, 167, 167, 1)',
     '.Mui-focusVisible &': {
       outline: '1px auto rgba(170, 167, 167, 1)',
       outlineOffset: 2,
