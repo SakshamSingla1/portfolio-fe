@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { enumToNormalKey, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type RoleListResponseDTO, type GetAllRolesParams } from "../../../services/useRoleService";
 import { FiEdit, FiEye, FiSearch, FiFilter, FiChevronUp, FiChevronDown, FiPlus } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
@@ -74,11 +74,10 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination
         pagination.currentPage * pagination.pageSize + index + 1,
         role.name,
         role.description || '-',
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            role.status === Status.ACTIVE 
-                ? "bg-green-100 text-green-800" 
-                : "bg-red-100 text-red-800"
-        }`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${role.status === Status.ACTIVE
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+            }`}>
             {enumToNormalKey(role.status)}
         </span>,
         new Date(role.createdAt).toLocaleDateString(),
@@ -214,7 +213,7 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination
                     )}
                 </div>
             </div>
-            <Table schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </div>
     )
 }

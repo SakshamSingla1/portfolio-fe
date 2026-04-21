@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import TableV1 from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type ExperienceResponse, type ExperienceFilterParams, EmploymentStatus } from "../../../services/useExperienceService";
 import { FiEdit, FiEye, FiSearch } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
@@ -117,7 +117,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ exper
                             Experience List
                         </h1>
                     </div>
-                    <Button 
+                    <Button
                         onClick={handleAddExperience}
                         variant={isMobile ? "primaryText" : "primaryContained"}
                         label={isMobile ? "" : "Add New Experience"}
@@ -142,7 +142,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ exper
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
+
                             {showFilters && (
                                 <div className="space-y-3 p-4">
                                     <TextField

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type ContactUs, type ContactUsFilterParams } from "../../../services/useContactUsService";
 import { FiSearch } from "react-icons/fi";
 import { DateUtils } from "../../../utils/helper";
@@ -34,7 +34,7 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
 
     const handleClose = () => {
         setSelectedMessage(null);
-        if( selectedMessage?.status === 'UNREAD') {
+        if (selectedMessage?.status === 'UNREAD') {
             handleMarkRead(selectedMessage.id ?? '');
         }
     }
@@ -48,7 +48,7 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
             </div>
         );
     };
-    
+
     const getRecords = () => contactUs?.map((contactUs: ContactUs, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         contactUs.name,
@@ -121,7 +121,7 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
+
                             {showFilters && (
                                 <div className="space-y-3 p-4">
                                     <TextField
@@ -164,12 +164,12 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
                 </div>
             </div>
             <div>
-                <Table 
-                    schema={getSchema()} 
-                    records={getRecords()} 
+                <TableV1
+                    schema={getSchema()}
+                    records={getRecords()}
                 />
             </div>
-            { selectedMessage && (
+            {selectedMessage && (
                 <MessageDetailModal message={selectedMessage} onClose={handleClose} />
             )}
         </div>

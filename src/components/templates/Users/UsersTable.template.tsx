@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { enumToNormalKey, makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type UserResponse, type GetProfilesParams } from "../../../services/useProfileService";
 import { FiEdit, FiEye, FiSearch, FiFilter, FiChevronUp, FiChevronDown, FiCheck } from "react-icons/fi";
 import { ADMIN_ROUTES, ROLES } from "../../../utils/constant";
@@ -249,7 +249,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({ users, paginatio
                     )}
                 </div>
             </div>
-            <Table schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </div>
     )
 }

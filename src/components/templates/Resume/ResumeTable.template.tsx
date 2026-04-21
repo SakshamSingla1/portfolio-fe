@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { HTTP_STATUS, StatusOptions, type IPagination } from "../../../utils/types";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
 import { FiEye, FiSearch, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
@@ -31,11 +31,11 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [showFilters, setShowFilters] = useState<boolean>(false);
 
-    const handleActivateResume = async(id: string) => {
-        try { 
+    const handleActivateResume = async (id: string) => {
+        try {
             const response = await resumeService.activateResume({ resumeId: id });
-            if(response.status === HTTP_STATUS.OK) {
-                showSnackbar('success','Resume activated successfully');
+            if (response.status === HTTP_STATUS.OK) {
+                showSnackbar('success', 'Resume activated successfully');
                 window.location.reload();
             }
         } catch (error) {
@@ -43,19 +43,19 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
         }
     }
 
-    const handleView = (url: string,status: string) => {
-        if(status === 'DELETED') {
-            showSnackbar('error','Cannot view deleted resume');
+    const handleView = (url: string, status: string) => {
+        if (status === 'DELETED') {
+            showSnackbar('error', 'Cannot view deleted resume');
             return;
         }
         window.open(url, '_blank');
     }
 
-    const handleDeleteResume = async(id: string) => {
-        try { 
+    const handleDeleteResume = async (id: string) => {
+        try {
             const response = await resumeService.deleteResume(id);
-            if(response.status === HTTP_STATUS.OK) {
-                showSnackbar('success','Resume deleted successfully');
+            if (response.status === HTTP_STATUS.OK) {
+                showSnackbar('success', 'Resume deleted successfully');
                 window.location.reload();
             }
         } catch (error) {
@@ -231,7 +231,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
                     )}
                 </div>
             </div>
-            <Table schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </div>
     )
 }

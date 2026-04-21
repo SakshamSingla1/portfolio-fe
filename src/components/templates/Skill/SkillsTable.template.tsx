@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { type ColumnType } from "../../organisms/TableV1/TableV1";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
-import Table from "../../organisms/TableV1/TableV1";
+import TableV1 from "../../organisms/Table/TableV1";
 import { type SkillResponse, type SkillFilterParams } from "../../../services/useSkillService";
 import { FiEdit, FiEye, FiSearch, FiPlus, FiFilter, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
@@ -25,11 +25,11 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [isMobile, setIsMobile] = useState<boolean>(false);
-        const [showFilters, setShowFilters] = useState<boolean>(false);
-    
+    const [showFilters, setShowFilters] = useState<boolean>(false);
+
     const handleAddSkill = () => {
         navigate(makeRoute(
-            ADMIN_ROUTES.SKILL_ADD,{}
+            ADMIN_ROUTES.SKILL_ADD, {}
         ));
     }
 
@@ -119,7 +119,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
                             Skill List
                         </h1>
                     </div>
-                    <Button 
+                    <Button
                         onClick={handleAddSkill}
                         variant={isMobile ? "primaryText" : "primaryContained"}
                         label={isMobile ? "" : "Add New Skill"}
@@ -144,7 +144,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
                                     {showFilters ? <FiChevronUp /> : <FiChevronDown />}
                                 </span>
                             </button>
-                            
+
                             {showFilters && (
                                 <div className="space-y-3 p-4">
                                     <TextField
@@ -186,7 +186,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
                     )}
                 </div>
             </div>
-            <Table schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </div>
     )
 }
