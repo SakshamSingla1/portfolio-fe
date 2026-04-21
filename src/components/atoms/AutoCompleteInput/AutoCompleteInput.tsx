@@ -3,9 +3,8 @@ import Autocomplete, {
     type AutocompleteChangeReason,
 } from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-import { ClearIcon } from "@mui/x-date-pickers";
 import { createUseStyles } from "react-jss";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiChevronDown, FiX } from "react-icons/fi";
 
 import { useDebounce } from "../../../utils/helper";
 import { DEBOUNCE_TIME } from "../../../utils/constant";
@@ -47,13 +46,20 @@ const useStyles = createUseStyles({
 
     autoComplete: (colors: any) => ({
         "& .MuiOutlinedInput-root": {
-            backgroundColor: colors.neutral50,
-            borderRadius: "4px",
+            backgroundColor: colors.neutral0,
+            borderRadius: "10px",
             paddingRight: "8px",
-            height: "52px",
+            minHeight: "48px",
+            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
 
             "& .MuiOutlinedInput-notchedOutline": {
                 borderColor: colors.neutral200,
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                borderWidth: "1px",
+            },
+
+            "&:hover": {
+                backgroundColor: colors.neutral50,
             },
 
             "&:hover .MuiOutlinedInput-notchedOutline": {
@@ -62,48 +68,94 @@ const useStyles = createUseStyles({
 
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                 borderColor: colors.primary500,
+                borderWidth: "1px",
                 boxShadow: `0 0 0 3px ${colors.primary100}`,
             },
 
             "&.Mui-disabled": {
-                backgroundColor: colors.neutral100,
-                borderColor: colors.neutral200,
-                color: colors.neutral500,
+                backgroundColor: colors.neutral50,
+                "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: colors.neutral200,
+                },
+                "& input": {
+                    "-webkit-text-fill-color": `${colors.neutral400} !important`,
+                    color: `${colors.neutral400} !important`,
+                },
                 cursor: "not-allowed",
             },
 
             "&.Mui-error .MuiOutlinedInput-notchedOutline": {
                 borderColor: colors.error500,
-                boxShadow: `0 0 0 2px ${colors.error100}`,
+                boxShadow: `0 0 0 3px ${colors.error50}`,
             },
+
+            "& .MuiAutocomplete-input": {
+                padding: "4px 8px !important",
+            }
         },
+
+        "& .MuiAutocomplete-endAdornment": {
+            top: "50%",
+            transform: "translateY(-50%)",
+            right: "8px",
+            display: "flex",
+            alignItems: "center",
+        },
+
+        "& .MuiAutocomplete-popupIndicator": {
+            color: colors.neutral500,
+            transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            padding: 4,
+            "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.04)"
+            }
+        },
+
+        "& .MuiAutocomplete-clearIndicator": {
+            color: colors.neutral400,
+            padding: 4,
+            transition: "all 0.2s ease",
+            "&:hover": {
+                color: colors.error600,
+                backgroundColor: "rgba(0,0,0,0.04)"
+            }
+        }
     }),
 
     option: (colors: any) => ({
-        padding: "10px 16px",
+        padding: "10px 14px",
         display: "flex",
         alignItems: "center",
-        gap: 8,
+        gap: 12,
         fontSize: "14px",
         cursor: "pointer",
+        color: colors.neutral800,
+        borderRadius: "8px",
+        margin: "4px 8px",
+        border: "1px solid transparent",
+        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
 
         "&[aria-selected='true']": {
-            backgroundColor: colors.primary50,
+            backgroundColor: `${colors.primary50} !important`,
+            color: colors.primary700,
+            borderColor: colors.primary200,
+            fontWeight: 600,
         },
 
         "&.Mui-focused, &:hover": {
-            backgroundColor: colors.primary100,
+            backgroundColor: `${colors.neutral50} !important`,
+            borderColor: colors.neutral200,
+            color: colors.primary600,
+            transform: "translateY(-1px)",
+            boxShadow: "0 2px 8px -2px rgba(0,0,0,0.05)",
         },
     }),
 
     helperText: (colors: any) => ({
-        marginTop: 4,
+        marginTop: 6,
+        marginLeft: 8,
         fontSize: 12,
         color: colors.neutral500,
-    }),
-
-    errorText: (colors: any) => ({
-        color: colors.error600,
     }),
 });
 
@@ -116,7 +168,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     value = null,
     error = false,
     helperText = "",
-    placeHolder = "",
+    placeHolder = "Search...",
     id,
     onBlur,
     className = "",
@@ -157,11 +209,6 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         [debouncedSearch]
     );
 
-    const handleClear = () => {
-        onChange(null);
-        onSearch("");
-    };
-
     const autoCompleteProps = useMemo(
         () => ({
             options,
@@ -179,9 +226,8 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 
     return (
         <div
-            className={`${classes.container} ${
-                isDisabled ? "disabled" : ""
-            } ${className}`}
+            className={`${classes.container} ${isDisabled ? "disabled" : ""
+                } ${className}`}
         >
             <Autocomplete
                 {...autoCompleteProps}
@@ -195,23 +241,37 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                 loading={loading}
                 clearOnBlur={false}
                 disableClearable={!value}
-                popupIcon={open ? <FiChevronUp /> : <FiChevronDown />}
-                clearIcon={
-                    value ? (
-                        <ClearIcon
-                            onClick={handleClear}
-                            style={{
-                                fontSize: 16,
-                                color: colors.neutral600,
-                                cursor: "pointer",
-                            }}
-                        />
-                    ) : null
-                }
+                popupIcon={<FiChevronDown />}
+                clearIcon={<FiX />}
                 className={classes.autoComplete}
                 onChange={handleChange}
                 onInputChange={handleInputChange}
                 onBlur={onBlur}
+                slotProps={{
+                    paper: {
+                        sx: {
+                            borderRadius: '12px',
+                            boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)',
+                            border: `1px solid ${colors.neutral200}`,
+                            marginTop: '6px',
+                            backgroundColor: colors.neutral0,
+                            color: colors.neutral800,
+                        }
+                    },
+                    listbox: {
+                        sx: {
+                            padding: '6px 0',
+                            backgroundColor: colors.neutral0,
+                            '&::-webkit-scrollbar': {
+                                width: '6px',
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                                backgroundColor: colors.neutral300,
+                                borderRadius: '10px',
+                            },
+                        }
+                    }
+                }}
                 renderInput={(params) => (
                     <TextField
                         {...params}
@@ -227,7 +287,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                                     {loading && (
                                         <CircularProgress
                                             size={16}
-                                            sx={{ mr: 1 }}
+                                            sx={{ mr: 1, color: colors.primary500 }}
                                         />
                                     )}
                                     {params.InputProps.endAdornment}
@@ -237,8 +297,12 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                     />
                 )}
                 renderOption={(props, option) => (
-                    <li {...props} className={classes.option}>
-                        {option.icon && <span>{option.icon}</span>}
+                    <li {...props} key={option.value} className={classes.option}>
+                        {option.icon && (
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 20 }}>
+                                {option.icon}
+                            </span>
+                        )}
                         {option.label}
                     </li>
                 )}

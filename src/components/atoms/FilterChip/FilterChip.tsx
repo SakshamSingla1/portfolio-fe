@@ -5,6 +5,7 @@ import {
   MenuItem,
   Checkbox,
   ListItemText,
+  ListItemIcon,
   Divider,
   InputAdornment,
   type MenuProps,
@@ -12,7 +13,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiChevronDown } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 
 export interface IMultiSelectOption {
@@ -44,25 +45,29 @@ const useStyles = createUseStyles({
   container: {
     display: "flex",
     flexDirection: "column",
-    gap: 6,
+    gap: 8,
     minWidth: ({ minWidth }: StyleProps) => minWidth || 280,
   },
 
   label: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: ({ colors }: StyleProps) => colors.neutral700,
+    fontSize: 13,
+    fontWeight: 600,
+    color: ({ colors }: StyleProps) => colors.neutral800,
+    letterSpacing: "0.2px",
   },
 
   select: {
-    borderRadius: 8,
+    borderRadius: 10,
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
     border: ({ colors }: StyleProps) => `1px solid ${colors.neutral200}`,
     background: ({ hasSelectedOptions, colors }: StyleProps) =>
-      hasSelectedOptions ? colors.primary50 : "#fff",
-    padding: "4px 8px",
+      hasSelectedOptions ? colors.primary50 : colors.neutral0,
+    padding: "6px 12px",
 
     "&:hover": {
       borderColor: ({ colors }: StyleProps) => colors.primary300,
+      background: ({ colors, hasSelectedOptions }: StyleProps) =>
+        hasSelectedOptions ? colors.primary100 : colors.neutral50,
     },
 
     "&.Mui-focused": {
@@ -75,33 +80,65 @@ const useStyles = createUseStyles({
       display: "flex",
       flexWrap: "wrap",
       gap: 6,
-      padding: "6px !important",
+      padding: "6px 24px 6px 4px !important",
+      minHeight: 24,
+      alignItems: "center"
     },
+
+    "& .MuiSelect-icon": {
+      color: ({ colors }: StyleProps) => colors.neutral500,
+      transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      position: "absolute",
+      top: "50%",
+      right: "12px",
+      transform: "translateY(-50%)",
+    },
+    "& .MuiSelect-iconOpen": {
+      transform: "translateY(-50%) rotate(180deg)",
+    }
   },
 
   header: {
     position: "sticky",
     top: 0,
     zIndex: 2,
-    background: "#fff",
-    padding: 12,
-    borderBottom: "1px solid #eee",
+    background: ({ colors }: StyleProps) => colors.neutral0,
+    padding: "16px 16px 12px",
+    borderBottom: ({ colors }: StyleProps) => `1px solid ${colors.neutral100}`,
   },
 
   chip: {
     display: "flex",
     alignItems: "center",
-    gap: 6,
-    padding: "4px 8px",
+    gap: 4,
+    padding: "4px 10px",
     borderRadius: 16,
     fontSize: 12,
+    fontWeight: 500,
+    transition: "all 0.2s ease",
     background: ({ colors }: StyleProps) => colors.primary100,
-    color: ({ colors }: StyleProps) => colors.primary700,
+    color: ({ colors }: StyleProps) => colors.primary800,
+    border: ({ colors }: StyleProps) => `1px solid ${colors.primary200}`,
+    "&:hover": {
+      background: ({ colors }: StyleProps) => colors.primary200,
+      transform: "translateY(-1px)",
+    }
   },
 
   chipClose: {
     cursor: "pointer",
     display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "50%",
+    padding: 2,
+    marginRight: -4,
+    transition: "all 0.2s ease",
+    color: ({ colors }: StyleProps) => colors.primary600,
+    "&:hover": {
+      background: "rgba(0,0,0,0.06)",
+      color: ({ colors }: StyleProps) => colors.error600,
+    }
   },
 
   searchContainer: {
@@ -112,21 +149,47 @@ const useStyles = createUseStyles({
     position: "sticky",
     bottom: 0,
     zIndex: 2,
-    background: "#fff",
-    padding: 12,
-    borderTop: "1px solid #eee",
+    background: ({ colors }: StyleProps) => colors.neutral0,
+    padding: "12px 16px",
+    borderTop: ({ colors }: StyleProps) => `1px solid ${colors.neutral100}`,
     display: "flex",
     justifyContent: "space-between",
+    gap: 12,
   },
 
   scrollContainer: {
     maxHeight: ({ maxHeight }: any) => maxHeight || 300,
     overflowY: "auto",
+    background: ({ colors }: StyleProps) => colors.neutral0,
+    "&::-webkit-scrollbar": {
+      width: "6px",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: ({ colors }: StyleProps) => colors.neutral300,
+      borderRadius: "10px",
+    },
   },
 
   divider: {
-    margin: "8px 0",
+    margin: "4px 0",
+    opacity: 0.6,
   },
+
+  menuItem: {
+    margin: "4px 8px",
+    borderRadius: "8px",
+    border: "1px solid transparent",
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    backgroundColor: ({ colors }: StyleProps) => colors.neutral0,
+    color: ({ colors }: StyleProps) => colors.neutral800,
+    "&:hover": {
+      backgroundColor: ({ colors }: StyleProps) => colors.neutral50,
+      borderColor: ({ colors }: StyleProps) => colors.neutral200,
+      color: ({ colors }: StyleProps) => colors.primary600,
+      transform: "translateY(-1px)",
+      boxShadow: "0 2px 8px -2px rgba(0,0,0,0.05)",
+    }
+  }
 });
 
 const FilterChip: React.FC<MultiSelectInputProps> = ({
@@ -134,10 +197,9 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
   label,
   value,
   onchange,
-  placeholder = "Select",
+  placeholder = "Select...",
   isSingleSelect = false,
   minWidth = "280px",
-  maxHeight = "320px",
   searchable = true,
   showSelectAll = true,
   MenuProps,
@@ -156,6 +218,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
   useEffect(() => {
     if (!open) {
       setTempSelected(value);
+      setSearchTerm("");
     }
   }, [open, value]);
 
@@ -220,16 +283,25 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
         displayEmpty
         disableUnderline
         className={classes.select}
+        IconComponent={FiChevronDown}
         MenuProps={{
           ...MenuProps,
           PaperProps: {
             ...MenuProps?.PaperProps,
-            sx: { maxHeight },
+            sx: {
+              maxHeight: "none",
+              borderRadius: "12px",
+              marginTop: "6px",
+              border: `1px solid ${colors.neutral200}`,
+              boxShadow: "0 10px 40px -10px rgba(0,0,0,0.1)",
+              backgroundColor: colors.neutral0,
+              ...MenuProps?.PaperProps?.sx
+            },
           },
         }}
         renderValue={() =>
           value.length === 0 ? (
-            <span style={{ color: colors.neutral400 }}>{placeholder}</span>
+            <span style={{ color: colors.neutral400, fontWeight: 400 }}>{placeholder}</span>
           ) : (
             value.map((option) => (
               <div key={option.value} className={classes.chip}>
@@ -238,7 +310,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
                   className={classes.chipClose}
                   onMouseDown={(e) => handleDeleteChip(e, option)}
                 >
-                  <CloseIcon fontSize="small" />
+                  <CloseIcon style={{ fontSize: 14 }} />
                 </span>
               </div>
             ))
@@ -249,14 +321,15 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
           <div className={classes.header}>
             <TextField
               size="small"
-              placeholder="Search..."
+              placeholder="Search options..."
               value={searchTerm}
               onChange={(e: any) => setSearchTerm(e.target.value)}
               onKeyDown={(e: any) => e.stopPropagation()}
+              autoFocus
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <FiSearch />
+                    <FiSearch style={{ color: colors.neutral400 }} />
                   </InputAdornment>
                 ),
               }}
@@ -264,47 +337,79 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
           </div>
         )}
 
-        {showSelectAll && !isSingleSelect && (
-          <MenuItem onClick={toggleSelectAll}>
-            <Checkbox
-              checked={tempSelected.length === options.length}
+        {showSelectAll && !isSingleSelect && filteredOptions.length > 0 && (
+          <MenuItem onClick={toggleSelectAll} className={classes.menuItem}>
+            <ListItemIcon style={{ minWidth: 32 }}>
+              <Checkbox
+                checked={tempSelected.length === options.length && options.length > 0}
+                indeterminate={tempSelected.length > 0 && tempSelected.length < options.length}
+                size="small"
+                style={{ color: colors.primary500, padding: 0 }}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary="Select All"
+              primaryTypographyProps={{ style: { fontWeight: 600, fontSize: 14 } }}
             />
-            <ListItemText primary="Select All" />
           </MenuItem>
         )}
 
-        <Divider className={classes.divider} />
+        {showSelectAll && !isSingleSelect && <Divider className={classes.divider} />}
 
         <div className={classes.scrollContainer}>
-        {filteredOptions.map((option) => (
-          <MenuItem
-            key={option.value}
-            onClick={() => handleChange(option)}
-          >
-            {!isSingleSelect && (
-              <Checkbox
-                checked={tempSelected.some(
-                  (v) => v.value === option.value
+          {filteredOptions.length === 0 ? (
+            <div style={{ padding: "20px", textAlign: "center", color: colors.neutral400, fontSize: 14 }}>
+              No options found
+            </div>
+          ) : (
+            filteredOptions.map((option) => (
+              <MenuItem
+                key={option.value}
+                onClick={() => handleChange(option)}
+                className={classes.menuItem}
+              >
+                {!isSingleSelect && (
+                  <ListItemIcon style={{ minWidth: 32 }}>
+                    <Checkbox
+                      checked={tempSelected.some((v) => v.value === option.value)}
+                      size="small"
+                      style={{
+                        padding: 0,
+                        color: tempSelected.some((v) => v.value === option.value)
+                          ? colors.primary500
+                          : colors.neutral400
+                      }}
+                    />
+                  </ListItemIcon>
                 )}
-              />
-            )}
-            <ListItemText primary={option.label} />
-          </MenuItem>
-        ))}
+                <ListItemText
+                  primary={option.label}
+                  primaryTypographyProps={{
+                    style: {
+                      fontSize: 14,
+                      fontWeight: tempSelected.some((v) => v.value === option.value) ? 600 : 400
+                    }
+                  }}
+                />
+              </MenuItem>
+            ))
+          )}
         </div>
 
-        <Divider />
+        <Divider className={classes.divider} />
 
         <div className={classes.footer}>
           <Button
             variant="secondaryContained"
-            label="Clear"
+            label="Clear Selection"
             onClick={handleClear}
+            className="w-full"
           />
           <Button
             variant="primaryContained"
-            label="Apply"
+            label={`Apply (${tempSelected.length})`}
             onClick={handleApply}
+            className="w-full"
           />
         </div>
       </MuiMultiSelect>
@@ -312,4 +417,4 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
   );
 };
 
-export default FilterChip;
+export default React.memo(FilterChip);

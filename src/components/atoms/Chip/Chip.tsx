@@ -10,23 +10,25 @@ interface ChipProps {
 }
 
 const useStyles = createUseStyles({
-  chip: (colors: any) => ({
+  chip: (props: any) => ({
     display: "inline-flex",
     alignItems: "center",
     gap: 6,
     padding: "6px 12px",
-    borderRadius: "999px", // pill shape
+    borderRadius: "999px",
     fontSize: "12px",
     fontWeight: 500,
-    backgroundColor: colors.neutral100,
-    color: colors.neutral800,
-    border: `1px solid ${colors.neutral200}`,
+    backgroundColor: props.disabled ? props.colors.neutral50 : props.colors.neutral100,
+    color: props.disabled ? props.colors.neutral400 : props.colors.neutral800,
+    border: `1px solid ${props.disabled ? props.colors.neutral100 : props.colors.neutral200}`,
     transition: "all 0.2s ease-in-out",
     userSelect: "none",
+    opacity: props.disabled ? 0.6 : 1,
+    cursor: props.disabled ? "not-allowed" : "default",
 
     "&:hover": {
-      backgroundColor: colors.neutral200,
-      borderColor: colors.neutral300,
+      backgroundColor: props.disabled ? props.colors.neutral50 : props.colors.neutral200,
+      borderColor: props.disabled ? props.colors.neutral100 : props.colors.neutral300,
     },
   }),
 
@@ -67,7 +69,7 @@ const useStyles = createUseStyles({
 
 const Chip: React.FC<ChipProps> = ({ label, onDelete, disabled }) => {
   const colors = useColors();
-  const classes = useStyles(colors);
+  const classes = useStyles({ colors, disabled });
 
   return (
     <div className={classes.chip}>

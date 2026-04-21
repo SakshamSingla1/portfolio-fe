@@ -176,20 +176,12 @@ const useStyles = createUseStyles({
     border: `2px solid ${c.neutral0}`,
   }),
 
-  userDropdownTrigger: (c: any) => ({
+  userDropdownTrigger: () => ({
     display: "flex",
     alignItems: "center",
     gap: 10,
     padding: "4px 6px 4px 12px",
-    borderRadius: 14,
-    cursor: "pointer",
     transition: "all 0.3s ease",
-    border: `1px solid transparent`,
-    "&:hover": {
-      background: `${c.neutral0}`,
-      borderColor: `${c.neutral200}80`,
-      boxShadow: `0 4px 12px ${c.neutral900}05`,
-    },
   }),
 
   userAvatar: (c: any) => ({
@@ -477,7 +469,6 @@ const DashboardLayout: React.FC = () => {
                 {!isMobile && (
                   <>
                     <span className={classes.userName}>{user?.fullName?.split(" ")[0]}</span>
-                    <FiChevronDown size={14} style={{ opacity: 0.5 }} />
                   </>
                 )}
               </div>

@@ -22,13 +22,16 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
       },
 
       "&.Mui-disabled": {
-        backgroundColor: colors.neutral100,
+        backgroundColor: colors.neutral50,
         borderColor: colors.neutral200,
-        color: colors.neutral500,
         cursor: "not-allowed",
+        "& input, & textarea": {
+          "-webkit-text-fill-color": `${colors.neutral400} !important`,
+          color: `${colors.neutral400} !important`,
+        }
       },
 
-      "& input": {
+      "& input, & textarea": {
         padding: "13px 12px",
         color: colors.neutral900,
 

@@ -72,6 +72,16 @@ const DatePicker: React.FC<DatePickerProps> = ({
                         field: {
                             clearable: true,
                         },
+                        popper: {
+                            sx: {
+                                "& .MuiPaper-root": {
+                                    backgroundColor: colors.neutral0,
+                                    border: `1px solid ${colors.neutral200}`,
+                                    boxShadow: `0 12px 32px -4px ${colors.neutral900}30`,
+                                    borderRadius: "16px",
+                                }
+                            }
+                        }
                     }}
                 />
             </div>

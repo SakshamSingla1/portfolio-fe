@@ -73,7 +73,7 @@ const useStyles = createUseStyles((colors: any) => ({
     borderRadius: '0.75rem',
     overflow: 'hidden',
     border: `1px solid ${colors.neutral200}`,
-    backgroundColor: 'white',
+    backgroundColor: colors.neutral0 || 'white',
     transition: 'all 0.2s ease-in-out',
   },
   tableHeader: {
@@ -169,14 +169,14 @@ const useStyles = createUseStyles((colors: any) => ({
     textAlign: 'center',
     color: colors.primary600,
     fontSize: '0.9375rem',
-    backgroundColor: 'white',
+    backgroundColor: colors.neutral0 || 'white',
     '@media (max-width: 768px)': {
       padding: '2rem 1rem',
       fontSize: '0.875rem',
     },
   },
   pagination: {
-    backgroundColor: 'white',
+    backgroundColor: colors.neutral0 || 'white',
     borderTop: `1px solid ${colors.neutral200}`,
     padding: '0.15rem 1.0rem',
     display: 'flex',
@@ -230,6 +230,8 @@ const useStyles = createUseStyles((colors: any) => ({
       borderRadius: '0.375rem',
       '@media (max-width: 768px)': {
         fontSize: '0.75rem',
+        color: colors.neutral700,
+
       },
     },
   },
@@ -252,7 +254,7 @@ const useStyles = createUseStyles((colors: any) => ({
     },
   },
   mobileCard: {
-    backgroundColor: 'white',
+    backgroundColor: colors.neutral0 || 'white',
     borderRadius: '0.5rem',
     border: `1px solid ${colors.neutral200}`,
     padding: '0',

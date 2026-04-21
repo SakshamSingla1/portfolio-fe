@@ -30,34 +30,57 @@ const StyledButton = styled(MuiButton)<{
   colors: any;
 }>(({ colors, $variant, $size }) => ({
   textTransform: "capitalize",
-  fontWeight: 500,
+  fontWeight: 600,
   lineHeight: 1,
   minWidth: "auto",
+  transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
 
   ...( {
-    extraSmall: { minHeight: 32, padding: "4px 12px", fontSize: 14, borderRadius: 4 },
-    small: { minHeight: 36, padding: "6px 16px", fontSize: 14, borderRadius: 4 },
-    medium: { minHeight: 40, padding: "8px 20px", fontSize: 16, borderRadius: 6 },
-    large: { minHeight: 48, padding: "12px 24px", fontSize: 16, borderRadius: 8 },
+    extraSmall: { minHeight: 32, padding: "4px 12px", fontSize: 13, borderRadius: 6 },
+    small: { minHeight: 36, padding: "6px 16px", fontSize: 14, borderRadius: 8 },
+    medium: { minHeight: 40, padding: "8px 20px", fontSize: 15, borderRadius: 10 },
+    large: { minHeight: 48, padding: "12px 24px", fontSize: 16, borderRadius: 12 },
   }[$size]),
+
+  "&:active": {
+    transform: "scale(0.97)",
+  },
 
   ...( {
     primaryContained: {
-      backgroundColor: colors.primary300,
-      color: colors.neutral50,
-      "&:hover": { backgroundColor: colors.primary300 },
+      backgroundColor: colors.primary400,
+      color: colors.neutral0,
+      border: `1px solid transparent`,
+      boxShadow: `0 4px 12px -2px ${colors.primary500}40`,
+      "&:hover": { 
+        backgroundColor: colors.primary500,
+        boxShadow: `0 6px 16px -2px ${colors.primary500}60`,
+        transform: "translateY(-1px)",
+      },
     },
 
     secondaryContained: {
-      backgroundColor: colors.neutral50,
-      color: colors.primary300,
-      border: `1px solid ${colors.primary300}`,
+      backgroundColor: colors.neutral0,
+      color: colors.primary600,
+      border: `1px solid ${colors.primary200}`,
+      "&:hover": { 
+        backgroundColor: colors.primary50,
+        borderColor: colors.primary400,
+        boxShadow: `0 4px 12px -2px ${colors.primary500}15`,
+        transform: "translateY(-1px)",
+      },
     },
 
     tertiaryContained: {
-      backgroundColor: colors.neutral50,
-      color: colors.primary300,
+      backgroundColor: colors.neutral0,
+      color: colors.neutral700,
       border: `1px solid ${colors.neutral200}`,
+      "&:hover": { 
+        backgroundColor: colors.neutral50,
+        borderColor: colors.neutral300,
+        color: colors.neutral900,
+        boxShadow: `0 2px 8px -2px ${colors.neutral900}10`,
+      },
     },
 
     primaryText: {

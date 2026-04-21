@@ -60,7 +60,7 @@ export const ADMIN_ROUTES = {
 
     COLOR_THEME: "/themes",
     COLOR_THEME_ADD: "/themes/add",
-    COLOR_THEME_EDIT: "/hemes/:themeName/edit",
+    COLOR_THEME_EDIT: "/themes/:themeName/edit",
     COLOR_THEME_VIEW: "/themes/:themeName",
 
     RESUMES: "/resumes",

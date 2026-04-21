@@ -42,9 +42,12 @@ const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
   },
 
   "&.Mui-disabled .MuiInputBase-root": {
-    backgroundColor: colors.neutral100,
+    backgroundColor: colors.neutral50,
     borderColor: colors.neutral200,
-    color: colors.neutral500,
+    color: colors.neutral400,
+    "& .MuiSelect-select": {
+        WebkitTextFillColor: `${colors.neutral400} !important`,
+    }
   },
 
   "&.Mui-error .MuiInputBase-root": {
@@ -134,6 +137,38 @@ const Select: React.FC<SelectProps> = ({
         onClose={() => setOpen(false)}
         onChange={(e) => onChange?.(e.target.value as string | number)}
         colors={colors}
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              backgroundColor: colors.neutral0,
+              boxShadow: `0 12px 32px -4px ${colors.neutral900}20`,
+              borderRadius: "12px",
+              marginTop: "8px",
+              border: `1px solid ${colors.neutral200}`,
+              "& .MuiMenuItem-root": {
+                margin: "4px 8px",
+                borderRadius: "8px",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                color: colors.neutral800,
+                fontSize: 14,
+                "&:hover": {
+                  backgroundColor: colors.neutral50,
+                  color: colors.primary600,
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 2px 8px -2px rgba(0,0,0,0.05)",
+                },
+                "&.Mui-selected": {
+                  backgroundColor: colors.primary50,
+                  color: colors.primary700,
+                  fontWeight: 600,
+                  "&:hover": {
+                      backgroundColor: colors.primary100,
+                  }
+                }
+              }
+            }
+          }
+        }}
         IconComponent={
           disableArrow
             ? () => null

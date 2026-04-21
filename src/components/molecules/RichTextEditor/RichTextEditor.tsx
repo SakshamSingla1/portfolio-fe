@@ -26,11 +26,12 @@ const useStyles = createUseStyles({
   preview: (colors: any) => ({
     marginTop: 12,
     padding: 16,
-    borderRadius: 6,
+    borderRadius: 12,
     border: `1px solid ${colors.neutral200}`,
     background: colors.neutral50,
     color: colors.neutral900,
     lineHeight: 1.6,
+    boxShadow: `inset 0 2px 4px 0 ${colors.neutral900}05`,
 
     "& p": {
       marginBottom: 12,
@@ -43,14 +44,24 @@ const useStyles = createUseStyles({
 
   toggle: (colors: any) => ({
     fontSize: 13,
+    fontWeight: 600,
     cursor: "pointer",
     color: colors.primary600,
-    marginTop: 6,
+    marginTop: 10,
     width: "fit-content",
+    padding: "6px 14px",
+    borderRadius: "20px",
+    background: colors.primary50,
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
 
     "&:hover": {
-      textDecoration: "underline",
+      background: colors.primary100,
+      transform: "translateY(-1px)",
+      boxShadow: `0 4px 12px -4px ${colors.primary500}30`
     },
+    "&:active": {
+      transform: "scale(0.96)"
+    }
   }),
 });
 

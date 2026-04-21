@@ -11,6 +11,53 @@ import Button from "../../atoms/Button/Button";
 import { HexColorPicker } from "react-colorful";
 import { ExpandMore } from "@mui/icons-material";
 import { useColors } from "../../../utils/types";
+import { FiCheck } from "react-icons/fi";
+import { createUseStyles } from "react-jss";
+
+const useStyles = createUseStyles({
+  swatchOuter: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  swatchWrapper: (colors: any) => ({
+    width: 20,
+    height: 20,
+    borderRadius: "50%",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    border: `2px solid transparent`,
+    position: "relative",
+    
+    "&:hover": {
+      transform: "scale(1.15)",
+      zIndex: 2,
+    },
+    
+    "&.active": {
+      transform: "scale(1.1)",
+      border: `2px solid ${colors.neutral0}`,
+      outline: `2px solid ${colors.primary500}`,
+    }
+  }),
+  previewBlock: {
+    padding: "6px 8px",
+    borderRadius: 8,
+    textAlign: "center",
+    fontWeight: 700,
+    fontSize: 13,
+    letterSpacing: "0.5px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 40,
+    boxShadow: `inset 0 2px 10px rgba(0,0,0,0.1), 0 8px 16px -4px rgba(0,0,0,0.1)`,
+    transition: "background 0.2s ease",
+  }
+});
 
 interface ColorPickerFieldProps
   extends Omit<
@@ -93,14 +140,7 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
     [tempColor, colors]
   );
 
-  const swatchStyle = (size: number, color: string) => ({
-    width: size,
-    height: size,
-    backgroundColor: color,
-    borderRadius: 6,
-    border: `1px solid ${colors.neutral200}`,
-    cursor: "pointer",
-  });
+  const classes = useStyles(colors);
 
   return (
     <>
@@ -122,7 +162,13 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
             readOnly: true,
             startAdornment: (
               <InputAdornment position="start">
-                <div style={swatchStyle(18, value)} />
+                <div style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  backgroundColor: value,
+                  boxShadow: `inset 0 2px 4px rgba(0,0,0,0.15), 0 0 0 2px ${colors.neutral0}, 0 0 0 3px ${colors.neutral200}`
+                }} />
               </InputAdornment>
             ),
             endAdornment: (
@@ -156,11 +202,12 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
         }}
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            padding: 2,
-            width: 280,
-            boxShadow:
-              "0 20px 40px rgba(0,0,0,0.15)",
+            backgroundColor: colors.neutral0,
+            borderRadius: "16px",
+            padding: "12px",
+            width: 220,
+            boxShadow: `0 32px 64px -12px ${colors.neutral900}35`,
+            border: `1px solid ${colors.neutral200}`,
           },
         }}
       >
@@ -168,26 +215,27 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 16,
+            gap: 12,
           }}
         >
           <div
+            className={classes.previewBlock}
             style={{
-              background: tempColor,
-              padding: 16,
-              borderRadius: 10,
-              textAlign: "center",
+              background: `linear-gradient(135deg, ${tempColor} 0%, ${tempColor}DD 100%)`,
               color: previewTextColor,
-              fontWeight: 500,
+              textShadow: isColorLight(tempColor) ? "none" : "0 1px 2px rgba(0,0,0,0.3)"
             }}
           >
-            Preview
+            {tempColor.toUpperCase()}
           </div>
 
-          <HexColorPicker
-            color={tempColor}
-            onChange={setTempColor}
-          />
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+              <HexColorPicker
+                color={tempColor}
+                onChange={setTempColor}
+                style={{ width: "100%", height: 120 }}
+              />
+          </div>
           <TextField
             value={tempColor}
             onChange={handleInputChange}
@@ -204,44 +252,51 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
 
           {showPresets && (
             <>
-              <div style={{ fontSize: 13 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: colors.neutral600, letterSpacing: "0.5px", textTransform: "uppercase" }}>
                 Presets
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  flexWrap: "wrap",
-                }}
-              >
-                {PRESET_COLORS.map((color) => (
-                  <div
-                    key={color}
-                    style={swatchStyle(24, color)}
-                    onClick={() => setTempColor(color)}
-                  />
-                ))}
+              <div className={classes.swatchOuter}>
+                {PRESET_COLORS.map((color) => {
+                    const isActive = color.toLowerCase() === tempColor.toLowerCase();
+                    return (
+                        <div
+                            key={color}
+                            className={`${classes.swatchWrapper} ${isActive ? 'active' : ''}`}
+                            onClick={() => setTempColor(color)}
+                            style={{ 
+                                backgroundColor: color,
+                                boxShadow: isActive ? `0 4px 12px ${color}60` : `0 2px 8px ${color}40`
+                            }}
+                        >
+                            {isActive && <FiCheck size={12} color={isColorLight(color) ? colors.neutral900 : colors.neutral0} />}
+                        </div>
+                    );
+                })}
               </div>
             </>
           )}
           {recentColors.length > 0 && (
             <>
-              <div style={{ fontSize: 13 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: colors.neutral600, letterSpacing: "0.5px", textTransform: "uppercase" }}>
                 Recent
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                }}
-              >
-                {recentColors.map((color) => (
-                  <div
-                    key={color}
-                    style={swatchStyle(24, color)}
-                    onClick={() => setTempColor(color)}
-                  />
-                ))}
+              <div className={classes.swatchOuter}>
+                {recentColors.map((color) => {
+                    const isActive = color.toLowerCase() === tempColor.toLowerCase();
+                    return (
+                        <div
+                            key={color}
+                            className={`${classes.swatchWrapper} ${isActive ? 'active' : ''}`}
+                            onClick={() => setTempColor(color)}
+                            style={{ 
+                                backgroundColor: color,
+                                boxShadow: isActive ? `0 4px 12px ${color}60` : `0 2px 8px ${color}40`
+                            }}
+                        >
+                            {isActive && <FiCheck size={12} color={isColorLight(color) ? colors.neutral900 : colors.neutral0} />}
+                        </div>
+                    );
+                })}
               </div>
             </>
           )}

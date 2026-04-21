@@ -164,7 +164,7 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
                 </div>
             </div>
             <div>
-                <Table
+                <TableV1
                     schema={getSchema()}
                     records={getRecords()}
                 />

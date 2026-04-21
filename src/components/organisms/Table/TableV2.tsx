@@ -19,20 +19,20 @@ import CurrencyCell from "../../atoms/TableUtils/CurrencyCell";
 import StringCell from "../../atoms/TableUtils/StringCell";
 
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable,
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -97,7 +97,7 @@ const useStyles = createUseStyles((colors: any) => ({
         borderRadius: '0.75rem',
         overflow: 'hidden',
         border: `1px solid ${colors.neutral200 || '#e0e5eb'}`,
-        backgroundColor: 'white',
+        backgroundColor: colors.neutral0 || 'white',
         transition: 'all 0.2s ease-in-out',
         width: '100%',
     },
@@ -148,7 +148,7 @@ const useStyles = createUseStyles((colors: any) => ({
     },
     tableRow: {
         transition: 'background-color 0.2s ease',
-        backgroundColor: 'white',
+        backgroundColor: colors.neutral0 || 'white',
         '&:last-child td': {
             borderBottom: 'none'
         }
@@ -166,10 +166,10 @@ const useStyles = createUseStyles((colors: any) => ({
         textAlign: 'center',
         color: colors.primary600 || '#666',
         fontSize: '0.9375rem',
-        backgroundColor: 'white',
+        backgroundColor: colors.neutral0 || 'white',
     },
     pagination: {
-        backgroundColor: 'white',
+        backgroundColor: colors.neutral0 || 'white',
         borderTop: `1px solid ${colors.neutral200 || '#e0e5eb'}`,
         padding: '0.15rem 1.0rem',
         display: 'flex',
@@ -262,18 +262,18 @@ const SortableRow = ({ id, disabled, className, children }: SortableRowProps) =>
     );
 };
 
-const TableV2: React.FC<TableProps> = ({ 
-    schema, 
-    records, 
-    setRecords, 
-    onReorder, 
-    showCheckboxes, 
-    selected, 
-    setSelected, 
-    scroll, 
-    disableCondition, 
+const TableV2: React.FC<TableProps> = ({
+    schema,
+    records,
+    setRecords,
+    onReorder,
+    showCheckboxes,
+    selected,
+    setSelected,
+    scroll,
+    disableCondition,
     isRounded = true,
-    className 
+    className
 }) => {
     const colors = useColors();
     const classes = useStyles({ theme: colors });
@@ -323,14 +323,15 @@ const TableV2: React.FC<TableProps> = ({
                             onBlur={handleInputBlur}
                             disableUnderline={true}
                             inputProps={{ min: 1, max: Math.ceil(count / rowsPerPage) }}
-                            style={{ 
-                                width: '54px', 
-                                height: "28px", 
-                                borderRadius: '8px', 
-                                border: `1px solid ${colors.neutral200 || '#E6E6E6'}`, 
+                            style={{
+                                width: '54px',
+                                height: "28px",
+                                borderRadius: '8px',
+                                border: `1px solid ${colors.neutral200}`,
                                 paddingLeft: '8px',
                                 fontSize: '14px',
-                                backgroundColor: 'white'
+                                backgroundColor: colors.neutral0,
+                                color: colors.neutral800
                             }}
                         />
                     </div>
@@ -486,7 +487,7 @@ const TableV2: React.FC<TableProps> = ({
                             <th
                                 key={index}
                                 className={clsx(
-                                    classes.header, 
+                                    classes.header,
                                     schema.stickyHeader && "sticky top-0 z-40",
                                     isFirstColumn && `sticky ${stickyLeftFirstColumn}`
                                 )}
@@ -503,12 +504,12 @@ const TableV2: React.FC<TableProps> = ({
     const renderRows = (isReorderableCtx: boolean) => {
         const stickyLeftCheckbox = isReorderable ? "left-[32px]" : "left-0";
         const stickyLeftFirstColumn = isReorderable && showCheckboxes ? "left-[80px]" : isReorderable && !showCheckboxes ? "left-[32px]" : !isReorderable && showCheckboxes ? "left-[48px]" : "left-0";
-        
+
         if (records.length === 0) {
             return (
                 <tr>
-                    <td 
-                        colSpan={schema.columns.length + (showCheckboxes ? 1 : 0) + (isReorderable ? 1 : 0)} 
+                    <td
+                        colSpan={schema.columns.length + (showCheckboxes ? 1 : 0) + (isReorderable ? 1 : 0)}
                         className={classes.emptyState}
                     >
                         No records found
