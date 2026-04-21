@@ -3,7 +3,7 @@ import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import { createUseStyles } from "react-jss";
 import {
   FiBell, FiSun, FiMoon,
-  FiLogOut, FiSettings, FiUser, FiSearch, FiLayout, FiChevronDown, FiMenu
+  FiLogOut, FiSettings, FiUser, FiSearch, FiLayout, FiMenu
 } from "react-icons/fi";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
