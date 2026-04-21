@@ -66,7 +66,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
         testimonials.map((testimonial, index) => [
             pagination.currentPage * pagination.pageSize + index + 1,
             testimonial.name,
-            testimonial.position,
+            testimonial.order,
             DateUtils.dateTimeSecondToDate(testimonial.createdAt ?? ""),
             DateUtils.dateTimeSecondToDate(testimonial.updatedAt ?? ""),
             Action(testimonial.id ?? "")
