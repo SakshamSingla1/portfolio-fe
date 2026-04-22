@@ -23,6 +23,7 @@ import DashboardRoutes from './AdminRoutes/DashboardRoutes';
 import LogoRoutes from './AdminRoutes/LogoRoutes';
 import UserRoutes from './AdminRoutes/UserRoutes';
 import RoleRoutes from './AdminRoutes/RoleRoutes';
+import HelpRoutes from './AdminRoutes/HelpRoutes';
 
 export const AdminRouter: React.FC = () => {
 
@@ -89,10 +90,11 @@ export const AdminRouter: React.FC = () => {
         <Route path="certifications/*" element={<div><CertificationRoutes /></div>} />
         <Route path="testimonials/*" element={<div><TestimonialRoutes /></div>} />
         <Route path="achievements/*" element={<div><AchievementRoutes /></div>} />
-        <Route path="dashboard" element={<div><DashboardRoutes/></div>} />
+        <Route path="dashboard" element={<div><DashboardRoutes /></div>} />
         <Route path="logos/*" element={<div><LogoRoutes /></div>} />
         <Route path="users/*" element={<div><UserRoutes /></div>} />
         <Route path="roles-permissions/*" element={<div><RoleRoutes /></div>} />
+        <Route path="help/*" element={<div><HelpRoutes /></div>} />
       </Route>
     </Routes>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FiLock, FiShield } from "react-icons/fi";
 
-import { Tabs, type ITabsSchema } from "../../atoms/Tabs/Tabs";
+import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import PasswordTab from "./PasswordTab";
 import ChangeEmailTab from "./ChangeEmailTab";
 
