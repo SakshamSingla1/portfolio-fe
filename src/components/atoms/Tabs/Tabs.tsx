@@ -1,7 +1,5 @@
 import React, { type ReactNode } from "react";
-import { Box, Tab } from "@mui/material";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { styled } from "@mui/material/styles";
+import { motion, AnimatePresence } from "framer-motion";
 import { useColors } from "../../../utils/types";
 
 export interface ITabsSchema {
@@ -20,71 +18,7 @@ interface TabsProps {
   selectedTabStyle?: string;
 }
 
-const StyledTabList = styled(TabList)({
-  "& .MuiTabs-flexContainer": {
-    display: "flex",
-    gap: 8,
-  },
-  "& .MuiTabs-indicator": {
-    display: "none",
-  },
-});
-
-const StyledTab = styled(Tab)<{ colors: any }>(({ colors }) => ({
-  textTransform: "none",
-  fontSize: 14,
-  fontWeight: 500,
-  padding: "8px 14px",
-  borderRadius: "10px 10px 0 0",
-  minHeight: "auto",
-
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-
-  color: colors.neutral700,
-  backgroundColor: colors.neutral100,
-  border: `1px solid ${colors.neutral200}`,
-  borderBottom: "none",
-
-  transition: "all 0.2s ease",
-  userSelect: "none",
-
-  "& svg": {
-    fontSize: 18,
-  },
-
-  "&:hover": {
-    backgroundColor: colors.neutral200,
-    color: colors.neutral900,
-  },
-
-  "&.Mui-selected": {
-    backgroundColor: colors.primary50,
-    color: `${colors.primary900} !important`,
-    borderColor: colors.primary300,
-    fontWeight: 500,
-    zIndex: 2,
-  },
-
-  "&.Mui-disabled": {
-    opacity: 0.5,
-    cursor: "not-allowed",
-  },
-}));
-
-const LabelWrapper = styled("span")({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 8,
-  lineHeight: 1,
-});
-
-const StyledTabPanel = styled(TabPanel)({
-  padding: "12px 0",
-});
-
-export const Tabs: React.FC<TabsProps> = ({
+const Tabs: React.FC<TabsProps> = ({
   schema,
   value,
   setValue,
@@ -93,40 +27,84 @@ export const Tabs: React.FC<TabsProps> = ({
 }) => {
   const colors = useColors();
 
-  const handleChange = (_: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
-  };
-
   return (
-    <Box width="100%">
-      <TabContext value={value}>
-        <Box className={fullWidth ? "w-full" : "w-max"}>
-          <StyledTabList onChange={handleChange}>
-            {schema.map((tab) => (
-              <StyledTab
-                key={tab.value}
-                value={tab.value}
-                disabled={tab.disabled}
-                colors={colors}
-                className={selectedTabStyle}
-                label={
-                  <LabelWrapper>
-                    {tab.icon && tab.icon}
-                    {tab.label}
-                  </LabelWrapper>
-                }
-              />
-            ))}
-          </StyledTabList>
-        </Box>
+    <div className="w-full">
+      {/* Tabs List - God UI Style */}
+      <div 
+        className={`inline-flex p-1 rounded-2xl border ${fullWidth ? 'w-full' : 'w-max'}`}
+        style={{ 
+          backgroundColor: `${colors.neutral100}80`, // Glass effect base
+          borderColor: colors.neutral200,
+          backdropFilter: 'blur(8px)'
+        }}
+      >
+        {schema.map((tab) => {
+          const isActive = value === tab.value;
+          return (
+            <button
+              key={tab.value}
+              onClick={() => !tab.disabled && setValue(tab.value)}
+              disabled={tab.disabled}
+              className={`
+                relative flex items-center justify-center gap-2 px-4 py-2.5 
+                text-sm font-semibold transition-all duration-300 rounded-xl
+                ${fullWidth ? 'flex-1' : ''}
+                ${tab.disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+                ${selectedTabStyle && isActive ? selectedTabStyle : ''}
+              `}
+              style={{
+                color: isActive ? colors.primary900 : colors.neutral600,
+              }}
+            >
+              {/* Sliding Background Indicator - The God UI Secret */}
+              {isActive && (
+                <motion.div
+                  layoutId="activeTabBackground"
+                  className="absolute inset-0 z-0 rounded-xl shadow-sm"
+                  style={{ 
+                    backgroundColor: colors.neutral0,
+                    border: `1px solid ${colors.primary200}`,
+                    boxShadow: `0 2px 10px ${colors.primary100}`
+                  }}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              
+              <span className="relative z-10 flex items-center gap-2">
+                {tab.icon && (
+                  <span 
+                    className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'scale-100 opacity-70'}`}
+                    style={{ color: isActive ? colors.primary500 : 'inherit' }}
+                  >
+                    {tab.icon}
+                  </span>
+                )}
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
-        {schema.map((tab) => (
-          <StyledTabPanel key={tab.value} value={tab.value}>
-            {tab.component}
-          </StyledTabPanel>
-        ))}
-      </TabContext>
-    </Box>
+      {/* Tab Panels - Silky Smooth Transitions */}
+      <div className="mt-4">
+        <AnimatePresence mode="wait">
+          {schema.map((tab) => (
+            value === tab.value && (
+              <motion.div
+                key={tab.value}
+                initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                {tab.component}
+              </motion.div>
+            )
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 };
 
