@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useColors } from "../../../utils/types";
 import { type ImageUploadResponse } from "../../../services/useProfileService";
-import { FiUpload, FiX, FiImage, FiZoomIn, FiCheck, FiAlertCircle, FiInfo, FiTrash2 } from "react-icons/fi";
+import { FiUpload, FiX, FiCheck, FiAlertCircle, FiInfo, FiTrash2, FiMaximize } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface ImageValue {
     url: string;
@@ -66,12 +67,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             setUploadError(`File size must be less than ${maxSize}MB`);
             return false;
         }
-
         if (!file.type.startsWith('image/')) {
             setUploadError('Only image files are allowed');
             return false;
         }
-
         setUploadError(null);
         return true;
     };
@@ -79,11 +78,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const handleFileSelect = async (file: File) => {
         if (!file || disabled) return;
         if (!validateFile(file)) return;
-        
+
         setLoading(true);
         setUploadError(null);
         setUploadSuccess(false);
-        
+
         try {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -95,7 +94,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 url: result.url,
                 publicId: result.publicId
             });
-            
             setUploadSuccess(true);
             setTimeout(() => setUploadSuccess(false), 3000);
         } catch (err) {
@@ -126,7 +124,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             handleFileSelect(e.dataTransfer.files[0]);
         }
@@ -142,274 +139,158 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         }
     };
 
-    const handleZoom = () => {
-        setShowZoomModal(true);
-    };
+    const handleZoom = () => setShowZoomModal(true);
 
     const hasError = error || !!uploadError;
     const displayHelperText = uploadError || helperText;
 
+    const currentRatioClass = aspectRatioClasses[aspectRatio] || aspectRatioClasses.square;
+
     return (
-        <div className={`space-y-2 ${className}`}>
+        <div className={`flex flex-col space-y-2 ${className}`}>
             {label && (
-                <label style={{
-                    color: colors.neutral700,
-                    fontSize: 14,
-                    fontWeight: 500,
-                    marginLeft: 8,
-                }}>
-                    {label}
-                    {required && <span className="ml-1" style={{ color: colors.error500 }}>*</span>}
+                <label className="flex items-center gap-2 mb-1" style={{ color: colors.neutral700, fontSize: 13, fontWeight: 700, letterSpacing: '0.025em' }}>
+                    <span className="uppercase opacity-50">{label}</span>
+                    {required && <span style={{ color: colors.error500 }}>*</span>}
                 </label>
             )}
-            {!previewImage ? (
-                <div
-                    className={`relative rounded-xl border-2 transition-all duration-300 ${
-                        disabled
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'cursor-pointer hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
-                    } ${
-                        dragActive
-                            ? 'border-primary500 bg-primary50 shadow-lg scale-[1.02]'
-                            : loading
-                            ? 'border-warning400 bg-warning50'
-                            : hasError
-                            ? 'border-error500 bg-error50'
-                            : 'border-dashed hover:border-primary300'
-                    }`}
-                    style={{
-                        borderColor: dragActive
-                            ? undefined
-                            : loading
-                            ? colors.warning400
-                            : hasError
-                            ? colors.error500
-                            : colors.neutral300,
-                        backgroundColor: dragActive
-                            ? undefined
-                            : loading
-                            ? colors.warning50
-                            : hasError
-                            ? colors.error50
-                            : colors.neutral50,
-                    }}
-                    onClick={() => !disabled && inputRef.current?.click()}
-                    onDragEnter={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                >
-                    <input
-                        ref={inputRef}
-                        type="file"
-                        accept={accept}
-                        hidden
-                        disabled={disabled}
-                        onChange={(e) => handleSelect(e.target.files)}
-                    />
 
-                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 space-y-4">
-                        <div
-                            className={`relative rounded-full p-3 sm:p-4 transition-all duration-300 ${
-                                loading ? 'animate-pulse' : dragActive ? 'animate-bounce' : ''
-                            }`}
-                            style={{
-                                backgroundColor: loading
-                                    ? colors.warning100
-                                    : dragActive
-                                    ? colors.primary100
-                                    : hasError
-                                    ? colors.error100
-                                    : colors.neutral100,
-                            }}
-                        >
-                            {loading ? (
-                                <FiUpload className="w-6 h-6 sm:w-8 sm:h-8 animate-bounce" style={{ color: colors.warning500 }} />
-                            ) : dragActive ? (
-                                <FiImage className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: colors.primary600 }} />
-                            ) : hasError ? (
-                                <FiAlertCircle className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: colors.error500 }} />
-                            ) : (
-                                <FiUpload className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: colors.neutral400 }} />
-                            )}
-                        </div>
-
-                        <div className="text-center space-y-2">
-                            <p
-                                className={`text-sm sm:text-base font-medium ${
-                                    dragActive
-                                        ? 'text-primary600'
-                                        : loading
-                                        ? 'text-warning500'
-                                        : hasError
-                                        ? 'text-error500'
-                                        : ''
+            <div className={`relative group/upload w-full ${currentRatioClass}`}>
+                <AnimatePresence mode="wait">
+                    {!previewImage ? (
+                        <motion.div
+                            key="dropzone"
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 1.02 }}
+                            className={`h-full w-full relative rounded-[24px] border-2 transition-all duration-500 overflow-hidden flex flex-col items-center justify-center ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                                } ${dragActive ? 'shadow-2xl scale-[1.02]' : 'hover:shadow-lg'
                                 }`}
-                                style={{
-                                    color: dragActive
-                                        ? colors.primary600
-                                        : loading
-                                        ? colors.warning500
-                                        : hasError
-                                        ? colors.error500
-                                        : colors.neutral700,
-                                }}
-                            >
-                                {loading
-                                    ? 'Uploading...'
-                                    : dragActive
-                                    ? 'Drop image here'
-                                    : placeholder || 'Click to upload or drag and drop'}
-                            </p>
-                            <p className="text-xs sm:text-sm" style={{ color: colors.neutral500 }}>
-                                {loading
-                                    ? 'Please wait...'
-                                    : hasError
-                                    ? 'Try again or choose a different file'
-                                    : `Accepts ${accept.replace('image/', '').toUpperCase()} files (Max ${maxSize}MB)`}
-                            </p>
-                        </div>
-                    </div>
-
-                    {loading && (
-                        <div className="absolute inset-0 rounded-xl bg-white bg-opacity-90 flex items-center justify-center backdrop-blur-sm">
-                            <div className="flex flex-col items-center space-y-2 sm:space-y-3">
-                                <div className="flex items-center space-x-2">
-                                    <div
-                                        className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
-                                        style={{ animationDelay: '0ms' }}
-                                    ></div>
-                                    <div
-                                        className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
-                                        style={{ animationDelay: '150ms' }}
-                                    ></div>
-                                    <div
-                                        className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
-                                        style={{ animationDelay: '300ms' }}
-                                    ></div>
-                                </div>
-                                <p className="text-xs sm:text-sm font-medium" style={{ color: colors.warning500 }}>
-                                    Uploading image...
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            ) : (
-                <div className="space-y-3">
-                    <div className="relative group">
-                        <div
-                            className={`rounded-xl overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-                                aspectRatioClasses[aspectRatio as keyof typeof aspectRatioClasses] ||
-                                aspectRatioClasses.square
-                            } ${hasError ? 'border-error500' : 'border-neutral200'}`}
-                            style={{ borderColor: hasError ? colors.error500 : colors.neutral200 }}
+                            style={{
+                                borderColor: dragActive ? colors.primary500 : hasError ? colors.error500 : `${colors.neutral200}80`,
+                                backgroundColor: dragActive ? `${colors.primary500}05` : hasError ? `${colors.error500}05` : `${colors.neutral50}50`,
+                                borderStyle: dragActive ? 'solid' : 'dashed',
+                                backdropFilter: 'blur(8px)'
+                            }}
+                            onClick={() => !disabled && inputRef.current?.click()}
+                            onDragEnter={handleDrag}
+                            onDragLeave={handleDrag}
+                            onDragOver={handleDrag}
+                            onDrop={handleDrop}
                         >
-                            <img
-                                src={previewImage}
-                                alt="Preview"
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
+                            <input ref={inputRef} type="file" accept={accept} hidden disabled={disabled} onChange={(e) => handleSelect(e.target.files)} />
 
-                            {uploadSuccess && (
-                                <div className="absolute top-2 left-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-success500 text-white flex items-center justify-center animate-pulse z-10">
-                                    <FiCheck className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+
+                            <div className="relative z-10 flex flex-col items-center gap-4 p-6 text-center">
+                                <div
+                                    className="h-16 w-16 rounded-3xl flex items-center justify-center shadow-inner transition-transform duration-500"
+                                    style={{ backgroundColor: `${colors.primary500}10` }}
+                                >
+                                    <FiUpload style={{ fontSize: 24, color: colors.primary500 }} />
                                 </div>
-                            )}
+                                <div>
+                                    <p className="text-sm font-black m-0" style={{ color: colors.neutral800 }}>
+                                        {placeholder || 'Drop assets here'}
+                                    </p>
+                                    <p className="text-[10px] mt-1 font-bold opacity-40 uppercase tracking-widest" style={{ color: colors.neutral500 }}>
+                                        Click to browse or drag
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="preview"
+                            initial={{ opacity: 0, scale: 1.05 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className={`h-full w-full relative rounded-[24px] border-2 overflow-hidden transition-all duration-500 shadow-xl`}
+                            style={{ borderColor: hasError ? colors.error500 : `${colors.neutral200}80` }}
+                        >
+                            <img src={previewImage} alt="Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover/upload:scale-110" />
 
-                            <div className="absolute bottom-2 right-2 flex space-x-1 sm:space-x-2 z-10">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/upload:opacity-100 transition-opacity duration-300" />
+
+                            <div className="absolute top-4 left-4 flex gap-2">
+                                {uploadSuccess && (
+                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="h-8 w-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg">
+                                        <FiCheck />
+                                    </motion.div>
+                                )}
+                            </div>
+
+                            <div className="absolute bottom-4 right-4 flex gap-2 translate-y-4 opacity-0 group-hover/upload:translate-y-0 group-hover/upload:opacity-100 transition-all duration-300">
                                 {showPreview && (
                                     <button
                                         type="button"
                                         onClick={handleZoom}
-                                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-neutral700 flex items-center justify-center hover:bg-neutral100 transition-all duration-200 shadow-lg hover:scale-110"
-                                        title="View full size"
+                                        className="h-10 w-10 rounded-xl bg-white/90 backdrop-blur-md text-neutral-900 flex items-center justify-center hover:bg-white transition-all shadow-xl"
                                     >
-                                        <FiZoomIn className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        <FiMaximize />
                                     </button>
                                 )}
                                 {!disabled && (
                                     <button
                                         type="button"
                                         onClick={handleRemove}
-                                        className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full text-white flex items-center justify-center hover:bg-error600 transition-all duration-200 shadow-lg hover:scale-110"
-                                        title="Remove image"
+                                        className="h-10 w-10 rounded-xl bg-white/90 backdrop-blur-md text-red-600 flex items-center justify-center hover:bg-red-50 transition-all shadow-xl"
                                     >
-                                        <FiTrash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                                        <FiTrash2 />
                                     </button>
                                 )}
                             </div>
-                        </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                        {loading && (
-                            <div className="absolute inset-0 bg-white bg-opacity-90 rounded-xl flex items-center justify-center backdrop-blur-sm z-20">
-                                <div className="flex flex-col items-center space-y-2 sm:space-y-3">
-                                    <div className="flex items-center space-x-2">
-                                        <div
-                                            className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
-                                            style={{ animationDelay: '0ms' }}
-                                        ></div>
-                                        <div
-                                            className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
-                                            style={{ animationDelay: '150ms' }}
-                                        ></div>
-                                        <div
-                                            className="w-2 h-2 sm:w-3 sm:h-3 bg-warning500 rounded-full animate-bounce"
-                                            style={{ animationDelay: '300ms' }}
-                                        ></div>
-                                    </div>
-                                    <p className="text-xs sm:text-sm font-medium" style={{ color: colors.warning500 }}>
-                                        Updating image...
-                                    </p>
-                                </div>
-                            </div>
-                        )}
+                {loading && (
+                    <div className="absolute inset-0 z-20 rounded-[24px] bg-white/60 backdrop-blur-md flex flex-col items-center justify-center gap-4">
+                        <div className="relative h-12 w-12">
+                            <div className="absolute inset-0 rounded-full border-4 border-primary-500/20" />
+                            <motion.div
+                                className="absolute inset-0 rounded-full border-4 border-primary-500 border-t-transparent"
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                            />
+                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: colors.primary600 }}>Syncing Asset...</p>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             {displayHelperText && (
-                <div
-                    className={`flex items-start space-x-2 text-xs sm:text-sm ${
-                        hasError ? 'text-error500' : 'text-neutral500'
-                    }`}
-                >
-                    {hasError ? (
-                        <FiAlertCircle
-                            className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0"
-                            style={{ color: colors.error500 }}
-                        />
-                    ) : (
-                        <FiInfo
-                            className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0"
-                            style={{ color: colors.neutral400 }}
-                        />
-                    )}
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-colors ${hasError ? 'bg-red-50 text-red-600' : 'text-neutral-500'}`}>
+                    {hasError ? <FiAlertCircle /> : <FiInfo className="opacity-40" />}
                     <span>{displayHelperText}</span>
                 </div>
             )}
 
-            {showZoomModal && previewImage && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 backdrop-blur-sm"
-                    onClick={() => setShowZoomModal(false)}
-                >
-                    <div className="relative w-full max-w-4xl sm:max-w-6xl max-h-[90vh] sm:max-h-full animate-in zoom-in-95 duration-200">
-                        <img
-                            src={previewImage}
-                            alt="Full size preview"
-                            className="w-full h-full max-w-full max-h-full object-contain rounded-xl shadow-2xl"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowZoomModal(false)}
-                            className="absolute top-2 right-2 sm:top-4 sm:right-4 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-white text-neutral700 flex items-center justify-center hover:bg-neutral100 transition-all duration-200 shadow-lg hover:scale-110"
+            <AnimatePresence>
+                {showZoomModal && previewImage && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl"
+                        onClick={() => setShowZoomModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="relative w-full max-w-5xl max-h-[85vh] rounded-[32px] overflow-hidden shadow-2xl"
+                            onClick={e => e.stopPropagation()}
                         >
-                            <FiX className="w-4 h-4 sm:w-6 sm:h-6" />
-                        </button>
-                    </div>
-                </div>
-            )}
+                            <img src={previewImage} alt="Full size" className="w-full h-full object-contain" />
+                            <button
+                                onClick={() => setShowZoomModal(false)}
+                                className="absolute top-6 right-6 h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-all flex items-center justify-center"
+                            >
+                                <FiX fontSize={20} />
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
