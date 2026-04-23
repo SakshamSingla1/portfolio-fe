@@ -8,11 +8,11 @@ import { useParams } from 'react-router-dom';
 const ColorThemeViewPage: React.FC = () => {
     const colorThemeService = useColorThemeService();
     const params = useParams();
-    const themeName = String(params.themeName);
+    const themeId = String(params.id);
     const [colorTheme, setColorTheme] = useState<ColorTheme | null>(null);
 
     const loadColorThemeData = async () => {
-        colorThemeService.getColorThemeByThemeName(themeName)
+        colorThemeService.getColorThemeById(themeId)
             .then((res: any) => {
                 if (res.status === HTTP_STATUS.OK) {
                     setColorTheme(res.data.data);
@@ -20,13 +20,16 @@ const ColorThemeViewPage: React.FC = () => {
             })
     }
 
+
     useEffect(() => {
+        if (!themeId) return;
+        console.log(themeId, 'themeId');
         loadColorThemeData();
-    }, []);
+    }, [themeId]);
 
     return (
         <div>
-            <ColorThemeForm onSubmit={() => {}} mode={MODE.VIEW} colorTheme={colorTheme} />
+            <ColorThemeForm onSubmit={() => { }} mode={MODE.VIEW} colorTheme={colorTheme} />
         </div>
     );
 };

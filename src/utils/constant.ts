@@ -22,27 +22,27 @@ export const REGEX = {
 
 export const ADMIN_ROUTES = {
     PROFILE: "/profile",
-    
+
     EDUCATION: "/education",
     EDUCATION_ADD: "/education/add",
     EDUCATION_EDIT: "/education/:id/edit",
     EDUCATION_VIEW: "/education/:id",
-    
+
     EXPERIENCE: "/experience",
     EXPERIENCE_ADD: "/experience/add",
     EXPERIENCE_EDIT: "/experience/:id/edit",
     EXPERIENCE_VIEW: "/experience/:id",
-    
+
     PROJECTS: "/projects",
     PROJECTS_ADD: "/projects/add",
     PROJECTS_EDIT: "/projects/:id/edit",
     PROJECTS_VIEW: "/projects/:id",
-    
+
     SKILL: "/skills",
     SKILL_ADD: "/skills/add",
     SKILL_EDIT: "/skills/:id/edit",
     SKILL_VIEW: "/skills/:id",
-    
+
     CONTACT_US: "/messages",
 
     SETTINGS: "/settings",
@@ -60,8 +60,8 @@ export const ADMIN_ROUTES = {
 
     COLOR_THEME: "/themes",
     COLOR_THEME_ADD: "/themes/add",
-    COLOR_THEME_EDIT: "/themes/:themeName/edit",
-    COLOR_THEME_VIEW: "/themes/:themeName",
+    COLOR_THEME_EDIT: "/themes/:id/edit",
+    COLOR_THEME_VIEW: "/themes/:id",
 
     RESUMES: "/resumes",
 
@@ -107,7 +107,7 @@ export const MODE = {
     EDIT: "EDIT",
     REVIEW: "REVIEW",
 }
-   
+
 export const initialPaginationValues: IPagination = {
     currentPage: 0,
     pageSize: 50,
@@ -469,31 +469,31 @@ export const DEBOUNCE_TIME = {
 }
 
 export const DEGREE_OPTIONS: Option[] = [
-  { value: 'HIGH_SCHOOL', label: '10th' },
-  { value: 'SENIOR_SECONDARY', label: '12th' },
-  { value: 'DIPLOMA', label: 'Diploma' },
-  { value: 'ADVANCED_DIPLOMA', label: 'Advanced Diploma' },
-  { value: 'CERTIFICATION', label: 'Certification' },
-  { value: 'ASSOCIATE', label: 'Associate Degree' },
-  { value: 'BACHELORS', label: 'Bachelors' },
-  { value: 'BTECH', label: 'Bachelor of Technology (B.Tech)' },
-  { value: 'BE', label: 'Bachelor of Engineering (B.E.)' },
-  { value: 'BSC', label: 'Bachelor of Science (B.Sc)' },
-  { value: 'BA', label: 'Bachelor of Arts (B.A)' },
-  { value: 'BCOM', label: 'Bachelor of Commerce (B.Com)' },
-  { value: 'BCA', label: 'Bachelor of Computer Applications (BCA)' },
-  { value: 'BBA', label: 'Bachelor of Business Administration (BBA)' },
-  { value: 'MASTERS', label: 'Masters' },
-  { value: 'MTECH', label: 'Master of Technology (M.Tech)' },
-  { value: 'ME', label: 'Master of Engineering (M.E.)' },
-  { value: 'MSC', label: 'Master of Science (M.Sc)' },
-  { value: 'MA', label: 'Master of Arts (M.A)' },
-  { value: 'MCOM', label: 'Master of Commerce (M.Com)' },
-  { value: 'MBA', label: 'Master of Business Administration (MBA)' },
-  { value: 'MCA', label: 'Master of Computer Applications (MCA)' },
-  { value: 'PHD', label: 'PhD' },
-  { value: 'POST_DOCTORATE', label: 'Post Doctorate' },
-  { value: 'OTHER', label: 'Other' },
+    { value: 'HIGH_SCHOOL', label: '10th' },
+    { value: 'SENIOR_SECONDARY', label: '12th' },
+    { value: 'DIPLOMA', label: 'Diploma' },
+    { value: 'ADVANCED_DIPLOMA', label: 'Advanced Diploma' },
+    { value: 'CERTIFICATION', label: 'Certification' },
+    { value: 'ASSOCIATE', label: 'Associate Degree' },
+    { value: 'BACHELORS', label: 'Bachelors' },
+    { value: 'BTECH', label: 'Bachelor of Technology (B.Tech)' },
+    { value: 'BE', label: 'Bachelor of Engineering (B.E.)' },
+    { value: 'BSC', label: 'Bachelor of Science (B.Sc)' },
+    { value: 'BA', label: 'Bachelor of Arts (B.A)' },
+    { value: 'BCOM', label: 'Bachelor of Commerce (B.Com)' },
+    { value: 'BCA', label: 'Bachelor of Computer Applications (BCA)' },
+    { value: 'BBA', label: 'Bachelor of Business Administration (BBA)' },
+    { value: 'MASTERS', label: 'Masters' },
+    { value: 'MTECH', label: 'Master of Technology (M.Tech)' },
+    { value: 'ME', label: 'Master of Engineering (M.E.)' },
+    { value: 'MSC', label: 'Master of Science (M.Sc)' },
+    { value: 'MA', label: 'Master of Arts (M.A)' },
+    { value: 'MCOM', label: 'Master of Commerce (M.Com)' },
+    { value: 'MBA', label: 'Master of Business Administration (MBA)' },
+    { value: 'MCA', label: 'Master of Computer Applications (MCA)' },
+    { value: 'PHD', label: 'PhD' },
+    { value: 'POST_DOCTORATE', label: 'Post Doctorate' },
+    { value: 'OTHER', label: 'Other' },
 ];
 
 
@@ -512,7 +512,7 @@ export const RESOURCE_STATUS = {
 
 export const SocialLinkPlatform = {
     GITHUB: "GITHUB",
-    GITLAB: "GITLAB",   
+    GITLAB: "GITLAB",
     BITBUCKET: "BITBUCKET",
     LINKEDIN: "LINKEDIN",
     STACKOVERFLOW: "STACKOVERFLOW",
@@ -529,7 +529,7 @@ export const SocialLinkPlatform = {
     OTHER: "OTHER"
 } as const;
 
-export const SocialLinkPlatformOptions : Option[] = [
+export const SocialLinkPlatformOptions: Option[] = [
     { label: "Github", value: SocialLinkPlatform.GITHUB },
     { label: "Gitlab", value: SocialLinkPlatform.GITLAB },
     { label: "Bitbucket", value: SocialLinkPlatform.BITBUCKET },

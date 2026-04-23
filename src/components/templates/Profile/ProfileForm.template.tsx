@@ -1,14 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { InputAdornment } from "@mui/material";
 import type { FormikProps } from "formik";
-import { FiUser,FiMail,FiMapPin,FiPhone,FiBriefcase,FiImage,FiInfo} from "react-icons/fi";
+import { FiUser, FiMail, FiMapPin, FiPhone, FiBriefcase, FiImage, FiInfo } from "react-icons/fi";
 import TextFieldV2 from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
-import AutoCompleteInput, { type AutoCompleteOption } from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import { useProfileService } from "../../../services/useProfileService";
-import { useColorThemeService, type ColorTheme, type ColorThemeFilterRequest} from "../../../services/useColorThemeService";
-import type { ProfileRequest, ImageUploadResponse,} from "../../../services/useProfileService";
+import type { ProfileRequest, ImageUploadResponse, } from "../../../services/useProfileService";
 import { Status, useColors, HTTP_STATUS } from "../../../utils/types";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { IoMdCloudUpload } from "react-icons/io";
@@ -17,7 +15,7 @@ import { useResumeService, type DocumentUploadResponse, type ResumeSearchParams 
 import { usePublicResumeService } from "../../../services/usePublicResumeService";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
-const SectionCard = ({ title, subtitle, icon: Icon, actions, children,}: {
+const SectionCard = ({ title, subtitle, icon: Icon, actions, children, }: {
   title: string;
   subtitle?: string;
   icon: React.ElementType;
@@ -65,7 +63,6 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
   const { showSnackbar } = useSnackbar();
 
   const profileService = useProfileService();
-  const colorThemeService = useColorThemeService();
   const resumeService = useResumeService();
   const publicResumeService = usePublicResumeService();
 
@@ -80,7 +77,6 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     resume: false,
     aboutMeImage: false,
   });
-  const [colorThemes, setColorThemes] = useState<ColorTheme[]>([]);
   const [activeResume, setActiveResume] = useState<DocumentUploadResponse | null>(null);
 
   const uploadProfileImage = async (file: File): Promise<ImageUploadResponse> => {
@@ -169,19 +165,6 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     }
   };
 
-  const loadColorThemes = async (search = "") => {
-    const params: ColorThemeFilterRequest = {
-      page: "0",
-      size: "10",
-      search,
-      status: Status.ACTIVE,
-    };
-    const res = await colorThemeService.getColorTheme(params);
-    if (res.status === HTTP_STATUS.OK) {
-      setColorThemes(res.data.data.content || []);
-    }
-  };
-
   const handleViewResume = async () => {
     const url = publicResumeService.getViewResumeUrl();
     window.open(url, "_blank");
@@ -192,28 +175,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     window.location.href = url;
   };
 
-  const themeOptions = useMemo<AutoCompleteOption[]>(
-    () =>
-      colorThemes.map((theme) => ({
-        label: theme.themeName,
-        value: theme.themeName,
-      })),
-    [colorThemes]
-  );
-
-  useEffect(() => {
-    loadColorThemes();
-  }, []);
-
   useEffect(() => {
     if (formik.values.userName) {
       loadActiveResume();
     }
   }, [formik.values.userName]);
-
-  useEffect(() => {
-    console.log(formik);
-  }, [formik]);
 
   return (
     <div className="pb-6 space-y-6">
@@ -229,9 +195,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               value={
                 formik.values.profileImageUrl
                   ? {
-                      url: formik.values.profileImageUrl,
-                      publicId: formik.values.profileImagePublicId,
-                    }
+                    url: formik.values.profileImageUrl,
+                    publicId: formik.values.profileImagePublicId,
+                  }
                   : null
               }
               onChange={(value) => {
@@ -255,9 +221,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               value={
                 formik.values.aboutMeImageUrl
                   ? {
-                      url: formik.values.aboutMeImageUrl,
-                      publicId: formik.values.aboutMeImagePublicId,
-                    }
+                    url: formik.values.aboutMeImageUrl,
+                    publicId: formik.values.aboutMeImagePublicId,
+                  }
                   : null
               }
               onChange={(value) => {
@@ -281,9 +247,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               value={
                 formik.values.logoUrl
                   ? {
-                      url: formik.values.logoUrl,
-                      publicId: formik.values.logoPublicId,
-                    }
+                    url: formik.values.logoUrl,
+                    publicId: formik.values.logoPublicId,
+                  }
                   : null
               }
               onChange={(value) => {
@@ -400,26 +366,6 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
                 required={isEditMode}
               />
             </div>
-            <div className="md:col-span-2">
-              <AutoCompleteInput
-                label="Color Theme"
-                placeHolder="Search theme"
-                options={themeOptions}
-                value={
-                  themeOptions.find(
-                    (o) => o.value === formik.values.themeName
-                  ) || null
-                }
-                onChange={(option) =>
-                  formik.setFieldValue("themeName", option?.value || "")
-                }
-                onSearch={loadColorThemes}
-                isDisabled={!isEditMode}
-                error={Boolean(formik.errors.themeName && formik.touched.themeName)}
-                helperText={Boolean(formik.errors.themeName && formik.touched.themeName) ? formik.errors.themeName : ""}
-                required={isEditMode}
-              />
-            </div>
           </div>
         </SectionCard>
       </div>
@@ -455,10 +401,10 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
           value={
             activeResume
               ? {
-                  id: activeResume.id,
-                  name: activeResume.fileName,
-                  url: activeResume.fileUrl,
-                }
+                id: activeResume.id,
+                name: activeResume.fileName,
+                url: activeResume.fileUrl,
+              }
               : null
           }
           onUpload={uploadResume}

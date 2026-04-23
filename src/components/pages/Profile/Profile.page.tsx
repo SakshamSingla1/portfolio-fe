@@ -3,19 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FiEdit } from "react-icons/fi";
-
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
-
-import {
-  useProfileService,
-  type ProfileRequest,
-} from "../../../services/useProfileService";
-import { useColorThemeService } from "../../../services/useColorThemeService";
-
+import { useProfileService, type ProfileRequest, } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
-
 import ProfileFormTemplate from "../../templates/Profile/ProfileForm.template";
 import Button from "../../atoms/Button/Button";
 
@@ -41,8 +32,6 @@ const ProfilePage: React.FC = () => {
   const { showSnackbar } = useSnackbar();
 
   const profileService = useProfileService();
-  const colorThemeService = useColorThemeService();
-  const { setDefaultTheme } = useAuthenticatedUser();
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -66,7 +55,6 @@ const ProfilePage: React.FC = () => {
       aboutMeImagePublicId: "",
       logoUrl: "",
       logoPublicId: "",
-      themeName: "",
     },
     validationSchema,
     enableReinitialize: true,
@@ -97,29 +85,9 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const applyTheme = async () => {
-    try {
-      const response =
-        await colorThemeService.getColorThemeByThemeName(
-          formik.values.themeName
-        );
-      if (response.status === HTTP_STATUS.OK) {
-        setDefaultTheme(response.data.data);
-      }
-    } catch {
-      showSnackbar("error", "Failed to apply theme");
-    }
-  };
-
   useEffect(() => {
     fetchProfile();
   }, []);
-
-  useEffect(() => {
-    if (formik.values.themeName) {
-      applyTheme();
-    }
-  }, [formik.values.themeName]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -131,18 +99,16 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     setIsEditMode(searchParams.get("mode") === MODE.EDIT);
   }, [searchParams]);
-  
+
   return (
     <div className="relative">
       <div className="relative" style={{ padding: isMobile ? "20px 0px" : "32px 24px" }}>
         {!isEditMode && (
           isMobile ? (
             <button
-              onClick={() =>
-                navigate(`${ADMIN_ROUTES.PROFILE}?mode=${MODE.EDIT}`)
-              }
+              onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=${MODE.EDIT}`)}
               className="absolute top-4 right-4 z-10"
-              style={{ backgroundColor: colors.primary50 , border: `1px solid ${colors.primary200}` , borderRadius: 12 , padding: 8 , cursor: "pointer" ,color: colors.primary500}}
+              style={{ backgroundColor: colors.primary50, border: `1px solid ${colors.primary200}`, borderRadius: 12, padding: 8, cursor: "pointer", color: colors.primary500 }}
             >
               <FiEdit />
             </button>
@@ -151,16 +117,12 @@ const ProfilePage: React.FC = () => {
               <Button
                 variant="primaryContained"
                 label="Edit Profile"
-                onClick={() =>
-                  navigate(`${ADMIN_ROUTES.PROFILE}?mode=${MODE.EDIT}`)
-                }
+                onClick={() => navigate(`${ADMIN_ROUTES.PROFILE}?mode=${MODE.EDIT}`)}
               />
             </div>
           )
         )}
-        <h1 className={`font-bold ${isMobile ? "text-xl" : "text-2xl"}`}>
-          {isEditMode ? "Edit Profile" : "My Profile"}
-        </h1>
+        <h1 className={`font-bold ${isMobile ? "text-xl" : "text-2xl"}`}>{isEditMode ? "Edit Profile" : "My Profile"}</h1>
         <p className="mt-1" style={{ color: colors.neutral700 }}>
           Manage your personal & professional information
         </p>
@@ -168,7 +130,7 @@ const ProfilePage: React.FC = () => {
       <div className="pb-10">
         {isLoading ? (
           <div className="py-12 text-center text-sm text-gray-500">
-            Loading profile…
+            Loading profile...
           </div>
         ) : (
           <ProfileFormTemplate

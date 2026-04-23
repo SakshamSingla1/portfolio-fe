@@ -12,7 +12,7 @@ const ColorThemeEditPage: React.FC = () => {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
     const params = useParams();
-    const themeName = String(params.themeName);
+    const themeId = String(params.themeId);
 
     const colorThemeService = useColorThemeService();
 
@@ -32,7 +32,7 @@ const ColorThemeEditPage: React.FC = () => {
     }
 
     const loadColorThemeData = async () => {
-        colorThemeService.getColorThemeByThemeName(themeName)
+        colorThemeService.getColorThemeById(themeId)
             .then((res: any) => {
                 if (res.status === HTTP_STATUS.OK) {
                     setColorTheme(res.data.data);
@@ -41,8 +41,10 @@ const ColorThemeEditPage: React.FC = () => {
     }
 
     useEffect(() => {
+        if (!themeId) return;
+        console.log(themeId, 'themeId');
         loadColorThemeData();
-    }, []);
+    }, [themeId]);
 
     return (
         <div>

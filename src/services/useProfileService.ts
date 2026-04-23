@@ -65,7 +65,6 @@ export interface ProfileRequest {
     aboutMeImagePublicId?: string;
     logoUrl?: string;
     logoPublicId?: string;
-    themeName: string;
 }
 
 export interface UserResponse {

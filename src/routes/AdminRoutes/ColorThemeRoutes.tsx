@@ -9,8 +9,8 @@ const ColorThemeRoutes = () => {
         <Routes>
             <Route index element={<ColorThemeListingPage />} />
             <Route path="add" element={<ColorThemeAddPage />} />
-            <Route path=":themeName/edit" element={<ColorThemeEditPage />} />
-            <Route path=":themeName" element={<ColorThemeViewPage />} />
+            <Route path=":id/edit" element={<ColorThemeEditPage />} />
+            <Route path=":id" element={<ColorThemeViewPage />} />
         </Routes>
     );
 };

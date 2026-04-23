@@ -11,13 +11,6 @@ const ColorThemeListingPage: React.FC = () => {
     const colorThemeService = useColorThemeService();
     const { showSnackbar } = useSnackbar();
 
-    const initialFiltersValues: any = {
-        search: searchParams.get("search") || "",
-        role: searchParams.get("role") || "",
-        status: searchParams.get("status") || ""
-    };
-
-    const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
     const [pagination, setPagination] = useState<IPagination>({
         ...initialPaginationValues,
         currentPage: Number(searchParams.get("page")) || 0,
@@ -27,13 +20,11 @@ const ColorThemeListingPage: React.FC = () => {
 
     const refreshColorThemes = async (page: string, size: string) => {
         const params: ColorThemeFilterRequest = {
-                    page: page,
-                    size: size,
-                    sortDir: "desc",
-                    sortBy: "createdAt",
-                    search: filters?.search,
-                    status: filters?.status
-                };
+            page: page,
+            size: size,
+            sortDir: "desc",
+            sortBy: "createdAt",
+        };
         await colorThemeService.getColorTheme(params)
             .then((res) => {
                 if (res?.status === HTTP_STATUS.OK) {
@@ -52,42 +43,41 @@ const ColorThemeListingPage: React.FC = () => {
             })
     }
 
-    const handleFiltersChange = (name: string, value: any) => {
-        setFiltersTo({ ...filters, [name]: value ?? "" });
-        setPagination({ ...pagination, currentPage: 0 })
-    }
+    // const handleFiltersChange = (name: string, value: any) => {
+    //     setFiltersTo({ ...filters, [name]: value ?? "" });
+    //     setPagination({ ...pagination, currentPage: 0 })
+    // }
 
-    const handlePaginationChange = (newPage: number) => {
-        setPagination((prevPagination) => ({
-            ...prevPagination,
-            currentPage: newPage
-        }));
-    };
+    // const handlePaginationChange = (newPage: number) => {
+    //     setPagination((prevPagination) => ({
+    //         ...prevPagination,
+    //         currentPage: newPage
+    //     }));
+    // };
 
-    const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newRowsPerPage = parseInt(event.target.value, 10);
-        setPagination((prevPagination) => ({
-            ...prevPagination,
-            pageSize: newRowsPerPage
-        }));
-    };
+    // const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const newRowsPerPage = parseInt(event.target.value, 10);
+    //     setPagination((prevPagination) => ({
+    //         ...prevPagination,
+    //         pageSize: newRowsPerPage
+    //     }));
+    // };
 
     useEffect(() => {
         refreshColorThemes(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
+    }, [pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         const params: Record<string, string> = {
             page: String(pagination.currentPage),
             size: String(pagination.pageSize),
-            search: filters.search ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [pagination]);
 
     return (
         <div>
-            <ColorThemeListingTemplate colorThemes={colorThemes} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
+            <ColorThemeListingTemplate colorThemes={colorThemes} />
         </div>
     )
 }
