@@ -36,7 +36,7 @@ interface ColorCardProps {
 
 const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
   const navigate = useNavigate();
-  const { activeThemeName, setActiveTheme, resetTheme } = useTheme();
+  const { activeThemeName, setActiveTheme, resetTheme, isDark, setColorMode } = useTheme();
   const { assignThemeToUser } = useProfileThemeService();
   const colors = useColors();
   const { setDefaultTheme } = useAuthenticatedUser();
@@ -81,7 +81,6 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
         await assignThemeToUser(colorTheme.id);
         setDefaultTheme(colorTheme);
       } catch (error) {
-        console.error("Failed to assign theme:", error);
       } finally {
         setIsAssigning(false);
       }
@@ -101,8 +100,10 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
     colorTheme.palette.colorGroups[1]?.colorShades[0]?.colorCode || "#8B5CF6";
 
   return (
-    <div className="relative h-full group/card">
-      {/* Dynamic Aura Glow */}
+    <div
+      className="relative h-full group/card select-none"
+      onDoubleClick={() => setColorMode(isDark ? "light" : "dark")}
+    >
       <div
         className="absolute inset-0 blur-[60px] opacity-0 group-hover/card:opacity-10 transition-opacity duration-700 pointer-events-none"
         style={{
@@ -111,22 +112,21 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
       />
 
       <GlassCard
-        className={`h-full relative overflow-hidden transition-all duration-500 border-0 ${isActive ? "ring-1 ring-primary-500/40" : ""
+        className={`h-full relative overflow-hidden transition-all duration-500 ${isActive ? "ring-2 ring-primary-500/30" : ""
           }`}
         style={{
           boxShadow: isActive
-            ? `0 20px 40px ${primaryColor}15`
-            : `0 8px 30px rgba(0,0,0,0.15)`,
-          backgroundColor: `${colors.neutral0}03`,
-          borderColor: isActive ? primaryColor : "transparent",
+            ? `0 20px 40px ${primaryColor}20`
+            : isDark ? `0 8px 30px rgba(0,0,0,0.4)` : `0 8px 30px ${colors.neutral900}08`,
+          backgroundColor: isDark ? `${colors.neutral0}05` : `${colors.neutral0}`,
+          border: `1.5px solid ${isActive ? primaryColor : isDark ? `${colors.neutral200}15` : `${colors.neutral200}`}`,
           padding: "20px",
         }}
       >
-        {/* Compact Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div
-              className="h-9 w-9 rounded-xl flex items-center justify-center relative overflow-hidden group-hover/card:rotate-12 transition-transform duration-500"
+              className="h-9 w-9 rounded-xl flex items-center justify-center relative overflow-hidden transition-transform duration-500"
               style={{ background: `linear-gradient(135deg, ${primaryColor}25, ${accentColor}15)`, border: `1px solid ${primaryColor}20` }}
             >
               <TbPalette className="h-4 w-4" style={{ color: primaryColor }} />
@@ -147,41 +147,46 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
           </div>
 
           <div className="flex items-center gap-1">
-            {/* Action Icons */}
             <div className="flex items-center gap-1 mr-2 opacity-0 group-hover/card:opacity-100 transition-all duration-300 transform translate-x-2 group-hover/card:translate-x-0">
               <button
                 onClick={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_VIEW, { params: { id: colorTheme.id } }))}
-                className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-white/10 text-white/40 hover:text-white transition-all"
+                className="h-7 w-7 rounded-lg flex items-center justify-center transition-all"
+                style={{ color: colors.neutral400 }}
               >
-                <FiMaximize2 className="h-3.5 w-3.5" />
+                <FiMaximize2 className="h-3.5 w-3.5 hover:scale-110 transition-transform" />
               </button>
               <button
                 onClick={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_EDIT, { params: { id: colorTheme.id } }))}
-                className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-white/10 text-white/40 hover:text-white transition-all"
+                className="h-7 w-7 rounded-lg flex items-center justify-center transition-all"
+                style={{ color: colors.neutral400 }}
               >
-                <FiEdit3 className="h-3.5 w-3.5" />
+                <FiEdit3 className="h-3.5 w-3.5 hover:scale-110 transition-transform" />
               </button>
               {onDelete && colorTheme.id && (
                 <button
                   onClick={() => onDelete(colorTheme.id!)}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-all"
+                  className="h-7 w-7 rounded-lg flex items-center justify-center transition-all hover:bg-red-500/10"
+                  style={{ color: colors.neutral400 }}
                 >
-                  <FiTrash2 className="h-3.5 w-3.5" />
+                  <FiTrash2 className="h-3.5 w-3.5 hover:text-red-500 transition-colors" />
                 </button>
               )}
             </div>
 
             <button
               onClick={handleApply}
-              className="h-8 w-8 rounded-lg flex items-center justify-center transition-all bg-white/5 border border-white/10 hover:bg-white/10 active:scale-90"
-              style={{ color: isActive ? primaryColor : colors.neutral400 }}
+              className="h-8 w-8 rounded-lg flex items-center justify-center transition-all border active:scale-90"
+              style={{
+                color: isActive ? primaryColor : colors.neutral400,
+                backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+                borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"
+              }}
             >
               {isActive ? <FiEyeOff className="h-4 w-4" /> : <FiEye className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        {/* Jewel Box Grid */}
         <div className="space-y-6">
           {colorTheme.palette.colorGroups.map((group: ColorGroup) => (
             <div key={group.groupName}>
@@ -189,7 +194,7 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 italic" style={{ color: colors.neutral900 }}>
                   {group.groupName}
                 </span>
-                <div className="h-[1px] flex-1 bg-white/5" />
+                <div className="h-[1px] flex-1" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }} />
               </div>
 
               <div className="grid grid-cols-5 gap-1.5">
@@ -200,21 +205,16 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
                     className="group/shade relative aspect-square"
                     onClick={(e) => copyToClipboard(shade.colorCode, e)}
                   >
-                    <div
+                      <div
                       className="w-full h-full rounded-lg cursor-pointer border border-white/5 shadow-sm overflow-hidden relative"
                       style={{ backgroundColor: shade.colorCode }}
                     >
-                      {/* Shine & Copy Reveal */}
                       <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/shade:opacity-100 transition-opacity flex flex-col items-center justify-center backdrop-blur-[1px]">
                         <FiCopy className="h-2.5 w-2.5 text-white" />
                       </div>
-
-                      {/* HEX Reveal on Hover */}
                       <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-[7px] px-1.5 py-0.5 rounded font-black opacity-0 group-hover/shade:opacity-100 transition-all pointer-events-none z-20 whitespace-nowrap">
                         {shade.colorCode}
                       </div>
-
-                      {/* Copied State */}
                       <AnimatePresence>
                         {copiedColor === shade.colorCode && (
                           <motion.div
@@ -235,7 +235,6 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
           ))}
         </div>
 
-        {/* Action Footer */}
         <div className="mt-8 pt-5 border-t flex items-center justify-between" style={{ borderColor: `${colors.neutral200}10` }}>
           <div className="flex items-center gap-2 opacity-20">
             <FiGrid className="h-3 w-3" style={{ color: colors.neutral500 }} />

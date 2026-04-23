@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useMemo} from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import TextField from "../../atoms/TextField/TextField";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { isRichTextEmpty, titleModification } from "../../../utils/helper";
@@ -216,8 +216,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                                 if (selectedOption) {
                                     if (!formik.values.skillIds.includes(selectedOption.value)) {
                                         formik.setFieldValue("skillIds", [...formik.values.skillIds, selectedOption.value]);
-                                    } else {
-                                        console.log(`${selectedOption.title} is already added to the experience`);
                                     }
                                 }
                             }}
@@ -236,12 +234,12 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                                     {selectedSkills.map((skill) => (
                                         mode !== MODE.VIEW ? (
                                             <Chip key={skill.id} label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>} onDelete={() => {
-                                                    const updatedTechs = formik.values.skillIds.filter((tech: any) => {
-                                                        const techId = typeof tech === 'object' && tech !== null && 'id' in tech ? tech.id : tech;
-                                                        return techId !== skill.id;
-                                                    });
-                                                    formik.setFieldValue("skillIds", updatedTechs);
-                                                }} />
+                                                const updatedTechs = formik.values.skillIds.filter((tech: any) => {
+                                                    const techId = typeof tech === 'object' && tech !== null && 'id' in tech ? tech.id : tech;
+                                                    return techId !== skill.id;
+                                                });
+                                                formik.setFieldValue("skillIds", updatedTechs);
+                                            }} />
                                         ) : (
                                             <Chip key={skill.id} label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>} onDelete={() => { }} />
                                         )

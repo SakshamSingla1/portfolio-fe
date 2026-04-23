@@ -398,30 +398,6 @@ const DashboardLayout: React.FC = () => {
               </div>
             </div>
 
-            {isPreviewActive && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "6px 12px",
-                  borderRadius: 10,
-                  background: `linear-gradient(135deg, ${colors.primary500}20, ${colors.primary600}10)`,
-                  color: colors.primary700,
-                  border: `1px solid ${colors.primary500}30`,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-                onClick={resetTheme}
-                whileHover={{ scale: 1.05 }}
-              >
-                <span>✨</span>
-                <span>{activeThemeName}</span>
-              </motion.div>
-            )}
           </div>
 
           <div className={classes.headerRight}>

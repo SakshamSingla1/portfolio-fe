@@ -11,8 +11,8 @@ import { useSnackbar } from '../../../hooks/useSnackBar';
 const ColorThemeEditPage: React.FC = () => {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
-    const params = useParams();
-    const themeId = String(params.themeId);
+    const { id } = useParams();
+    const themeId = String(id);
 
     const colorThemeService = useColorThemeService();
 
@@ -42,7 +42,6 @@ const ColorThemeEditPage: React.FC = () => {
 
     useEffect(() => {
         if (!themeId) return;
-        console.log(themeId, 'themeId');
         loadColorThemeData();
     }, [themeId]);
 

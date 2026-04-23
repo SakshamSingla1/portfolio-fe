@@ -23,7 +23,6 @@ const ColorThemeViewPage: React.FC = () => {
 
     useEffect(() => {
         if (!themeId) return;
-        console.log(themeId, 'themeId');
         loadColorThemeData();
     }, [themeId]);
 

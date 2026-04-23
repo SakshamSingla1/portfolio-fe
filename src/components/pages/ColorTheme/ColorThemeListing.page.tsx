@@ -73,11 +73,14 @@ const ColorThemeListingPage: React.FC = () => {
             size: String(pagination.pageSize),
         };
         setSearchParams(params);
-    }, [pagination]);
+    }, [pagination.currentPage, pagination.pageSize]);
 
     return (
         <div>
-            <ColorThemeListingTemplate colorThemes={colorThemes} />
+            <ColorThemeListingTemplate 
+                colorThemes={colorThemes} 
+                onRefresh={() => refreshColorThemes(pagination.currentPage.toString(), pagination.pageSize.toString())} 
+            />
         </div>
     )
 }

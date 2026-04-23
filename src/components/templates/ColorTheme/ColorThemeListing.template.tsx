@@ -38,14 +38,12 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 await deleteColorTheme(id);
                 if (onRefresh) onRefresh();
             } catch (error) {
-                console.error("Failed to delete theme:", error);
             }
         }
     };
 
     return (
         <div className="relative w-full max-w-[1200px] mx-auto py-6 sm:py-10 px-4 sm:px-6">
-            {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -81,7 +79,6 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 </div>
             </motion.div>
 
-            {/* Live Preview Panel */}
             <AnimatePresence>
                 {isPreviewActive && (
                     <motion.div
@@ -113,7 +110,6 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 )}
             </AnimatePresence>
 
-            {/* Themes Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {colorThemes.map((theme, i) => (
                     <motion.div
@@ -130,7 +126,6 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 ))}
             </div>
 
-            {/* No Data State */}
             {colorThemes.length === 0 && (
                 <div className="py-32 flex flex-col items-center justify-center text-center">
                     <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6 opacity-20">
@@ -141,7 +136,6 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 </div>
             )}
 
-            {/* Grain Overlay */}
             <div
                 className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100]"
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
