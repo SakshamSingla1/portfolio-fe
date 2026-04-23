@@ -81,7 +81,7 @@ export const useColors = () => {
             else if (shade === 200) targetShade = 700;
             else if (shade === 300) targetShade = 600;
             else if (shade === 400) targetShade = 500;
-            else if (shade === 500) targetShade = 400; // Make base color slighty lighter in dark mode for pop
+            else if (shade === 500) targetShade = 400;
             else if (shade === 600) targetShade = 300;
             else if (shade === 700) targetShade = 200;
             else if (shade === 800) targetShade = 100;

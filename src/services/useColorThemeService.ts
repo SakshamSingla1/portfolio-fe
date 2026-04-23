@@ -5,7 +5,7 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 export const COLOR_THEME_URLS = {
     GET_COLOR_THEME: "color-themes",
-    GET_COLOR_THEME_BY_ROLE_THEME_NAME: "color-themes/:themeName",
+    GET_COLOR_THEME_BY_ROLE_THEME_ID: "color-themes/:themeId",
     GET_COLOR_THEME_BY_ID: "color-themes/:id",
 }
 
@@ -44,17 +44,17 @@ export interface ColorTheme {
 export const useColorThemeService = () => {
     const { user } = useAuthenticatedUser();
     const getColorTheme = async (params: ColorThemeFilterRequest) => {
-        return request(API_METHOD.GET, COLOR_THEME_URLS.GET_COLOR_THEME, user,null,{params});
+        return request(API_METHOD.GET, COLOR_THEME_URLS.GET_COLOR_THEME, user, null, { params });
     }
 
-    const getColorThemeByThemeName = async (themeName: string) => {
-        return request(API_METHOD.GET, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ROLE_THEME_NAME, { themeName }), user);
+    const getColorThemeById = async (id: string) => {
+        return request(API_METHOD.GET, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user);
     }
 
     const createColorTheme = async (colorTheme: ColorTheme) => {
         return request(API_METHOD.POST, COLOR_THEME_URLS.GET_COLOR_THEME, user, colorTheme);
     }
-    
+
     const updateColorTheme = async (id: string, colorTheme: ColorTheme) => {
         return request(API_METHOD.PUT, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user, colorTheme);
     }
@@ -65,7 +65,7 @@ export const useColorThemeService = () => {
 
     return {
         getColorTheme,
-        getColorThemeByThemeName,
+        getColorThemeById,
         createColorTheme,
         updateColorTheme,
         deleteColorTheme

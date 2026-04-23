@@ -1,277 +1,151 @@
-import React, { useState, useEffect } from "react";
-import TableV1, { type ColumnType } from "../../organisms/Table/TableV1";
-import { type IPagination } from "../../../utils/types";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import TextField from "../../atoms/TextField/TextField";
-import { InputAdornment } from "@mui/material";
-import { type ColorTheme, type ColorThemeFilterRequest } from "../../../services/useColorThemeService";
-import { makeRoute, DateUtils } from "../../../utils/helper";
-import { FiEdit, FiEye, FiSearch, FiFilter, FiPlus, FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { ADMIN_ROUTES } from "../../../utils/constant";
+import React from "react";
+import {
+    type ColorTheme,
+    useColorThemeService
+} from "../../../services/useColorThemeService";
+import {
+    FiStar,
+    FiX,
+    FiPlus,
+} from "react-icons/fi";
+import { TbPalette } from "react-icons/tb";
 import Button from "../../atoms/Button/Button";
-import { StatusOptions } from "../../../utils/types";
-import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
+import { useColors } from "../../../utils/types";
+import { motion, AnimatePresence } from "framer-motion";
+import GlassCard from "../../atoms/GlassCard/GlassCard";
+import ColorCard from "./ColorCard.template";
+import { useTheme } from "../../../contexts/ThemeContext";
+import { useNavigate } from "react-router-dom";
+import { ADMIN_ROUTES } from "../../../utils/constant";
 
 interface ColorThemeListingTemplateProps {
     colorThemes: ColorTheme[];
-    pagination: IPagination;
-    handleFiltersChange: (name: string, value: any) => void;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
-    filters: ColorThemeFilterRequest
+    onRefresh?: () => void;
 }
 
 const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     colorThemes,
-    pagination,
-    handleFiltersChange,
-    handlePaginationChange,
-    handleRowsPerPageChange,
-    filters
+    onRefresh
 }) => {
+    const colors = useColors();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState(false);
-    const [showFilters, setShowFilters] = useState(false);
+    const { activeThemeName, resetTheme, isPreviewActive } = useTheme();
+    const { deleteColorTheme } = useColorThemeService();
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
-    const handleEdit = (themeName: string) => {
-        navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_EDIT, {
-            params: {
-                themeName
-            },
-            query: {
-                page: searchParams.get("page") || "0",
-                size: searchParams.get("size") || "10",
-                search: searchParams.get("search") || "",
-                status: searchParams.get("status") || ""
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this theme?")) {
+            try {
+                await deleteColorTheme(id);
+                if (onRefresh) onRefresh();
+            } catch (error) {
+                console.error("Failed to delete theme:", error);
             }
-        }));
+        }
     };
-
-    const handleView = (themeName: string) => {
-        navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_VIEW, {
-            params: {
-                themeName
-            },
-            query: {
-                page: searchParams.get("page") || "0",
-                size: searchParams.get("size") || "10",
-                search: searchParams.get("search") || "",
-                status: searchParams.get("status") || ""
-            }
-        }));
-    };
-
-    const Action = (themeName: string) => (
-        <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-            <button
-                onClick={() => handleEdit(themeName)}
-                className="w-6 h-6"
-                title="Edit"
-            >
-                <FiEdit />
-            </button>
-            <button
-                onClick={() => handleView(themeName)}
-                className='w-6 h-6'
-                title="View"
-            >
-                <FiEye />
-            </button>
-        </div>
-    );
-
-    const getRecords = () =>
-        colorThemes?.map((theme, index) => [
-            pagination.currentPage * pagination.pageSize + index + 1,
-            theme.themeName,
-            theme.createdAt ? DateUtils.dateTimeSecondToDate(theme.createdAt) : "-",
-            theme.updatedAt ? DateUtils.dateTimeSecondToDate(theme.updatedAt) : "-",
-            theme.updatedBy ?? "-",
-            Action(theme.themeName ?? "")
-        ]);
-
-    const getTableColumns = () => [
-        {
-            label: "Sr No.",
-            key: "srNo",
-            type: "number" as ColumnType,
-            props: {},
-            priority: "low" as const,
-            hideOnMobile: true
-        },
-        {
-            label: "Theme Name",
-            key: "themeName",
-            type: "string" as ColumnType,
-            props: {},
-            priority: "high" as const
-        },
-        {
-            label: "Created Date",
-            key: "createdAt",
-            type: "date" as ColumnType,
-            props: {},
-            priority: "medium" as const
-        },
-        {
-            label: "Last Modified",
-            key: "updatedAt",
-            type: "date" as ColumnType,
-            props: {},
-            priority: "medium" as const,
-            hideOnMobile: true
-        },
-        {
-            label: "Updated By",
-            key: "updatedBy",
-            type: "string" as ColumnType,
-            props: {},
-            priority: "low" as const,
-            hideOnMobile: true
-        },
-        {
-            label: "Action",
-            key: "action",
-            type: "custom" as ColumnType,
-            props: {},
-            priority: "high" as const
-        },
-    ];
-
-    const getSchema = () => ({
-        id: "color-theme-table",
-        mobileView: isMobile ? "cards" as const : "responsive" as const,
-        pagination: {
-            total: pagination.totalRecords,
-            currentPage: pagination.currentPage,
-            isVisible: true,
-            limit: pagination.pageSize,
-            handleChangePage: handlePaginationChange,
-            handleChangeRowsPerPage: handleRowsPerPageChange
-        },
-        columns: getTableColumns(),
-        hover: true,
-        striped: true
-    });
 
     return (
-        <div>
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Color Theme List
-                        </h1>
-                    </div>
+        <div className="relative w-full max-w-[1200px] mx-auto py-6 sm:py-10 px-4 sm:px-6">
+            {/* Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12"
+            >
+                <div>
+                    <h1 className="text-3xl sm:text-4xl font-black m-0 tracking-tight uppercase italic" style={{ color: colors.neutral900 }}>
+                        Color <span style={{ color: colors.primary500 }}>Engine</span>
+                    </h1>
+                    <p className="text-xs mt-2 font-bold opacity-30 uppercase tracking-[0.2em]" style={{ color: colors.neutral600 }}>
+                        Advanced dynamic palette management system
+                    </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {isPreviewActive && (
+                        <Button
+                            variant="tertiaryContained"
+                            size="small"
+                            onClick={resetTheme}
+                            className="h-10 px-6 rounded-xl font-black tracking-widest text-[10px]"
+                            label="RESET PREVIEW"
+                        />
+                    )}
                     <Button
-                        onClick={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_ADD, {}))}
-                        variant={isMobile ? "primaryText" : "primaryContained"}
-                        label={isMobile ? "" : "Add New Color Theme"}
-                        startIcon={isMobile ? <FiPlus /> : ""}
-                        className={isMobile ? 'w-12 h-12 rounded-full' : ''}
+                        variant="primaryContained"
+                        size="small"
+                        onClick={() => navigate(ADMIN_ROUTES.COLOR_THEME_ADD)}
+                        className="h-10 px-8 rounded-xl font-black tracking-widest text-[10px] shadow-xl shadow-primary-500/20"
+                        startIcon={<FiPlus size={16} />}
+                        label="NEW THEME"
                     />
                 </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
-                    {isMobile ? (
-                        <div className="w-full">
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
-                            >
-                                <span className="flex items-center">
-                                    <FiFilter />
-                                    <span className="ml-2">Filters</span>
-                                </span>
-                                <span className="transform transition-transform">
-                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-                                </span>
-                            </button>
-
-                            {showFilters && (
-                                <div className="space-y-3 p-4">
-                                    <AutoCompleteInput
-                                        label="Status"
-                                        placeHolder="Search and select a status"
-                                        options={StatusOptions}
-                                        value={StatusOptions.find(option => option.value === filters.status) || null}
-                                        onSearch={() => { }}
-                                        onChange={value => {
-                                            handleFiltersChange("status", value?.value ?? null);
-                                        }}
-                                        isDisabled={false}
-                                    />
-                                    <TextField
-                                        label='Search'
-                                        variant="outlined"
-                                        placeholder="Search themes..."
-                                        value={filters.search}
-                                        name='search'
-                                        onChange={(event) => {
-                                            handleFiltersChange("search", event.target.value)
-                                        }}
-                                        InputProps={{
-                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
-                                        }}
-                                        fullWidth
-                                    />
+            {/* Live Preview Panel */}
+            <AnimatePresence>
+                {isPreviewActive && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="mb-12"
+                    >
+                        <GlassCard className="border-primary-500/30" style={{ borderColor: `${colors.primary500}50` }}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-5">
+                                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-primary-500/10 relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-primary-500/5 animate-pulse" />
+                                        <FiStar className="text-primary-500" size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-black m-0 uppercase italic" style={{ color: colors.neutral900 }}>
+                                            Active Injection: <span style={{ color: colors.primary600 }}>{activeThemeName}</span>
+                                        </p>
+                                        <p className="text-[10px] font-bold opacity-30 uppercase tracking-[0.2em] mt-1">Real-time stylesheet override active</p>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            <div className="w-[250px]">
-                                <AutoCompleteInput
-                                    label="Status"
-                                    placeHolder="Search and select a status"
-                                    options={StatusOptions}
-                                    value={StatusOptions.find(option => option.value === filters.status) || null}
-                                    onSearch={() => { }}
-                                    onChange={value => {
-                                        handleFiltersChange("status", value?.value ?? null);
-                                    }}
-                                    isDisabled={false}
-                                />
+                                <button onClick={resetTheme} className="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-white/5 transition-colors border border-white/5">
+                                    <FiX size={18} className="opacity-20 hover:opacity-100 transition-opacity" />
+                                </button>
                             </div>
-                            <div className="w-[250px]">
-                                <TextField
-                                    label=''
-                                    variant="outlined"
-                                    placeholder="Search...."
-                                    value={filters.search}
-                                    name='search'
-                                    onChange={(event) => {
-                                        handleFiltersChange("search", event.target.value)
-                                    }}
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                                    }}
-                                    fullWidth
-                                />
-                            </div>
-                        </>
-                    )}
+                        </GlassCard>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Themes Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {colorThemes.map((theme, i) => (
+                    <motion.div
+                        key={theme.id || theme.themeName}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ delay: i * 0.05, duration: 0.5, ease: "easeOut" }}
+                    >
+                        <ColorCard
+                            colorTheme={theme}
+                            onDelete={handleDelete}
+                        />
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* No Data State */}
+            {colorThemes.length === 0 && (
+                <div className="py-32 flex flex-col items-center justify-center text-center">
+                    <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6 opacity-20">
+                        <TbPalette size={40} />
+                    </div>
+                    <h3 className="font-black text-xl uppercase tracking-tighter opacity-20">No Engine Configs Found</h3>
+                    <p className="text-xs mt-2 opacity-10 uppercase tracking-[0.3em] font-bold">Initialize a new theme to begin</p>
                 </div>
-            </div>
-            <div>
-                <TableV1
-                    schema={getSchema()}
-                    records={getRecords()}
-                />
-            </div>
+            )}
+
+            {/* Grain Overlay */}
+            <div
+                className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100]"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
+            />
         </div>
     );
 };
