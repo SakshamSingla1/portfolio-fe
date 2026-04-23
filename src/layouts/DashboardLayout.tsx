@@ -281,7 +281,7 @@ const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthenticatedUser();
-  const { isDark, setColorMode, isPreviewActive, activeThemeName, resetTheme } = useTheme();
+  const { isDark, setColorMode } = useTheme();
 
   const breadcrumbs = useMemo(() => getBreadcrumbsFromUrl(location.pathname), [location.pathname]);
 
