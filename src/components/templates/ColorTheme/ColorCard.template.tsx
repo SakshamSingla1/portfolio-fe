@@ -212,7 +212,7 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
               </div>
 
               <div className="flex w-full gap-1 h-9 items-center">
-                {group.colorShades.map((shade: ColorShade, idx) => (
+                {group.colorShades.map((shade: ColorShade) => (
                   <motion.div
                     key={shade.colorName}
                     whileHover={{
