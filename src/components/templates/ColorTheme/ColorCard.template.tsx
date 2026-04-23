@@ -77,7 +77,9 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
     if (colorTheme.id) {
       try {
         setIsAssigning(true);
-        await assignThemeToUser(colorTheme.id);
+        await assignThemeToUser({
+          themeId: colorTheme.id
+        });
         setDefaultTheme(colorTheme);
       } catch (error) {
       } finally {

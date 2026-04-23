@@ -37,8 +37,8 @@ export const useProfileThemeService = () => {
         return request(API_METHOD.GET, replaceUrlParams(PROFILE_THEME_URLS.GET_THEME_USERS_BY_THEME_ID, { themeId }), user);
     }
 
-    const assignThemeToUser = async (themeId: string) => {
-        return request(API_METHOD.POST, PROFILE_THEME_URLS.GET_PROFILE_THEME, user, themeId);
+    const assignThemeToUser = async (requestData: ProfileThemeRequest) => {
+        return request(API_METHOD.POST, PROFILE_THEME_URLS.GET_PROFILE_THEME, user, requestData);
     }
 
     return {
