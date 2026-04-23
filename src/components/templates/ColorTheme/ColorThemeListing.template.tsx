@@ -50,7 +50,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12"
             >
                 <div>
-                    <h1 className="text-3xl sm:text-4xl font-black m-0 tracking-tight uppercase italic" style={{ color: colors.neutral900 }}>
+                    <h1 className="text-3xl sm:text-4xl font-black m-0 tracking-tight" style={{ color: colors.neutral900 }}>
                         Color <span style={{ color: colors.primary500 }}>Engine</span>
                     </h1>
                     <p className="text-xs mt-2 font-bold opacity-30 uppercase tracking-[0.2em]" style={{ color: colors.neutral600 }}>
@@ -95,7 +95,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                                         <FiStar className="text-primary-500" size={24} />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-black m-0 uppercase italic" style={{ color: colors.neutral900 }}>
+                                        <p className="text-sm font-black m-0 tracking-tight" style={{ color: colors.neutral900 }}>
                                             Active Injection: <span style={{ color: colors.primary600 }}>{activeThemeName}</span>
                                         </p>
                                         <p className="text-[10px] font-bold opacity-30 uppercase tracking-[0.2em] mt-1">Real-time stylesheet override active</p>

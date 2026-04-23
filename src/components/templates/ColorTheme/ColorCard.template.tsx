@@ -5,7 +5,6 @@ import {
   FiEyeOff,
   FiStar,
   FiCopy,
-  FiGrid,
   FiCheck,
   FiLoader,
   FiEdit3,
@@ -39,11 +38,11 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
   const { activeThemeName, setActiveTheme, resetTheme, isDark, setColorMode } = useTheme();
   const { assignThemeToUser } = useProfileThemeService();
   const colors = useColors();
-  const { setDefaultTheme } = useAuthenticatedUser();
+  const { setDefaultTheme, defaultTheme } = useAuthenticatedUser();
 
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [isAssigning, setIsAssigning] = useState(false);
-  const isActive = activeThemeName === colorTheme.themeName;
+  const isActive = activeThemeName === colorTheme.themeName || defaultTheme?.themeName === colorTheme.themeName;
 
   const deriveThemeColors = (theme: ColorTheme): ThemeColors => {
     const findColor = (name: string) => {
@@ -100,130 +99,155 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
     colorTheme.palette.colorGroups[1]?.colorShades[0]?.colorCode || "#8B5CF6";
 
   return (
-    <div
-      className="relative h-full group/card select-none"
+    <motion.div
+      className={`relative h-full group/card select-none border rounded-3xl ${isActive ? `border-primary-500` : ''}`}
       onDoubleClick={() => setColorMode(isDark ? "light" : "dark")}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.4 }}
     >
       <div
-        className="absolute inset-0 blur-[60px] opacity-0 group-hover/card:opacity-10 transition-opacity duration-700 pointer-events-none"
+        className="absolute inset-0 blur-[80px] opacity-0 group-hover/card:opacity-20 transition-all duration-700 pointer-events-none"
         style={{
           background: `radial-gradient(circle at 50% 50%, ${primaryColor}, ${accentColor})`,
         }}
       />
 
       <GlassCard
-        className={`h-full relative overflow-hidden transition-all duration-500 ${isActive ? "ring-2 ring-primary-500/30" : ""
+        className={`h-full relative overflow-hidden transition-all duration-500 ${isActive ? "ring-[3px] ring-primary-500/30" : ""
           }`}
         style={{
           boxShadow: isActive
-            ? `0 20px 40px ${primaryColor}20`
-            : isDark ? `0 8px 30px rgba(0,0,0,0.4)` : `0 8px 30px ${colors.neutral900}08`,
-          backgroundColor: isDark ? `${colors.neutral0}05` : `${colors.neutral0}`,
-          border: `1.5px solid ${isActive ? primaryColor : isDark ? `${colors.neutral200}15` : `${colors.neutral200}`}`,
-          padding: "20px",
+            ? `0 25px 50px ${primaryColor}25, inset 0 0 20px ${primaryColor}10`
+            : isDark ? `0 8px 30px rgba(0,0,0,0.5)` : `0 8px 30px ${colors.neutral900}08`,
+          backgroundColor: isDark ? `${colors.neutral0}05` : `${colors.neutral0}99`,
+          backdropFilter: "blur(20px) saturate(180%)",
+          border: `1px solid ${isActive ? primaryColor : isDark ? `${colors.neutral200}10` : `${colors.neutral200}`}`,
+          padding: "24px",
         }}
       >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div
-              className="h-9 w-9 rounded-xl flex items-center justify-center relative overflow-hidden transition-transform duration-500"
-              style={{ background: `linear-gradient(135deg, ${primaryColor}25, ${accentColor}15)`, border: `1px solid ${primaryColor}20` }}
+        <div className="absolute inset-0 opacity-0 group-hover/card:opacity-100 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 translate-x-[-100%] group-hover/card:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+        </div>
+
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <motion.div
+              className="h-11 w-11 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner"
+              style={{ background: `linear-gradient(135deg, ${primaryColor}30, ${accentColor}20)`, border: `1px solid ${primaryColor}30` }}
+              whileHover={{ rotate: 10, scale: 1.1 }}
             >
-              <TbPalette className="h-4 w-4" style={{ color: primaryColor }} />
-            </div>
+              <TbPalette className="h-5 w-5" style={{ color: primaryColor }} />
+              <div className="absolute inset-0 bg-white/5" />
+            </motion.div>
             <div>
-              <h3 className="font-black text-base tracking-tight m-0 uppercase italic" style={{ color: colors.neutral900 }}>
+              <h3 className="text-xl font-black m-0 tracking-tight leading-none mb-1" style={{ color: colors.neutral900 }}>
                 {colorTheme.themeName}
               </h3>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[8px] font-black tracking-widest opacity-30 uppercase" style={{ color: colors.neutral500 }}>
-                  PRISM v4.0
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-medium opacity-50 uppercase tracking-wider" style={{ color: colors.neutral600 }}>
+                  v4.2 Engine
                 </span>
                 {isActive && (
-                  <span className="h-1 w-1 rounded-full bg-green-500 animate-pulse" />
+                  <div className="flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                    <span className="text-[10px] font-black text-green-600 tracking-widest uppercase">Active</span>
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
-            <div className="flex items-center gap-1 mr-2 opacity-0 group-hover/card:opacity-100 transition-all duration-300 transform translate-x-2 group-hover/card:translate-x-0">
+          <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 mr-1 opacity-0 group-hover/card:opacity-100 transition-all duration-300 transform translate-x-2 group-hover/card:translate-x-0">
               <button
                 onClick={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_VIEW, { params: { id: colorTheme.id } }))}
-                className="h-7 w-7 rounded-lg flex items-center justify-center transition-all"
+                className="h-8 w-8 rounded-xl flex items-center justify-center transition-all hover:bg-white/10"
                 style={{ color: colors.neutral400 }}
               >
-                <FiMaximize2 className="h-3.5 w-3.5 hover:scale-110 transition-transform" />
+                <FiMaximize2 className="h-4 w-4 hover:scale-110 transition-transform" />
               </button>
               <button
                 onClick={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME_EDIT, { params: { id: colorTheme.id } }))}
-                className="h-7 w-7 rounded-lg flex items-center justify-center transition-all"
+                className="h-8 w-8 rounded-xl flex items-center justify-center transition-all hover:bg-white/10"
                 style={{ color: colors.neutral400 }}
               >
-                <FiEdit3 className="h-3.5 w-3.5 hover:scale-110 transition-transform" />
+                <FiEdit3 className="h-4 w-4 hover:scale-110 transition-transform" />
               </button>
               {onDelete && colorTheme.id && (
                 <button
                   onClick={() => onDelete(colorTheme.id!)}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center transition-all hover:bg-red-500/10"
+                  className="h-8 w-8 rounded-xl flex items-center justify-center transition-all hover:bg-red-500/10 hover:text-red-500"
                   style={{ color: colors.neutral400 }}
                 >
-                  <FiTrash2 className="h-3.5 w-3.5 hover:text-red-500 transition-colors" />
+                  <FiTrash2 className="h-4 w-4 hover:scale-110 transition-transform" />
                 </button>
               )}
             </div>
 
             <button
               onClick={handleApply}
-              className="h-8 w-8 rounded-lg flex items-center justify-center transition-all border active:scale-90"
+              className="h-9 w-9 rounded-xl flex items-center justify-center transition-all border shadow-lg active:scale-90"
               style={{
                 color: isActive ? primaryColor : colors.neutral400,
-                backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
-                borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"
+                backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.01)",
+                borderColor: isActive ? primaryColor : isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"
               }}
             >
-              {isActive ? <FiEyeOff className="h-4 w-4" /> : <FiEye className="h-4 w-4" />}
+              {isActive ? <FiEyeOff className="h-4.5 w-4.5" /> : <FiEye className="h-4.5 w-4.5" />}
             </button>
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {colorTheme.palette.colorGroups.map((group: ColorGroup) => (
-            <div key={group.groupName}>
-              <div className="flex items-center gap-2 mb-2.5">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 italic" style={{ color: colors.neutral900 }}>
+            <div key={group.groupName} className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-black uppercase tracking-widest opacity-40" style={{ color: colors.neutral900 }}>
                   {group.groupName}
-                </span>
-                <div className="h-[1px] flex-1" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }} />
+                </h3>
+                <div className="h-[1px] flex-1 mx-4 opacity-10" style={{ background: `linear-gradient(to right, ${primaryColor}, transparent)` }} />
+                <span className="text-[10px] font-bold opacity-20">{group.colorShades.length} Units</span>
               </div>
 
-              <div className="grid grid-cols-5 gap-1.5">
-                {group.colorShades.map((shade: ColorShade) => (
+              <div className="flex w-full gap-1 h-9 items-center">
+                {group.colorShades.map((shade: ColorShade, idx) => (
                   <motion.div
                     key={shade.colorName}
-                    whileHover={{ scale: 1.15, zIndex: 10 }}
-                    className="group/shade relative aspect-square"
+                    whileHover={{
+                      scaleY: 1.25,
+                      scaleX: 1.1,
+                      zIndex: 10,
+                      borderRadius: '8px'
+                    }}
+                    className="group/shade relative flex-1 h-full min-w-[12px]"
                     onClick={(e) => copyToClipboard(shade.colorCode, e)}
                   >
-                      <div
-                      className="w-full h-full rounded-lg cursor-pointer border border-white/5 shadow-sm overflow-hidden relative"
-                      style={{ backgroundColor: shade.colorCode }}
+                    <div
+                      className="w-full h-full rounded-md cursor-pointer transition-all duration-300 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),_0_2px_4px_rgba(0,0,0,0.1)]"
+                      style={{
+                        backgroundColor: shade.colorCode,
+                        border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)'
+                      }}
                     >
-                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/shade:opacity-100 transition-opacity flex flex-col items-center justify-center backdrop-blur-[1px]">
-                        <FiCopy className="h-2.5 w-2.5 text-white" />
+                      <div className="absolute inset-0 bg-white/20 opacity-0 group-hover/shade:opacity-100 transition-opacity flex items-center justify-center">
+                        <FiCopy className="h-3 w-3 text-white mix-blend-difference" />
                       </div>
-                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-[7px] px-1.5 py-0.5 rounded font-black opacity-0 group-hover/shade:opacity-100 transition-all pointer-events-none z-20 whitespace-nowrap">
+
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded-md font-black opacity-0 group-hover/shade:opacity-100 transition-all pointer-events-none z-50 shadow-2xl scale-75 group-hover/shade:scale-100">
                         {shade.colorCode}
                       </div>
+
                       <AnimatePresence>
                         {copiedColor === shade.colorCode && (
                           <motion.div
                             initial={{ opacity: 0, scale: 0.5 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-white/90 flex items-center justify-center z-30"
+                            className="absolute inset-0 bg-white/95 flex items-center justify-center z-30"
                           >
-                            <FiCheck className="h-3 w-3 text-green-600" />
+                            <FiCheck className="h-4 w-4 text-green-600" />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -235,37 +259,49 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
           ))}
         </div>
 
-        <div className="mt-8 pt-5 border-t flex items-center justify-between" style={{ borderColor: `${colors.neutral200}10` }}>
-          <div className="flex items-center gap-2 opacity-20">
-            <FiGrid className="h-3 w-3" style={{ color: colors.neutral500 }} />
-            <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: colors.neutral500 }}>
-              SYSTEM_ACTIVE
-            </span>
+        <div className="mt-10 pt-6 border-t flex items-center justify-between" style={{ borderColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }}>
+          <div className="flex items-center gap-3">
+            <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+            <div className="flex flex-col">
+              <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: colors.neutral900 }}>
+                Status
+              </span>
+              <span className="text-[10px] font-medium opacity-40 uppercase tracking-widest">
+                {isActive ? 'Active Runtime' : 'Standby Buffer'}
+              </span>
+            </div>
           </div>
 
           <Button
             variant={isActive ? "primaryContained" : "tertiaryContained"}
             size="extraSmall"
-            className="h-8 rounded-lg font-black tracking-widest text-[9px] px-6 transition-all hover:px-8 shadow-xl"
+            className="h-9 rounded-xl font-black tracking-widest text-[10px] px-8 transition-all hover:scale-105 active:scale-95 shadow-xl"
             disabled={isAssigning}
             onClick={handleApply}
             style={{
-              background: isActive ? primaryColor : "rgba(255,255,255,0.02)",
-              color: isActive ? "white" : colors.neutral400,
-              border: isActive ? "none" : `1px solid ${colors.neutral200}15`
+              background: isActive ? `linear-gradient(135deg, ${primaryColor}, ${accentColor})` : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
+              color: isActive ? "white" : colors.neutral500,
+              border: isActive ? "none" : `1px solid ${colors.neutral200}10`
             }}
           >
             {isAssigning ? (
-              <FiLoader className="h-3 w-3 animate-spin" />
+              <FiLoader className="h-3.5 w-3.5 animate-spin" />
             ) : isActive ? (
-              <span className="flex items-center gap-1.5"><FiStar className="h-3 w-3" /> APPLIED</span>
+              <span className="flex items-center gap-2"><FiStar className="h-3.5 w-3.5 fill-white" /> APPLIED</span>
             ) : (
-              <span className="flex items-center gap-1.5">INITIALIZE <FiChevronRight className="h-3.5 w-3.5" /></span>
+              <span className="flex items-center gap-2">BOOT SYSTEM <FiChevronRight className="h-4 w-4" /></span>
             )}
           </Button>
         </div>
       </GlassCard>
-    </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
+    </motion.div>
   );
 };
 
