@@ -13,8 +13,8 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 interface SocialLinksTableTemplateProps {
     socialLinks: SocialLinkResponse[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ socialLinks, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
@@ -23,8 +23,8 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
 
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
-    const [localRecords, setLocalRecords] = useState<Record<string, any>[]>([]);
-    const [selectedRows, setSelectedRows] = useState<Record<string, any>[]>([]);
+    const [localRecords, setLocalRecords] = useState<Record<string, unknown>[]>([]);
+    const [selectedRows, setSelectedRows] = useState<Record<string, unknown>[]>([]);
 
     useEffect(() => {
         if (socialLinks) {

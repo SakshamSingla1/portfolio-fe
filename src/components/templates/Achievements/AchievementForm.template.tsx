@@ -9,7 +9,6 @@ import DatePicker from "../../atoms/DatePicker/DatePicker";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import { type Achievement, type AchievementRequest } from "../../../services/useAchievementService";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { Status, StatusOptions } from "../../../utils/types";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import { useAchievementService } from "../../../services/useAchievementService";
@@ -46,7 +45,6 @@ const AchievementFormTemplate = ({
 }: AchievementFormProps) => {
 
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
     const achievementService = useAchievementService();
 
     const onClose = () => navigate(ADMIN_ROUTES.ACHIEVEMENTS);
@@ -55,7 +53,6 @@ const AchievementFormTemplate = ({
 
     const formik = useFormik<AchievementRequest>({
         initialValues: {
-            profileId: user?.id || "",
             title: "",
             description: "",
             issuer: "",
@@ -98,7 +95,6 @@ const AchievementFormTemplate = ({
     useEffect(() => {
         if (!achievement) return;
         formik.setValues({
-            profileId: user?.id || "",
             title: achievement.title,
             description: achievement.description,
             issuer: achievement.issuer,
@@ -108,7 +104,7 @@ const AchievementFormTemplate = ({
             order: achievement.order,
             status: achievement.status,
         });
-    }, [achievement]);
+    }, [achievement, formik]);
 
     return (
         <div className="mb-8">

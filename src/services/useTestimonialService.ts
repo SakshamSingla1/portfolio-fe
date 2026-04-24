@@ -25,7 +25,6 @@ export interface Testimonial {
 }
 
 export interface TestimonialRequest {
-    profileId: string;
     name: string;
     message: string;
     role: string;
@@ -39,7 +38,6 @@ export interface TestimonialRequest {
 
 export interface TestimonialFilterParams {
     search?: string;
-    profileId?: string;
     page?: string;
     size?: string;
     sortDir?: string;
@@ -69,7 +67,7 @@ export const useTestimonialService = () => {
 
     const getAll = (params : TestimonialFilterParams) => {
         const url = TESTIMONIAL_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, {params:{...params, profileId: user?.id}});
+        return request(API_METHOD.GET, url, user, null, {params});
     };
 
     const uploadImage = (file: File) => {

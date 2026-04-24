@@ -24,7 +24,6 @@ export interface Certification {
 }
 
 export interface CertificationRequest {
-    profileId: string;
     title: string;
     issuer: string;
     issueDate: string;
@@ -37,7 +36,6 @@ export interface CertificationRequest {
 
 export interface CertificationFilterParams {
     search?: string;
-    profileId?: string;
     page?: string;
     size?: string;
     sortDir?: string;
@@ -46,7 +44,7 @@ export interface CertificationFilterParams {
 
 export const useCertificationService = () => {
     const { user } = useAuthenticatedUser();
-    
+
     const create = (certification: CertificationRequest) =>
         request(API_METHOD.POST, CERTIFICATION_URLS.GET_ALL, user, certification);
 
@@ -65,9 +63,9 @@ export const useCertificationService = () => {
         return request(API_METHOD.GET, url, user, null);
     };
 
-    const getAll = (params : CertificationFilterParams) => {
+    const getAll = (params: CertificationFilterParams) => {
         const url = CERTIFICATION_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, {params:{...params, profileId: user?.id}});
+        return request(API_METHOD.GET, url, user, null, { params: params });
     };
 
     const uploadCredential = (file: File) => {

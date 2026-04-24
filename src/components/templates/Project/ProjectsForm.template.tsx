@@ -15,7 +15,6 @@ import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import { HTTP_STATUS, type ImageValue } from "../../../utils/types";
 import { type Project, type ProjectResponse, WorkStatusOptions, WorkStatusType, useProjectService, } from "../../../services/useProjectService";
 import { useSkillService, type SkillDropdown, } from "../../../services/useSkillService";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { FiTrash2 } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 
@@ -52,7 +51,6 @@ interface ProjectFormProps {
 
 const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => {
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
     const colors = useColors();
 
     const skillService = useSkillService();
@@ -65,7 +63,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     const formik = useFormik<Project>({
         initialValues: {
-            profileId: user?.id?.toString() || "",
             projectName: "",
             projectDescription: "",
             githubRepositories: [],
@@ -180,12 +177,11 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     useEffect(() => {
         loadSkills();
-    }, []);
+    }, [loadSkills]);
 
     useEffect(() => {
         if (!projects) return;
         formik.setValues({
-            profileId: user?.id?.toString() || "",
             projectName: projects.projectName || "",
             projectDescription: projects.projectDescription || "",
             githubRepositories: projects.githubRepositories || [],
@@ -196,7 +192,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             projectImages: projects.projectImages || [],
             skillIds: projects.skills?.map(s => s.id) || [],
         });
-    }, [projects]);
+    }, [projects, formik]);
 
     return (
         <div className="mb-8">

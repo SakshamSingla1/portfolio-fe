@@ -24,7 +24,6 @@ export interface Achievement {
 }
 
 export interface AchievementRequest {
-    profileId: string;
     title: string;
     description: string;
     issuer: string;
@@ -37,7 +36,6 @@ export interface AchievementRequest {
 
 export interface AchievementFilterParams {
     search?: string;
-    profileId?: string;
     page?: string;
     size?: string;
     sortDir?: string;
@@ -46,7 +44,7 @@ export interface AchievementFilterParams {
 
 export const useAchievementService = () => {
     const { user } = useAuthenticatedUser();
-    
+
     const create = (achievement: AchievementRequest) =>
         request(API_METHOD.POST, ACHIEVEMENT_URLS.GET_ALL, user, achievement);
 
@@ -65,9 +63,9 @@ export const useAchievementService = () => {
         return request(API_METHOD.GET, url, user, null);
     };
 
-    const getAll = (params : AchievementFilterParams) => {
+    const getAll = (params: AchievementFilterParams) => {
         const url = ACHIEVEMENT_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, {params:{...params, profileId: user?.id}});
+        return request(API_METHOD.GET, url, user, null, { params: params });
     };
 
     const uploadImage = (file: File) => {

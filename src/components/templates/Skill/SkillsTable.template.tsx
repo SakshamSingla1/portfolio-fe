@@ -12,8 +12,8 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 interface SkillTableTemplateProps {
     skills: SkillResponse[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, pagination, handlePaginationChange, handleRowsPerPageChange }) => {

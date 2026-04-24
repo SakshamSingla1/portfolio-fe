@@ -9,7 +9,6 @@ import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
 import { Status } from '../../../utils/types';
 import { makeRoute } from '../../../utils/helper';
 import { type SocialLink, type SocialLinkResponse } from '../../../services/useSocialLinkService';
-import { useAuthenticatedUser } from '../../../hooks/useAuthenticatedUser';
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 import { SocialLinkPlatformOptions } from '../../../utils/constant';
 
@@ -32,11 +31,9 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
     socialLink,
 }) => {
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
 
     const formik = useFormik<SocialLink>({
         initialValues: {
-            profileId: user?.id || '',
             platform: socialLink?.platform || '',
             url: socialLink?.url || '',
             order: socialLink?.order || '',
@@ -49,14 +46,13 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
     useEffect(() => {
         if (socialLink) {
             formik.setValues({
-                profileId: user?.id || '',
                 platform: socialLink.platform || '',
                 url: socialLink.url || '',
                 order: socialLink.order || '',
                 status: socialLink.status || Status.ACTIVE,
             });
         }
-    }, [socialLink]);
+    }, [socialLink, formik]);
     
     return (
         <div className="mb-8">

@@ -9,7 +9,6 @@ const SOCIAL_LINK_URLS = {
 }
 
 export interface SocialLink {
-    profileId: string;
     platform: string;
     url: string;
     order: string;
@@ -27,7 +26,6 @@ export interface SocialLinkResponse {
 }
 
 export interface SocialLinkFilterParams {
-    profileId?: string;
     page?: string;
     size?: string;
     search?: string;
@@ -41,7 +39,7 @@ export const useSocialLinkService = () => {
 
     const getAll = (params: SocialLinkFilterParams) => {
         const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK, {});
-        return request(API_METHOD.GET, url, user, null, { params: { ...params, profileId: user?.id } }, null);
+        return request(API_METHOD.GET, url, user, null, { params }, null);
     };
 
     const getById = (id: string | null) => {

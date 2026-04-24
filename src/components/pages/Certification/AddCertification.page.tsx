@@ -4,13 +4,11 @@ import { HTTP_STATUS } from "../../../utils/types";
 import { useNavigate } from "react-router-dom";
 import CertificationFormTemplate from "../../templates/Certification/CertificationForm.template";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 
 const AddCertificationPage = () => {
     const certificationService = useCertificationService();
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
-    const { user } = useAuthenticatedUser();
 
     const onClose = () => navigate(ADMIN_ROUTES.CERTIFICATIONS);
 
@@ -18,7 +16,6 @@ const AddCertificationPage = () => {
         try {
             const response = await certificationService.create({
                 ...values,
-                profileId: user?.id?.toString() || "",
             });
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);

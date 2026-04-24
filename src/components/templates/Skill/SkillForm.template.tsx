@@ -9,7 +9,6 @@ import { useFormik } from "formik";
 import { type Skill, SkillLevelType } from "../../../services/useSkillService";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../../../utils/constant";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 
 const validationSchema = Yup.object().shape({
     logoId: Yup.string()
@@ -30,7 +29,6 @@ interface SkillFormProps {
 const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     const logoService = useLogoService();
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
 
     const [logos, setLogos] = useState<Logo[]>([]);
     const [selectedLogo, setSelectedLogo] = useState<Logo | null>(null);
@@ -42,7 +40,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
             logoId: "",
             level: SkillLevelType.BEGINNER,
             category: "",
-            profileId: user?.id?.toString() || "",
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
@@ -95,11 +92,11 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
             formik.setFieldValue("level", skill.level);
             formik.setFieldValue("category", skill.category);
         }
-    }, [skill]);
+    }, [skill, formik]);
 
     useEffect(() => {
         loadLogoDropdown();
-    }, []);
+    }, [loadLogoDropdown]);
 
     return (
         <div className="mb-8">

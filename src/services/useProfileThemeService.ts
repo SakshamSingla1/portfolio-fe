@@ -16,7 +16,6 @@ export interface ProfileThemeRequest {
 export interface ProfileThemeResponse {
     id: string;
     themeId: string;
-    profileId: string;
     username: string;
     themeName: string;
     createdAt: string;

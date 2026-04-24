@@ -9,7 +9,6 @@ import DatePicker from "../../atoms/DatePicker/DatePicker";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { titleModification } from "../../../utils/helper";
 import { type Certification, type CertificationRequest } from "../../../services/useCertificationService";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { Status, StatusOptions } from "../../../utils/types";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import { useCertificationService } from "../../../services/useCertificationService";
@@ -43,7 +42,6 @@ const CertificationFormTemplate = ({
 }: CertificationFormProps) => {
 
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
     const certificationService = useCertificationService();
 
     const onClose = () => navigate(ADMIN_ROUTES.CERTIFICATIONS);
@@ -52,7 +50,6 @@ const CertificationFormTemplate = ({
 
     const formik = useFormik<CertificationRequest>({
         initialValues: {
-            profileId: user?.id || "",
             title: "",
             issuer: "",
             issueDate: "",
@@ -91,7 +88,6 @@ const CertificationFormTemplate = ({
     useEffect(() => {
         if (!certification) return;
         formik.setValues({
-            profileId: user?.id || "",
             title: certification.title,
             issuer: certification.issuer,
             issueDate: certification.issueDate,
@@ -101,7 +97,7 @@ const CertificationFormTemplate = ({
             order: certification.order,
             status: certification.status,
         });
-    }, [certification]);
+    }, [certification, formik]);
 
     return (
         <div className="mb-8">

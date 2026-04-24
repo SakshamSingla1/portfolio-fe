@@ -8,8 +8,8 @@ import type { ImageValue } from "../utils/types";
 export const AUTH_URLS = {
     GET_ALL: "/projects",
     GET_ALL_BY_ID: "/projects/:id",
-    GET_BY_PROFILE: "/projects/profile/:profileId",
-    IMAGE_UPLOAD: "/projects/:profileId/images",
+    GET_BY_PROFILE: "/projects",
+    IMAGE_UPLOAD: "/projects/images",
 };
 
 export const WorkStatusType = {
@@ -18,21 +18,20 @@ export const WorkStatusType = {
 };
 
 export const WorkStatusOptions = [
-    {label: "Current" ,value: WorkStatusType.CURRENT},
-    {label: "Completed" ,value: WorkStatusType.COMPLETED}
+    { label: "Current", value: WorkStatusType.CURRENT },
+    { label: "Completed", value: WorkStatusType.COMPLETED }
 ]
 
 export interface Project {
-    profileId : string;
-    projectName : string;
-    projectDescription : string;
+    projectName: string;
+    projectDescription: string;
     githubRepositories: string[];
-    projectLink : string;
-    projectStartDate : string;
-    projectEndDate : string;
-    workStatus : string;
-    projectImages : ImageValue[];
-    skillIds : string[];
+    projectLink: string;
+    projectStartDate: string;
+    projectEndDate: string;
+    workStatus: string;
+    projectImages: ImageValue[];
+    skillIds: string[];
 }
 
 export interface ProjectResponse {
@@ -85,14 +84,14 @@ export const useProjectService = () => {
     };
 
     const getByProfile = (params: ProjectFilterParams) => {
-        const url = replaceUrlParams(AUTH_URLS.GET_BY_PROFILE, { profileId: user?.id });
+        const url = AUTH_URLS.GET_BY_PROFILE;
         return request(API_METHOD.GET, url, user, null, { params });
     };
 
     const uploadProjectImage = (file: File) => {
         const formData = new FormData();
         formData.append("file", file);
-        const url = replaceUrlParams(AUTH_URLS.IMAGE_UPLOAD, { profileId: user?.id });
+        const url = AUTH_URLS.IMAGE_UPLOAD;
         return request(
             API_METHOD.POST,
             url,

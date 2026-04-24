@@ -36,9 +36,7 @@ export const useAuthenticatedUser = () => {
             alert("Session expired. Please log in again.");
             navigate("/");
         } 
-        // Don't clear authentication data when expired === null
-        // This handles cases where user data exists but reLoginTimestamp is not set yet
-    }, [navigate]);
+    }, [navigate, context]);
 
     return context;
 };

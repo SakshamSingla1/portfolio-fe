@@ -60,7 +60,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
     if (template) {
       formik.setValues(template);
     }
-  }, [template]);
+  }, [template, formik]);
 
   return (
     <div className="mb-8">

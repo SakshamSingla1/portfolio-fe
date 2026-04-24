@@ -57,6 +57,10 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({ children }) 
     message: '',
   });
 
+  const hideSnackbar = useCallback(() => {
+    setSnackBar(prev => ({ ...prev, isActive: false }));
+  }, []);
+
   const showSnackbar = useCallback((type: SnackbarType, message: string, duration: number = 3000) => {
     setSnackBar({
       isActive: true,
@@ -69,11 +73,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({ children }) 
     }, duration);
 
     return () => clearTimeout(timer);
-  }, []);
-
-  const hideSnackbar = useCallback(() => {
-    setSnackBar(prev => ({ ...prev, isActive: false }));
-  }, []);
+  }, [hideSnackbar]);
 
   const getStyles = (type: SnackbarType) => {
     const baseStyles = {

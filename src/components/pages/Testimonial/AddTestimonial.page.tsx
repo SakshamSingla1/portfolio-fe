@@ -4,13 +4,11 @@ import { HTTP_STATUS } from "../../../utils/types";
 import { useNavigate } from "react-router-dom";
 import TestimonialFormTemplate from "../../templates/Testimonial/TestimonialForm.template";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 
 const AddTestimonialPage = () => {
     const testimonialService = useTestimonialService();
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
-    const { user } = useAuthenticatedUser();
 
     const onClose = () => navigate(ADMIN_ROUTES.TESTIMONIALS);
 
@@ -18,7 +16,6 @@ const AddTestimonialPage = () => {
         try {
             const response = await testimonialService.create({
                 ...values,
-                profileId: user?.id?.toString() || "",
             });
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);

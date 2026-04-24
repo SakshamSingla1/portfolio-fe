@@ -1,11 +1,10 @@
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
-import { replaceUrlParams } from "../utils/helper";
 import type { ContactUs } from "./useContactUsService";
 
 export const DASHBOARD_URLS = {
-    DASHBOARD_SUMMARY : "/dashboard/:profileId"
+    DASHBOARD_SUMMARY : "/dashboard"
 }
 
 export interface IStats {
@@ -42,7 +41,7 @@ export const useDashboardService = () => {
     const { user } = useAuthenticatedUser();
 
     const getByProfile = () => {
-        const url = replaceUrlParams(DASHBOARD_URLS.DASHBOARD_SUMMARY, { profileId: user?.id });
+        const url = DASHBOARD_URLS.DASHBOARD_SUMMARY;
         return request(API_METHOD.GET, url, user, null);
     };
 

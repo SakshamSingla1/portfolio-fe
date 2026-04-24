@@ -4,7 +4,7 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { replaceUrlParams } from "../utils/helper";
 
 export const CONTACT_US_URLS = {
-    GET_BY_PROFILE: "/contact-us/profile/:profileId",
+    GET_BY_PROFILE: "/contact-us",
     MARK_AS_READ: "/contact-us/:id/mark-read",
 };
 
@@ -23,7 +23,6 @@ export interface ContactUsRequest {
     email: string;
     message: string;
     phone: string;
-    profileId: string | null;
 }
 
 export interface ContactUsFilterParams {
@@ -38,7 +37,7 @@ export const useContactUsService = () => {
     const { user } = useAuthenticatedUser();
 
     const getByProfile = (params: ContactUsFilterParams) => {
-        const url = replaceUrlParams(CONTACT_US_URLS.GET_BY_PROFILE, { profileId: user?.id });
+        const url = CONTACT_US_URLS.GET_BY_PROFILE;
         return request(API_METHOD.GET, url, user, null, {params});
     };
 

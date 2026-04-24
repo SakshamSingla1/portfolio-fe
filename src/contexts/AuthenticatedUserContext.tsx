@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState} from "react";
+import React, { useCallback, useEffect, useMemo, useState} from "react";
 import { type ColorTheme } from "../services/useColorThemeService";
 import type { RolePermissionResponseDTO } from "../services/useRoleService";
 
@@ -82,9 +82,9 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
         }
     });
 
-    const syncAuthDialogActive = (value?: boolean) => {
+    const syncAuthDialogActive = useCallback((value?: boolean) => {
         setAuthDialogActive(value ?? user === null);
-    };
+    }, [user]);
 
     useEffect(() => {
         if (user) localStorage.setItem("user", JSON.stringify(user));
@@ -101,7 +101,7 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
         else localStorage.removeItem("rolePermissions");
     }, [rolePermissions]);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         setAuthenticatedUser(null);
         setDefaultTheme(null);
         setRolePermissions(null);
@@ -109,14 +109,14 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
         localStorage.removeItem("defaultTheme");
         localStorage.removeItem("rolePermissions");
         localStorage.removeItem("reLoginTimestamp");
-    };
+    }, []);
 
-    const setAuthenticatedUserWithTimestamp = (user: AuthenticatedUserType | null) => {
+    const setAuthenticatedUserWithTimestamp = useCallback((user: AuthenticatedUserType | null) => {
         if (user && !localStorage.getItem("reLoginTimestamp")) {
             localStorage.setItem("reLoginTimestamp", new Date().toISOString());
         }
         setAuthenticatedUser(user);
-    };
+    }, []);
 
     const providerValue = useMemo(
         () => ({
@@ -130,7 +130,7 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
             setRolePermissions,
             logout,
         }),
-        [isAuthDialogActive, user, defaultTheme, rolePermissions, setAuthenticatedUserWithTimestamp]
+        [isAuthDialogActive, user, defaultTheme, rolePermissions, setAuthenticatedUserWithTimestamp, syncAuthDialogActive, logout]
     );
 
     return (

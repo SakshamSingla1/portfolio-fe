@@ -6,7 +6,7 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 const SKILL_URLS = {
     SKILL: "/skill",
     SKILL_BY_ID: "/skill/:id",
-    SKILL_BY_PROFILE_ID: "/skill/profile/:profileId",
+    SKILL_BY_PROFILE_ID: "/skill",
     SKILL_STATS: "/skill/stats",
 }
 
@@ -21,7 +21,6 @@ export interface Skill {
     logoId: string;
     level: string;
     category: string;
-    profileId: string;
 }
 
 export interface SkillDropdown {
@@ -83,12 +82,12 @@ export const useSkillService = () => {
     };
 
     const getByProfile = (params: SkillFilterParams) => {
-        const url = replaceUrlParams(SKILL_URLS.SKILL_BY_PROFILE_ID, { profileId: user?.id });
+        const url = SKILL_URLS.SKILL_BY_PROFILE_ID;
         return request(API_METHOD.GET, url, user, null, { params });
     };
 
     const getStats = () => {
-        const url = replaceUrlParams(SKILL_URLS.SKILL_STATS, {});
+        const url = SKILL_URLS.SKILL_STATS;
         return request(API_METHOD.GET, url, user, null, null, null);
     };
 

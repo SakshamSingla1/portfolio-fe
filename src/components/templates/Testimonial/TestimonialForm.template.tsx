@@ -7,7 +7,6 @@ import Button from "../../atoms/Button/Button";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { titleModification } from "../../../utils/helper";
 import { type Testimonial, type TestimonialRequest } from "../../../services/useTestimonialService";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { Status, StatusOptions } from "../../../utils/types";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import { useTestimonialService } from "../../../services/useTestimonialService";
@@ -46,7 +45,6 @@ const TestimonialFormTemplate = ({
 }: TestimonialFormProps) => {
 
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
     const testimonialService = useTestimonialService();
 
     const onClose = () => navigate(ADMIN_ROUTES.TESTIMONIALS);
@@ -55,7 +53,6 @@ const TestimonialFormTemplate = ({
 
     const formik = useFormik<TestimonialRequest>({
         initialValues: {
-            profileId: user?.id || "",
             name: "",
             message: "",
             role: "",
@@ -99,7 +96,6 @@ const TestimonialFormTemplate = ({
     useEffect(() => {
         if (!testimonial) return;
         formik.setValues({
-            profileId: user?.id || "",
             name: testimonial.name,
             role: testimonial.role,
             company: testimonial.company,
@@ -110,7 +106,7 @@ const TestimonialFormTemplate = ({
             order: testimonial.order,
             status: testimonial.status,
         });
-    }, [testimonial]);
+    }, [testimonial, formik]);
 
     return (
         <div className="mb-8">

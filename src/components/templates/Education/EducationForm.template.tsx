@@ -7,7 +7,6 @@ import { InputAdornment } from "@mui/material";
 import { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
@@ -48,7 +47,6 @@ interface EducationFormProps {
 
 const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, education }) => {
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
     const colors = useColors();
 
     const onClose = () => navigate(ADMIN_ROUTES.EDUCATION);
@@ -63,7 +61,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
             location: '',
             description: '',
             grade: '',
-            profileId: user?.id?.toString(),
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
@@ -94,7 +91,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
             formik.setFieldValue("grade", education.grade?.trim().split(" ")[0] || "");
             formik.setFieldValue("gradeType", education.grade?.trim().split(" ")[1] || "");
         }
-    }, [education]);
+    }, [education, formik]);
     
     return (
         <div className="mb-8">

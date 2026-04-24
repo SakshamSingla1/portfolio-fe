@@ -13,7 +13,6 @@ import { useFormik } from "formik";
 import { HTTP_STATUS } from "../../../utils/types";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { useColors } from "../../../utils/types";
 
@@ -62,7 +61,6 @@ interface ExperienceFormProps {
 const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode, experience }) => {
     const skillService = useSkillService();
     const navigate = useNavigate();
-    const { user } = useAuthenticatedUser();
     const colors = useColors();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
@@ -79,7 +77,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
             employmentStatus: EmploymentStatus.CURRENT,
             description: "",
             skillIds: [],
-            profileId: String(user?.id),
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
@@ -134,11 +131,11 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
             formik.setFieldValue("description", experience.description || "");
             formik.setFieldValue("skillIds", experience.skills.map((skill) => String(skill.id)) || []);
         }
-    }, [experience]);
+    }, [experience, formik]);
 
     useEffect(() => {
         loadSkills();
-    }, []);
+    }, [loadSkills]);
 
     return (
         <div className="mb-8">
