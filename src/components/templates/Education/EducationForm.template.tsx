@@ -4,7 +4,6 @@ import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
 import { GradeType, type Education } from "../../../services/useEducationService";
 import { InputAdornment } from "@mui/material";
-import { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -53,18 +52,20 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
 
     const formik = useFormik<Education>({
         initialValues: {
-            institution: '',
-            degree: '',
-            fieldOfStudy: '',
-            startYear: '',
-            endYear: '',
-            location: '',
-            description: '',
-            grade: '',
+            institution: education?.institution || '',
+            degree: education?.degree || '',
+            fieldOfStudy: education?.fieldOfStudy || '',
+            startYear: education?.startYear || '',
+            endYear: education?.endYear || '',
+            location: education?.location || '',
+            description: education?.description || '',
+            grade: education?.grade?.trim().split(" ")[0] || '',
+            gradeType: education?.grade?.trim().split(" ")[1] || '',
         },
+        enableReinitialize: true,
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
-            const payload={
+            const payload = {
                 ...values,
                 description: isRichTextEmpty(values.description) ? "" : values.description,
                 grade: values.grade + " " + values.gradeType
@@ -79,20 +80,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
         },
     });
 
-    useEffect(() => {
-        if (education) {
-            formik.setFieldValue("institution", education.institution);
-            formik.setFieldValue("degree", education.degree);
-            formik.setFieldValue("fieldOfStudy", education.fieldOfStudy);
-            formik.setFieldValue("startYear", education.startYear);
-            formik.setFieldValue("endYear", education.endYear);
-            formik.setFieldValue("location", education.location);
-            formik.setFieldValue("description", education.description);
-            formik.setFieldValue("grade", education.grade?.trim().split(" ")[0] || "");
-            formik.setFieldValue("gradeType", education.grade?.trim().split(" ")[1] || "");
-        }
-    }, [education, formik]);
-    
+
     return (
         <div className="mb-8">
             <div className="mb-8">
@@ -100,7 +88,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     {mode === MODE.ADD ? "Add Education" : mode === MODE.EDIT ? "Edit Education" : "Education Details"}
                 </h2>
                 <p className="text-gray-600">
-                    {mode === MODE.ADD? "Add your academic achievement to your profile": mode === MODE.EDIT? "Update your education information": "View education details"}
+                    {mode === MODE.ADD ? "Add your academic achievement to your profile" : mode === MODE.EDIT ? "Update your education information" : "View education details"}
                 </p>
             </div>
 
@@ -204,7 +192,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             }}
                             required={true}
                             error={formik.touched.grade && Boolean(formik.errors.grade)}
-                            helperText={Boolean(formik.touched.grade && formik.errors.grade) ? formik.errors.grade : ""}                       
+                            helperText={Boolean(formik.touched.grade && formik.errors.grade) ? formik.errors.grade : ""}
                         />
                     </div>
                 </div>
@@ -255,12 +243,12 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             placeholder="Enter Description"
                             value={formik.values.description}
                             onChange={(value) => formik.setFieldValue("description", value)}
-                            isEditMode = {mode !== MODE.VIEW}
+                            isEditMode={mode !== MODE.VIEW}
                             required
                         />
                         {Boolean(formik.errors.description && formik.touched.description) && (
                             <div className="mt-2 text-xs"
-                            style={{ color: colors.error600 }}>
+                                style={{ color: colors.error600 }}>
                                 {formik.errors.description}
                             </div>
                         )}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
@@ -53,15 +53,16 @@ const AchievementFormTemplate = ({
 
     const formik = useFormik<AchievementRequest>({
         initialValues: {
-            title: "",
-            description: "",
-            issuer: "",
-            achievedAt: "",
-            proofUrl: "",
-            proofPublicId: "",
-            order: "",
-            status: Status.ACTIVE,
+            title: achievement?.title || "",
+            description: achievement?.description || "",
+            issuer: achievement?.issuer || "",
+            achievedAt: achievement?.achievedAt || "",
+            proofUrl: achievement?.proofUrl || "",
+            proofPublicId: achievement?.proofPublicId || "",
+            order: achievement?.order || "",
+            status: achievement?.status || Status.ACTIVE,
         },
+        enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
             const payload = {
@@ -92,19 +93,6 @@ const AchievementFormTemplate = ({
         }
     };
 
-    useEffect(() => {
-        if (!achievement) return;
-        formik.setValues({
-            title: achievement.title,
-            description: achievement.description,
-            issuer: achievement.issuer,
-            achievedAt: achievement.achievedAt,
-            proofUrl: achievement.proofUrl,
-            proofPublicId: achievement.proofPublicId,
-            order: achievement.order,
-            status: achievement.status,
-        });
-    }, [achievement, formik]);
 
     return (
         <div className="mb-8">

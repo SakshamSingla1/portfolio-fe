@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
@@ -50,15 +50,16 @@ const CertificationFormTemplate = ({
 
     const formik = useFormik<CertificationRequest>({
         initialValues: {
-            title: "",
-            issuer: "",
-            issueDate: "",
-            expiryDate: "",
-            credentialId: "",
-            credentialUrl: "",
-            order: "",
-            status: Status.ACTIVE,
+            title: certification?.title || "",
+            issuer: certification?.issuer || "",
+            issueDate: certification?.issueDate || "",
+            expiryDate: certification?.expiryDate || "",
+            credentialId: certification?.credentialId || "",
+            credentialUrl: certification?.credentialUrl || "",
+            order: certification?.order || "",
+            status: certification?.status || Status.ACTIVE,
         },
+        enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
             setSubmitting(true);
@@ -85,19 +86,6 @@ const CertificationFormTemplate = ({
         }
     };
 
-    useEffect(() => {
-        if (!certification) return;
-        formik.setValues({
-            title: certification.title,
-            issuer: certification.issuer,
-            issueDate: certification.issueDate,
-            expiryDate: certification.expiryDate,
-            credentialId: certification.credentialId || "",
-            credentialUrl: certification.credentialUrl || "",
-            order: certification.order,
-            status: certification.status,
-        });
-    }, [certification, formik]);
 
     return (
         <div className="mb-8">

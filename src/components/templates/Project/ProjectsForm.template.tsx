@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
@@ -63,16 +63,17 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     const formik = useFormik<Project>({
         initialValues: {
-            projectName: "",
-            projectDescription: "",
-            githubRepositories: [],
-            projectLink: "",
-            projectStartDate: "",
-            projectEndDate: "",
-            workStatus: WorkStatusType.CURRENT,
-            projectImages: [],
-            skillIds: [],
+            projectName: projects?.projectName || "",
+            projectDescription: projects?.projectDescription || "",
+            githubRepositories: projects?.githubRepositories || [],
+            projectLink: projects?.projectLink || "",
+            projectStartDate: projects?.projectStartDate || "",
+            projectEndDate: projects?.projectEndDate || "",
+            workStatus: projects?.workStatus || WorkStatusType.CURRENT,
+            projectImages: projects?.projectImages || [],
+            skillIds: projects?.skills?.map(s => s.id) || [],
         },
+        enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
             const payload = {
@@ -86,14 +87,14 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         },
     });
 
-    const loadSkills = async (search = "") => {
+    const loadSkills = React.useCallback(async (search = "") => {
         try {
             const res = await skillService.getByProfile({ search });
             setSkills(res?.status === HTTP_STATUS.OK ? res.data.data.content : []);
         } catch {
             setSkills([]);
         }
-    };
+    }, [skillService]);
 
     const uploadProjectImage = async (file: File, index?: number) => {
         setIsUploading(true);
@@ -179,20 +180,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         loadSkills();
     }, [loadSkills]);
 
-    useEffect(() => {
-        if (!projects) return;
-        formik.setValues({
-            projectName: projects.projectName || "",
-            projectDescription: projects.projectDescription || "",
-            githubRepositories: projects.githubRepositories || [],
-            projectLink: projects.projectLink || "",
-            projectStartDate: projects.projectStartDate || "",
-            projectEndDate: projects.projectEndDate || "",
-            workStatus: projects.workStatus || WorkStatusType.CURRENT,
-            projectImages: projects.projectImages || [],
-            skillIds: projects.skills?.map(s => s.id) || [],
-        });
-    }, [projects, formik]);
 
     return (
         <div className="mb-8">

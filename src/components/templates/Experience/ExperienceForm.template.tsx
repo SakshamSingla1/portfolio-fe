@@ -69,15 +69,16 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
 
     const formik = useFormik<ExperienceRequest>({
         initialValues: {
-            companyName: "",
-            jobTitle: "",
-            location: "",
-            startDate: "",
-            endDate: "",
-            employmentStatus: EmploymentStatus.CURRENT,
-            description: "",
-            skillIds: [],
+            companyName: experience?.companyName || "",
+            jobTitle: experience?.jobTitle || "",
+            location: experience?.location || "",
+            startDate: experience?.startDate || "",
+            endDate: experience?.endDate || "",
+            employmentStatus: experience?.employmentStatus || EmploymentStatus.CURRENT,
+            description: experience?.description || "",
+            skillIds: experience?.skills?.map((skill) => String(skill.id)) || [],
         },
+        enableReinitialize: true,
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
             const payload = {
@@ -94,7 +95,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         },
     });
 
-    const loadSkills = async (searchTerm?: string) => {
+    const loadSkills = React.useCallback(async (searchTerm?: string) => {
         try {
             const response = await skillService.getByProfile({
                 search: searchTerm || "",
@@ -105,7 +106,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         } catch (error) {
             setSkills([]);
         }
-    }
+    }, [skillService]);
 
     const skillOptions = useMemo(() => {
         return skills.map((skill) => ({
@@ -120,18 +121,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     }, [skills, formik.values.skillIds]);
 
 
-    useEffect(() => {
-        if (experience) {
-            formik.setFieldValue("companyName", experience.companyName || "");
-            formik.setFieldValue("jobTitle", experience.jobTitle || "");
-            formik.setFieldValue("location", experience.location || "");
-            formik.setFieldValue("startDate", experience.startDate || "");
-            formik.setFieldValue("endDate", experience.endDate || "");
-            formik.setFieldValue("employmentStatus", experience.employmentStatus || EmploymentStatus.CURRENT);
-            formik.setFieldValue("description", experience.description || "");
-            formik.setFieldValue("skillIds", experience.skills.map((skill) => String(skill.id)) || []);
-        }
-    }, [experience, formik]);
 
     useEffect(() => {
         loadSkills();

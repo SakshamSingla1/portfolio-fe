@@ -9,7 +9,7 @@ import { useSearchParams } from "react-router-dom";
 import { InputAdornment, IconButton } from "@mui/material";
 import Button from "../../atoms/Button/Button";
 import { useSnackbar } from "../../../hooks/useSnackBar";
-import { PasswordStrengthMeter } from "../../atoms/PasswordStrengthMeter/PasswordStrengthMeter";
+import PasswordStrengthMeter from "../../atoms/PasswordStrengthMeter/PasswordStrengthMeter";
 
 interface ResetPasswordProps {
   setAuthState: (authState: AUTH_STATE) => void;
@@ -31,8 +31,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
   const authService = useAuthService();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
-  const [showPassword,setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword,setShowConfirmPassword] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const { showSnackbar } = useSnackbar();
 
   const formik = useFormik<PasswordResetConfirmDTO>({
@@ -143,7 +143,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
               }
               helperText={
                 formik.touched.confirmPassword &&
-                formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""
+                  formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""
               }
             />
             <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />

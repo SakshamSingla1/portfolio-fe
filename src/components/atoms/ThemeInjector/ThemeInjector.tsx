@@ -59,4 +59,4 @@ const ThemeInjector: React.FC = () => {
     return null;
 };
 
-export default ThemeInjector;
+export default React.memo(ThemeInjector);

@@ -86,7 +86,7 @@ const useStyles = createUseStyles({
                     borderColor: colors.neutral200,
                 },
                 "& input": {
-                    "-webkit-text-fill-color": `${colors.neutral400} !important`,
+                    WebkitTextFillColor: `${colors.neutral400} !important`,
                     color: `${colors.neutral400} !important`,
                 },
                 "& svg": {

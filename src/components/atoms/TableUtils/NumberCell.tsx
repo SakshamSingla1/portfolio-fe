@@ -12,4 +12,4 @@ const NumberCell: React.FC<NumberCellProps> = ({ data, props }) => {
         </div>
     );
 }
-export default NumberCell
+export default React.memo(NumberCell);

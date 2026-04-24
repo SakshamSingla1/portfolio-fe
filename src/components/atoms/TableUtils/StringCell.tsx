@@ -12,4 +12,4 @@ const StringCell: React.FC<StringCellProps> = ({ data, props }) => {
         </div>
     );
 }
-export default StringCell
+export default React.memo(StringCell);

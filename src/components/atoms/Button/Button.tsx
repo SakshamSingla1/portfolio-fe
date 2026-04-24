@@ -24,7 +24,9 @@ interface ButtonProps extends Omit<MuiButtonProps, "variant" | "size"> {
   buttonWithImg?: boolean;
 }
 
-const StyledButton = styled(MuiButton)<{
+const StyledButton = styled(MuiButton, {
+  shouldForwardProp: (prop) => prop !== "$variant" && prop !== "$size" && prop !== "colors",
+})<{
   $variant: CustomVariant;
   $size: CustomSize;
   colors: any;
@@ -149,4 +151,4 @@ const Button: React.FC<ButtonProps> = ({
   );
 };
 
-export default Button;
+export default React.memo(Button);

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import TextField from "../../../components/atoms/TextField/TextField";
 import Button from "../../../components/atoms/Button/Button";
 import { InputAdornment } from "@mui/material";
-import { PasswordStrengthMeter } from "../../../components/atoms/PasswordStrengthMeter/PasswordStrengthMeter";
+import PasswordStrengthMeter from "../../../components/atoms/PasswordStrengthMeter/PasswordStrengthMeter";
 import { FiLock } from "react-icons/fi";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useAuthService } from "../../../services/useAuthService";

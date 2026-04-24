@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../atoms/Button/Button";
 import { MODE, SKILL_CATEGORY_OPTIONS, SKILL_LEVEL_OPTIONS } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
@@ -37,10 +37,11 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     const formik = useFormik<Skill>({
         initialValues: {
-            logoId: "",
-            level: SkillLevelType.BEGINNER,
-            category: "",
+            logoId: skill?.logoId || "",
+            level: skill?.level || SkillLevelType.BEGINNER,
+            category: skill?.category || "",
         },
+        enableReinitialize: true,
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
             setSubmitting(true);
@@ -53,7 +54,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         },
     });
 
-    const loadLogoDropdown = async (searchTerm?: string) => {
+    const loadLogoDropdown = React.useCallback(async (searchTerm?: string) => {
         const params : LogoFilterParams = {
             search: searchTerm || "",
             page: "0",
@@ -73,7 +74,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         } catch (error) {
             setLogos([]);
         }
-    };
+    }, [logoService, formik.values.logoId]);
 
     const logoOptions = logos.map((logo) => ({
         label: (
@@ -86,13 +87,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         value: String(logo.id),
     }));
 
-    useEffect(() => {
-        if (skill) {
-            formik.setFieldValue("logoId", skill.logoId);
-            formik.setFieldValue("level", skill.level);
-            formik.setFieldValue("category", skill.category);
-        }
-    }, [skill, formik]);
 
     useEffect(() => {
         loadLogoDropdown();

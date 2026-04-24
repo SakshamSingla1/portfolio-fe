@@ -166,4 +166,4 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
     );
 };
 
-export default MessageDetailModal;
+export default React.memo(MessageDetailModal);

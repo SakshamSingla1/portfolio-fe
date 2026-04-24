@@ -13,4 +13,4 @@ const DateCell: React.FC<DateCellProps> = ({ data, props }) => {
     );
 }
 
-export default DateCell;
+export default React.memo(DateCell);

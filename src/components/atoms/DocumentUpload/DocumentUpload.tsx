@@ -210,4 +210,4 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
   );
 };
 
-export default DocumentUpload;
+export default React.memo(DocumentUpload);

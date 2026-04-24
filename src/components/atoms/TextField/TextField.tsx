@@ -1,6 +1,7 @@
 import MuiTextField, { type TextFieldProps } from "@mui/material/TextField";
 import { styled } from "@mui/system";
 import { useColors } from "../../../utils/types";
+import React from "react";
 
 const StyledTextField = styled(MuiTextField)<{ colors: any }>(
   ({ colors }) => ({
@@ -15,7 +16,7 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
       "&:hover": {
         borderColor: colors.primary300,
       },
-      
+
       "&:hover svg": {
         color: colors.neutral700,
       },
@@ -24,7 +25,7 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
         borderColor: colors.primary500,
         boxShadow: `0 0 0 3px ${colors.primary100}`,
       },
-      
+
       "&.Mui-focused svg": {
         color: colors.primary500,
       },
@@ -34,7 +35,7 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
         borderColor: colors.neutral200,
         cursor: "not-allowed",
         "& input, & textarea": {
-          "-webkit-text-fill-color": `${colors.neutral400} !important`,
+          WebkitTextFillColor: `${colors.neutral400} !important`,
           color: `${colors.neutral400} !important`,
         },
         "& svg": {
@@ -55,7 +56,7 @@ const StyledTextField = styled(MuiTextField)<{ colors: any }>(
           WebkitTextFillColor: colors.neutral900,
         },
       },
-      
+
       "& svg": {
         color: colors.neutral500,
         transition: "color 0.2s ease-in-out",
@@ -140,4 +141,4 @@ const TextField: React.FC<Props> = ({
   );
 };
 
-export default TextField;
+export default React.memo(TextField);

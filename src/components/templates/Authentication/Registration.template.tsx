@@ -10,11 +10,11 @@ import { AUTH_STATE } from "../../../utils/types";
 import { userNameMaker } from "../../../utils/helper";
 import Button from "../../atoms/Button/Button";
 import { useState } from "react";
-import { InputAdornment,IconButton } from "@mui/material";
+import { InputAdornment, IconButton } from "@mui/material";
 import { FiLock, FiEye, FiEyeOff, FiUser, FiMail, FiPhone } from "react-icons/fi";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { ROLES } from "../../../utils/constant";
-import { PasswordStrengthMeter } from "../../atoms/PasswordStrengthMeter/PasswordStrengthMeter";
+import PasswordStrengthMeter from "../../atoms/PasswordStrengthMeter/PasswordStrengthMeter";
 
 interface RegisterTemplateProps {
     setEmail: (email: string) => void;
@@ -34,9 +34,10 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
     const authService = useAuthService();
     const { showSnackbar } = useSnackbar();
 
-    const [showPassword,setShowPassword] = useState<{password: boolean,confirmPassword: boolean
-    }>({password: false, confirmPassword: false});
-    const [isLoading,setIsLoading] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<{
+        password: boolean, confirmPassword: boolean
+    }>({ password: false, confirmPassword: false });
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const formik = useFormik<AuthRegisterDTO>({
         initialValues: {
@@ -201,7 +202,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
                             }
                             helperText={
                                 formik.touched.confirmPassword &&
-                                formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""
+                                    formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""
                             }
                         />
                         <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />

@@ -153,7 +153,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     }
   };
 
-  const loadActiveResume = async () => {
+  const loadActiveResume = React.useCallback(async () => {
     const params: ResumeSearchParams = {
       page: "0",
       size: "1",
@@ -163,7 +163,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     if (res.status === HTTP_STATUS.OK) {
       setActiveResume(res.data.data.content?.[0] || null);
     }
-  };
+  }, [resumeService]);
 
   const handleViewResume = async () => {
     const url = publicResumeService.getViewResumeUrl();

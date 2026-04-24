@@ -25,4 +25,4 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message }) => {
   return <ErrorText colors={colors}>{message}</ErrorText>;
 };
 
-export default ErrorMessage;
+export default React.memo(ErrorMessage);

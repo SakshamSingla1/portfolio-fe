@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Button from '../../atoms/Button/Button';
 import TextField from '../../atoms/TextField/TextField';
 import CustomRadioGroup from '../../molecules/CustomRadioGroup/CustomRadioGroup';
@@ -39,21 +39,12 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
             order: socialLink?.order || '',
             status: socialLink?.status || Status.ACTIVE,
         },
+        enableReinitialize: true,
         validationSchema,
         onSubmit,
     });
 
-    useEffect(() => {
-        if (socialLink) {
-            formik.setValues({
-                platform: socialLink.platform || '',
-                url: socialLink.url || '',
-                order: socialLink.order || '',
-                status: socialLink.status || Status.ACTIVE,
-            });
-        }
-    }, [socialLink, formik]);
-    
+
     return (
         <div className="mb-8">
             <div className="mb-8">

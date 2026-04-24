@@ -13,4 +13,4 @@ const CurrencyCell: React.FC<CurrencyCellProps> = ({ data, props }) => {
     );
 }
 
-export default CurrencyCell;
+export default React.memo(CurrencyCell);
