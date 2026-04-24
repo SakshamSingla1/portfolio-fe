@@ -79,6 +79,54 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                     border: `1px solid ${colors.neutral200}`,
                                     boxShadow: `0 12px 32px -4px ${colors.neutral900}30`,
                                     borderRadius: "16px",
+                                    color: colors.neutral900,
+                                },
+                                "& .MuiPickersCalendarHeader-root": {
+                                    color: colors.neutral900,
+                                },
+                                "& .MuiPickersCalendarHeader-label": {
+                                    fontWeight: 700,
+                                    fontSize: "0.95rem",
+                                },
+                                "& .MuiDayCalendar-weekDayLabel": {
+                                    color: colors.neutral500,
+                                    fontWeight: 600,
+                                },
+                                "& .MuiPickersArrowSwitcher-button": {
+                                    color: colors.neutral600,
+                                    "&:hover": {
+                                        backgroundColor: colors.neutral100,
+                                    }
+                                },
+                                "& .MuiPickersDay-root": {
+                                    color: colors.neutral800,
+                                    fontWeight: 500,
+                                    "&:hover": {
+                                        backgroundColor: colors.primary50,
+                                        color: colors.primary600,
+                                    },
+                                    "&.Mui-selected": {
+                                        backgroundColor: colors.primary500,
+                                        color: colors.neutral0,
+                                        "&:focus": {
+                                            backgroundColor: colors.primary600,
+                                        }
+                                    },
+                                    "&.MuiPickersDay-today": {
+                                        borderColor: colors.primary400,
+                                        color: colors.primary600,
+                                    }
+                                },
+                                "& .MuiPickersYear-yearButton": {
+                                    color: colors.neutral800,
+                                    "&.Mui-selected": {
+                                        backgroundColor: colors.primary500,
+                                        color: colors.neutral0,
+                                    },
+                                    "&:hover": {
+                                        backgroundColor: colors.primary50,
+                                        color: colors.primary600,
+                                    }
                                 }
                             }
                         }

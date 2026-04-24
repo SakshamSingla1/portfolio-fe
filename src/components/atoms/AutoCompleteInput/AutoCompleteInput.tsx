@@ -65,7 +65,7 @@ const useStyles = createUseStyles({
             "&:hover .MuiOutlinedInput-notchedOutline": {
                 borderColor: colors.primary300,
             },
-            
+
             "&:hover svg": {
                 color: colors.neutral700,
             },
@@ -75,7 +75,7 @@ const useStyles = createUseStyles({
                 borderWidth: "1px",
                 boxShadow: `0 0 0 3px ${colors.primary100}`,
             },
-            
+
             "&.Mui-focused svg": {
                 color: colors.primary500,
             },
@@ -103,7 +103,7 @@ const useStyles = createUseStyles({
             "& .MuiAutocomplete-input": {
                 padding: "4px 8px !important",
             },
-            
+
             "& svg": {
                 color: colors.neutral500,
                 transition: "color 0.2s cubic-bezier(0.4, 0, 0.2, 1)",

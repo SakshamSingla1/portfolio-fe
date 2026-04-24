@@ -56,48 +56,48 @@ export interface SkillStats {
 export const useSkillService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getAll = () => {
-        const url = replaceUrlParams(SKILL_URLS.SKILL, {});
-        return request(API_METHOD.GET, url, user, null, null, null);
-    };
+        const getAll = () => {
+            const url = replaceUrlParams(SKILL_URLS.SKILL, {});
+            return request(API_METHOD.GET, url, user, null, null, null);
+        };
 
-    const getById = (id: string | null) => {
-        const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null, null, null);
-    };
+        const getById = (id: string | null) => {
+            const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null, null, null);
+        };
 
-    const create = (skill: Skill) => {
-        const url = replaceUrlParams(SKILL_URLS.SKILL, {});
-        return request(API_METHOD.POST, url, user, skill);
-    };
+        const create = (skill: Skill) => {
+            const url = replaceUrlParams(SKILL_URLS.SKILL, {});
+            return request(API_METHOD.POST, url, user, skill);
+        };
 
-    const update = (id: string | null, skill: Skill) => {
-        const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, skill);
-    };
+        const update = (id: string | null, skill: Skill) => {
+            const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, skill);
+        };
 
-    const remove = (id: string) => {
-        const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: string) => {
+            const url = replaceUrlParams(SKILL_URLS.SKILL_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const getByProfile = (params: SkillFilterParams) => {
-        const url = SKILL_URLS.SKILL_BY_PROFILE_ID;
-        return request(API_METHOD.GET, url, user, null, { params });
-    };
+        const getByProfile = (params: SkillFilterParams) => {
+            const url = SKILL_URLS.SKILL_BY_PROFILE_ID;
+            return request(API_METHOD.GET, url, user, null, { params });
+        };
 
-    const getStats = () => {
-        const url = SKILL_URLS.SKILL_STATS;
-        return request(API_METHOD.GET, url, user, null, null, null);
-    };
+        const getStats = () => {
+            const url = SKILL_URLS.SKILL_STATS;
+            return request(API_METHOD.GET, url, user, null, null, null);
+        };
 
-    return {
-        getAll,
-        getById,
-        create,
-        update,
-        remove,
-        getByProfile,
-        getStats,
-    };
+        return {
+            getAll,
+            getById,
+            create,
+            update,
+            remove,
+            getByProfile,
+            getStats,
+        };
 }

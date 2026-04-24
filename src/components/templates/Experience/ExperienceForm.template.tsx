@@ -120,11 +120,9 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         return skills.filter(skill => formik.values.skillIds.includes(String(skill.id)));
     }, [skills, formik.values.skillIds]);
 
-
-
     useEffect(() => {
         loadSkills();
-    }, [loadSkills]);
+    }, []);
 
     return (
         <div className="mb-8">

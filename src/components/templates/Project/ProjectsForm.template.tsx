@@ -178,7 +178,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     useEffect(() => {
         loadSkills();
-    }, [loadSkills]);
+    }, []);
 
 
     return (

@@ -80,7 +80,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
         },
     });
 
-
     return (
         <div className="mb-8">
             <div className="mb-8">
