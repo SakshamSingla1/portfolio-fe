@@ -12,8 +12,8 @@ import { DateUtils } from "../../../utils/helper";
 interface ExperienceTableTemplateProps {
     experiences: ExperienceResponse[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ experiences, pagination, handlePaginationChange, handleRowsPerPageChange }) => {

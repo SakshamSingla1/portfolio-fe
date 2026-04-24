@@ -12,8 +12,8 @@ import type { SkillDropdown } from "../../../services/useSkillService";
 interface ProjectsTableTemplateProps {
     projects: ProjectResponse[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects, pagination, handlePaginationChange, handleRowsPerPageChange }) => {

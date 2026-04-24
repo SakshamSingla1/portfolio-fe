@@ -11,8 +11,8 @@ import type { Education } from "../../../services/useEducationService";
 interface IEducationsTableTemplateProps {
     educations: Education[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educations, pagination, handlePaginationChange, handleRowsPerPageChange }) => {

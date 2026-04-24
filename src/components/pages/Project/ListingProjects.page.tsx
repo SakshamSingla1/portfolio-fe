@@ -63,7 +63,7 @@ const ListingProjectsPage: React.FC = () => {
         setPagination({ ...pagination, currentPage: 0 })
     }
 
-    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
+    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage

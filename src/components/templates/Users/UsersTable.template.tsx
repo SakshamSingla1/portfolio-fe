@@ -13,8 +13,8 @@ import { useSnackbar } from "../../../hooks/useSnackBar";
 interface UserTableTemplateProps {
     users: UserResponse[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({ users, pagination, handlePaginationChange, handleRowsPerPageChange }) => {

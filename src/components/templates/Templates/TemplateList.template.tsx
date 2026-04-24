@@ -12,8 +12,8 @@ import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 interface TemplateListTableTemplateProps {
     templates: TemplateResponse[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ templates, pagination, handlePaginationChange, handleRowsPerPageChange }) => {

@@ -12,8 +12,8 @@ import { DateUtils } from "../../../utils/helper";
 interface ITestimonialTableTemplateProps {
     testimonials: Testimonial[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ testimonials, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
