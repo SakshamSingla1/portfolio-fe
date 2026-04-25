@@ -317,32 +317,32 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                         <div className="w-2 h-2 bg-red-500 rounded-full mr-3" />
                         GitHub Repositories
                     </h3>
-                    {(formik.values.githubRepositories.length? formik.values.githubRepositories : [""]).map((repo, index) => {
-                            return (
-                                <div key={index} className="flex items-center gap-3 mb-3">
-                                    <TextField
-                                        label={`Repository ${index + 1}`}
-                                        value={repo}
-                                        onChange={e =>updateGithubRepo(index, e.target.value)}
-                                        onBlur={() =>formik.setFieldTouched(`githubRepositories.${index}`, true)}
-                                        placeholder="https://github.com/username/repo"
-                                        disabled={mode === MODE.VIEW}
-                                        required
-                                    />
-                                    {formik.values.githubRepositories.length > 1 &&
-                                        mode !== MODE.VIEW && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeGithubRepo(index)}
-                                                className="p-2 rounded transition"
-                                                style={{ backgroundColor: colors.error50, color: colors.error600 }}
-                                            >
-                                                <FiTrash2 />
-                                            </button>
-                                        )}
-                                </div>
-                            );
-                        })}
+                    {(formik.values.githubRepositories.length ? formik.values.githubRepositories : [""]).map((repo, index) => {
+                        return (
+                            <div key={index} className="flex items-center gap-3 mb-3">
+                                <TextField
+                                    label={`Repository ${index + 1}`}
+                                    value={repo}
+                                    onChange={e => updateGithubRepo(index, e.target.value)}
+                                    onBlur={() => formik.setFieldTouched(`githubRepositories.${index}`, true)}
+                                    placeholder="https://github.com/username/repo"
+                                    disabled={mode === MODE.VIEW}
+                                    required
+                                />
+                                {formik.values.githubRepositories.length > 1 &&
+                                    mode !== MODE.VIEW && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeGithubRepo(index)}
+                                            className="p-2 rounded transition"
+                                            style={{ backgroundColor: colors.error50, color: colors.error600 }}
+                                        >
+                                            <FiTrash2 />
+                                        </button>
+                                    )}
+                            </div>
+                        );
+                    })}
                     {mode !== MODE.VIEW && (
                         <Button
                             label="Add Repository"
@@ -359,36 +359,58 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-3">
                     <h3 className="text-lg font-semibold flex items-center mb-4">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"/>
+                        <div className="w-2 h-2 bg-orange-500 rounded-xl mr-3" />
                         Project Images
                     </h3>
-                    {(formik.values.projectImages.length > 0 ? formik.values.projectImages : [null]).map((image, index) => {
-                        return (
-                        <div key={index} className="flex items-center gap-3">
-                            <ImageUpload
-                                label={`Image ${index + 1}`}
-                                value={image}
-                                onChange={() => { }}
-                                onUpload={(file) => uploadProjectImage(file, index)}
-                                disabled={mode === MODE.VIEW || isUploading}
-                                maxSize={5}
-                                aspectRatio="wide"
-                                helperText="Project image · Max 5MB"
-                                required={true}
-                                error={formik.touched.projectImages && Boolean(formik.errors.projectImages)}
-                            />
-                            {formik.values.projectImages.length > 1 && mode !== MODE.VIEW && (
-                                <button
-                                    onClick={() => removeProjectImage(index)}
-                                    className="p-2 rounded hover:bg-red-100"
-                                    style={{ backgroundColor: colors.error50, color: colors.error600 }}
-                                >
-                                    <FiTrash2 />
-                                </button>
-                            )}
-                        </div>
-                        );
-                    })}
+                    <div className="flex flex-col lg:flex-row gap-10">
+                        {(formik.values.projectImages.length > 0 ? formik.values.projectImages : [null]).map((image, index) => {
+                            const isPrimary = index === 0;
+                            return (
+                                <div key={index} className="relative group/img-container w-[260px]">
+                                    <div className="relative p-2 rounded-sm bg-gray-50/50 border border-gray-100 shadow-inner group-hover/img-container:bg-white group-hover/img-container:shadow-xl group-hover/img-container:shadow-blue-500/5 transition-all duration-500">
+                                        <ImageUpload
+                                            label={isPrimary ? "Primary Project Cover" : `Additional Asset ${index + 1}`}
+                                            value={image}
+                                            onChange={(val) => {
+                                                if (val === null) {
+                                                    const updated = [...formik.values.projectImages];
+                                                    updated[index] = null as any;
+                                                    formik.setFieldValue("projectImages", updated);
+                                                } else {
+                                                    addProjectImage(val, index);
+                                                }
+                                            }}
+                                            onUpload={(file) => uploadProjectImage(file, index)}
+                                            disabled={mode === MODE.VIEW || isUploading}
+                                            maxSize={5}
+                                            aspectRatio="wide"
+                                            helperText={isPrimary ? "Main visual for this project" : "Gallery asset · Max 5MB"}
+                                            required={true}
+                                            error={formik.touched.projectImages && Boolean(formik.errors.projectImages)}
+                                        />
+
+                                        {isPrimary && !!image && (
+                                            <div className="absolute top-11 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/90 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest shadow-lg z-10 border border-white/20">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                                Cover Image
+                                            </div>
+                                        )}
+
+                                        {formik.values.projectImages.length > 1 && mode !== MODE.VIEW && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeProjectImage(index)}
+                                                className="absolute top-11 right-4 p-2.5 rounded-xl bg-red-500 text-white shadow-xl opacity-0 group-hover/img-container:opacity-100 transition-all duration-300 hover:scale-110 z-20 hover:bg-red-600"
+                                                title="Remove image"
+                                            >
+                                                <FiTrash2 size={16} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                     {mode !== MODE.VIEW && (
                         <div className="mt-3">
                             <Button
@@ -402,10 +424,10 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                         </div>
                     )}
                     {typeof formik.errors.projectImages === "string" && formik.touched.projectImages && (
-                            <p className="mb-3 text-xs" style={{ color: colors.error600 }}>
-                                {formik.errors.projectImages}
-                            </p>
-                        )}
+                        <p className="mb-3 text-xs" style={{ color: colors.error600 }}>
+                            {formik.errors.projectImages}
+                        </p>
+                    )}
                 </div>
 
 
