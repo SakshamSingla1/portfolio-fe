@@ -36,7 +36,7 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.USER_VIEW, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.ROLE_VIEW, { query, params: { id: id } }));
     }
 
     const Action = (role: RoleListResponseDTO) => {

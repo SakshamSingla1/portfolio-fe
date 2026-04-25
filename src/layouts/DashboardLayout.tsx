@@ -88,18 +88,18 @@ const useStyles = createUseStyles({
   }),
 
   header: (c: any) => ({
-    height: 72,
+    height: c.isMobile ? 56 : 72,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    margin: "12px 16px 8px",
-    padding: "0 20px",
+    margin: c.isMobile ? "8px 12px 6px" : "12px 16px 8px",
+    padding: c.isMobile ? "0 12px" : "0 20px",
     background: `${c.neutral0}aa`,
     backdropFilter: "blur(16px)",
     border: `1px solid ${c.neutral200}40`,
-    borderRadius: 20,
+    borderRadius: c.isMobile ? 16 : 20,
     position: "sticky",
-    top: 12,
+    top: c.isMobile ? 8 : 12,
     zIndex: 50,
     boxShadow: `0 8px 32px ${c.neutral900}05`,
     transition: "all 0.3s ease",
@@ -112,13 +112,13 @@ const useStyles = createUseStyles({
     flex: 1,
   },
 
-  breadcrumbs: {
+  breadcrumbs: (c: any) => ({
     display: "flex",
     alignItems: "center",
     gap: 8,
-    fontSize: 14,
+    fontSize: c.isMobile ? 12 : 14,
     color: (c: any) => c.neutral500,
-  },
+  }),
 
   breadcrumbItem: (c: any) => ({
     display: "flex",
@@ -126,6 +126,7 @@ const useStyles = createUseStyles({
     gap: 6,
     cursor: "pointer",
     transition: "all 0.2s",
+    fontSize: c.isMobile ? 10 : 14,
     "&:hover": {
       color: c.primary600,
     },
@@ -146,9 +147,9 @@ const useStyles = createUseStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: c.isMobile ? 20 : 40,
+    height: c.isMobile ? 20 : 40,
+    borderRadius: c.isMobile ? 8 : 12,
     background: "transparent",
     border: "none",
     cursor: "pointer",
@@ -167,34 +168,34 @@ const useStyles = createUseStyles({
 
   notificationDot: (c: any) => ({
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
+    top: c.isMobile ? 1 : 8,
+    right: c.isMobile ? 3 : 8,
+    width: c.isMobile ? 7 : 8,
+    height: c.isMobile ? 7 : 8,
     borderRadius: "50%",
     background: c.primary500,
     border: `2px solid ${c.neutral0}`,
   }),
 
-  userDropdownTrigger: () => ({
+  userDropdownTrigger: (c: any) => ({
     display: "flex",
     alignItems: "center",
-    gap: 10,
-    padding: "4px 6px 4px 12px",
+    gap: c.isMobile ? 6 : 10,
+    padding: c.isMobile ? "4px 4px 4px 8px" : "4px 6px 4px 12px",
     transition: "all 0.3s ease",
   }),
 
   userAvatar: (c: any) => ({
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: c.isMobile ? 30 : 34,
+    height: c.isMobile ? 30 : 34,
+    borderRadius: c.isMobile ? 8 : 10,
     background: `linear-gradient(135deg, ${c.primary500}, ${c.primary600})`,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
     color: "white",
-    fontSize: 12,
+    fontSize: c.isMobile ? 11 : 12,
     fontWeight: 700,
     boxShadow: `0 4px 12px ${c.primary500}30`,
   }),
@@ -250,7 +251,7 @@ const useStyles = createUseStyles({
 
   mainContent: (c: any) => ({
     flexGrow: 1,
-    padding: "12px 16px 20px",
+    padding: c.isMobile ? "8px 12px 16px" : "12px 16px 20px",
     overflowX: "hidden",
     overflowY: "auto",
     position: "relative",
