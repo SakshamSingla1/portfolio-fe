@@ -71,7 +71,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
         { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
         { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Action", key: "id", component: ({ value }: { value: string }) => Action(value), type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Action", key: "id", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ];
 
     const getSchema = () => ({
