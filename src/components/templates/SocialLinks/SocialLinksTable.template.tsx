@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { type ColumnType } from "../../organisms/Table/TableV2";
+import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
-import TableV2 from "../../organisms/Table/TableV2";
+import TableV1 from "../../organisms/Table/TableV1";
 import { FiEye, FiEdit } from "react-icons/fi";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import { DateUtils, enumToNormalKey } from "../../../utils/helper";
@@ -22,24 +22,6 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
     const navigate = useNavigate();
 
     const [isMobile, setIsMobile] = useState<boolean>(false);
-
-    const [localRecords, setLocalRecords] = useState<Record<string, unknown>[]>([]);
-    const [selectedRows, setSelectedRows] = useState<Record<string, unknown>[]>([]);
-
-    useEffect(() => {
-        if (socialLinks) {
-            setLocalRecords(socialLinks.map((sl, index) => ({
-                id: sl.id,
-                serial: pagination.currentPage * pagination.pageSize + index + 1,
-                platform: enumToNormalKey(sl.platform),
-                status: sl.status,
-                createdAt: DateUtils.dateTimeSecondToDate(sl.createdAt ?? ""),
-                updatedAt: DateUtils.dateTimeSecondToDate(sl.updatedAt ?? ""),
-            })));
-        } else {
-            setLocalRecords([]);
-        }
-    }, [socialLinks, pagination]);
 
     const handleEdit = (id: string) => {
         const query = {
@@ -74,18 +56,27 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
         );
     };
 
+    const getRecords = () => socialLinks?.map((sl: SocialLinkResponse, index) => [
+        pagination.currentPage * pagination.pageSize + index + 1,
+        enumToNormalKey(sl.platform),
+        sl.status,
+        DateUtils.dateTimeSecondToDate(sl.createdAt ?? ""),
+        DateUtils.dateTimeSecondToDate(sl.updatedAt ?? ""),
+        Action(sl.id ?? "")
+    ]);
+
     const getTableColumns = () => [
         { label: "Sr No.", key: "serial", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Platform", key: "platform", type: "string" as ColumnType, props: { className: '' }, priority: "high" as const },
+        { label: "Platform", key: "platform", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
         { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
-        { label: "Created At", key: "createdAt", type: "string" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Updated At", key: "updatedAt", type: "string" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Action", key: "id", component: ({ value }: { value: string }) => Action(value), type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ];
 
     const getSchema = () => ({
         id: "social-links-table",
-        rowKey: "id",
+        mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
             currentPage: pagination.currentPage,
@@ -110,14 +101,9 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
     }, []);
 
     return (
-        <TableV2
+        <TableV1
             schema={getSchema()}
-            records={localRecords}
-            setRecords={setLocalRecords}
-            showCheckboxes={true}
-            selected={selectedRows}
-            setSelected={setSelectedRows}
-            isRounded={true}
+            records={getRecords()}
         />
     )
 }
