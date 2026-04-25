@@ -43,7 +43,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     };
 
     return (
-        <div className="relative w-full max-w-[1200px] mx-auto py-6 sm:py-10 px-4 sm:px-6">
+        <div className="relative w-full mx-auto py-6 sm:py-10 px-4 sm:px-6">
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -110,7 +110,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {colorThemes.map((theme, i) => (
                     <motion.div
                         key={theme.id || theme.themeName}
