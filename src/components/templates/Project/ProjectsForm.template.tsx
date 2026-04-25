@@ -57,6 +57,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     const projectService = useProjectService();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
+    const [selectedSkillObjects, setSelectedSkillObjects] = useState<SkillDropdown[]>(projects?.skills || []);
     const [isUploading, setIsUploading] = useState<boolean>(false);
 
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
@@ -87,14 +88,20 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         },
     });
 
-    const loadSkills = React.useCallback(async (search = "") => {
+    const loadSkills = async (search = "") => {
         try {
             const res = await skillService.getByProfile({ search });
             setSkills(res?.status === HTTP_STATUS.OK ? res.data.data.content : []);
         } catch {
             setSkills([]);
         }
-    }, [skillService]);
+    }
+
+    useEffect(() => {
+        if (projects?.skills) {
+            setSelectedSkillObjects(projects.skills);
+        }
+    }, [projects?.skills]);
 
     const uploadProjectImage = async (file: File, index?: number) => {
         setIsUploading(true);
@@ -132,22 +139,25 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     const skillOptions = useMemo(
         () =>
-            skills.map(skill => ({
-                label: (
-                    <div className="flex items-center gap-2">
-                        <img src={skill.logoUrl} className="w-6 h-6" />
-                        {skill.logoName}
-                    </div>
-                ),
-                value: skill.id,
-                title: skill.logoName,
-            })),
-        [skills]
+            skills
+                .filter(skill => !formik.values.skillIds.includes(skill.id))
+                .map(skill => ({
+                    label: (
+                        <div className="flex items-center gap-2">
+                            <img src={skill.logoUrl} className="w-6 h-6" />
+                            {skill.logoName}
+                        </div>
+                    ),
+                    value: skill.id,
+                    title: skill.logoName,
+                    original: skill,
+                })),
+        [skills, formik.values.skillIds]
     );
 
-    const selectedSkills = useMemo(
-        () => skills.filter(s => formik.values.skillIds.includes(s.id)),
-        [skills, formik.values.skillIds]
+    const selectedSkillsList = useMemo(
+        () => selectedSkillObjects,
+        [selectedSkillObjects]
     );
 
     const removeProjectImage = (index: number) => {
@@ -241,6 +251,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                     ...formik.values.skillIds,
                                     o.value,
                                 ]);
+                                setSelectedSkillObjects(prev => [...prev, o.original]);
                             }
                         }}
                         required={true}
@@ -250,7 +261,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     />
 
                     <div className="flex flex-wrap gap-2 mt-4">
-                        {selectedSkills.map(skill => (
+                        {selectedSkillsList.map(skill => (
                             <Chip
                                 key={skill.id}
                                 label={
@@ -259,12 +270,13 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                         {skill.logoName}
                                     </div>
                                 }
-                                onDelete={() =>
+                                onDelete={() => {
                                     formik.setFieldValue(
                                         "skillIds",
                                         formik.values.skillIds.filter(id => id !== skill.id)
-                                    )
-                                }
+                                    );
+                                    setSelectedSkillObjects(prev => prev.filter(s => s.id !== skill.id));
+                                }}
                                 disabled={mode === MODE.VIEW}
                             />
                         ))}
@@ -362,7 +374,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                         <div className="w-2 h-2 bg-orange-500 rounded-xl mr-3" />
                         Project Images
                     </h3>
-                    <div className="flex flex-col lg:flex-row gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
                         {(formik.values.projectImages.length > 0 ? formik.values.projectImages : [null]).map((image, index) => {
                             const isPrimary = index === 0;
                             return (
@@ -466,4 +478,4 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     );
 };
 
-export default ProjectFormTemplate;
+export default React.memo(ProjectFormTemplate);

@@ -55,7 +55,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     });
 
     const loadLogoDropdown = React.useCallback(async (searchTerm?: string) => {
-        const params : LogoFilterParams = {
+        const params: LogoFilterParams = {
             search: searchTerm || "",
             page: "0",
             size: "10"
@@ -90,7 +90,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     useEffect(() => {
         loadLogoDropdown();
-    }, [loadLogoDropdown]);
+    }, []);
 
     return (
         <div className="mb-8">
