@@ -15,6 +15,7 @@ import { InputAdornment } from "@mui/material";
 import { IconButton } from "@mui/material";
 import Button from "../../atoms/Button/Button";
 import { useSnackbar } from "../../../hooks/useSnackBar";
+import { motion } from "framer-motion";
 
 interface LoginWithEmailProps {
     setAuthState: (authState: AUTH_STATE) => void;
@@ -36,7 +37,6 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
     
     const [isLoading,setIsLoading ] = useState<boolean>(false);
     const { showSnackbar } = useSnackbar();
-
 
     const formik = useFormik<AuthLoginDTO>({
         initialValues: {
@@ -79,13 +79,22 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
     });
 
     return (
-        <div className="w-full">
+        <motion.div 
+            className="w-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+        >
             <div className="p-8">
                 <div className="text-center mb-6 flex flex-col items-center">
-                    <div className="p-3 rounded-full bg-green-100 text-green-600 text-3xl flex items-center justify-center mb-3 shadow-sm">
+                    <motion.div 
+                        className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-3xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20"
+                        whileHover={{ scale: 1.05, rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                    >
                         <FiLock />
-                    </div>
-                    <h2 className="text-2xl text-green-800 font-bold tracking-tight">
+                    </motion.div>
+                    <h2 className="text-2xl text-slate-800 font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">
                         Sign in to your account
                     </h2>
                     <div className="mt-6 flex justify-center">
@@ -209,7 +218,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

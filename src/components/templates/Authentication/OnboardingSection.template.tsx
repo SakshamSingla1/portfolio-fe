@@ -16,13 +16,30 @@ const OnboardingSection = ({ onFlip }: { onFlip: () => void }) => {
       text-white relative overflow-hidden w-full"
     >
       <motion.div
-        className="absolute inset-0 opacity-35"
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.2 }}
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 20%, rgba(16,185,129,0.35), transparent 40%), radial-gradient(circle at 80% 30%, rgba(16,185,129,0.25), transparent 45%)",
+        className="absolute top-[-20%] left-[-20%] w-[400px] h-[400px] rounded-full bg-emerald-500/20 blur-[100px] pointer-events-none"
+        animate={{
+          scale: [1, 1.3, 1],
+          x: [0, 40, 0],
+          y: [0, -30, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-teal-500/20 blur-[100px] pointer-events-none"
+        animate={{
+          scale: [1, 1.2, 1],
+          x: [0, -30, 0],
+          y: [0, 40, 0],
+        }}
+        transition={{
+          duration: 14,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1,
         }}
       />
 
@@ -34,16 +51,17 @@ const OnboardingSection = ({ onFlip }: { onFlip: () => void }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-4">
           <motion.div
-            className="text-[#10b981]"
-            animate={{ rotate: [0, 360] }}
-            transition={{ repeat: Infinity, duration: 14, ease: "linear" }}
+            className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700/50 text-emerald-400 shadow-2xl shadow-emerald-500/10 relative group"
+            whileHover={{ scale: 1.05, borderColor: "rgba(16,185,129,0.4)" }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <FaLaptopCode size={isMobile ? 42 : 58} />
+            <div className="absolute inset-0 rounded-3xl bg-emerald-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <FaLaptopCode size={isMobile ? 36 : 52} className="relative z-10" />
           </motion.div>
-          <span className="tracking-widest text-xs uppercase text-gray-400">
-            Portfolio
+          <span className="tracking-[0.25em] text-xs uppercase font-semibold text-emerald-400/80">
+            Full-Stack Portfolio
           </span>
         </div>
       </motion.div>
@@ -56,18 +74,18 @@ const OnboardingSection = ({ onFlip }: { onFlip: () => void }) => {
         >
           <div className="text-center">
             <h1
-              className={`font-extrabold ${
-                isMobile ? "text-2xl" : "text-4xl"
+              className={`font-extrabold tracking-tight ${
+                isMobile ? "text-3xl" : "text-5xl"
               }`}
             >
               Building reliable
-              <span className="block text-[#10b981]">
+              <span className="block mt-1 bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
                 digital products
               </span>
             </h1>
 
             <p
-              className={`mt-4 text-gray-400 ${
+              className={`mt-4 text-slate-400 font-medium ${
                 isMobile ? "text-sm" : "text-base"
               }`}
             >
@@ -75,19 +93,37 @@ const OnboardingSection = ({ onFlip }: { onFlip: () => void }) => {
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-3 gap-6 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <FaCode className="text-[#10b981]" />
-              <span className="text-xs text-gray-400">Clean Code</span>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <FaRocket className="text-[#10b981]" />
-              <span className="text-xs text-gray-400">Fast Delivery</span>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <FaLaptopCode className="text-[#10b981]" />
-              <span className="text-xs text-gray-400">Modern UI</span>
-            </div>
+          <div className="mt-12 grid grid-cols-3 gap-4 text-center">
+            <motion.div 
+              className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg"
+              whileHover={{ y: -6, backgroundColor: "rgba(255,255,255,0.08)", borderColor: "rgba(16,185,129,0.4)", boxShadow: "0 10px 30px -10px rgba(16,185,129,0.3)" }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-400 text-2xl shadow-inner">
+                <FaCode />
+              </div>
+              <span className="text-xs font-bold tracking-wide text-slate-300">Clean Code</span>
+            </motion.div>
+            <motion.div 
+              className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg"
+              whileHover={{ y: -6, backgroundColor: "rgba(255,255,255,0.08)", borderColor: "rgba(16,185,129,0.4)", boxShadow: "0 10px 30px -10px rgba(16,185,129,0.3)" }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-400 text-2xl shadow-inner">
+                <FaRocket />
+              </div>
+              <span className="text-xs font-bold tracking-wide text-slate-300">Fast Delivery</span>
+            </motion.div>
+            <motion.div 
+              className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg"
+              whileHover={{ y: -6, backgroundColor: "rgba(255,255,255,0.08)", borderColor: "rgba(16,185,129,0.4)", boxShadow: "0 10px 30px -10px rgba(16,185,129,0.3)" }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-400 text-2xl shadow-inner">
+                <FaLaptopCode />
+              </div>
+              <span className="text-xs font-bold tracking-wide text-slate-300">Modern UI</span>
+            </motion.div>
           </div>
         </div>
       </Fade>
