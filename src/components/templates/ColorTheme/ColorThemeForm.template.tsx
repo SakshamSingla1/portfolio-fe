@@ -3,7 +3,6 @@ import TextField from "../../atoms/TextField/TextField";
 import ColorPickerField from "../../atoms/ColorPicker/ColorPicker";
 import Button from "../../atoms/Button/Button";
 
-import { FiPlus, FiTrash2 } from "react-icons/fi";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { makeRoute, capitalizeFirstLetter } from "../../../utils/helper";
 import { type ColorTheme } from "../../../services/useColorThemeService";
+import { DEFAULT_PALETTE } from "../../../utils/themeConstants";
 
 interface ColorThemeFormProps {
   onSubmit: (values: ColorTheme) => void;
@@ -49,50 +49,11 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
   const formik = useFormik<ColorTheme>({
     initialValues: {
       themeName: "",
-      palette: {
-        colorGroups: [
-          {
-            groupName: "",
-            colorShades: [{ colorName: "", colorCode: "#ffffff" }],
-          },
-        ],
-      },
+      palette: DEFAULT_PALETTE,
     },
     validationSchema,
     onSubmit,
   });
-
-  const addGroup = () => {
-    formik.setFieldValue("palette.colorGroups", [
-      ...formik.values.palette.colorGroups,
-      {
-        groupName: "",
-        colorShades: [{ colorName: "", colorCode: "#ffffff" }],
-      },
-    ]);
-  };
-
-  const removeGroup = (index: number) => {
-    formik.setFieldValue(
-      "palette.colorGroups",
-      formik.values.palette.colorGroups.filter((_, i) => i !== index)
-    );
-  };
-
-  const addShade = (gIndex: number) => {
-    const groups = [...formik.values.palette.colorGroups];
-    groups[gIndex].colorShades.push({
-      colorName: "",
-      colorCode: "#ffffff",
-    });
-    formik.setFieldValue("palette.colorGroups", groups);
-  };
-
-  const removeShade = (gIndex: number, sIndex: number) => {
-    const groups = [...formik.values.palette.colorGroups];
-    groups[gIndex].colorShades.splice(sIndex, 1);
-    formik.setFieldValue("palette.colorGroups", groups);
-  };
 
   useEffect(() => {
     if (colorTheme) formik.setValues(colorTheme);
@@ -105,7 +66,7 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
           {capitalizeFirstLetter(mode)} Color Theme
         </h2>
         <p className="text-gray-600">
-          Define reusable color palettes for consistent UI
+          Configure the specific color codes for your fixed theme structure
         </p>
       </div>
 
@@ -117,6 +78,7 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
           </h3>
           <TextField
             label="Theme Name"
+            placeholder="e.g. Modern Gold, Dark Premium"
             {...formik.getFieldProps("themeName")}
             error={Boolean(
               formik.touched.themeName && formik.errors.themeName
@@ -128,111 +90,45 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
             fullWidth
           />
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+
+        {formik.values.palette.colorGroups.map((group, gIndex) => (
+          <div
+            key={group.groupName}
+            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
-              Color Groups
+              {capitalizeFirstLetter(group.groupName)} Palette
             </h3>
-            {mode !== MODE.VIEW && (
-              <Button
-                label="Add Group"
-                variant="primaryContained"
-                startIcon={<FiPlus />}
-                onClick={addGroup}
-              />
-            )}
-          </div>
-          <div className="space-y-6">
-            {formik.values.palette.colorGroups.map((group, gIndex) => (
-              <div
-                key={gIndex}
-                className="border border-gray-200 rounded-xl p-4 space-y-4"
-              >
-                <div className="flex items-end justify-between gap-3">
-                  <TextField
-                    label="Group Name"
-                    value={group.groupName}
-                    onChange={(e) =>
-                      formik.setFieldValue(
-                        `palette.colorGroups.${gIndex}.groupName`,
-                        e.target.value
-                      )
-                    }
-                    disabled={mode === MODE.VIEW}
-                    fullWidth
-                  />
-                  {mode !== MODE.VIEW && (
-                    <button
-                      onClick={() =>
-                        removeGroup(gIndex)
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {group.colorShades.map((shade, sIndex) => (
+                <div 
+                  key={shade.colorName}
+                  className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-200"
+                >
+                  <div className="flex-1">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                      {shade.colorName}
+                    </p>
+                    <ColorPickerField
+                      label=""
+                      value={shade.colorCode}
+                      onChange={(color) =>
+                        formik.setFieldValue(
+                          `palette.colorGroups.${gIndex}.colorShades.${sIndex}.colorCode`,
+                          color
+                        )
                       }
-                      className="p-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
-                    >
-                      <FiTrash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-sm font-medium text-gray-700">
-                      Color Shades
-                    </h4>
-                    {mode !== MODE.VIEW && (
-                      <Button
-                        label="Add Shade"
-                        variant="secondaryContained"
-                        startIcon={<FiPlus size={14} />}
-                        onClick={() => addShade(gIndex)}
-                      />
-                    )}
+                      disabled={mode === MODE.VIEW}
+                    />
                   </div>
-                  {group.colorShades.map((shade, sIndex) => (
-                    <div className="flex items-center gap-4">
-                      <div key={sIndex} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                        <TextField
-                          label="Color Name"
-                          value={shade.colorName}
-                          onChange={(e) =>
-                            formik.setFieldValue(
-                              `palette.colorGroups.${gIndex}.colorShades.${sIndex}.colorName`,
-                              e.target.value
-                            )
-                          }
-                          disabled={mode === MODE.VIEW}
-                          fullWidth
-                        />
-                        <ColorPickerField
-                          label="Color Code"
-                          value={shade.colorCode}
-                          onChange={(color) =>
-                            formik.setFieldValue(
-                              `palette.colorGroups.${gIndex}.colorShades.${sIndex}.colorCode`,
-                              color
-                            )
-                          }
-                          disabled={mode === MODE.VIEW}
-                        />
-                      </div>
-                      {mode !== MODE.VIEW && (
-                        <div className="flex items-start justify-end">
-                          <button
-                            onClick={() =>
-                              removeShade(gIndex, sIndex)
-                            }
-                            className="p-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
-                          >
-                            <FiTrash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
+
         <div className="flex justify-between gap-3 pt-4">
           <Button
             variant="tertiaryContained"

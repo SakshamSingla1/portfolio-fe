@@ -9,7 +9,7 @@ export const AUTH_URLS = {
     GET_ALL: "/projects",
     GET_ALL_BY_ID: "/projects/:id",
     GET_BY_PROFILE: "/projects",
-    IMAGE_UPLOAD: "/projects/images",
+    IMAGE_UPLOAD: "/projects/images/upload",
 };
 
 export const WorkStatusType = {

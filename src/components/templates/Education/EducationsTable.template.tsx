@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
 import { FiEdit, FiEye } from "react-icons/fi";
-import { ADMIN_ROUTES } from "../../../utils/constant";
+import { ADMIN_ROUTES, DEGREE_OPTIONS } from "../../../utils/constant";
 import type { Education } from "../../../services/useEducationService";
 
 interface IEducationsTableTemplateProps {
@@ -64,7 +64,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
     const getRecords = () => educations?.map((education: Education, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         education.institution,
-        education.degree,
+        DEGREE_OPTIONS.find(opt => opt.value === education.degree)?.label ?? "",
         education.startYear ?? "",
         education.endYear ?? "",
         Action(education.id ?? "")

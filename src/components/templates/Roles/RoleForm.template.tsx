@@ -48,7 +48,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
             name: roleDetails?.name || '',
             description: roleDetails?.description || '',
             status: roleDetails?.status || Status.ACTIVE,
-            rolePermissions: roleDetails?.navLinks?.flatMap((navlink) => 
+            rolePermissions: roleDetails?.navLinks?.flatMap((navlink) =>
                 navlink.permissions.map((permission) => ({
                     navLinkId: navlink.navLinkId,
                     permissionId: permission.id
@@ -65,13 +65,13 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     const loadNavlinks = async () => {
         try {
             const response = await navLinkService.getAllNavlinks({
-                page: "1",
+                page: "0",
                 size: "1000",
                 sortDir: "ASC",
                 sortBy: "name"
             });
             if (response.status === HTTP_STATUS.OK) {
-                setNavlinks(response.data.data);
+                setNavlinks(response.data.data.content);
             }
         } catch (error) {
             console.error('Error loading navlinks:', error);
@@ -383,8 +383,8 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                                                                 <label
                                                                     key={permission.id}
                                                                     className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all duration-200 ${isSelected
-                                                                            ? 'border-blue-500 bg-blue-50'
-                                                                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                                                        ? 'border-blue-500 bg-blue-50'
+                                                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                                                                         }`}
                                                                     style={{
                                                                         borderColor: isSelected ? colors.primary500 : colors.neutral200,

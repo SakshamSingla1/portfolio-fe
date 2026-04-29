@@ -7,7 +7,7 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 // URLS
 // =========================
 export const PROFILE_URLS = {
-    GET_BY_ID: "/profile/:id",
+    GET_BY_ID: "/profile",
     GET_ALL: "/profile",
 
     // Uploads
@@ -114,13 +114,11 @@ export const useProfileService = () => {
     // PROFILE
     // =========================
     const get = () => {
-        const url = replaceUrlParams(PROFILE_URLS.GET_BY_ID, { id: user?.id });
-        return request(API_METHOD.GET, url, user);
+        return request(API_METHOD.GET, PROFILE_URLS.GET_BY_ID, user);
     };
 
     const update = (profile: ProfileRequest) => {
-        const url = replaceUrlParams(PROFILE_URLS.GET_BY_ID, { id: user?.id });
-        return request(API_METHOD.PUT, url, user, profile);
+        return request(API_METHOD.PUT, PROFILE_URLS.GET_BY_ID, user, profile);
     };
 
     // =========================

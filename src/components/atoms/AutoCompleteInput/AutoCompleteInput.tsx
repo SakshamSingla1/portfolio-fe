@@ -135,36 +135,22 @@ const useStyles = createUseStyles({
                 color: colors.error600,
                 backgroundColor: "rgba(0,0,0,0.04)"
             }
+        },
+
+        "& .MuiAutocomplete-noOptions": {
+            padding: "20px",
+            fontSize: "14px",
+            color: colors.neutral500,
+            textAlign: "center",
+            fontWeight: 500,
+        },
+
+        "& .MuiAutocomplete-loading": {
+            padding: "20px",
+            fontSize: "14px",
+            color: colors.neutral500,
+            textAlign: "center",
         }
-    }),
-
-    option: (colors: any) => ({
-        padding: "10px 14px",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        fontSize: "14px",
-        cursor: "pointer",
-        color: colors.neutral800,
-        borderRadius: "8px",
-        margin: "4px 8px",
-        border: "1px solid transparent",
-        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-
-        "&[aria-selected='true']": {
-            backgroundColor: `${colors.primary50} !important`,
-            color: colors.primary700,
-            borderColor: colors.primary200,
-            fontWeight: 600,
-        },
-
-        "&.Mui-focused, &:hover": {
-            backgroundColor: `${colors.neutral50} !important`,
-            borderColor: colors.neutral200,
-            color: colors.primary600,
-            transform: "translateY(-1px)",
-            boxShadow: "0 2px 8px -2px rgba(0,0,0,0.05)",
-        },
     }),
 
     helperText: (colors: any) => ({
@@ -228,10 +214,15 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     const autoCompleteProps = useMemo(
         () => ({
             options,
-            getOptionLabel: (option: AutoCompleteOption) =>
-                typeof option.title === "string" && option.title.trim()
-                    ? option.title
-                    : String(option.label ?? ""),
+            getOptionLabel: (option: AutoCompleteOption) => {
+                if (typeof option.title === "string" && option.title.trim()) {
+                    return option.title;
+                }
+                if (typeof option.label === "string") {
+                    return option.label;
+                }
+                return "";
+            },
             isOptionEqualToValue: (
                 o: AutoCompleteOption,
                 v: AutoCompleteOption
@@ -278,6 +269,47 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                         sx: {
                             padding: '6px 0',
                             backgroundColor: colors.neutral0,
+                            '& .MuiAutocomplete-option': {
+                                padding: "10px 14px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                                fontSize: "14px",
+                                cursor: "pointer",
+                                color: colors.neutral800,
+                                borderRadius: "8px",
+                                margin: "4px 8px",
+                                border: "1px solid transparent",
+                                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+
+                                "&[aria-selected='true']": {
+                                    backgroundColor: `${colors.primary50} !important`,
+                                    color: colors.primary700,
+                                    borderColor: colors.primary200,
+                                    fontWeight: 600,
+                                },
+
+                                "&.Mui-focused, &:hover": {
+                                    backgroundColor: `${colors.neutral50} !important`,
+                                    borderColor: colors.neutral200,
+                                    color: colors.primary700,
+                                    transform: "translateX(4px)",
+                                    boxShadow: "0 2px 12px -4px rgba(0,0,0,0.08)",
+                                },
+                            },
+                            '& .MuiAutocomplete-noOptions': {
+                                padding: "20px",
+                                fontSize: "14px",
+                                color: colors.neutral500,
+                                textAlign: "center",
+                                fontWeight: 500,
+                            },
+                            '& .MuiAutocomplete-loading': {
+                                padding: "20px",
+                                fontSize: "14px",
+                                color: colors.neutral500,
+                                textAlign: "center",
+                            },
                             '&::-webkit-scrollbar': {
                                 width: '6px',
                             },
@@ -312,16 +344,19 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                         }}
                     />
                 )}
-                renderOption={(props, option) => (
-                    <li {...props} key={option.value} className={classes.option}>
-                        {option.icon && (
-                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 20 }}>
-                                {option.icon}
-                            </span>
-                        )}
-                        {option.label}
-                    </li>
-                )}
+                renderOption={(props, option) => {
+                    const { key, ...optionProps } = props as any;
+                    return (
+                        <li {...optionProps} key={key}>
+                            {option.icon && (
+                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 20 }}>
+                                    {option.icon}
+                                </span>
+                            )}
+                            {option.label}
+                        </li>
+                    );
+                }}
             />
 
             {helperText && !error && (

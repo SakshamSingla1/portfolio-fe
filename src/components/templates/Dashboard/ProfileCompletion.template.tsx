@@ -50,10 +50,10 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({
   const isComplete = percentage === 100;
 
   const getMessage = () => {
-    if (percentage === 100) return "You're Fully Optimized 🚀";
-    if (percentage >= 80) return "Just One More Push 💪";
-    if (percentage >= 50) return "You're Making Great Progress 🔥";
-    return "Let’s Strengthen Your Profile ✨";
+    if (percentage === 100) return "You're Fully Optimized";
+    if (percentage >= 80) return "Just One More Push";
+    if (percentage >= 50) return "You're Making Great Progress";
+    return "Let’s Strengthen Your Profile";
   };
 
   return (
@@ -65,7 +65,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({
             <div className="w-48 h-2 rounded-full overflow-hidden" style={{ background: colors.primary100 }}>
               <div className="h-full transition-all duration-700" style={{ width: `${animatedProgress}%`, background: `linear-gradient(90deg, ${colors.primary400}, ${colors.primary600})` }} />
             </div>
-            <div className="text-sm font-medium mt-2" style={{ color: colors.neutral600 }}>
+            <div className="text-xs font-medium mt-2" style={{ color: colors.neutral600 }}>
               {getMessage()}
             </div>
           </div>
@@ -103,9 +103,8 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({
                   r={radius}
                   cx={size / 2}
                   cy={size / 2}
-                  transform={`rotate(-90 ${size / 2} ${
-                    size / 2
-                  })`}
+                  transform={`rotate(-90 ${size / 2} ${size / 2
+                    })`}
                   className="transition-all duration-700 ease-out"
                 />
               </svg>
@@ -114,15 +113,15 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({
               </div>
               {isComplete && (
                 <div className="absolute -bottom-2 -right-2 text-white text-sm font-bold" style={{
-                    background: colors.success500,
-                    width: 36,
-                    height: 36,
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: `0 6px 14px ${colors.success400}60`,
-                  }}
+                  background: colors.success500,
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: `0 6px 14px ${colors.success400}60`,
+                }}
                 >
                   ✓
                 </div>

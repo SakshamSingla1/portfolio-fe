@@ -22,7 +22,6 @@ const validationSchema = Yup.object({
   profileImagePublicId: Yup.string().required(),
   logoUrl: Yup.string().required("Logo is required"),
   logoPublicId: Yup.string().required(),
-  themeName: Yup.string().required("Theme is required"),
 });
 
 const ProfilePage: React.FC = () => {
@@ -88,6 +87,8 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  console.log(formik);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
