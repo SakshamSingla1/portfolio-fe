@@ -1,5 +1,6 @@
 import React, { useEffect, type ReactNode, useState } from "react";
 import { createUseStyles } from "react-jss";
+import { useSearchParams } from "react-router-dom";
 import OnboardingSection from "./OnboardingSection.template";
 import { AUTH_STATE } from "../../../utils/types";
 import { motion } from "framer-motion";
@@ -28,14 +29,19 @@ const AuthenticationTemplate: React.FC<AuthenticationTemplateProps> = ({
   setAuthState,
 }) => {
   const classes = useStyles();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
   const [isDesktopView, setIsDesktopView] = useState<boolean>(window.innerWidth >= 1024);
-  const [isOnboardingVisible, setIsOnboardingVisible] = useState<boolean>(true);
+  const [isOnboardingVisible, setIsOnboardingVisible] = useState<boolean>(!token);
 
   const onFlip = () => {
-    if (!isDesktopView) {
+    if (!isDesktopView && !token) {
       setIsOnboardingVisible(false);
       setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL);
+    } else if (!isDesktopView && token) {
+      setIsOnboardingVisible(false);
+      setAuthState(AUTH_STATE.RESET_PASSWORD);
     }
   };
 
@@ -46,6 +52,12 @@ const AuthenticationTemplate: React.FC<AuthenticationTemplateProps> = ({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      setAuthState(AUTH_STATE.RESET_PASSWORD);
+    }
+  }, [token, setAuthState]);
 
   const showOnboarding = isDesktopView || isOnboardingVisible;
 
