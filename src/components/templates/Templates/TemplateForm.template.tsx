@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -56,11 +56,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({
     enableReinitialize: true,
   });
 
-  useEffect(() => {
-    if (template) {
-      formik.setValues(template);
-    }
-  }, [template, formik]);
+
 
   return (
     <div className="mb-8">

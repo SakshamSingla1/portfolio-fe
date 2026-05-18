@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -53,16 +53,17 @@ const TestimonialFormTemplate = ({
 
     const formik = useFormik<TestimonialRequest>({
         initialValues: {
-            name: "",
-            message: "",
-            role: "",
-            company: "",
-            imageId: "",
-            imageUrl: "",
-            linkedInUrl: "",
-            order: "",
-            status: Status.ACTIVE,
+            name: testimonial?.name || "",
+            message: testimonial?.message || "",
+            role: testimonial?.role || "",
+            company: testimonial?.company || "",
+            imageId: testimonial?.imageId || "",
+            imageUrl: testimonial?.imageUrl || "",
+            linkedInUrl: testimonial?.linkedInUrl || "",
+            order: testimonial?.order || "",
+            status: testimonial?.status || Status.ACTIVE,
         },
+        enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
             const payload = {
@@ -93,20 +94,7 @@ const TestimonialFormTemplate = ({
         }
     };
 
-    useEffect(() => {
-        if (!testimonial) return;
-        formik.setValues({
-            name: testimonial.name,
-            role: testimonial.role,
-            company: testimonial.company,
-            message: testimonial.message,
-            imageUrl: testimonial.imageUrl,
-            imageId: testimonial.imageId,
-            linkedInUrl: testimonial.linkedInUrl,
-            order: testimonial.order,
-            status: testimonial.status,
-        });
-    }, [testimonial, formik]);
+
 
     return (
         <div className="mb-8">
