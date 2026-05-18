@@ -6,6 +6,7 @@ import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useNavigate } from "react-router-dom";
 import Button from "../../atoms/Button/Button";
 import { useSnackbar } from "../../../hooks/useSnackBar";
+import { motion } from "framer-motion";
 
 interface OTPVerificationTemplateProps {
     phone?: string;
@@ -110,34 +111,44 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
     }, [timer]);
 
     return (
-        <div className="w-full p-8">
+        <motion.div 
+            className="w-full p-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+        >
             <button
                 onClick={() =>
                     setAuthState(isRegisterFlow ? AUTH_STATE.REGISTER : AUTH_STATE.LOGIN_WITH_PHONE)
                 }
-                className="flex items-center gap-2 text-green-600 hover:text-green-700 mb-4"
+                className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 mb-4 font-medium transition-colors"
                 disabled={isLoading}
             >
                 <FiArrowLeft className="text-xl" />
                 Back
             </button>
             <div className="text-center mb-6 flex flex-col items-center">
-                <div className="p-3 rounded-full bg-green-100 text-green-600 text-3xl flex items-center justify-center mb-3 shadow-sm">
+                <motion.div 
+                    className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-3xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20"
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                >
                     <FiShield />
-                </div>
-                <h2 className="text-2xl font-bold tracking-tight">
+                </motion.div>
+                <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">
                     {isRegisterFlow ? "Verify Your Account" : "Verify OTP"}
                 </h2>
                 <p className="text-gray-600 mt-1">
                     OTP sent to <span className="font-semibold">{phone || email}</span>
                 </p>
             </div>
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-6">
                 <input
                     className="
-                        text-center text-2xl tracking-widest font-semibold
-                        border border-green-300 rounded-lg p-3 w-48
-                        focus:outline-none focus:ring-2 focus:ring-green-500
+                        text-center text-3xl tracking-[0.5rem] font-bold
+                        border border-slate-200 rounded-xl p-4 w-64 bg-slate-50/50
+                        focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500
+                        transition-all duration-200 shadow-sm
                     "
                     maxLength={6}
                     value={otp}
@@ -168,7 +179,7 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
                     className="w-1/2"
                 />
             </div>
-        </div>
+        </motion.div>
     );
 };
 
