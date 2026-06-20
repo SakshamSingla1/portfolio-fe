@@ -106,8 +106,8 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
 
     useEffect(() => {
         if (timer === 0) return;
-        const id = setInterval(() => setTimer((t) => t - 1), 1000);
-        return () => clearInterval(id);
+        const id = setTimeout(() => setTimer((t) => t - 1), 1000);
+        return () => clearTimeout(id);
     }, [timer]);
 
     return (

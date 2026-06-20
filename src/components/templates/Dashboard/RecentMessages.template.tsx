@@ -1,186 +1,161 @@
 import React from "react";
 import type { ContactUs } from "../../../services/useContactUsService";
-import { FiInbox } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
-import { useIsMobile } from "../../../hooks/useIsMobile";
+import { useTheme } from "../../../contexts/ThemeContext";
+import { motion } from "framer-motion";
 
 interface RecentMessagesProps {
   messages: ContactUs[];
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const getInitials = (name: string): string => {
+  if (!name) return "?";
+  const words = name.trim().split(/\s+/);
+  return words.length === 1
+    ? words[0][0].toUpperCase()
+    : (words[0][0] + words[words.length - 1][0]).toUpperCase();
 };
 
-const getInitials = (name: string) => {
-  if (!name) return "U";
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+const getRelativeTime = (dateString: string): string => {
+  const now = Date.now();
+  const then = new Date(dateString).getTime();
+  const diffMs = now - then;
+  const m = Math.floor(diffMs / 60000);
+  const h = Math.floor(m / 60);
+  const d = Math.floor(h / 24);
+
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  if (h < 24) return `${h}h ago`;
+  if (d === 1) return "yesterday";
+  if (d < 7) return `${d}d ago`;
+  return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
-const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({
-  messages,
-}) => {
+const AVATAR_PALETTES = [
+  { bg: "#ede9fe", fg: "#7c3aed" },
+  { bg: "#dbeafe", fg: "#1d4ed8" },
+  { bg: "#d1fae5", fg: "#065f46" },
+  { bg: "#fef3c7", fg: "#92400e" },
+  { bg: "#fce7f3", fg: "#9d174d" },
+  { bg: "#e0f2fe", fg: "#075985" },
+];
+
+// Dark-mode adapted palettes (slightly more saturated)
+const AVATAR_PALETTES_DARK = [
+  { bg: "#4c1d95", fg: "#c4b5fd" },
+  { bg: "#1e3a5f", fg: "#93c5fd" },
+  { bg: "#064e3b", fg: "#6ee7b7" },
+  { bg: "#78350f", fg: "#fde68a" },
+  { bg: "#831843", fg: "#fbcfe8" },
+  { bg: "#0c4a6e", fg: "#7dd3fc" },
+];
+
+const getAvatarColor = (name: string, isDark: boolean) => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const idx = Math.abs(hash) % AVATAR_PALETTES.length;
+  return isDark ? AVATAR_PALETTES_DARK[idx] : AVATAR_PALETTES[idx];
+};
+
+const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => {
   const colors = useColors();
-  const isMobile = useIsMobile();
+  const { isDark } = useTheme();
+
+  if (messages.length === 0) {
+    return (
+      <div
+        className="flex flex-col items-center justify-center py-8 rounded-xl text-center"
+        style={{ border: `1px dashed ${colors.neutral200}` }}
+      >
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center mb-3 text-lg"
+          style={{ background: colors.primary50, color: colors.primary500 }}
+        >
+          ✉
+        </div>
+        <div className="text-sm font-medium" style={{ color: colors.neutral600 }}>No messages yet</div>
+        <div className="text-xs mt-0.5" style={{ color: colors.neutral400 }}>New inquiries will appear here</div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden"
-      style={{
-        background: `linear-gradient(145deg, ${colors.neutral50}, ${colors.primary50})`,
-      }}
-    >
-      {messages.length === 0 ? (
-        <div
-          className="flex flex-col items-center justify-center text-center"
-          style={{
-            padding: isMobile ? 32 : 48,
-            background: colors.neutral50,
-            border: `1px dashed ${colors.neutral300}`,
-            borderRadius: 16,
-          }}
-        >
-          <div
-            className="rounded-full flex items-center justify-center mb-4"
+    <div className="space-y-2">
+      {messages.map((msg, i) => {
+        const isUnread = msg.status?.toUpperCase() === "UNREAD";
+        const { bg, fg } = getAvatarColor(msg.name || "?", isDark);
+        const initials = getInitials(msg.name);
+
+        return (
+          <motion.div
+            key={msg.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, duration: 0.3 }}
+            className="flex items-start gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden"
             style={{
-              width: 60,
-              height: 60,
-              background: colors.primary100,
-              color: colors.primary600,
+              background: isUnread
+                ? (isDark ? `${colors.primary900}` : colors.primary50)
+                : colors.neutral50,
+              border: `1px solid ${isUnread ? colors.primary200 : colors.neutral200}`,
             }}
           >
-            <FiInbox size={24} />
-          </div>
-
-          <div
-            className="text-sm font-semibold"
-            style={{ color: colors.neutral600 }}
-          >
-            No recent messages yet
-          </div>
-
-          <div
-            className="text-xs mt-1"
-            style={{ color: colors.neutral400 }}
-          >
-            New inquiries will appear here
-          </div>
-        </div>
-      ) : (
-        <div
-          className="flex flex-col gap-4"
-          style={{
-            maxHeight: isMobile ? 380 : 440,
-            overflowY: "auto",
-            padding: isMobile ? 12 : 16,
-          }}
-        >
-          {messages.map((msg) => {
-            const isUnread = msg.status?.toUpperCase() === "UNREAD";
-
-            return (
+            {/* Unread accent bar */}
+            {isUnread && (
               <div
-                key={msg.id}
-                className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-                style={{
-                  padding: isMobile ? "14px" : "18px",
-                  background: isUnread ? colors.primary50 : "#ffffff",
-                  border: `1px solid ${
-                    isUnread ? colors.primary300 : colors.neutral200
-                  }`,
-                  borderRadius: 16,
-                }}
-              >
-                {isUnread && (
-                  <div
-                    className="absolute left-0 top-0 bottom-0 rounded-l-xl"
-                    style={{
-                      width: 4,
-                      background: colors.primary500,
-                    }}
-                  />
-                )}
+                className="absolute left-0 top-0 bottom-0 rounded-l-xl"
+                style={{ width: 3, background: colors.primary500 }}
+              />
+            )}
 
-                <div className="flex items-start gap-4 flex-1">
-                  <div
-                    className="rounded-full flex items-center justify-center shrink-0 font-semibold"
-                    style={{
-                      width: isMobile ? 38 : 44,
-                      height: isMobile ? 38 : 44,
-                      fontSize: 13,
-                      background: colors.primary100,
-                      color: colors.primary700,
-                    }}
-                  >
-                    {getInitials(msg.name)}
-                  </div>
+            {/* Avatar */}
+            <div
+              className="shrink-0 rounded-full flex items-center justify-center font-bold text-xs"
+              style={{ width: 34, height: 34, background: bg, color: fg }}
+            >
+              {initials}
+            </div>
 
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <div
-                        className="text-sm font-semibold truncate"
-                        style={{ color: colors.neutral800 }}
-                      >
-                        {msg.name}
-                      </div>
-
-                      <div
-                        className="text-xs mt-1 sm:mt-0"
-                        style={{ color: colors.neutral400 }}
-                      >
-                        {formatDate(msg.createdAt)}
-                      </div>
-                    </div>
-
-                    <div
-                      className="text-xs mt-1"
-                      style={{ color: colors.neutral500 }}
-                    >
-                      {msg.email} • {msg.phone}
-                    </div>
-
-                    <div
-                      className="text-sm mt-2 leading-relaxed"
-                      style={{ color: colors.neutral700 }}
-                    >
-                      {msg.message.length > 120
-                        ? msg.message.slice(0, 120) + "..."
-                        : msg.message}
-                    </div>
-                  </div>
+            {/* Body */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-semibold text-xs truncate" style={{ color: colors.neutral800 }}>
+                  {msg.name}
                 </div>
-
-                <div>
-                  <div
-                    className="rounded-full text-xs font-semibold"
-                    style={{
-                      padding: "4px 12px",
-                      background: isUnread
-                        ? colors.primary500
-                        : colors.neutral200,
-                      color: isUnread ? "#ffffff" : colors.neutral700,
-                    }}
-                  >
-                    {isUnread ? "Unread" : "Read"}
-                  </div>
+                <div className="text-[10px] shrink-0" style={{ color: colors.neutral400 }}>
+                  {getRelativeTime(msg.createdAt)}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+              <div className="text-[11px] mt-0.5 truncate" style={{ color: colors.neutral500 }}>
+                {msg.email}
+              </div>
+              <div
+                className="text-xs mt-1 leading-relaxed"
+                style={{
+                  color: colors.neutral600,
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+              >
+                {msg.message}
+              </div>
+            </div>
+
+            {/* Unread badge */}
+            {isUnread && (
+              <div
+                className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full self-start mt-0.5"
+                style={{ background: colors.primary500, color: "#fff" }}
+              >
+                New
+              </div>
+            )}
+          </motion.div>
+        );
+      })}
     </div>
   );
 };

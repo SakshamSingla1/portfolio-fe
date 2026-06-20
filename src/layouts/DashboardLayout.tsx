@@ -117,7 +117,7 @@ const useStyles = createUseStyles({
     alignItems: "center",
     gap: 8,
     fontSize: c.isMobile ? 12 : 14,
-    color: (c: any) => c.neutral500,
+    color: c.neutral500,
   }),
 
   breadcrumbItem: (c: any) => ({
@@ -200,11 +200,11 @@ const useStyles = createUseStyles({
     boxShadow: `0 4px 12px ${c.primary500}30`,
   }),
 
-  userName: {
+  userName: (c: any) => ({
     fontSize: 14,
     fontWeight: 600,
-    color: (c: any) => c.neutral800,
-  },
+    color: c.neutral800,
+  }),
 
   dropdownMenu: (c: any) => ({
     position: "absolute",

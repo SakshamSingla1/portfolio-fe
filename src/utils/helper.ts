@@ -1,4 +1,6 @@
-import moment from "moment";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
 import { REGEX } from "./constant";
 import { createSearchParams, generatePath } from "react-router-dom";
 import type { IOption, MakeRouteParams } from "./types";
@@ -94,41 +96,41 @@ export const addToQueue = (newObject: any) => {
 
 export const DateUtils = {
   formatDateTimeToDate: (dateTime: string): string => {
-    return moment(dateTime, "DD-MM-YYYY HH:mm:ss").format("DD-MM-YYYY");
+    return dayjs(dateTime, "DD-MM-YYYY HH:mm:ss").format("DD-MM-YYYY");
   },
 
   unixToDate: (unix: number): string => {
-    return moment.unix(unix).format("DD-MM-YYYY");
+    return dayjs.unix(unix).format("DD-MM-YYYY");
   },
 
   dateToUnix: (date: string): number => {
-    return moment(date, "DD-MM-YYYY").unix();
+    return dayjs(date, "DD-MM-YYYY").unix();
   },
 
   unixToDateTime: (unix: number): string => {
-    return moment.unix(unix).format("DD-MM-YYYY HH:mm:ss");
+    return dayjs.unix(unix).format("DD-MM-YYYY HH:mm:ss");
   },
 
   dateTimeToUnix: (dateTime: string): number | null => {
     if (!dateTime) return null;
-    return moment(dateTime, "DD-MM-YYYY HH:mm:ss").unix();
+    return dayjs(dateTime, "DD-MM-YYYY HH:mm:ss").unix();
   },
 
   dateTimeSecondToDate: (dateTime: string): string => {
-    return moment(dateTime).format("DD-MM-YYYY");
+    return dayjs(dateTime).format("DD-MM-YYYY");
   },
 
   unixToYYYYMMDD: (unix: number): string => {
-    return moment.unix(unix).format("YYYY-MM-DD");
+    return dayjs.unix(unix).format("YYYY-MM-DD");
   },
 
   dateTimeSecondToDateTime: (dateTime: string): string => {
     if (!dateTime) return "No Data";
-    return moment(dateTime).format("DD-MM-YYYY HH:mm");
+    return dayjs(dateTime).format("DD-MM-YYYY HH:mm");
   },
 
   formatDateTimeToDateMonthYear: (dateTime: string): string => {
-    return moment(dateTime, "YYYY-MM-DD HH:mm:ss").format("D-MMM-YYYY");
+    return dayjs(dateTime).format("D-MMM-YYYY");
   },
 };
 

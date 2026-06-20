@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import type { SkillStats } from "../../../services/useSkillService";
+import { useCountUp } from "../../../hooks/useCountUp";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface SkillStatsProps {
     stats: SkillStats | null;
@@ -11,27 +13,6 @@ interface StatsCardProps {
     isMobile: boolean;
 }
 
-const useCountUp = (value = 0) => {
-    const [count, setCount] = useState(0);
-    useEffect(() => {
-        let current = 0;
-        const duration = 800;
-        const step = value / (duration / 16);
-
-        const timer = setInterval(() => {
-            current += step;
-            if (current >= value) {
-                setCount(value);
-                clearInterval(timer);
-            } else {
-                setCount(Math.floor(current));
-            }
-        }, 16);
-
-        return () => clearInterval(timer);
-    }, [value]);
-    return count;
-};
 
 const StatsCard: React.FC<StatsCardProps> = ({
     label,
@@ -53,13 +34,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
 };
 
 const SkillStatsTemplate: React.FC<SkillStatsProps> = ({ stats }) => {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const isMobile = useIsMobile();
 
     const statsConfig = [
         { label: "Expert", value: stats?.expertSkillCount },

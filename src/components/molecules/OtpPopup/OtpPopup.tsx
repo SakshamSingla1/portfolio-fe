@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
 import { createUseStyles } from 'react-jss';
 import { motion } from 'framer-motion';
@@ -91,7 +91,9 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   const [error, setError] = useState<string>('');
   const [canResend, setCanResend] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(30);
-  const inputRefs = Array(6).fill(0).map(() => React.createRef<HTMLInputElement>());
+  const inputRefs = useRef<Array<React.RefObject<HTMLInputElement>>>(
+    Array.from({ length: 6 }, () => React.createRef<HTMLInputElement>())
+  );
 
   useEffect(() => {
     if (!open) {
@@ -122,7 +124,7 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
 
       // Move to next input
       if (value !== '' && index < 5) {
-        inputRefs[index + 1].current?.focus();
+        inputRefs.current[index + 1].current?.focus();
       }
     }
   };
@@ -130,11 +132,11 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       // Move to previous input on backspace
-      inputRefs[index - 1].current?.focus();
+      inputRefs.current[index - 1].current?.focus();
     } else if (e.key === 'ArrowLeft' && index > 0) {
-      inputRefs[index - 1].current?.focus();
+      inputRefs.current[index - 1].current?.focus();
     } else if (e.key === 'ArrowRight' && index < 5) {
-      inputRefs[index + 1].current?.focus();
+      inputRefs.current[index + 1].current?.focus();
     } else if (e.key === 'Enter') {
       handleVerify();
     }
@@ -158,7 +160,7 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
       
       // Focus on the last input with a value or the last input if all are filled
       const lastFilledIndex = Math.min(digits.length - 1, 5);
-      inputRefs[lastFilledIndex].current?.focus();
+      inputRefs.current[lastFilledIndex].current?.focus();
     }
   };
 
@@ -171,7 +173,7 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
       if (resendOtp) {
         resendOtp();
       }
-      inputRefs[0].current?.focus();
+      inputRefs.current[0].current?.focus();
     }
   };
 
@@ -209,7 +211,7 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
           {otp.map((digit, index) => (
             <motion.input
               key={index}
-              ref={inputRefs[index]}
+              ref={inputRefs.current[index]}
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"

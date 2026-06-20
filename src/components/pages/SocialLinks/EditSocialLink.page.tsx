@@ -27,7 +27,6 @@ const SocialLinkEditPage: React.FC = () => {
                 showSnackbar('success', response.data.message);
             }
         } catch (error) {
-            console.log(error);
             showSnackbar('error', `${error}`);
         }
     };
@@ -38,8 +37,8 @@ const SocialLinkEditPage: React.FC = () => {
             if (response?.status === HTTP_STATUS.OK) {
                 setSocialLink(response.data.data);
             }
-        } catch (error) {
-            console.log(error);
+        } catch {
+            showSnackbar('error', 'Failed to load social link');
         }
     };
 

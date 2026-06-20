@@ -4,7 +4,39 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import type { ContactUs } from "./useContactUsService";
 
 export const DASHBOARD_URLS = {
-    DASHBOARD_SUMMARY : "/dashboard"
+    DASHBOARD_SUMMARY: "/dashboard"
+}
+
+export interface IProfileSummary {
+    fullName: string;
+    title: string;
+    location: string;
+    profileImageUrl: string;
+}
+
+export interface IDailyView {
+    day: string;    // Mon, Tue …
+    date: string;   // Jun 18
+    count: number;
+}
+
+export interface IPortfolioView {
+    device: string;
+    referrer: string;
+    timestamp: string;
+    sessionId: string;
+}
+
+export interface IViewStats {
+    totalViews: number;
+    viewsToday: number;
+    viewsThisWeek: number;
+    viewsThisMonth: number;
+    uniqueVisitors: number;
+    resumeDownloads: number;
+    weeklyTrend: IDailyView[];
+    deviceBreakdown: Record<string, number>;
+    recentViews: IPortfolioView[];
 }
 
 export interface IStats {
@@ -17,6 +49,7 @@ export interface IStats {
     totalCertification: number;
     totalMessages: number;
     unreadMessages: number;
+    totalSocialLinks: number;
 }
 
 export interface IProfileCompletion {
@@ -28,9 +61,12 @@ export interface IActivity {
     type: string;
     description: string;
     timestamp: string;
+    entityId?: string;
 }
 
 export interface IDashboardSummary {
+    profileSummary: IProfileSummary;
+    viewStats: IViewStats;
     stats: IStats;
     profileCompletion: IProfileCompletion;
     recentMessages: ContactUs[];

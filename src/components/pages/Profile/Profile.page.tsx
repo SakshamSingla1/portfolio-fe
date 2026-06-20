@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFormik } from "formik";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
 import { FiEdit } from "react-icons/fi";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
-import { useProfileService, type ProfileRequest, } from "../../../services/useProfileService";
+import { useProfileService, type ProfileRequest } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
 import ProfileFormTemplate from "../../templates/Profile/ProfileForm.template";
 import Button from "../../atoms/Button/Button";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 const validationSchema = Yup.object({
   userName: Yup.string().required("User name is required"),
@@ -24,43 +26,56 @@ const validationSchema = Yup.object({
   logoPublicId: Yup.string().required(),
 });
 
+const EMPTY_PROFILE: ProfileRequest = {
+  userName: "",
+  fullName: "",
+  email: "",
+  title: "",
+  phone: "",
+  location: "",
+  aboutMe: "",
+  githubUrl: "",
+  linkedinUrl: "",
+  websiteUrl: "",
+  profileImageUrl: "",
+  profileImagePublicId: "",
+  aboutMeImageUrl: "",
+  aboutMeImagePublicId: "",
+  logoUrl: "",
+  logoPublicId: "",
+};
+
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const colors = useColors();
+  const isMobile = useIsMobile();
   const { showSnackbar } = useSnackbar();
-
   const profileService = useProfileService();
+  const queryClient = useQueryClient();
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const { data: profileData, isLoading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const response = await profileService.get();
+      if (response.status === HTTP_STATUS.OK) {
+        return response.data.data as ProfileRequest;
+      }
+      return null;
+    },
+  });
 
   const formik = useFormik<ProfileRequest>({
-    initialValues: {
-      userName: "",
-      fullName: "",
-      email: "",
-      title: "",
-      phone: "",
-      location: "",
-      aboutMe: "",
-      githubUrl: "",
-      linkedinUrl: "",
-      websiteUrl: "",
-      profileImageUrl: "",
-      profileImagePublicId: "",
-      aboutMeImageUrl: "",
-      aboutMeImagePublicId: "",
-      logoUrl: "",
-      logoPublicId: "",
-    },
+    initialValues: profileData ?? EMPTY_PROFILE,
     validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
         const response = await profileService.update(values);
         if (response.status === HTTP_STATUS.OK) {
+          queryClient.invalidateQueries({ queryKey: ["profile"] });
           showSnackbar("success", response.data.message);
           navigate(ADMIN_ROUTES.PROFILE);
         }
@@ -69,33 +84,6 @@ const ProfilePage: React.FC = () => {
       }
     },
   });
-
-  const fetchProfile = async () => {
-    try {
-      setIsLoading(true);
-      const response = await profileService.get();
-      if (response.status === HTTP_STATUS.OK) {
-        formik.setValues(response.data.data);
-      }
-    } catch {
-      showSnackbar("error", "Failed to fetch profile");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  console.log(formik);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     setIsEditMode(searchParams.get("mode") === MODE.EDIT);

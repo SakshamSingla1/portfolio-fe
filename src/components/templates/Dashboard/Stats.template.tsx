@@ -1,211 +1,152 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import type { IStats } from "../../../services/useDashboardService";
-
-import skillsIcon from "../../../assets/icons/skill.png";
-import educationIcon from "../../../assets/icons/education.png";
-import experienceIcon from "../../../assets/icons/experience.png";
-import projectsIcon from "../../../assets/icons/project.png";
-import achievementIcon from "../../../assets/icons/achievement.png";
-import testimonialIcon from "../../../assets/icons/testimonial.png";
-import certificationIcon from "../../../assets/icons/certification.png";
-import messageIcon from "../../../assets/icons/messages.png";
+import { useCountUp } from "../../../hooks/useCountUp";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 interface StatsProps {
   stats: IStats;
 }
 
-type ColorVariant =
-  | "indigo"
-  | "blue"
-  | "emerald"
-  | "violet"
-  | "amber"
-  | "rose"
-  | "cyan"
-  | "purple"
-  | "red";
+const STATS_CONFIG = [
+  { label: "Skills",        key: "totalSkills",        accent: "#6366f1", route: "/skills" },
+  { label: "Education",     key: "totalEducation",      accent: "#3b82f6", route: "/education" },
+  { label: "Experience",    key: "totalExperience",     accent: "#10b981", route: "/experience" },
+  { label: "Projects",      key: "totalProjects",       accent: "#8b5cf6", route: "/projects" },
+  { label: "Achievements",  key: "totalAchievements",   accent: "#f59e0b", route: "/achievements" },
+  { label: "Testimonials",  key: "totalTestimonials",   accent: "#f43f5e", route: "/testimonials" },
+  { label: "Certs",         key: "totalCertification",  accent: "#06b6d4", route: "/certifications" },
+  { label: "Social",        key: "totalSocialLinks",    accent: "#ec4899", route: "/social-links" },
+  { label: "Messages",      key: "totalMessages",       accent: "#a855f7", route: "/messages" },
+] as const;
 
-interface StatsCardProps {
-  icon?: string;
+interface StatCellProps {
   label: string;
-  value?: number;
-  color: ColorVariant;
-  isMobile: boolean;
+  value: number;
+  accent: string;
+  route: string;
   index: number;
+  unreadCount?: number;
 }
 
-const colorClasses = {
-  indigo: {
-    bg: "from-indigo-50 via-indigo-100/50 to-white",
-    text: "text-indigo-600",
-    border: "border-indigo-100 group-hover:border-indigo-300",
-    glow: "group-hover:shadow-indigo-500/10",
-  },
-  blue: {
-    bg: "from-blue-50 via-blue-100/50 to-white",
-    text: "text-blue-600",
-    border: "border-blue-100 group-hover:border-blue-300",
-    glow: "group-hover:shadow-blue-500/10",
-  },
-  emerald: {
-    bg: "from-emerald-50 via-emerald-100/50 to-white",
-    text: "text-emerald-600",
-    border: "border-emerald-100 group-hover:border-emerald-300",
-    glow: "group-hover:shadow-emerald-500/10",
-  },
-  violet: {
-    bg: "from-violet-50 via-violet-100/50 to-white",
-    text: "text-violet-600",
-    border: "border-violet-100 group-hover:border-violet-300",
-    glow: "group-hover:shadow-violet-500/10",
-  },
-  amber: {
-    bg: "from-amber-50 via-amber-100/50 to-white",
-    text: "text-amber-600",
-    border: "border-amber-100 group-hover:border-amber-300",
-    glow: "group-hover:shadow-amber-500/10",
-  },
-  rose: {
-    bg: "from-rose-50 via-rose-100/50 to-white",
-    text: "text-rose-600",
-    border: "border-rose-100 group-hover:border-rose-300",
-    glow: "group-hover:shadow-rose-500/10",
-  },
-  cyan: {
-    bg: "from-cyan-50 via-cyan-100/50 to-white",
-    text: "text-cyan-600",
-    border: "border-cyan-100 group-hover:border-cyan-300",
-    glow: "group-hover:shadow-cyan-500/10",
-  },
-  purple: {
-    bg: "from-purple-50 via-purple-100/50 to-white",
-    text: "text-purple-600",
-    border: "border-purple-100 group-hover:border-purple-300",
-    glow: "group-hover:shadow-purple-500/10",
-  },
-  red: {
-    bg: "from-red-50 via-red-100/50 to-white",
-    text: "text-red-600",
-    border: "border-red-100 group-hover:border-red-300",
-    glow: "group-hover:shadow-red-500/10",
-  },
-} as const;
-
-const useCountUp = (value = 0, delay = 0) => {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      let current = 0;
-      const duration = 1000;
-      const step = value / (duration / 16);
-
-      const timer = setInterval(() => {
-        current += step;
-        if (current >= value) {
-          setCount(value);
-          clearInterval(timer);
-        } else {
-          setCount(Math.floor(current));
-        }
-      }, 16);
-
-      return () => clearInterval(timer);
-    }, delay);
-
-    return () => clearTimeout(timeout);
-  }, [value, delay]);
-  return count;
-};
-
-const StatsCard: React.FC<StatsCardProps> = ({
-  icon,
-  label,
-  value = 0,
-  color,
-  isMobile,
-  index,
-}) => {
-  const theme = colorClasses[color];
-  const animatedValue = useCountUp(value, index * 50 + 100);
+const StatCell: React.FC<StatCellProps> = ({ label, value, accent, route, index, unreadCount }) => {
+  const colors = useColors();
+  const animatedValue = useCountUp(value, index * 50 + 60);
+  const navigate = useNavigate();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
+    <motion.button
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
-      className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br transition-all duration-300 shadow-sm ${theme.bg} ${theme.border} ${theme.glow}`}
+      transition={{ delay: index * 0.04, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+      onClick={() => navigate(route)}
+      className="group w-full flex flex-col items-center justify-center relative overflow-hidden"
+      style={{ padding: "16px 6px 14px", background: "transparent", border: "none", cursor: "pointer", outline: "none" }}
     >
-      <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500 bg-white/40" />
-
-      <img
-        src={icon}
-        alt={label}
-        className={`absolute pointer-events-none object-contain opacity-20 group-hover:opacity-40 transition-all duration-500 ${isMobile ? "w-48 h-48 -right-9 -bottom-18" : "w-96 h-96 -right-18 -bottom-36"
-          }`}
+      {/* Hover tint */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        style={{ background: `${accent}08` }}
       />
 
-      <div className={`relative z-10 ${isMobile ? "p-4" : "p-6"}`}>
-        <div className={`text-[10px] font-bold uppercase tracking-wider ${theme.text}`}>
-          {label}
-        </div>
+      {/* Accent bar — bottom on hover */}
+      <div
+        className="absolute bottom-0 left-1/2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"
+        style={{ width: 24, height: 3, background: accent, transform: "translateX(-50%)" }}
+      />
 
-        <div className="mt-3 flex items-baseline gap-1">
-          <div
-            className={`font-extrabold leading-none text-slate-900 ${isMobile ? "text-2xl" : "text-3xl"
-              }`}
+      {/* Number */}
+      <div className="relative flex items-start">
+        <span
+          className="tabular-nums font-black leading-none"
+          style={{ fontSize: "clamp(18px, 2.2vw, 26px)", color: colors.neutral900, letterSpacing: "-0.03em" }}
+        >
+          {animatedValue}
+        </span>
+        {/* Unread badge */}
+        {unreadCount !== undefined && unreadCount > 0 && (
+          <span
+            className="absolute -top-1 -right-3 text-[9px] font-bold rounded-full flex items-center justify-center"
+            style={{ minWidth: 14, height: 14, background: accent, color: "#fff", lineHeight: 1 }}
           >
-            {animatedValue}
-          </div>
-          {label === "Unread" && value > 0 && (
-            <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse ml-1" />
-          )}
-        </div>
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        )}
       </div>
-    </motion.div>
+
+      <span
+        className="relative font-semibold uppercase mt-1.5 text-center leading-tight"
+        style={{ fontSize: "9px", letterSpacing: "0.08em", color: colors.neutral400 }}
+      >
+        {label}
+      </span>
+    </motion.button>
   );
 };
 
 const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
   const isMobile = useIsMobile();
+  const colors = useColors();
+  const { isDark } = useTheme();
 
-  const statsConfig = [
-    { icon: skillsIcon, label: "Skills", value: stats?.totalSkills, color: "indigo" },
-    { icon: educationIcon, label: "Education", value: stats?.totalEducation, color: "blue" },
-    { icon: experienceIcon, label: "Experience", value: stats?.totalExperience, color: "emerald" },
-    { icon: projectsIcon, label: "Projects", value: stats?.totalProjects, color: "violet" },
-    { icon: achievementIcon, label: "Achievements", value: stats?.totalAchievements, color: "amber" },
-    { icon: testimonialIcon, label: "Testimonials", value: stats?.totalTestimonials, color: "rose" },
-    { icon: certificationIcon, label: "Certifications", value: stats?.totalCertification, color: "cyan" },
-    { icon: messageIcon, label: "Messages", value: stats?.totalMessages, color: "purple" },
-  ] as const;
+  const containerStyle = {
+    background: colors.neutral0,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: "16px",
+    overflow: "hidden",
+    boxShadow: isDark
+      ? "0 1px 4px rgba(0,0,0,0.35)"
+      : `0 1px 3px rgba(0,0,0,0.04)`,
+  };
+
+  const values = STATS_CONFIG.map((s) => ({
+    ...s,
+    value: (stats as any)?.[s.key] ?? 0,
+    unreadCount: s.key === "totalMessages" ? (stats.unreadMessages ?? 0) : undefined,
+  }));
+
+  if (isMobile) {
+    // 3×3 grid for 9 items
+    return (
+      <div style={containerStyle}>
+        <div className="grid grid-cols-3">
+          {values.map((item, i) => {
+            const isLastCol  = (i + 1) % 3 === 0;
+            const isLastRow  = i >= 6;
+            return (
+              <div
+                key={item.label}
+                style={{
+                  borderRight: isLastCol ? "none" : `1px solid ${colors.neutral200}`,
+                  borderBottom: isLastRow  ? "none" : `1px solid ${colors.neutral200}`,
+                }}
+              >
+                <StatCell {...item} index={i} />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={{
-        visible: {
-          transition: {
-            staggerChildren: 0.05,
-          },
-        },
-      }}
-      className={`grid gap-4 ${isMobile ? "grid-cols-2" : "grid-cols-4"}`}
-    >
-      {statsConfig.map((item, index) => (
-        <StatsCard
-          key={item.label}
-          icon={item.icon}
-          label={item.label}
-          value={item.value}
-          color={item.color}
-          isMobile={isMobile}
-          index={index}
-        />
-      ))}
-    </motion.div>
+    <div style={containerStyle}>
+      <div className="flex">
+        {values.map((item, i) => (
+          <div
+            key={item.label}
+            className="flex-1"
+            style={{ borderRight: i < values.length - 1 ? `1px solid ${colors.neutral200}` : "none" }}
+          >
+            <StatCell {...item} index={i} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

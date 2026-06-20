@@ -1,234 +1,133 @@
 import React from "react";
-import {
-  FaGraduationCap,
-  FaBriefcase,
-  FaCode,
-  FaEnvelope,
-  FaUser,
-  FaDumbbell,
-} from "react-icons/fa";
-import { IoDocuments, IoLinkSharp } from "react-icons/io5";
-import { GrCertificate } from "react-icons/gr";
-import { BsPersonVcard } from "react-icons/bs";
-import { GiAchievement } from "react-icons/gi";
-import { FiInbox } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import { useColors } from "../../../utils/types";
-
-const iconMap: Record<string, React.ReactNode> = {
-  EDUCATION: <FaGraduationCap />,
-  EXPERIENCE: <FaBriefcase />,
-  SKILLS: <FaDumbbell />,
-  PROJECTS: <FaCode />,
-  PROFILE: <FaUser />,
-  CONTACT_US: <FaEnvelope />,
-  RESUMES: <IoDocuments />,
-  SOCIAL_LINKS: <IoLinkSharp />,
-  CERTIFICATIONS: <GrCertificate />,
-  TESTIMONIALS: <BsPersonVcard />,
-  ACHIEVEMENTS: <GiAchievement />,
-  MESSAGES: <FiInbox />,
-};
+import { useTheme } from "../../../contexts/ThemeContext";
+import { motion } from "framer-motion";
 
 interface IActivity {
   type: string;
   description: string;
   timestamp: string;
+  entityId?: string;
 }
 
 interface RecentActivitiesProps {
   activities: IActivity[];
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-    formatMatcher: "best fit",
-  });
+const TYPE_META: Record<string, { dot: string; label: string; route: string }> = {
+  PROFILE:        { dot: "#0ea5e9", label: "Profile",      route: "/profile" },
+  EDUCATION:      { dot: "#6366f1", label: "Education",    route: "/education" },
+  EXPERIENCE:     { dot: "#f97316", label: "Experience",   route: "/experience" },
+  SKILLS:         { dot: "#10b981", label: "Skills",       route: "/skills" },
+  SKILL:          { dot: "#10b981", label: "Skills",       route: "/skills" },
+  PROJECTS:       { dot: "#3b82f6", label: "Projects",     route: "/projects" },
+  PROJECT:        { dot: "#3b82f6", label: "Projects",     route: "/projects" },
+  CONTACT:        { dot: "#f43f5e", label: "Message",      route: "/messages" },
+  CONTACT_US:     { dot: "#f43f5e", label: "Message",      route: "/messages" },
+  MESSAGE:        { dot: "#f43f5e", label: "Message",      route: "/messages" },
+  TESTIMONIAL:    { dot: "#a855f7", label: "Testimonial",  route: "/testimonials" },
+  TESTIMONIALS:   { dot: "#a855f7", label: "Testimonial",  route: "/testimonials" },
+  CERTIFICATION:  { dot: "#06b6d4", label: "Cert",         route: "/certifications" },
+  CERTIFICATIONS: { dot: "#06b6d4", label: "Cert",         route: "/certifications" },
+  ACHIEVEMENT:    { dot: "#f59e0b", label: "Achievement",  route: "/achievements" },
+  ACHIEVEMENTS:   { dot: "#f59e0b", label: "Achievement",  route: "/achievements" },
 };
 
-const getActivityMeta = (type: string) => {
-  const upperType = type?.toUpperCase();
+const getTypeMeta = (type: string) =>
+  TYPE_META[type?.toUpperCase()] ?? { dot: "#94a3b8", label: type, route: "/" };
 
-  const base = {
-    ring: "ring-4 ring-white",
-  };
+const getRelativeTime = (dateString: string): string => {
+  const now  = Date.now();
+  const then = new Date(dateString).getTime();
+  const s    = Math.floor((now - then) / 1000);
+  const m    = Math.floor(s / 60);
+  const h    = Math.floor(m / 60);
+  const d    = Math.floor(h / 24);
 
-  switch (upperType) {
-    case "PROFILE":
-      return {
-        ...base,
-        color: "bg-sky-500",
-        light: "bg-sky-100 text-sky-600",
-        border: "border-sky-500",
-        icon: iconMap.PROFILE,
-      };
-    case "EDUCATION":
-      return {
-        ...base,
-        color: "bg-indigo-500",
-        light: "bg-indigo-100 text-indigo-600",
-        border: "border-indigo-500",
-        icon: iconMap.EDUCATION,
-      };
-    case "EXPERIENCE":
-      return {
-        ...base,
-        color: "bg-orange-500",
-        light: "bg-orange-100 text-orange-600",
-        border: "border-orange-500",
-        icon: iconMap.EXPERIENCE,
-      };
-    case "SKILLS":
-      return {
-        ...base,
-        color: "bg-teal-500",
-        light: "bg-teal-100 text-teal-600",
-        border: "border-teal-500",
-        icon: iconMap.SKILLS,
-      };
-    case "PROJECTS":
-      return {
-        ...base,
-        color: "bg-blue-500",
-        light: "bg-blue-100 text-blue-600",
-        border: "border-blue-500",
-        icon: iconMap.PROJECTS,
-      };
-    case "CONTACT":
-    case "CONTACT_US":
-      return {
-        ...base,
-        color: "bg-rose-500",
-        light: "bg-rose-100 text-rose-600",
-        border: "border-rose-500",
-        icon: iconMap.CONTACT_US,
-      };
-    case "TESTIMONIAL":
-    case "TESTIMONIALS":
-      return {
-        ...base,
-        color: "bg-purple-500",
-        light: "bg-purple-100 text-purple-600",
-        border: "border-purple-500",
-        icon: iconMap.TESTIMONIALS,
-      };
-    case "CERTIFICATION":
-    case "CERTIFICATIONS":
-      return {
-        ...base,
-        color: "bg-cyan-500",
-        light: "bg-cyan-100 text-cyan-600",
-        border: "border-cyan-500",
-        icon: iconMap.CERTIFICATIONS,
-      };
-    case "ACHIEVEMENT":
-    case "ACHIEVEMENTS":
-      return {
-        ...base,
-        color: "bg-emerald-500",
-        light: "bg-emerald-100 text-emerald-600",
-        border: "border-emerald-500",
-        icon: iconMap.ACHIEVEMENTS,
-      };
-    case "MESSAGE":
-    case "MESSAGES":
-      return {
-        ...base,
-        color: "bg-pink-500",
-        light: "bg-pink-100 text-pink-600",
-        border: "border-pink-500",
-        icon: iconMap.MESSAGES,
-      };
-    default:
-      return {
-        ...base,
-        color: "bg-gray-500",
-        light: "bg-gray-100 text-gray-600",
-        border: "border-gray-400",
-        icon: iconMap.PROFILE,
-      };
-  }
+  if (s < 60)  return "just now";
+  if (m < 60)  return `${m}m ago`;
+  if (h < 24)  return `${h}h ago`;
+  if (d === 1) return "yesterday";
+  if (d < 7)   return `${d}d ago`;
+  return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
-const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({
-  activities,
-}) => {
+const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities }) => {
   const colors = useColors();
+  const { isDark } = useTheme();
+  const navigate = useNavigate();
+
+  if (activities.length === 0) {
+    return (
+      <div
+        className="py-8 text-center rounded-xl text-sm"
+        style={{ color: colors.neutral400, border: `1px dashed ${colors.neutral200}` }}
+      >
+        No activity yet.
+      </div>
+    );
+  }
 
   return (
-    <div>
-      {activities.length === 0 ? (
-        <div
-          className="py-10 text-center rounded-xl border"
-          style={{
-            borderColor: colors.neutral300,
-            color: colors.neutral500,
-          }}
-        >
-          No recent activities yet.
-        </div>
-      ) : (
-        <div
-          className="relative pl-10 pt-4 space-y-8 overflow-y-auto pr-2"
-          style={{ borderColor: colors.neutral300 }}
-        >
-          <div
-            className="absolute left-8 top-1 bottom-1 w-[2px] rounded-full mt-8"
-            style={{
-              background: `linear-gradient(to bottom, ${colors.primary200}, ${colors.primary400})`,
-            }}
-          />
+    <div className="space-y-0">
+      {activities.map((activity, i) => {
+        const { dot, label, route } = getTypeMeta(activity.type);
+        const isLast = i === activities.length - 1;
 
-          {activities.map((activity, index) => {
-            const { color, light, border, icon, ring } = getActivityMeta(
-              activity.type
-            );
-            return (
-              <div key={index} className="relative pl-6 group">
-                <div
-                  className={`absolute -left-2 bottom-8 z-10 w-10 h-10 -translate-x-1/2 rounded-full flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-110 ${color} ${ring}`}
-                  style={{
-                    boxShadow: `0 0 0 4px ${colors.neutral50}`,
-                  }}
+        return (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.05, duration: 0.3 }}
+            className="flex gap-3 relative cursor-pointer group"
+            style={{ paddingBottom: isLast ? 0 : 16 }}
+            onClick={() => navigate(route)}
+          >
+            {/* Timeline line */}
+            {!isLast && (
+              <div
+                className="absolute left-[7px] top-5 bottom-0 w-px"
+                style={{
+                  background: isDark
+                    ? `linear-gradient(to bottom, ${colors.neutral700}, transparent)`
+                    : `linear-gradient(to bottom, ${colors.neutral200}, transparent)`,
+                }}
+              />
+            )}
+
+            {/* Dot */}
+            <div className="shrink-0 mt-1" style={{ width: 15, height: 15 }}>
+              <div
+                className="rounded-full transition-transform duration-200 group-hover:scale-125"
+                style={{ width: 15, height: 15, background: dot, boxShadow: `0 0 0 3px ${dot}22` }}
+              />
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span
+                  className="text-[10px] font-bold uppercase tracking-wider"
+                  style={{ color: dot }}
                 >
-                  <div className="text-xl">{icon}</div>
-                </div>
-
-                <div
-                  className={`flex-1 rounded-2xl p-4 border ${border}`}
-                  style={{ background: "#ffffff" }}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <div
-                      className={`text-xs font-semibold px-3 py-1 rounded-full ${light}`}
-                    >
-                      {activity.type}
-                    </div>
-                    <div
-                      className="text-xs"
-                      style={{ color: colors.neutral400 }}
-                    >
-                      {formatDate(activity.timestamp)}
-                    </div>
-                  </div>
-
-                  <div
-                    className="text-sm"
-                    style={{ color: colors.neutral700 }}
-                  >
-                    {activity.description}
-                  </div>
-                </div>
+                  {label}
+                </span>
+                <span className="text-[10px]" style={{ color: colors.neutral400 }}>
+                  · {getRelativeTime(activity.timestamp)}
+                </span>
               </div>
-            );
-          })}
-        </div>
-      )}
+              <p
+                className="text-xs leading-relaxed line-clamp-2 group-hover:underline decoration-dotted"
+                style={{ color: colors.neutral600 }}
+              >
+                {activity.description}
+              </p>
+            </div>
+          </motion.div>
+        );
+      })}
     </div>
   );
 };

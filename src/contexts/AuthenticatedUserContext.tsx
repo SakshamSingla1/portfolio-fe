@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { type ColorTheme } from "../services/useColorThemeService";
 import type { RolePermissionResponseDTO } from "../services/useRoleService";
+import { AuthDialogProvider } from "./AuthDialogContext";
 
 interface AuthenticatedUserProviderType {
     children: React.ReactNode;
@@ -21,9 +22,6 @@ export interface AuthenticatedUserType {
 }
 
 export interface AuthenticatedUserContextType {
-    isAuthDialogActive: boolean;
-    syncAuthDialogActive: (value?: boolean) => void;
-
     user: AuthenticatedUserType | null;
     setAuthenticatedUser: (user: AuthenticatedUserType | null) => void;
 
@@ -37,9 +35,6 @@ export interface AuthenticatedUserContextType {
 }
 
 export const AuthenticatedUserContext = React.createContext<AuthenticatedUserContextType>({
-    isAuthDialogActive: false,
-    syncAuthDialogActive: () => {},
-
     user: null,
     setAuthenticatedUser: () => {},
 
@@ -53,8 +48,6 @@ export const AuthenticatedUserContext = React.createContext<AuthenticatedUserCon
 });
 
 export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> = ({ children }) => {
-    const [isAuthDialogActive, setAuthDialogActive] = useState<boolean>(false);
-
     const [user, setAuthenticatedUser] = useState<AuthenticatedUserType | null>(() => {
         try {
             const stored = localStorage.getItem("user");
@@ -82,10 +75,6 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
         }
     });
 
-    const syncAuthDialogActive = useCallback((value?: boolean) => {
-        setAuthDialogActive(value ?? user === null);
-    }, [user]);
-
     useEffect(() => {
         if (user) localStorage.setItem("user", JSON.stringify(user));
         else localStorage.removeItem("user");
@@ -111,17 +100,15 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
         localStorage.removeItem("reLoginTimestamp");
     }, []);
 
-    const setAuthenticatedUserWithTimestamp = useCallback((user: AuthenticatedUserType | null) => {
-        if (user && !localStorage.getItem("reLoginTimestamp")) {
+    const setAuthenticatedUserWithTimestamp = useCallback((u: AuthenticatedUserType | null) => {
+        if (u && !localStorage.getItem("reLoginTimestamp")) {
             localStorage.setItem("reLoginTimestamp", new Date().toISOString());
         }
-        setAuthenticatedUser(user);
+        setAuthenticatedUser(u);
     }, []);
 
     const providerValue = useMemo(
         () => ({
-            isAuthDialogActive,
-            syncAuthDialogActive,
             user,
             setAuthenticatedUser: setAuthenticatedUserWithTimestamp,
             defaultTheme,
@@ -130,12 +117,14 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
             setRolePermissions,
             logout,
         }),
-        [isAuthDialogActive, user, defaultTheme, rolePermissions, setAuthenticatedUserWithTimestamp, syncAuthDialogActive, logout]
+        [user, defaultTheme, rolePermissions, setAuthenticatedUserWithTimestamp, logout]
     );
 
     return (
         <AuthenticatedUserContext.Provider value={providerValue}>
-            {children}
+            <AuthDialogProvider isLoggedIn={!!user}>
+                {children}
+            </AuthDialogProvider>
         </AuthenticatedUserContext.Provider>
     );
 };

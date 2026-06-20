@@ -8,93 +8,90 @@ import { useSnackbar } from '../../../hooks/useSnackBar';
 import TextField from '../../atoms/TextField/TextField';
 import { InputAdornment } from '@mui/material';
 import { FiFilter, FiSearch, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const ContactUsListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const contactUsService = useContactUsService();
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient();
+    const isMobile = useIsMobile();
 
-    const [isMobile, setIsMobile] = useState<boolean>(false);
     const [showFilters, setShowFilters] = useState<boolean>(false);
-
-    const initialFiltersValues: any = {
+    const [filters, setFiltersTo] = useState<any>({
         search: searchParams.get("search") || "",
-    };
-
-    const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
+    });
     const [pagination, setPagination] = useState<IPagination>({
         ...initialPaginationValues,
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [contactUs, setContactUs] = useState<ContactUs[]>([]);
 
-    const refreshTemplates = async (page: string, size: string) => {
-        const params: ContactUsFilterParams = {
-            page: page,
-            size: size,
-            sortDir: "DESC",
-            sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await contactUsService.getByProfile(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setContactUs(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching contact us:", error);
-                setContactUs([]);
-                showSnackbar('error', 'Failed to load contact us');
-            })
-    }
+    const queryParams: ContactUsFilterParams = {
+        page: pagination.currentPage.toString(),
+        size: pagination.pageSize.toString(),
+        sortDir: "DESC",
+        sortBy: "createdAt",
+        search: filters.search,
+    };
+
+    const { data: queryResult } = useQuery({
+        queryKey: ['contactUs', queryParams],
+        queryFn: async () => {
+            const res = await contactUsService.getByProfile(queryParams);
+            if (res?.status === HTTP_STATUS.OK) {
+                return res.data.data;
+            }
+            return null;
+        },
+        placeholderData: (prev) => prev,
+    });
+
+    const contactUs: ContactUs[] = queryResult?.content ?? [];
+    const totalPages: number = queryResult?.totalPages ?? 0;
+    const totalRecords: number = queryResult?.totalElements ?? 0;
+
+    const currentPagination: IPagination = {
+        ...pagination,
+        totalPages,
+        totalRecords,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
-        setFiltersTo({ ...filters, [name]: value ?? "" });
-        setPagination({ ...pagination, currentPage: 0 })
-    }
+        setFiltersTo((prev: any) => ({ ...prev, [name]: value ?? "" }));
+        setPagination((prev) => ({ ...prev, currentPage: 0 }));
+    };
 
     const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
-        setPagination((prevPagination) => ({
-            ...prevPagination,
-            currentPage: newPage
-        }));
-    }
+        setPagination((prev) => ({ ...prev, currentPage: newPage }));
+    };
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newRowsPerPage = parseInt(event.target.value, 10);
-        setPagination((prevPagination) => ({
-            ...prevPagination,
-            pageSize: newRowsPerPage
-        }));
+        setPagination((prev) => ({ ...prev, pageSize: newRowsPerPage }));
     };
 
     const handleMarkRead = async (id?: string) => {
-        if (!id) {
-            console.warn("Invalid ID");
-            return;
-        }
+        if (!id) return;
         try {
             const response = await contactUsService.markAsRead(id);
             if (response.status === HTTP_STATUS.OK) {
-                setContactUs(prev => prev.map(item => item.id === id ? { ...item, status: "READ" } : item));
+                queryClient.setQueryData(['contactUs', queryParams], (old: any) => {
+                    if (!old?.content) return old;
+                    return {
+                        ...old,
+                        content: old.content.map((item: ContactUs) =>
+                            item.id === id ? { ...item, status: "READ" } : item
+                        ),
+                    };
+                });
                 showSnackbar('success', 'Marked as read successfully');
             }
-        } catch (error: any) {
-            console.log("Backend error:", error?.response?.data);
+        } catch {
             showSnackbar('error', 'Failed to mark as read');
         }
     };
-
-    useEffect(() => {
-        refreshTemplates(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         const params: Record<string, string> = {
@@ -104,15 +101,6 @@ const ContactUsListPage: React.FC = () => {
         };
         setSearchParams(params);
     }, [filters.search, pagination]);
-
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
 
     return (
         <div className="grid gap-y-4">
@@ -151,11 +139,9 @@ const ContactUsListPage: React.FC = () => {
                                         placeholder="Search inquiries..."
                                         value={filters.search}
                                         name='search'
-                                        onChange={(event) => {
-                                            handleFiltersChange("search", event.target.value)
-                                        }}
+                                        onChange={(event) => handleFiltersChange("search", event.target.value)}
                                         InputProps={{
-                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
+                                            startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment>,
                                         }}
                                         fullWidth
                                     />
@@ -163,37 +149,33 @@ const ContactUsListPage: React.FC = () => {
                             )}
                         </div>
                     ) : (
-                        <>
-                            <div className="w-[250px]">
-                                <TextField
-                                    label=''
-                                    variant="outlined"
-                                    placeholder="Search inquiries..."
-                                    value={filters.search}
-                                    name='search'
-                                    onChange={(event) => {
-                                        handleFiltersChange("search", event.target.value)
-                                    }}
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                                    }}
-                                    fullWidth
-                                />
-                            </div>
-                        </>
+                        <div className="w-[250px]">
+                            <TextField
+                                label=''
+                                variant="outlined"
+                                placeholder="Search inquiries..."
+                                value={filters.search}
+                                name='search'
+                                onChange={(event) => handleFiltersChange("search", event.target.value)}
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start" className='pl-[11px]'><FiSearch /></InputAdornment>,
+                                }}
+                                fullWidth
+                            />
+                        </div>
                     )}
                 </div>
             </div>
 
-            <ContactUsTableTemplate 
-                contactUs={contactUs} 
-                pagination={pagination} 
-                handlePaginationChange={handlePaginationChange} 
-                handleRowsPerPageChange={handleRowsPerPageChange} 
+            <ContactUsTableTemplate
+                contactUs={contactUs}
+                pagination={currentPagination}
+                handlePaginationChange={handlePaginationChange}
+                handleRowsPerPageChange={handleRowsPerPageChange}
                 handleMarkRead={handleMarkRead}
             />
         </div>
-    )
-}
+    );
+};
 
 export default ContactUsListPage;
