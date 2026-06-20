@@ -39,7 +39,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
   const arcColorEnd = isComplete ? "#34d399" : colors.primary400;
 
   // Track color — slightly visible in both modes
-  const trackColor = isDark ? colors.neutral200 : (colors.neutral150 ?? colors.neutral200);
+  const trackColor = isDark ? colors.neutral200 : colors.neutral100;
 
   return (
     <div className="flex flex-col items-center">
