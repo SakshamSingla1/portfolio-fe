@@ -38,7 +38,6 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     const navLinkService = useNavlinkService();
     const permissionService = usePermissionService();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const [navlinks, setNavlinks] = useState<NavlinkResponse[]>([]);
     const [permissions, setPermissions] = useState<PermissionResponseDTO[]>([]);

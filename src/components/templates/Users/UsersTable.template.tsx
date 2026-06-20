@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { enumToNormalKey, makeRoute } from "../../../utils/helper";
+import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
 import ListingShell from "../Shared/ListingShell.template";
 import { type UserResponse } from "../../../services/useProfileService";

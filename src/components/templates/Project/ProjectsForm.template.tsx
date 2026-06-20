@@ -54,7 +54,6 @@ interface ProjectFormProps {
 const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => {
     const navigate = useNavigate();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const skillService = useSkillService();
     const projectService = useProjectService();

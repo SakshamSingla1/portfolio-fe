@@ -34,7 +34,6 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
 }) => {
   const navigate = useNavigate();
   const colors = useColors();
-  const { isDark } = useTheme();
 
   const formik = useFormik<NavlinkRequest>({
     initialValues: {

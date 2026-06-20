@@ -64,7 +64,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     const skillService = useSkillService();
     const navigate = useNavigate();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
 

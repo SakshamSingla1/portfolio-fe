@@ -50,7 +50,6 @@ const AchievementFormTemplate = ({
     const navigate = useNavigate();
     const achievementService = useAchievementService();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const onClose = () => navigate(ADMIN_ROUTES.ACHIEVEMENTS);
 

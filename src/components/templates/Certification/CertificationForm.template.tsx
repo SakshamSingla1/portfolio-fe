@@ -47,7 +47,6 @@ const CertificationFormTemplate = ({
     const navigate = useNavigate();
     const certificationService = useCertificationService();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const onClose = () => navigate(ADMIN_ROUTES.CERTIFICATIONS);
 
