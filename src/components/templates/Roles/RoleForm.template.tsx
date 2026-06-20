@@ -8,7 +8,6 @@ import AdvancedCheckbox from '../../atoms/AdvancedCheckbox/AdvancedCheckbox';
 import { useFormik } from 'formik';
 import CustomRadioGroup from '../../molecules/CustomRadioGroup/CustomRadioGroup';
 import { HTTP_STATUS, Status, useColors } from '../../../utils/types';
-import { useTheme } from '../../../contexts/ThemeContext';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';

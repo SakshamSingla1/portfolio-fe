@@ -16,7 +16,6 @@ import { HTTP_STATUS } from "../../../utils/types";
 import type { ImageUploadResponse } from "../../../services/useProfileService";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object({

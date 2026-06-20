@@ -17,7 +17,6 @@ import { type Project, type ProjectResponse, WorkStatusOptions, WorkStatusType, 
 import { useSkillService, type SkillDropdown, } from "../../../services/useSkillService";
 import { FiTrash2 } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object({

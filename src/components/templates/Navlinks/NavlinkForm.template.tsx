@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
 import { Status } from '../../../utils/types';
 import { useColors } from '../../../utils/types';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { formatToEnumKey, makeRoute } from '../../../utils/helper';
 import { type NavlinkRequest, type NavlinkResponse } from '../../../services/useNavlinkService';
 import FormShell from '../Shared/FormShell.template';

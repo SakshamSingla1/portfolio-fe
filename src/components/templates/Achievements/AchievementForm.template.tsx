@@ -17,7 +17,6 @@ import type { ImageUploadResponse } from "../../../services/useProfileService";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object({

@@ -15,7 +15,6 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import FormShell from "../Shared/FormShell.template";
 
 export const employmentStatusOptions = [
