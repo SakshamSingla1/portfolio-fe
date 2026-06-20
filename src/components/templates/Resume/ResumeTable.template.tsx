@@ -4,8 +4,10 @@ import { HTTP_STATUS, StatusOptions, type IPagination } from "../../../utils/typ
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from '@mui/material';
 import TableV1 from "../../organisms/Table/TableV1";
+import ListingShell from "../Shared/ListingShell.template";
 import { type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
-import { FiEye, FiSearch, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
+import { FiSearch, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import { CgUnblock } from "react-icons/cg";
@@ -66,9 +68,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
     const Action = (resume: DocumentUploadResponse) => {
         return (
             <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`}>
-                <button onClick={() => handleView(resume.fileUrl, resume.status)} className="w-6 h-6">
-                    <FiEye />
-                </button>
+                <ActionButtons onView={() => handleView(resume.fileUrl, resume.status)} />
                 {resume.status === 'INACTIVE' && (
                     <button
                         onClick={() => handleActivateResume(resume.id)}
@@ -134,34 +134,69 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
     }, []);
 
     return (
-        <div className="grid gap-y-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Resume List
-                        </h1>
+        <ListingShell title="Resumes" description="Manage your resume files" count={pagination.totalRecords} accentColor="#10b981">
+            <div className="grid gap-y-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-800">
+                                Resume List
+                            </h1>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
-                    {isMobile ? (
-                        <div className="w-full">
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
-                            >
-                                <span className="flex items-center">
-                                    <FiFilter />
-                                    <span className="ml-2">Filters</span>
-                                </span>
-                                <span className="transform transition-transform">
-                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-                                </span>
-                            </button>
-                            {showFilters && (
-                                <div className="flex flex-col gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                    <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
+                        {isMobile ? (
+                            <div className="w-full">
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
+                                >
+                                    <span className="flex items-center">
+                                        <FiFilter />
+                                        <span className="ml-2">Filters</span>
+                                    </span>
+                                    <span className="transform transition-transform">
+                                        {showFilters ? <FiChevronUp /> : <FiChevronDown />}
+                                    </span>
+                                </button>
+                                {showFilters && (
+                                    <div className="flex flex-col gap-4">
+                                        <AutoCompleteInput
+                                            label=""
+                                            placeHolder="Select Status"
+                                            options={StatusOptions}
+                                            value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                                            onChange={(option: any) => {
+                                                if (option) {
+                                                    handleFiltersChange("status", option.value);
+                                                } else {
+                                                    handleFiltersChange("status", "");
+                                                }
+                                            }}
+                                            onSearch={() => { }}
+                                        />
+                                        <TextField
+                                            label=''
+                                            variant="outlined"
+                                            placeholder="Search..."
+                                            value={filters.search}
+                                            name='search'
+                                            onChange={(event) => {
+                                                handleFiltersChange("search", event.target.value)
+                                            }}
+                                            InputProps={{
+                                                startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
+                                            }}
+                                            fullWidth
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="flex gap-4">
+                                <div className="w-[250px]">
                                     <AutoCompleteInput
                                         label=""
                                         placeHolder="Select Status"
@@ -176,63 +211,30 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
                                         }}
                                         onSearch={() => { }}
                                     />
+                                </div>
+                                <div className="w-[250px]">
                                     <TextField
                                         label=''
                                         variant="outlined"
-                                        placeholder="Search..."
+                                        placeholder="Search...."
                                         value={filters.search}
                                         name='search'
                                         onChange={(event) => {
                                             handleFiltersChange("search", event.target.value)
                                         }}
                                         InputProps={{
-                                            startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
+                                            startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
                                         }}
                                         fullWidth
                                     />
                                 </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="flex gap-4">
-                            <div className="w-[250px]">
-                                <AutoCompleteInput
-                                    label=""
-                                    placeHolder="Select Status"
-                                    options={StatusOptions}
-                                    value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
-                                    onChange={(option: any) => {
-                                        if (option) {
-                                            handleFiltersChange("status", option.value);
-                                        } else {
-                                            handleFiltersChange("status", "");
-                                        }
-                                    }}
-                                    onSearch={() => { }}
-                                />
                             </div>
-                            <div className="w-[250px]">
-                                <TextField
-                                    label=''
-                                    variant="outlined"
-                                    placeholder="Search...."
-                                    value={filters.search}
-                                    name='search'
-                                    onChange={(event) => {
-                                        handleFiltersChange("search", event.target.value)
-                                    }}
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                                    }}
-                                    fullWidth
-                                />
-                            </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
+                <TableV1 schema={getSchema()} records={getRecords()} />
             </div>
-            <TableV1 schema={getSchema()} records={getRecords()} />
-        </div>
+        </ListingShell>
     )
 }
 export default ResumeTableTemplate;

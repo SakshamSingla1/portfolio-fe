@@ -4,8 +4,9 @@ import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
+import ListingShell from "../Shared/ListingShell.template";
 import { type ProjectResponse, WorkStatusType } from "../../../services/useProjectService";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { SkillDropdown } from "../../../services/useSkillService";
 
@@ -39,18 +40,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
         navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query, params: { id: id } }));
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => projects?.map((project: ProjectResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -110,7 +100,9 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
-    )
+        <ListingShell title="Projects" description="Portfolio projects and case studies" count={pagination.totalRecords} accentColor="#8b5cf6">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
+    );
 }
 export default ProjectsTableTemplate;

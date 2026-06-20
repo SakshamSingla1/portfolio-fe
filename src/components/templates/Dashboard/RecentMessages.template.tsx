@@ -16,19 +16,17 @@ const getInitials = (name: string): string => {
     : (words[0][0] + words[words.length - 1][0]).toUpperCase();
 };
 
-const getRelativeTime = (dateString: string): string => {
+const relTime = (dateString: string): string => {
   const now = Date.now();
   const then = new Date(dateString).getTime();
-  const diffMs = now - then;
-  const m = Math.floor(diffMs / 60000);
+  const m = Math.floor((now - then) / 60000);
   const h = Math.floor(m / 60);
   const d = Math.floor(h / 24);
-
-  if (m < 1) return "just now";
+  if (m < 1)  return "just now";
   if (m < 60) return `${m}m ago`;
   if (h < 24) return `${h}h ago`;
   if (d === 1) return "yesterday";
-  if (d < 7) return `${d}d ago`;
+  if (d < 7)   return `${d}d ago`;
   return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
@@ -41,7 +39,6 @@ const AVATAR_PALETTES = [
   { bg: "#e0f2fe", fg: "#075985" },
 ];
 
-// Dark-mode adapted palettes (slightly more saturated)
 const AVATAR_PALETTES_DARK = [
   { bg: "#4c1d95", fg: "#c4b5fd" },
   { bg: "#1e3a5f", fg: "#93c5fd" },
@@ -58,6 +55,16 @@ const getAvatarColor = (name: string, isDark: boolean) => {
   return isDark ? AVATAR_PALETTES_DARK[idx] : AVATAR_PALETTES[idx];
 };
 
+const STATUS_META: Record<string, { color: string; label: string }> = {
+  UNREAD:   { color: "#3b82f6", label: "Unread" },
+  READ:     { color: "#10b981", label: "Read" },
+  REPLIED:  { color: "#8b5cf6", label: "Replied" },
+  ARCHIVED: { color: "#94a3b8", label: "Archived" },
+};
+
+const getStatusMeta = (status: string) =>
+  STATUS_META[status?.toUpperCase()] ?? { color: "#94a3b8", label: status };
+
 const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => {
   const colors = useColors();
   const { isDark } = useTheme();
@@ -69,13 +76,17 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
         style={{ border: `1px dashed ${colors.neutral200}` }}
       >
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center mb-3 text-lg"
+          className="w-11 h-11 rounded-full flex items-center justify-center mb-3 text-xl"
           style={{ background: colors.primary50, color: colors.primary500 }}
         >
           ✉
         </div>
-        <div className="text-sm font-medium" style={{ color: colors.neutral600 }}>No messages yet</div>
-        <div className="text-xs mt-0.5" style={{ color: colors.neutral400 }}>New inquiries will appear here</div>
+        <div className="text-sm font-semibold" style={{ color: colors.neutral600 }}>
+          No messages yet
+        </div>
+        <div className="text-xs mt-0.5" style={{ color: colors.neutral400 }}>
+          Visitors who contact you will appear here
+        </div>
       </div>
     );
   }
@@ -86,6 +97,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
         const isUnread = msg.status?.toUpperCase() === "UNREAD";
         const { bg, fg } = getAvatarColor(msg.name || "?", isDark);
         const initials = getInitials(msg.name);
+        const { color: statusColor, label: statusLabel } = getStatusMeta(msg.status);
 
         return (
           <motion.div
@@ -97,7 +109,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             style={{
               background: isUnread
                 ? (isDark ? `${colors.primary900}` : colors.primary50)
-                : colors.neutral50,
+                : (isDark ? colors.neutral50 : colors.neutral50),
               border: `1px solid ${isUnread ? colors.primary200 : colors.neutral200}`,
             }}
           >
@@ -124,7 +136,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
                   {msg.name}
                 </div>
                 <div className="text-[10px] shrink-0" style={{ color: colors.neutral400 }}>
-                  {getRelativeTime(msg.createdAt)}
+                  {relTime(msg.createdAt)}
                 </div>
               </div>
               <div className="text-[11px] mt-0.5 truncate" style={{ color: colors.neutral500 }}>
@@ -141,6 +153,19 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
                 }}
               >
                 {msg.message}
+              </div>
+
+              {/* Status chip */}
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <span
+                  className="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+                  style={{
+                    background: `${statusColor}14`,
+                    color: statusColor,
+                  }}
+                >
+                  {statusLabel}
+                </span>
               </div>
             </div>
 

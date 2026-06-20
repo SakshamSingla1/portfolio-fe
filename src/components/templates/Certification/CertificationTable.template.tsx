@@ -4,7 +4,8 @@ import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ListingShell from "../Shared/ListingShell.template";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { Certification } from "../../../services/useCertificationService";
 import { DateUtils } from "../../../utils/helper";
@@ -49,18 +50,7 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
         );
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () =>
         certifications.map((certification, index) => {
@@ -115,7 +105,9 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
+        <ListingShell title="Certifications" description="Professional certifications" count={pagination.totalRecords} accentColor="#06b6d4">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
     )
 }
 export default CertificationsTableTemplate;

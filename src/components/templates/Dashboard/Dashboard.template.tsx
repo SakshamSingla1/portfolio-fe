@@ -1,10 +1,12 @@
 import React, { useContext } from "react";
-import { type IDashboardSummary } from "../../../services/useDashboardService";
+import { type IDashboardSummary, type IViewStats } from "../../../services/useDashboardService";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { AuthenticatedUserContext } from "../../../contexts/AuthenticatedUserContext";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { FiArrowRight } from "react-icons/fi";
 
 import StatsTemplate from "./Stats.template";
 import ViewAnalyticsTemplate from "./ViewAnalytics.template";
@@ -17,6 +19,18 @@ interface DashboardTemplateProps {
   dashboardData: IDashboardSummary | null;
 }
 
+const EMPTY_VIEW_STATS: IViewStats = {
+  totalViews: 0,
+  viewsToday: 0,
+  viewsThisWeek: 0,
+  viewsThisMonth: 0,
+  uniqueVisitors: 0,
+  resumeDownloads: 0,
+  weeklyTrend: [],
+  deviceBreakdown: {},
+  recentViews: [],
+};
+
 const getGreeting = (): string => {
   const h = new Date().getHours();
   if (h >= 5 && h < 12) return "Good morning";
@@ -28,7 +42,7 @@ const getGreeting = (): string => {
 const formatDate = (): string =>
   new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
-/* ─ Avatar helpers ───────────────────────────────────────────────── */
+/* ─ Avatar helpers ───────────────────────────────────────────── */
 const AVATAR_PALETTES = [
   { bg: "#ede9fe", fg: "#7c3aed" },
   { bg: "#dbeafe", fg: "#1d4ed8" },
@@ -56,24 +70,49 @@ const getInitials = (name: string) => {
   return w.length === 1 ? w[0][0].toUpperCase() : (w[0][0] + w[w.length - 1][0]).toUpperCase();
 };
 
+/* ─── Focus chip ─────────────────────────────────────────────── */
+interface FocusChipProps {
+  label: string;
+  color: string;
+  onClick?: () => void;
+}
+const FocusChip: React.FC<FocusChipProps> = ({ label, color, onClick }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center gap-1.5 rounded-full transition-opacity duration-150 hover:opacity-80"
+    style={{
+      padding: "5px 10px 5px 8px",
+      background: `${color}14`,
+      border: `1px solid ${color}28`,
+      cursor: onClick ? "pointer" : "default",
+    }}
+  >
+    <div className="rounded-full shrink-0" style={{ width: 6, height: 6, background: color }} />
+    <span className="text-[11px] font-semibold" style={{ color }}>
+      {label}
+    </span>
+    {onClick && <FiArrowRight size={9} color={color} />}
+  </button>
+);
+
 const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) => {
   const colors = useColors();
   const { isDark } = useTheme();
   const isMobile = useIsMobile();
   const { user } = useContext(AuthenticatedUserContext);
+  const navigate = useNavigate();
 
-  // Prefer profileSummary from API (more complete), fall back to auth user
-  const fullName      = dashboardData?.profileSummary?.fullName || user?.fullName || "";
-  const profileTitle  = dashboardData?.profileSummary?.title || "";
-  const profileLoc    = dashboardData?.profileSummary?.location || "";
-  const profileImg    = dashboardData?.profileSummary?.profileImageUrl || "";
-  const firstName     = fullName.split(" ")[0] || "there";
+  const fullName     = dashboardData?.profileSummary?.fullName || user?.fullName || "";
+  const profileTitle = dashboardData?.profileSummary?.title || "";
+  const profileLoc   = dashboardData?.profileSummary?.location || "";
+  const profileImg   = dashboardData?.profileSummary?.profileImageUrl || "";
+  const firstName    = fullName.split(" ")[0] || "there";
 
   const cardShadow = isDark
     ? "0 1px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)"
     : "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)";
 
-  /* ─── Card shell ─────────────────────────────────────────────────── */
+  /* ─── Card shell ─────────────────────────────────────────── */
   const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({
     children, className = "",
   }) => (
@@ -89,10 +128,12 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
     </div>
   );
 
-  /* ─── Section label ──────────────────────────────────────────────── */
-  const SectionLabel: React.FC<{ children: React.ReactNode; count?: number; accent?: string }> = ({
-    children, count, accent,
-  }) => (
+  /* ─── Section label ──────────────────────────────────────── */
+  const SectionLabel: React.FC<{
+    children: React.ReactNode;
+    count?: number;
+    accent?: string;
+  }> = ({ children, count, accent }) => (
     <div className="flex items-center justify-between mb-4">
       <span
         className="text-[10px] font-black uppercase tracking-[0.1em]"
@@ -114,7 +155,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
     </div>
   );
 
-  /* ─── Skeleton ───────────────────────────────────────────────────── */
+  /* ─── Skeleton ───────────────────────────────────────────── */
   const Skeleton = () => (
     <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
       <div className={isMobile ? "space-y-4" : "col-span-7 space-y-4"}>
@@ -138,17 +179,39 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
     </div>
   );
 
+  /* ─── Focus strip insights ───────────────────────────────── */
+  const buildFocusChips = () => {
+    if (!dashboardData) return [];
+    const chips: Array<{ label: string; color: string; route?: string }> = [];
+
+    const unread = dashboardData.stats?.unreadMessages ?? 0;
+    if (unread > 0) {
+      chips.push({ label: `${unread} unread ${unread === 1 ? "message" : "messages"}`, color: "#f43f5e", route: "/messages" });
+    }
+
+    const pct = dashboardData.profileCompletion?.percentage ?? 100;
+    if (pct < 100) {
+      chips.push({ label: `Portfolio ${pct}% — improve it`, color: colors.primary600, route: "/profile" });
+    }
+
+    const viewsToday = dashboardData.viewStats?.viewsToday ?? 0;
+    if (viewsToday > 0) {
+      chips.push({ label: `${viewsToday} ${viewsToday === 1 ? "view" : "views"} today`, color: "#10b981" });
+    }
+
+    return chips;
+  };
+
   return (
     <div style={{ padding: isMobile ? "12px 10px 24px" : "20px 20px 32px" }}>
 
-      {/* ─ Greeting header ─────────────────────────────────────────── */}
+      {/* ─ Greeting header ─────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
         className="flex items-center justify-between mb-5"
       >
-        {/* Left: greeting text */}
         <div className="flex-1 min-w-0">
           <h1
             className="font-bold tracking-tight"
@@ -173,7 +236,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
           </div>
         </div>
 
-        {/* Right: avatar */}
         {fullName && (
           <div className="ml-4 shrink-0">
             {profileImg ? (
@@ -210,7 +272,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
       ) : (
         <div className="space-y-4">
 
-          {/* ─ Stats strip ─────────────────────────────────────────── */}
+          {/* ─ Stats strip ──────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -219,21 +281,49 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             <StatsTemplate stats={dashboardData.stats} />
           </motion.div>
 
-          {/* ─ View Analytics hero ─────────────────────────────────── */}
+          {/* ─ Focus strip ──────────────────────────────────── */}
+          {(() => {
+            const chips = buildFocusChips();
+            if (chips.length === 0) return null;
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.07 }}
+                className="flex items-center gap-2 flex-wrap"
+              >
+                <span
+                  className="text-[9px] font-black uppercase tracking-widest shrink-0"
+                  style={{ color: colors.neutral400 }}
+                >
+                  Focus
+                </span>
+                {chips.map((chip, i) => (
+                  <FocusChip
+                    key={i}
+                    label={chip.label}
+                    color={chip.color}
+                    onClick={chip.route ? () => navigate(chip.route!) : undefined}
+                  />
+                ))}
+              </motion.div>
+            );
+          })()}
+
+          {/* ─ View Analytics ───────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.08 }}
           >
-            <ViewAnalyticsTemplate viewStats={dashboardData.viewStats} />
+            <ViewAnalyticsTemplate viewStats={dashboardData.viewStats ?? EMPTY_VIEW_STATS} />
           </motion.div>
 
-          {/* ─ Main grid ───────────────────────────────────────────── */}
+          {/* ─ Main grid ────────────────────────────────────── */}
           <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
 
             {/* Left column */}
             <div className={`space-y-4 ${isMobile ? "" : "col-span-7"}`}>
-
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -261,7 +351,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
 
             {/* Right column */}
             <div className={`space-y-4 ${isMobile ? "" : "col-span-5"}`}>
-
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

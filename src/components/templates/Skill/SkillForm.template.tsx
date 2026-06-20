@@ -9,6 +9,9 @@ import { useFormik } from "formik";
 import { type Skill, SkillLevelType } from "../../../services/useSkillService";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../../../utils/constant";
+import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object().shape({
     logoId: Yup.string()
@@ -29,6 +32,8 @@ interface SkillFormProps {
 const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     const logoService = useLogoService();
     const navigate = useNavigate();
+    const colors = useColors();
+    const { isDark } = useTheme();
 
     const [logos, setLogos] = useState<Logo[]>([]);
     const [selectedLogo, setSelectedLogo] = useState<Logo | null>(null);
@@ -92,20 +97,32 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         loadLogoDropdown();
     }, []);
 
-    return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Add New Skill" : mode === MODE.EDIT ? "Edit Skill" : "Skill Details"}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Add a new skill to your portfolio" : mode === MODE.EDIT ? "Update your skill information" : "View skill details"}
-                </p>
-            </div>
+    const cardShadow = isDark
+        ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
+        : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+    return (
+        <FormShell
+            title={mode === MODE.ADD ? "Add New Skill" : mode === MODE.EDIT ? "Edit Skill" : "Skill Details"}
+            subtitle={mode === MODE.ADD ? "Add a new skill to your portfolio" : mode === MODE.EDIT ? "Update your skill information" : "View skill details"}
+            accentColor="#6366f1"
+            breadcrumb="Skills"
+            onBack={onClose}
+        >
+            <div className="space-y-8" style={{ padding: "24px" }}>
+                <div
+                    style={{
+                        background: colors.neutral50,
+                        padding: "20px",
+                        borderRadius: "12px",
+                        border: "1px solid " + colors.neutral200,
+                        boxShadow: cardShadow,
+                    }}
+                >
+                    <h3
+                        className="text-lg font-semibold mb-4 flex items-center"
+                        style={{ color: colors.neutral900 }}
+                    >
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                         Select Skill Logo
                     </h3>
@@ -139,27 +156,48 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                         </div>
                         <div className="flex items-center md:justify-end">
                             {(selectedLogo) ? (
-                                <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div
+                                    className="flex items-center gap-4 rounded-lg p-4"
+                                    style={{
+                                        background: colors.neutral50,
+                                        border: "1px solid " + colors.neutral200,
+                                    }}
+                                >
                                     <img
                                         src={selectedLogo?.url || ''}
                                         alt={selectedLogo?.name || 'Logo'}
-                                        className="w-16 h-16 rounded-md shadow-sm"
+                                        className="w-16 h-16 rounded-md"
+                                        style={{ boxShadow: cardShadow }}
                                     />
                                     <div>
-                                        <p className="text-sm text-gray-600">Selected</p>
-                                        <p className="text-base font-medium text-gray-900 truncate max-w-[200px]">
+                                        <p className="text-sm" style={{ color: colors.neutral500 }}>Selected</p>
+                                        <p
+                                            className="text-base font-medium truncate max-w-[200px]"
+                                            style={{ color: colors.neutral900 }}
+                                        >
                                             {selectedLogo?.name || '—'}
                                         </p>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-gray-400 text-sm">No logo selected</div>
+                                <div className="text-sm" style={{ color: colors.neutral400 }}>No logo selected</div>
                             )}
                         </div>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div
+                    style={{
+                        background: colors.neutral50,
+                        padding: "20px",
+                        borderRadius: "12px",
+                        border: "1px solid " + colors.neutral200,
+                        boxShadow: cardShadow,
+                    }}
+                >
+                    <h3
+                        className="text-lg font-semibold mb-4 flex items-center"
+                        style={{ color: colors.neutral900 }}
+                    >
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
                         Classification
                     </h3>
@@ -206,7 +244,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                     )}
                 </div>
             </div>
-        </div>
+        </FormShell>
     );
 };
 

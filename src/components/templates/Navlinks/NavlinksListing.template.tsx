@@ -4,8 +4,9 @@ import { StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
+import ListingShell from "../Shared/ListingShell.template";
 import { type NavlinkResponse } from "../../../services/useNavlinkService";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { enumToNormalKey } from "../../../utils/helper";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
@@ -50,18 +51,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         );
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => navlinks?.map((navlink: NavlinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -108,7 +98,9 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
+        <ListingShell title="Navigation Links" description="Portfolio navigation menu" count={pagination.totalRecords} accentColor="#f97316">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
     )
 }
 export default NavlinkListTableTemplate;

@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object().shape({
     institution: Yup.string()
@@ -47,6 +49,7 @@ interface EducationFormProps {
 const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, education }) => {
     const navigate = useNavigate();
     const colors = useColors();
+    const { isDark } = useTheme();
 
     const onClose = () => navigate(ADMIN_ROUTES.EDUCATION);
 
@@ -80,20 +83,32 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
         },
     });
 
-    return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Add Education" : mode === MODE.EDIT ? "Edit Education" : "Education Details"}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Add your academic achievement to your profile" : mode === MODE.EDIT ? "Update your education information" : "View education details"}
-                </p>
-            </div>
+    const cardShadow = isDark
+        ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
+        : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+    return (
+        <FormShell
+            title={mode === MODE.ADD ? "Add Education" : mode === MODE.EDIT ? "Edit Education" : "View Education"}
+            subtitle={mode === MODE.ADD ? "Add your academic achievement to your profile" : mode === MODE.EDIT ? "Update your education information" : "View education details"}
+            accentColor="#3b82f6"
+            breadcrumb="Education"
+            onBack={onClose}
+        >
+            <div className="space-y-8" style={{ padding: "24px" }}>
+                <div
+                    style={{
+                        background: colors.neutral50,
+                        padding: "20px",
+                        borderRadius: "12px",
+                        border: "1px solid " + colors.neutral200,
+                        boxShadow: cardShadow,
+                    }}
+                >
+                    <h3
+                        className="text-lg font-semibold mb-4 flex items-center"
+                        style={{ color: colors.neutral900 }}
+                    >
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                         Basic Information
                     </h3>
@@ -127,8 +142,19 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div
+                    style={{
+                        background: colors.neutral50,
+                        padding: "20px",
+                        borderRadius: "12px",
+                        border: "1px solid " + colors.neutral200,
+                        boxShadow: cardShadow,
+                    }}
+                >
+                    <h3
+                        className="text-lg font-semibold mb-4 flex items-center"
+                        style={{ color: colors.neutral900 }}
+                    >
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
                         Details
                     </h3>
@@ -195,8 +221,19 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div
+                    style={{
+                        background: colors.neutral50,
+                        padding: "20px",
+                        borderRadius: "12px",
+                        border: "1px solid " + colors.neutral200,
+                        boxShadow: cardShadow,
+                    }}
+                >
+                    <h3
+                        className="text-lg font-semibold mb-4 flex items-center"
+                        style={{ color: colors.neutral900 }}
+                    >
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
                         Timeline
                     </h3>
@@ -231,9 +268,20 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div
+                    style={{
+                        background: colors.neutral50,
+                        padding: "20px",
+                        borderRadius: "12px",
+                        border: "1px solid " + colors.neutral200,
+                        boxShadow: cardShadow,
+                    }}
+                >
                     <div className="mt-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <h3
+                            className="text-lg font-semibold mb-4 flex items-center"
+                            style={{ color: colors.neutral900 }}
+                        >
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
                             Description
                         </h3>
@@ -269,7 +317,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     )}
                 </div>
             </div>
-        </div>
+        </FormShell>
     )
 }
 

@@ -4,8 +4,9 @@ import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
+import ListingShell from "../Shared/ListingShell.template";
 import { type ExperienceResponse, EmploymentStatus } from "../../../services/useExperienceService";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { DateUtils } from "../../../utils/helper";
 
@@ -39,18 +40,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ exper
         navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_VIEW, { query, params: { id: id } }));
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => experiences?.map((experience: ExperienceResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -96,7 +86,9 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ exper
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
-    )
+        <ListingShell title="Experience" description="Work history and roles" count={pagination.totalRecords} accentColor="#10b981">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
+    );
 }
 export default ExperienceTableTemplate;

@@ -16,6 +16,9 @@ import { HTTP_STATUS } from "../../../utils/types";
 import type { ImageUploadResponse } from "../../../services/useProfileService";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
@@ -46,6 +49,8 @@ const AchievementFormTemplate = ({
 
     const navigate = useNavigate();
     const achievementService = useAchievementService();
+    const colors = useColors();
+    const { isDark } = useTheme();
 
     const onClose = () => navigate(ADMIN_ROUTES.ACHIEVEMENTS);
 
@@ -93,21 +98,25 @@ const AchievementFormTemplate = ({
         }
     };
 
+    const cardStyle: React.CSSProperties = {
+        background: colors.neutral0,
+        border: `1px solid ${colors.neutral200}`,
+    };
+
+    const sectionTitleStyle: React.CSSProperties = {
+        color: colors.neutral800,
+    };
 
     return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Add Achievement" : mode === MODE.EDIT ? "Edit Achievement" : "Achievement Details"}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Add a professional achievement" : mode === MODE.EDIT ? "Update achievement information" : "View achievement information"}
-                </p>
-            </div>
-
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+        <FormShell
+            title={mode === MODE.ADD ? "Add Achievement" : mode === MODE.EDIT ? "Edit Achievement" : "Achievement Details"}
+            subtitle={mode === MODE.ADD ? "Add a professional achievement" : mode === MODE.EDIT ? "Update achievement information" : "View achievement information"}
+            accentColor="#f59e0b"
+            onBack={() => navigate(-1)}
+        >
+            <div className="p-6 space-y-8">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
                         Basic Information
                     </h3>
@@ -140,8 +149,8 @@ const AchievementFormTemplate = ({
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
                         Achievement Timeline
                     </h3>
@@ -169,15 +178,15 @@ const AchievementFormTemplate = ({
                             required
                         />
                         {mode !== MODE.VIEW && (
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs" style={{ color: colors.neutral500 }}>
                                 Tip: Use bullet points to highlight key achievements for better
                                 readability in the achievement card.
                             </p>
                         )}
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
                         Proof Details
                     </h3>
@@ -219,8 +228,8 @@ const AchievementFormTemplate = ({
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-orange-500 rounded-full mr-3" />
                         Achievement Status
                     </h3>
@@ -249,7 +258,7 @@ const AchievementFormTemplate = ({
                     )}
                 </div>
             </div>
-        </div>
+        </FormShell>
     );
 };
 

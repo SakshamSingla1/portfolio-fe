@@ -8,10 +8,12 @@ import AdvancedCheckbox from '../../atoms/AdvancedCheckbox/AdvancedCheckbox';
 import { useFormik } from 'formik';
 import CustomRadioGroup from '../../molecules/CustomRadioGroup/CustomRadioGroup';
 import { HTTP_STATUS, Status, useColors } from '../../../utils/types';
+import { useTheme } from '../../../contexts/ThemeContext';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
 import { enumToNormalKey, makeRoute } from '../../../utils/helper';
+import FormShell from '../Shared/FormShell.template';
 
 interface RoleFormTemplateProps {
     roleDetails?: RolePermissionResponseDTO | null;
@@ -36,6 +38,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     const navLinkService = useNavlinkService();
     const permissionService = usePermissionService();
     const colors = useColors();
+    const { isDark } = useTheme();
 
     const [navlinks, setNavlinks] = useState<NavlinkResponse[]>([]);
     const [permissions, setPermissions] = useState<PermissionResponseDTO[]>([]);
@@ -204,23 +207,20 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
         setSelectedPermissionCount(getSelectedPermissionCount());
     }, [formik.values.rolePermissions]);
 
-    return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold mb-2" style={{ color: colors.neutral900 }}>
-                    {mode === MODE.ADD
-                        ? 'Add Role'
-                        : mode === MODE.EDIT
-                            ? 'Edit Role'
-                            : 'Role Details'}
-                </h2>
-                <p style={{ color: colors.neutral600 }}>
-                    {mode === MODE.VIEW
-                        ? 'View role details and permissions'
-                        : 'Configure role settings and permissions'}
-                </p>
-            </div>
+    const title =
+        mode === MODE.ADD ? 'Add Role' : mode === MODE.EDIT ? 'Edit Role' : 'Role Details';
+    const subtitle =
+        mode === MODE.VIEW ? 'View role details and permissions' : 'Configure role settings and permissions';
 
+    return (
+        <FormShell
+            title={title}
+            subtitle={subtitle}
+            accentColor="#0ea5e9"
+            breadcrumb="Roles"
+            onBack={() => navigate(-1)}
+        >
+        <div className="p-6">
             <div className="space-y-8">
                 <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral200 }}>
                     <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
@@ -434,6 +434,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                 </div>
             </div>
         </div>
+        </FormShell>
     )
 }
 

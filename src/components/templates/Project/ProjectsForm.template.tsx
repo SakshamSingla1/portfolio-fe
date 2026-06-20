@@ -17,6 +17,8 @@ import { type Project, type ProjectResponse, WorkStatusOptions, WorkStatusType, 
 import { useSkillService, type SkillDropdown, } from "../../../services/useSkillService";
 import { FiTrash2 } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object({
     projectName: Yup.string().required("Project name is required"),
@@ -52,6 +54,7 @@ interface ProjectFormProps {
 const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => {
     const navigate = useNavigate();
     const colors = useColors();
+    const { isDark } = useTheme();
 
     const skillService = useSkillService();
     const projectService = useProjectService();
@@ -185,25 +188,29 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         formik.setFieldValue("githubRepositories", updated);
     };
 
-
     useEffect(() => {
         loadSkills();
     }, []);
 
+    const cardStyle: React.CSSProperties = {
+        background: colors.neutral0,
+        border: `1px solid ${colors.neutral200}`,
+    };
+
+    const sectionTitleStyle: React.CSSProperties = {
+        color: colors.neutral800,
+    };
 
     return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Add Project" : mode === MODE.EDIT ? "Edit Project" : "Project Details"}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Showcase your work and contributions" : mode === MODE.EDIT ? "Update project details" : "View project information"}
-                </p>
-            </div>
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+        <FormShell
+            title={mode === MODE.ADD ? "Add Project" : mode === MODE.EDIT ? "Edit Project" : "Project Details"}
+            subtitle={mode === MODE.ADD ? "Showcase your work and contributions" : mode === MODE.EDIT ? "Update project details" : "View project information"}
+            accentColor="#8b5cf6"
+            onBack={() => navigate(-1)}
+        >
+            <div className="p-6 space-y-8">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
                         Basic Information
                     </h3>
@@ -234,8 +241,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
                         Technologies Used
                     </h3>
@@ -283,8 +290,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
                         Timeline
                     </h3>
@@ -324,8 +331,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-red-500 rounded-full mr-3" />
                         GitHub Repositories
                     </h3>
@@ -369,8 +376,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             </p>
                         )}
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-3">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm gap-3" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-orange-500 rounded-xl mr-3" />
                         Project Images
                     </h3>
@@ -379,7 +386,10 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             const isPrimary = index === 0;
                             return (
                                 <div key={index} className="relative group/img-container w-[260px]">
-                                    <div className="relative p-2 rounded-sm bg-gray-50/50 border border-gray-100 shadow-inner group-hover/img-container:bg-white group-hover/img-container:shadow-xl group-hover/img-container:shadow-blue-500/5 transition-all duration-500">
+                                    <div
+                                        className="relative p-2 rounded-sm shadow-inner group-hover/img-container:shadow-xl group-hover/img-container:shadow-blue-500/5 transition-all duration-500"
+                                        style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}` }}
+                                    >
                                         <ImageUpload
                                             label={isPrimary ? "Primary Project Cover" : `Additional Asset ${index + 1}`}
                                             value={image}
@@ -442,9 +452,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     )}
                 </div>
 
-
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-pink-500 rounded-full mr-3" />
                         Project Description
                     </h3>
@@ -458,7 +467,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                         error={formik.touched.projectDescription && Boolean(formik.errors.projectDescription)}
                         helperText={Boolean(formik.touched.projectDescription && formik.errors.projectDescription) ? formik.errors.projectDescription : ""}
                         required={true}
-
                     />
                 </div>
 
@@ -474,7 +482,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     )}
                 </div>
             </div>
-        </div>
+        </FormShell>
     );
 };
 

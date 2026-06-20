@@ -13,7 +13,7 @@ import CurrencyCell from "../../atoms/TableUtils/CurrencyCell";
 import NumberCell from "../../atoms/TableUtils/NumberCell";
 import StringCell from "../../atoms/TableUtils/StringCell";
 import DateTimeCell from "../../atoms/TableUtils/DateTimeCell";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiInbox } from "react-icons/fi";
 
 export interface Pagination {
   limit: number;
@@ -102,16 +102,17 @@ const useStyles = createUseStyles((colors: any) => ({
     },
   },
   tableHead: {
-    backgroundColor: colors.primary50,
+    background: `linear-gradient(180deg, ${colors.primary50} 0%, ${colors.neutral0} 100%)`,
     '& th': {
       padding: '0.75rem 1.25rem',
       textAlign: 'left',
-      fontWeight: 600,
-      fontSize: '0.75rem',
+      fontWeight: 700,
+      fontSize: '0.6875rem',
       textTransform: 'uppercase',
-      letterSpacing: '0.05em',
-      color: colors.primary700,
-      borderBottom: `2px solid ${colors.primary200}`,
+      letterSpacing: '0.08em',
+      color: colors.primary600,
+      borderBottom: `1px solid ${colors.primary100}`,
+      whiteSpace: 'nowrap',
       '&:first-child': {
         borderTopLeftRadius: '0.5rem',
       },
@@ -126,9 +127,10 @@ const useStyles = createUseStyles((colors: any) => ({
   },
   tableBody: {
     '& tr': {
-      transition: 'background-color 0.2s ease',
+      transition: 'background-color 0.15s ease, box-shadow 0.15s ease',
       '&:hover': {
-        backgroundColor: colors.primary50,
+        backgroundColor: `${colors.neutral100}`,
+        boxShadow: `inset 3px 0 0 ${colors.primary400}`,
       },
       '&:last-child td': {
         borderBottom: 'none',
@@ -141,14 +143,14 @@ const useStyles = createUseStyles((colors: any) => ({
       },
       '@media (max-width: 768px)': {
         '&:hover': {
-          backgroundColor: colors.primary100,
+          backgroundColor: colors.neutral100,
           cursor: 'pointer',
         },
       },
     },
     '& td': {
-      padding: '1rem 1.25rem',
-      borderBottom: `1px solid ${colors.neutral200}`,
+      padding: '0.875rem 1.25rem',
+      borderBottom: `1px solid ${colors.neutral100}`,
       color: colors.neutral700,
       fontSize: '0.875rem',
       lineHeight: '1.5',
@@ -159,15 +161,15 @@ const useStyles = createUseStyles((colors: any) => ({
     },
   },
   stripedRow: {
-    backgroundColor: colors.primary50,
+    backgroundColor: `${colors.primary500}06`,
     '@media (max-width: 768px)': {
-      backgroundColor: colors.primary25,
+      backgroundColor: `${colors.primary500}04`,
     },
   },
   emptyState: {
     padding: '3rem 1.5rem',
     textAlign: 'center',
-    color: colors.primary600,
+    color: colors.neutral400,
     fontSize: '0.9375rem',
     backgroundColor: colors.neutral0 || 'white',
     '@media (max-width: 768px)': {
@@ -346,6 +348,33 @@ const useStyles = createUseStyles((colors: any) => ({
     right: '0.5rem',
   },
 }));
+
+const EmptyState: React.FC<{ colors: any }> = ({ colors }) => (
+  <div style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
+    <div
+      style={{
+        width: 52,
+        height: 52,
+        borderRadius: 16,
+        background: `${colors.primary500}10`,
+        border: `1px dashed ${colors.primary300}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "0 auto 1rem",
+        color: colors.primary400,
+      }}
+    >
+      <FiInbox size={22} />
+    </div>
+    <div style={{ fontSize: "0.9375rem", fontWeight: 600, color: colors.neutral600, marginBottom: 4 }}>
+      No records found
+    </div>
+    <div style={{ fontSize: "0.8125rem", color: colors.neutral400 }}>
+      There are no items to display here yet
+    </div>
+  </div>
+);
 
 function TablePaginationActions(props: any) {
   const { count, page, rowsPerPage, onPageChange } = props;
@@ -543,9 +572,7 @@ const TableV1: React.FC<TableProps> = ({
       {isMobile && mobileView === 'cards' && (
         <div className={classes.mobileCardContainer}>
           {records.length === 0 ? (
-            <div className={classes.emptyState}>
-              No records found
-            </div>
+            <EmptyState colors={colors} />
           ) : (
             records.map((row, rowIndex) => renderMobileCard(row, rowIndex))
           )}
@@ -579,7 +606,7 @@ const TableV1: React.FC<TableProps> = ({
                     colSpan={(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).length}
                     className={classes.emptyState}
                   >
-                    No records found
+                    <EmptyState colors={colors} />
                   </td>
                 </tr>
               ) : (

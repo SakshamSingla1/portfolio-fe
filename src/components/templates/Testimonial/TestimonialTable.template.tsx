@@ -4,7 +4,8 @@ import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ListingShell from "../Shared/ListingShell.template";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { Testimonial } from "../../../services/useTestimonialService";
 import { DateUtils } from "../../../utils/helper";
@@ -49,18 +50,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
         );
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () =>
         testimonials.map((testimonial, index) => [
@@ -109,7 +99,9 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
+        <ListingShell title="Testimonials" description="Recommendations and reviews" count={pagination.totalRecords} accentColor="#f43f5e">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
     )
 }
 export default TestimonialTableTemplate;

@@ -4,7 +4,8 @@ import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ListingShell from "../Shared/ListingShell.template";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES, DEGREE_OPTIONS } from "../../../utils/constant";
 import type { Education } from "../../../services/useEducationService";
 
@@ -48,18 +49,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
         );
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;;
 
     const getRecords = () => educations?.map((education: Education, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -106,7 +96,9 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
-    )
+        <ListingShell title="Education" description="Academic background and degrees" count={pagination.totalRecords} accentColor="#3b82f6">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
+    );
 }
 export default EducationsTableTemplate;

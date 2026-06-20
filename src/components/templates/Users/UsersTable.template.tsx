@@ -4,8 +4,11 @@ import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { enumToNormalKey, makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
+import ListingShell from "../Shared/ListingShell.template";
 import { type UserResponse } from "../../../services/useProfileService";
-import { FiEdit, FiEye, FiCheck } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
+import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useProfileService } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
@@ -55,25 +58,18 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({ users, paginatio
         }
     }
 
-    const Action = (user: UserResponse) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(user.id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(user.id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-                {user.emailVerified !== 'VERIFIED' && user.phoneVerified !== 'VERIFIED' && <button
-                    onClick={() => handleVerifyUser(user.id)}
-                    className={`w-6 h-6 ${user.emailVerified === 'VERIFIED' ? 'text-green-600' : 'text-blue-600'}`}
-                    title={user.emailVerified === 'VERIFIED' ? 'Verified' : 'Verify User'}
-                >
-                    <FiCheck />
-                </button>}
-            </div>
-        );
-    };
+    const Action = (user: UserResponse) => (
+        <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
+            <ActionButtons onEdit={() => handleEdit(user.id)} onView={() => handleView(user.id)} />
+            {user.emailVerified !== 'VERIFIED' && user.phoneVerified !== 'VERIFIED' && <button
+                onClick={() => handleVerifyUser(user.id)}
+                className={`w-6 h-6 ${user.emailVerified === 'VERIFIED' ? 'text-green-600' : 'text-blue-600'}`}
+                title={user.emailVerified === 'VERIFIED' ? 'Verified' : 'Verify User'}
+            >
+                <FiCheck />
+            </button>}
+        </div>
+    );
 
     const getRecords = () => users?.map((user: UserResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -86,7 +82,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({ users, paginatio
         </div>,
         user.userName,
         user.roleName,
-        enumToNormalKey(user.status),
+        <ResourceStatus status={user.status} />,
         Action(user)
     ])
 
@@ -95,7 +91,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({ users, paginatio
         { label: "User", key: "user", type: "custom" as ColumnType, props: { className: '' }, priority: "high" as const },
         { label: "Username", key: "username", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Role", key: "role", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Status", key: "status", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
         { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
     ]
 
@@ -126,7 +122,9 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({ users, paginatio
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
+        <ListingShell title="Users" description="Platform user accounts" count={pagination.totalRecords} accentColor="#64748b">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
     )
 }
 export default UsersTableTemplate;

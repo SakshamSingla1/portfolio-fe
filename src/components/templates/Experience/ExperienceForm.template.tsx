@@ -15,6 +15,8 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import FormShell from "../Shared/FormShell.template";
 
 export const employmentStatusOptions = [
     { label: "Current", value: EmploymentStatus.CURRENT },
@@ -62,6 +64,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     const skillService = useSkillService();
     const navigate = useNavigate();
     const colors = useColors();
+    const { isDark } = useTheme();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
 
@@ -124,20 +127,25 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         loadSkills();
     }, []);
 
-    return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Add New Experience" : mode === MODE.EDIT ? "Edit Experience" : "Experience Details"}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Add your professional experience to your portfolio" : mode === MODE.EDIT ? "Update your experience information" : "View experience details"}
-                </p>
-            </div>
+    const cardStyle: React.CSSProperties = {
+        background: colors.neutral0,
+        border: `1px solid ${colors.neutral200}`,
+    };
 
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+    const sectionTitleStyle: React.CSSProperties = {
+        color: colors.neutral800,
+    };
+
+    return (
+        <FormShell
+            title={mode === MODE.ADD ? "Add New Experience" : mode === MODE.EDIT ? "Edit Experience" : "Experience Details"}
+            subtitle={mode === MODE.ADD ? "Add your professional experience to your portfolio" : mode === MODE.EDIT ? "Update your experience information" : "View experience details"}
+            accentColor="#10b981"
+            onBack={() => navigate(-1)}
+        >
+            <div className="p-6 space-y-8">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                         Basic Information
                     </h3>
@@ -185,8 +193,8 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
                         Technologies Used
                     </h3>
@@ -210,8 +218,8 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             isDisabled={mode === MODE.VIEW}
                         />
                         {(selectedSkills.length > 0 || formik.values.skillIds.length > 0) && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <p className="text-sm font-medium text-gray-700 mb-3">
+                            <div className="p-4 rounded-lg" style={{ background: colors.neutral50 }}>
+                                <p className="text-sm font-medium mb-3" style={{ color: colors.neutral800 }}>
                                     Selected Technologies ({selectedSkills.length})
                                 </p>
                                 <div className="flex flex-wrap gap-2">
@@ -233,8 +241,8 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         )}
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
                         Employment Timeline
                     </h3>
@@ -261,7 +269,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                                 helperText={Boolean(formik.touched.endDate && formik.errors.endDate) ? formik.errors.endDate : "Select the end date"}
                             />
                         </div>
-                        <div className="bg-blue-50 p-4 rounded-lg">
+                        <div className="p-4 rounded-lg" style={{ background: colors.neutral50 }}>
                             <AutoCompleteInput
                                 label="Employment Status"
                                 placeHolder="Select Employment Status"
@@ -277,9 +285,9 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         </div>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <div className="mt-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                             <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
                             Job Description
                         </h3>
@@ -295,23 +303,23 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         )}
                     </div>
                 </div>
-            </div>
-            <div className="mt-8 flex justify-between gap-3">
-                <Button
-                    label="Cancel"
-                    variant="tertiaryContained"
-                    onClick={onClose}
-                />
-                {mode !== MODE.VIEW && (
+                <div className="flex justify-between gap-3">
                     <Button
-                        label={mode === MODE.ADD ? "Add" : "Update"}
-                        variant="primaryContained"
-                        onClick={() => formik.handleSubmit()}
-                        disabled={formik.isSubmitting}
+                        label="Cancel"
+                        variant="tertiaryContained"
+                        onClick={onClose}
                     />
-                )}
+                    {mode !== MODE.VIEW && (
+                        <Button
+                            label={mode === MODE.ADD ? "Add" : "Update"}
+                            variant="primaryContained"
+                            onClick={() => formik.handleSubmit()}
+                            disabled={formik.isSubmitting}
+                        />
+                    )}
+                </div>
             </div>
-        </div>
+        </FormShell>
     );
 };
 

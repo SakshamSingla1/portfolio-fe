@@ -15,6 +15,9 @@ import { useCertificationService } from "../../../services/useCertificationServi
 import { HTTP_STATUS } from "../../../utils/types";
 import type { ImageUploadResponse } from "../../../services/useProfileService";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
+import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
@@ -43,6 +46,8 @@ const CertificationFormTemplate = ({
 
     const navigate = useNavigate();
     const certificationService = useCertificationService();
+    const colors = useColors();
+    const { isDark } = useTheme();
 
     const onClose = () => navigate(ADMIN_ROUTES.CERTIFICATIONS);
 
@@ -86,21 +91,25 @@ const CertificationFormTemplate = ({
         }
     };
 
+    const cardStyle: React.CSSProperties = {
+        background: colors.neutral0,
+        border: `1px solid ${colors.neutral200}`,
+    };
+
+    const sectionTitleStyle: React.CSSProperties = {
+        color: colors.neutral800,
+    };
 
     return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Add Certification" : mode === MODE.EDIT ? "Edit Certification" : "Certification Details"}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Add a professional certification" : mode === MODE.EDIT ? "Update certification information" : "View certification information"}
-                </p>
-            </div>
-
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+        <FormShell
+            title={mode === MODE.ADD ? "Add Certification" : mode === MODE.EDIT ? "Edit Certification" : "Certification Details"}
+            subtitle={mode === MODE.ADD ? "Add a professional certification" : mode === MODE.EDIT ? "Update certification information" : "View certification information"}
+            accentColor="#06b6d4"
+            onBack={() => navigate(-1)}
+        >
+            <div className="p-6 space-y-8">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
                         Basic Information
                     </h3>
@@ -133,8 +142,8 @@ const CertificationFormTemplate = ({
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
                         Certification Timeline
                     </h3>
@@ -160,8 +169,8 @@ const CertificationFormTemplate = ({
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
                         Credential Details
                     </h3>
@@ -203,8 +212,8 @@ const CertificationFormTemplate = ({
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-orange-500 rounded-full mr-3" />
                         Certification Status
                     </h3>
@@ -233,7 +242,7 @@ const CertificationFormTemplate = ({
                     )}
                 </div>
             </div>
-        </div>
+        </FormShell>
     );
 };
 

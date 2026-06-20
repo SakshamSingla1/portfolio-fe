@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { enumToNormalKey, makeRoute } from "../../../utils/helper";
+import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
+import ListingShell from "../Shared/ListingShell.template";
 import { type RoleListResponseDTO } from "../../../services/useRoleService";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
+import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import { ADMIN_ROUTES } from "../../../utils/constant";
-import { Status } from "../../../utils/types";
 
 interface RoleTableTemplateProps {
     users: RoleListResponseDTO[];
@@ -39,29 +40,13 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination
         navigate(makeRoute(ADMIN_ROUTES.ROLE_VIEW, { query, params: { id: id } }));
     }
 
-    const Action = (role: RoleListResponseDTO) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleView(role.id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-                <button onClick={() => handleEdit(role.id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-            </div>
-        );
-    };
+    const Action = (role: RoleListResponseDTO) => <ActionButtons onEdit={() => handleEdit(role.id)} onView={() => handleView(role.id)} />;
 
     const getRecords = () => users?.map((role: RoleListResponseDTO, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         role.name,
         role.description || '-',
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${role.status === Status.ACTIVE
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-            }`}>
-            {enumToNormalKey(role.status)}
-        </span>,
+        <ResourceStatus status={role.status} />,
         new Date(role.createdAt).toLocaleDateString(),
         Action(role)
     ])
@@ -102,7 +87,9 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
+        <ListingShell title="Roles" description="User roles and permissions" count={pagination.totalRecords} accentColor="#0ea5e9">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
     )
 }
 export default RoleTableTemplate;

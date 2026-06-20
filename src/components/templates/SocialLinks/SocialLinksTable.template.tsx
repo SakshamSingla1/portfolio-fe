@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import TableV1 from "../../organisms/Table/TableV1";
-import { FiEye, FiEdit } from "react-icons/fi";
+import ListingShell from "../Shared/ListingShell.template";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import { DateUtils, enumToNormalKey } from "../../../utils/helper";
 import type { SocialLinkResponse } from "../../../services/useSocialLinkService";
@@ -43,18 +44,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
         navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_VIEW, { query, params: { id: id } }));
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => socialLinks?.map((sl: SocialLinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -101,10 +91,9 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
     }, []);
 
     return (
-        <TableV1
-            schema={getSchema()}
-            records={getRecords()}
-        />
+        <ListingShell title="Social Links" description="Online profiles and presence" count={pagination.totalRecords} accentColor="#ec4899">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
     )
 }
 export default SocialLinksTableTemplate;

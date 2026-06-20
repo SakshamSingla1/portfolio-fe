@@ -4,8 +4,9 @@ import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
+import ListingShell from "../Shared/ListingShell.template";
 import { type SkillResponse } from "../../../services/useSkillService";
-import { FiEdit, FiEye } from "react-icons/fi";
+import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { convertToCamelCase } from "../../../utils/helper";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 
@@ -39,18 +40,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
         navigate(makeRoute(ADMIN_ROUTES.SKILL_VIEW, { query, params: { id: id } }));
     }
 
-    const Action = (id: string) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-                <button onClick={() => handleEdit(id)} className={`w-6 h-6`}>
-                    <FiEdit />
-                </button>
-                <button onClick={() => handleView(id)} className={`w-6 h-6`}>
-                    <FiEye />
-                </button>
-            </div>
-        );
-    };
+    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => skills?.map((skill: SkillResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -99,7 +89,9 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({ skills, paginat
     }, []);
 
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
-    )
+        <ListingShell title="Skills" description="Technical skills and expertise" count={pagination.totalRecords} accentColor="#6366f1">
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
+    );
 }
 export default SkillTableTemplate;
