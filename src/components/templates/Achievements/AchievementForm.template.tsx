@@ -35,7 +35,7 @@ const validationSchema = Yup.object({
 });
 
 interface AchievementFormProps {
-    onSubmit: (values: AchievementRequest) => void;
+    onSubmit: (values: AchievementRequest) => Promise<void>;
     mode: string;
     achievement?: Achievement | null;
 }
@@ -84,9 +84,10 @@ const AchievementFormTemplate = ({
         try {
             const response = await achievementService.uploadImage(file);
             if (response.status === HTTP_STATUS.OK) {
-                formik.setFieldValue("proofUrl", response.data.data.url);
-                formik.setFieldValue("proofPublicId", response.data.data.publicId);
-                return response.data.data;
+                const asset = response.data.data;
+                formik.setFieldValue("proofUrl", asset.path);
+                formik.setFieldValue("proofPublicId", asset.id);
+                return { url: asset.path, publicId: asset.id };
             }
             throw new Error();
         } catch {

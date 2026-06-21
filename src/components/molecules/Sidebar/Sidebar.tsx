@@ -252,11 +252,11 @@ const Sidebar: React.FC<{
               >
                 <h2 style={{
                   fontWeight: 800,
-                  fontSize: 16,
+                  fontSize: 15,
                   color: colors.neutral800,
                   margin: 0,
                   letterSpacing: "-0.5px"
-                }}>Portfolio</h2>
+                }}>Portfolios Builder</h2>
                 <p style={{
                   fontSize: 10,
                   color: colors.neutral500,

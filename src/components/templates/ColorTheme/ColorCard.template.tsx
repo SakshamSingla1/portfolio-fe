@@ -81,7 +81,8 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
           themeId: colorTheme.id
         });
         setDefaultTheme(colorTheme);
-      } catch (error) {
+      } catch {
+        // assignment failed; spinner stops in finally
       } finally {
         setIsAssigning(false);
       }

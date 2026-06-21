@@ -32,7 +32,7 @@ const validationSchema = Yup.object({
 });
 
 interface CertificationFormProps {
-    onSubmit: (values: CertificationRequest) => void;
+    onSubmit: (values: CertificationRequest) => Promise<void>;
     mode: string;
     certification?: Certification | null;
 }
@@ -77,9 +77,10 @@ const CertificationFormTemplate = ({
         try {
             const response = await certificationService.uploadCredential(file);
             if (response.status === HTTP_STATUS.OK) {
-                formik.setFieldValue("credentialUrl", response.data.data.url);
-                formik.setFieldValue("credentialId", response.data.data.publicId);
-                return response.data.data;
+                const asset = response.data.data;
+                formik.setFieldValue("credentialUrl", asset.path);
+                formik.setFieldValue("credentialId", asset.id);
+                return { url: asset.path, publicId: asset.id };
             }
             throw new Error();
         } catch {

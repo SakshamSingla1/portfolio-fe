@@ -84,10 +84,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     try {
       const response = await profileService.uploadProfileImage(file);
       if (response.status === HTTP_STATUS.OK) {
-        formik.setFieldValue("profileImageUrl", response.data.data.url);
-        formik.setFieldValue("profileImagePublicId", response.data.data.publicId);
+        const asset = response.data.data;
+        formik.setFieldValue("profileImageUrl", asset.path);
+        formik.setFieldValue("profileImagePublicId", asset.id);
         showSnackbar("success", "Profile image uploaded");
-        return response.data.data;
+        return { url: asset.path, publicId: asset.id };
       }
       throw new Error();
     } catch {
@@ -103,10 +104,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     try {
       const response = await profileService.uploadLogo(file);
       if (response.status === HTTP_STATUS.OK) {
-        formik.setFieldValue("logoUrl", response.data.data.url);
-        formik.setFieldValue("logoPublicId", response.data.data.publicId);
+        const asset = response.data.data;
+        formik.setFieldValue("logoUrl", asset.path);
+        formik.setFieldValue("logoPublicId", asset.id);
         showSnackbar("success", "Logo uploaded");
-        return response.data.data;
+        return { url: asset.path, publicId: asset.id };
       }
       throw new Error();
     } catch {
@@ -122,10 +124,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     try {
       const response = await profileService.uploadAboutMeImage(file);
       if (response.status === HTTP_STATUS.OK) {
-        formik.setFieldValue("aboutMeImageUrl", response.data.data.url);
-        formik.setFieldValue("aboutMeImagePublicId", response.data.data.publicId);
+        const asset = response.data.data;
+        formik.setFieldValue("aboutMeImageUrl", asset.path);
+        formik.setFieldValue("aboutMeImagePublicId", asset.id);
         showSnackbar("success", "About me image uploaded");
-        return response.data.data;
+        return { url: asset.path, publicId: asset.id };
       }
       throw new Error();
     } catch {

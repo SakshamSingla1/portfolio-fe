@@ -4,6 +4,7 @@ import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { type SkillDropdown } from "./useSkillService";
 import type { ImageValue } from "../utils/types";
+import useFileService from "./useFileService";
 
 export const AUTH_URLS = {
     GET_ALL: "/projects",
@@ -57,6 +58,7 @@ export interface ProjectFilterParams {
 
 export const useProjectService = () => {
     const { user } = useAuthenticatedUser();
+    const fileService = useFileService();
 
     const getAll = () => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
@@ -88,17 +90,8 @@ export const useProjectService = () => {
         return request(API_METHOD.GET, url, user, null, { params });
     };
 
-    const uploadProjectImage = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        const url = AUTH_URLS.IMAGE_UPLOAD;
-        return request(
-            API_METHOD.POST,
-            url,
-            user,
-            formData
-        );
-    };
+    const uploadProjectImage = (file: File) =>
+        fileService.upload(file, user?.id ?? "", "PROJECT");
 
     return {
         getAll,

@@ -2,6 +2,7 @@ import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
+import useFileService from "./useFileService";
 
 export const TESTIMONIAL_URLS = {
     GET_ALL: "/testimonials",
@@ -46,6 +47,7 @@ export interface TestimonialFilterParams {
 
 export const useTestimonialService = () => {
     const { user } = useAuthenticatedUser();
+    const fileService = useFileService();
     
     const create = (testimonial: TestimonialRequest) =>
         request(API_METHOD.POST, TESTIMONIAL_URLS.GET_ALL, user, testimonial);
@@ -70,17 +72,8 @@ export const useTestimonialService = () => {
         return request(API_METHOD.GET, url, user, null, {params});
     };
 
-    const uploadImage = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        const url = replaceUrlParams(TESTIMONIAL_URLS.UPLOAD_IMAGE, { id: user?.id });
-        return request(
-            API_METHOD.POST,
-            url,
-            user,
-            formData
-        );
-    };
+    const uploadImage = (file: File) =>
+        fileService.upload(file, user?.id ?? "", "TESTIMONIAL", { isPrimary: true });
 
     return {
         create,

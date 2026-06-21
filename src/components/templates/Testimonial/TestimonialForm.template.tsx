@@ -82,9 +82,10 @@ const TestimonialFormTemplate = ({
         try {
             const response = await testimonialService.uploadImage(file);
             if (response.status === HTTP_STATUS.OK) {
-                formik.setFieldValue("imageUrl", response.data.data.url);
-                formik.setFieldValue("imageId", response.data.data.publicId);
-                return response.data.data;
+                const asset = response.data.data;
+                formik.setFieldValue("imageUrl", asset.path);
+                formik.setFieldValue("imageId", asset.id);
+                return { url: asset.path, publicId: asset.id };
             }
             throw new Error();
         } catch {

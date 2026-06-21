@@ -181,13 +181,9 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     const classes = useStyles(colors);
     const [open, setOpen] = useState(false);
 
-    const debouncedSearch = useMemo(
-        () =>
-            useDebounce((val: string) => {
-                onSearch(val);
-            }, DEBOUNCE_TIME.DEFAULT),
-        [onSearch]
-    );
+    const debouncedSearch = useDebounce((val: string) => {
+        onSearch(val);
+    }, DEBOUNCE_TIME.DEFAULT);
 
     const handleChange = useCallback(
         (

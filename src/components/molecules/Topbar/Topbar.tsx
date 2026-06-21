@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { createUseStyles } from "react-jss";
-import { FiChevronRight } from "react-icons/fi";
+import { FiChevronRight, FiExternalLink } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { getBreadcrumbsFromUrl } from "../../../utils/helper";
@@ -82,6 +82,28 @@ const useStyles = createUseStyles({
     alignItems: "center",
     gap: 12,
   },
+
+  previewBtn: (c: any) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    padding: "0 12px",
+    height: 36,
+    borderRadius: 10,
+    cursor: "pointer",
+    background: "transparent",
+    border: `1px solid ${c.neutral200}`,
+    color: c.neutral600,
+    fontSize: 12,
+    fontWeight: 600,
+    transition: "all 0.2s ease",
+    whiteSpace: "nowrap",
+    "&:hover": {
+      background: c.neutral50,
+      borderColor: c.neutral300,
+      color: c.neutral800,
+    },
+  }),
 
   logoutBtn: (c: any) => ({
     display: "flex",
@@ -173,6 +195,14 @@ const Topbar: React.FC = () => {
       </div>
 
       <div className={classes.right}>
+        <button
+          className={classes.previewBtn}
+          onClick={() => navigate("/landing")}
+          title="Preview landing page"
+        >
+          <FiExternalLink size={13} />
+          Preview
+        </button>
         <button
           className={classes.logoutBtn}
           onClick={handleLogout}

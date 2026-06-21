@@ -189,9 +189,9 @@ function fixConfig(
   axiosInstance: AxiosInstance | AxiosStatic,
   config: AxiosRequestConfig
 ) {
-  // @ts-ignore
+  // @ts-expect-error agent is not in AxiosDefaults types
   if (axiosInstance.defaults.agent === config.agent) {
-    // @ts-ignore
+    // @ts-expect-error agent is not in AxiosRequestConfig types
     delete config.agent;
   }
   if (axiosInstance.defaults.httpAgent === config.httpAgent) {

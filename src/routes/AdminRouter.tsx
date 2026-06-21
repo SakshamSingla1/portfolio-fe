@@ -26,6 +26,7 @@ const LogoRoutes = lazy(() => import('./AdminRoutes/LogoRoutes'));
 const UserRoutes = lazy(() => import('./AdminRoutes/UserRoutes'));
 const RoleRoutes = lazy(() => import('./AdminRoutes/RoleRoutes'));
 const HelpRoutes = lazy(() => import('./AdminRoutes/HelpRoutes'));
+const LandingPage = lazy(() => import('../components/pages/Landing/Landing.page'));
 
 export const AdminRouter: React.FC = () => {
   const { showSnackbar } = useSnackbar();
@@ -92,6 +93,8 @@ export const AdminRouter: React.FC = () => {
           <Route path="roles-permissions/*" element={<div><RoleRoutes /></div>} />
           <Route path="help/*" element={<div><HelpRoutes /></div>} />
         </Route>
+        {/* Renders without admin chrome — full-screen landing preview */}
+        <Route path="landing" element={<LandingPage />} />
       </Routes>
     </Suspense>
   );

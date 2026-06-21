@@ -2,6 +2,7 @@ import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
+import useFileService from "./useFileService";
 
 export const ACHIEVEMENT_URLS = {
     GET_ALL: "/achievements",
@@ -44,6 +45,7 @@ export interface AchievementFilterParams {
 
 export const useAchievementService = () => {
     const { user } = useAuthenticatedUser();
+    const fileService = useFileService();
 
     const create = (achievement: AchievementRequest) =>
         request(API_METHOD.POST, ACHIEVEMENT_URLS.GET_ALL, user, achievement);
@@ -68,17 +70,8 @@ export const useAchievementService = () => {
         return request(API_METHOD.GET, url, user, null, { params: params });
     };
 
-    const uploadImage = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        const url = replaceUrlParams(ACHIEVEMENT_URLS.UPLOAD_IMAGE, { id: user?.id });
-        return request(
-            API_METHOD.POST,
-            url,
-            user,
-            formData
-        );
-    };
+    const uploadImage = (file: File) =>
+        fileService.upload(file, user?.id ?? "", "ACHIEVEMENT", { isPrimary: true });
 
     return {
         create,

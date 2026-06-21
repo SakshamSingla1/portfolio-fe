@@ -104,7 +104,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
             if (response?.status === HTTP_STATUS.OK) {
                 setSkills(response?.data?.data?.content);
             }
-        } catch (error) {
+        } catch {
             setSkills([]);
         }
     }, [skillService]);

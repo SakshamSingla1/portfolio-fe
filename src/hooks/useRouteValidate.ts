@@ -18,6 +18,7 @@ const useRouteValidate = () => {
   const allowedRoutes = useMemo(() => {
     const routes = new Set<string>();
     routes.add("/admin");
+    routes.add("/landing");
 
     if (rolePermissions?.navLinks?.length) {
       rolePermissions.navLinks.forEach((link: ModulePermissionDTO) => {

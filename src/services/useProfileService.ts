@@ -2,6 +2,7 @@ import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
+import useFileService from "./useFileService";
 
 // =========================
 // URLS
@@ -109,6 +110,7 @@ export interface GetProfilesParams {
 // =========================
 export const useProfileService = () => {
     const { user } = useAuthenticatedUser();
+    const fileService = useFileService();
 
     // =========================
     // PROFILE
@@ -124,41 +126,14 @@ export const useProfileService = () => {
     // =========================
     // IMAGE UPLOADS
     // =========================
-    const uploadProfileImage = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
+    const uploadProfileImage = (file: File) =>
+        fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: true, sortOrder: 0 });
 
-        return request(
-            API_METHOD.PUT,
-            replaceUrlParams(PROFILE_URLS.UPLOAD_PROFILE_IMAGE, { id: user?.id }),
-            user,
-            formData
-        );
-    };
+    const uploadLogo = (file: File) =>
+        fileService.upload(file, user?.id ?? "", "LOGO", { isPrimary: true, sortOrder: 0 });
 
-    const uploadLogo = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        return request(
-            API_METHOD.PUT,
-            replaceUrlParams(PROFILE_URLS.UPLOAD_LOGO, { id: user?.id }),
-            user,
-            formData
-        );
-    };
-
-    const uploadAboutMeImage = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        return request(
-            API_METHOD.PUT,
-            replaceUrlParams(PROFILE_URLS.UPLOAD_ABOUT_ME_IMAGE, { id: user?.id }),
-            user,
-            formData
-        );
-    };
+    const uploadAboutMeImage = (file: File) =>
+        fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: false, sortOrder: 1 });
 
     // =========================
     // ADMIN APIs

@@ -72,7 +72,7 @@ const ChangeEmailTab: React.FC = () => {
                 newEmail: formik.values.newEmail,
             });
             showSnackbar("success", "OTP resent successfully");
-        } catch (error: any) {
+        } catch {
             showSnackbar("error", "Failed to resend OTP");
         }
     };

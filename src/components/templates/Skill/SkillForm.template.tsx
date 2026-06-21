@@ -76,7 +76,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                     if (existing) setSelectedLogo(existing);
                 }
             }
-        } catch (error) {
+        } catch {
             setLogos([]);
         }
     }, [logoService, formik.values.logoId]);

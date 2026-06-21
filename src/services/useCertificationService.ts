@@ -2,6 +2,7 @@ import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
+import useFileService from "./useFileService";
 
 export const CERTIFICATION_URLS = {
     GET_ALL: "/certifications",
@@ -44,6 +45,7 @@ export interface CertificationFilterParams {
 
 export const useCertificationService = () => {
     const { user } = useAuthenticatedUser();
+    const fileService = useFileService();
 
     const create = (certification: CertificationRequest) =>
         request(API_METHOD.POST, CERTIFICATION_URLS.GET_ALL, user, certification);
@@ -68,17 +70,8 @@ export const useCertificationService = () => {
         return request(API_METHOD.GET, url, user, null, { params: params });
     };
 
-    const uploadCredential = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        const url = replaceUrlParams(CERTIFICATION_URLS.UPLOAD_CREDENTIAL, { id: user?.id });
-        return request(
-            API_METHOD.POST,
-            url,
-            user,
-            formData
-        );
-    };
+    const uploadCredential = (file: File) =>
+        fileService.upload(file, user?.id ?? "", "CERTIFICATION", { isPrimary: true });
 
     return {
         create,

@@ -66,13 +66,11 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
     try {
       const response = await profileService.uploadLogo(file);
       if (response.status === HTTP_STATUS.OK) {
-        const uploaded = response.data.data;
-        formik.setFieldValue("url", uploaded.url);
-        return uploaded;
+        const asset = response.data.data;
+        formik.setFieldValue("url", asset.path);
+        return { url: asset.path, publicId: asset.id };
       }
       throw new Error("Upload failed");
-    } catch (error) {
-      throw error;
     } finally {
       setIsUploading((prev) => ({ ...prev, logo: false }));
     }

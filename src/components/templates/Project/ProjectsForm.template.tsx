@@ -45,7 +45,7 @@ const validationSchema = Yup.object({
 });
 
 interface ProjectFormProps {
-    onSubmit: (values: Project) => void;
+    onSubmit: (values: Project) => Promise<void>;
     mode: string;
     projects?: ProjectResponse | null;
 }
@@ -109,11 +109,9 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         try {
             const response = await projectService.uploadProjectImage(file);
             if (response.status === HTTP_STATUS.OK) {
-                addProjectImage(
-                    { url: response.data.data.url, publicId: response.data.data.publicId },
-                    index
-                );
-                return response.data.data;
+                const asset = response.data.data;
+                addProjectImage({ url: asset.path, publicId: asset.id }, index);
+                return { url: asset.path, publicId: asset.id };
             }
             throw new Error("Upload failed");
         } catch {

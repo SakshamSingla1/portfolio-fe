@@ -95,7 +95,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 url: result.url,
                 publicId: result.publicId
             });
-        } catch (err) {
+        } catch {
             setUploadError('Upload failed. Please try again.');
             setPreviewImage(value?.url || null);
         } finally {
