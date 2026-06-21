@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LogIn, BarChart2, Globe, LayoutDashboard, Lock, Palette, Zap, CheckCircle,
-  Server, Code2, Database, Image, Layers, RefreshCw, ChevronDown, ChevronRight,
+  LogIn, BarChart2, Globe, LayoutDashboard, Lock, Palette, CheckCircle,
+  Server, Code2, Database, Image, Layers, ChevronDown, ChevronRight,
   Star, ArrowRight, Shield, Eye, Briefcase, Award, GraduationCap, MessageSquare,
-  Mail, Terminal, Monitor, Cpu, Cloud,
+  Terminal, Monitor, Cpu, Cloud,
 } from 'lucide-react';
 
 interface LandingProps {
@@ -30,11 +30,13 @@ const C = {
   muted: '#52525B',
 };
 
+const CUBIC: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 } as const,
+  whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as number[], delay },
+  transition: { duration: 0.55, ease: CUBIC, delay },
 });
 
 // ── Data ────────────────────────────────────────────────────────────────────

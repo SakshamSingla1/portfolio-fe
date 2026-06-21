@@ -31,6 +31,7 @@
     "formik": "^2.4.6",
     "framer-motion": "^12.23.0",
     "github-calendar": "^2.3.4",
+    "i18next": "^26.3.1",
     "jodit": "^4.6.2",
     "jodit-react": "^5.2.19",
     "jss": "^10.10.0",
