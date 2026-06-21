@@ -32,7 +32,7 @@ const ViewCertificationPage = () => {
     return (
         <div>
             <CertificationFormTemplate
-                onSubmit={() => { }}
+                onSubmit={async () => { }}
                 mode={MODE.VIEW}
                 certification={certification}
             />

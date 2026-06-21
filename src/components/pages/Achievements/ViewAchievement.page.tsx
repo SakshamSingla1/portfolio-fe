@@ -32,7 +32,7 @@ const ViewAchievementPage = () => {
     return (
         <div>
             <AchievementFormTemplate
-                onSubmit={() => { }}
+                onSubmit={async () => { }}
                 mode={MODE.VIEW}
                 achievement={achievement}
             />

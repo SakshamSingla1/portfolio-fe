@@ -32,7 +32,7 @@ const ViewProjectPage = () => {
     return (
         <div>
             <ProjectFormTemplate
-                onSubmit={() => { }}
+                onSubmit={async () => { }}
                 mode={MODE.VIEW}
                 projects={project}
             />
