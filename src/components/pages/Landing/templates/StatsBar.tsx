@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { LuLayers, LuDatabase, LuPalette, LuZap } from 'react-icons/lu';
 import { C, fadeUp } from '../constants';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LuChevronDown } from 'react-icons/lu';
 import { C, CUBIC, fadeUp } from '../constants';

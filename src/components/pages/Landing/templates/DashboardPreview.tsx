@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { C, fadeUp } from '../constants';
 import { SectionLabel, SectionTitle } from '../SectionPrimitives';

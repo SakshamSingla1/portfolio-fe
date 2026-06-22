@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { LuLayoutDashboard, LuGlobe, LuPalette, LuChartBar, LuCloud, LuLock } from 'react-icons/lu';
 import { C, fadeUp } from '../constants';

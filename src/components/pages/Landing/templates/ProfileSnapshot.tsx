@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { LuMonitor, LuCode, LuBriefcase, LuAward, LuStar, LuCircleCheck, LuGraduationCap, LuGlobe } from 'react-icons/lu';
 import { C, fadeUp } from '../constants';

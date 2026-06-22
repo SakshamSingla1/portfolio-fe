@@ -1,4 +1,3 @@
-import React from 'react';
 import { LuServer, LuCode, LuImage, LuDatabase } from 'react-icons/lu';
 import { C } from '../constants';
 

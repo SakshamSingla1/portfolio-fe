@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { LuLogIn } from 'react-icons/lu';
 import { C, CUBIC } from '../constants';
