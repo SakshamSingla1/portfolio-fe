@@ -505,10 +505,10 @@ export const ROLES = {
 };
 
 export const RESOURCE_STATUS = {
-    ACTIVE: "Active",
-    INACTIVE: "Inactive",
-    BLOCKED: "Blocked",
-    DELETED: "Deleted",
+    ACTIVE: "ACTIVE",
+    INACTIVE: "INACTIVE",
+    BLOCKED: "BLOCKED",
+    DELETED: "DELETED",
 }
 
 

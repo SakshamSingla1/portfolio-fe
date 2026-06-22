@@ -22,10 +22,10 @@ interface INavlinkListTableTemplateProps {
     filterContent?: React.ReactNode;
 }
 
-const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ 
-    navlinks, 
-    pagination, 
-    handlePaginationChange, 
+const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
+    navlinks,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
@@ -100,12 +100,12 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
     });
 
     return (
-        <ListingShell 
-            title="Navigation Links" 
-            description="Portfolio navigation menu" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Navigation Link" 
+        <ListingShell
+            title="Navigation Links"
+            description="Portfolio navigation menu"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Navigation Link"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.NAVLINKS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
