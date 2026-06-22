@@ -96,7 +96,7 @@ export const AdminRouter: React.FC = () => {
           <Route path="landing-management/*" element={<div><LandingRoutes /></div>} />
         </Route>
         {/* Renders without admin chrome — full-screen landing preview */}
-        <Route path="landing" element={<LandingPage />} />
+        <Route path="" element={<LandingPage />} />
       </Routes>
     </Suspense>
   );

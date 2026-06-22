@@ -156,6 +156,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
             padding: "6px 32px 6px 12px !important",
             minHeight: "24px",
             alignItems: "center",
+            color: "var(--color-neutral-900)",
           },
           "& .MuiSelect-icon": {
             color: "var(--color-neutral-500)",
@@ -191,7 +192,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
         }
       >
         {searchable && (
-          <div className="sticky top-0 z-10 bg-white px-4 py-3 border-b border-gray-100">
+          <div className="sticky top-0 z-10 px-4 py-3 border-b border-gray-100" style={{ backgroundColor: "var(--color-neutral-0)" }}>
             <TextField
               size="small"
               placeholder="Search options..."
@@ -233,8 +234,8 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
         {showSelectAll && !isSingleSelect && <Divider className="my-1 opacity-60" />}
 
         <div
-          className="overflow-y-auto bg-white scrollbar-thin scrollbar-thumb-gray-200"
-          style={{ maxHeight }}
+          className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200"
+          style={{ maxHeight, backgroundColor: "var(--color-neutral-0)" }}
         >
           {filteredOptions.length === 0 ? (
             <div className="py-8 text-center text-gray-400 text-sm select-none">
@@ -277,7 +278,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
 
         <Divider className="my-1 opacity-60" />
 
-        <div className="sticky bottom-0 z-10 bg-white px-4 py-3 border-t border-gray-100 flex justify-between gap-3">
+        <div className="sticky bottom-0 z-10 px-4 py-3 border-t border-gray-100 flex justify-between gap-3" style={{ backgroundColor: "var(--color-neutral-0)" }}>
           <Button
             variant="secondaryContained"
             label="Clear"

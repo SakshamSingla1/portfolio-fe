@@ -87,6 +87,7 @@ const Select: React.FC<SelectProps> = ({
             padding: "13px 16px",
             display: "flex",
             alignItems: "center",
+            color: "var(--color-neutral-900)",
           },
           "& .MuiOutlinedInput-notchedOutline": {
             border: "none",

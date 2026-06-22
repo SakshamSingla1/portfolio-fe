@@ -43,6 +43,9 @@ const TextField: React.FC<Props> = ({
           ),
         }}
         sx={{
+          "& .MuiInputBase-root": {
+            color: "var(--color-neutral-900)",
+          },
           "& .MuiOutlinedInput-notchedOutline": {
             border: "none",
           },
