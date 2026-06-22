@@ -1,0 +1,33 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="100" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4B5EFF"/>
+      <stop offset="100%" stop-color="#00D4FF"/>
+    </linearGradient>
+  </defs>
+  <!-- Scaled B mark within a 100x100 square (letterform is ~76x95, centred) -->
+  <path fill-rule="evenodd" fill="url(#g)" d="
+    M 14 5
+    Q 8 5 8 11
+    L 8 89
+    Q 8 95 14 95
+    L 52 95
+    Q 78 95 78 74
+    Q 78 56 58 51
+    Q 76 46 76 28
+    Q 76 5 52 5
+    Z
+    M 22 15
+    L 46 15
+    Q 62 15 62 29
+    Q 62 43 46 43
+    L 22 43
+    Z
+    M 22 59
+    L 48 59
+    Q 66 59 66 73
+    Q 66 87 48 87
+    L 22 87
+    Z
+  "/>
+</svg>

@@ -94,6 +94,8 @@ export const ADMIN_ROUTES = {
     USER_EDIT: "/users/:id/edit",
     USER_VIEW: "/users/:id",
 
+    LANDING_MANAGEMENT: "/landing-management",
+
     ROLE: "/roles-permissions",
     ROLE_ADD: "/roles-permissions/add",
     ROLE_EDIT: "/roles-permissions/:id/edit",
