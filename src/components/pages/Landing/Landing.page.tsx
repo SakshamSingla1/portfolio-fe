@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import usePlatformSettingsService from '../../../services/usePlatformSettingsService';
+import useLandingPageService from '../../../services/useLandingPageService';
+import type { LandingPageData } from '../../../services/useLandingPageService';
 import {
   LogIn, BarChart2, Globe, LayoutDashboard, Lock, Palette, CheckCircle,
   Server, Code2, Image, Layers, ChevronDown, ChevronRight,
@@ -41,6 +43,29 @@ const C = {
 };
 
 const CUBIC: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+// ── Icon + color resolution maps ─────────────────────────────────────────────
+
+const ICON_MAP: Record<string, React.ElementType> = {
+  LayoutDashboard, Globe, Palette, BarChart2, Cloud, Lock, Shield, Database,
+  Terminal, Monitor, Code2, Award, Star, CheckCircle, Zap, Users, Server,
+  Image, GitBranch, Activity, Eye, TrendingUp, MessageSquare, Briefcase,
+  GraduationCap, Layers, ArrowRight,
+};
+
+const COLOR_MAP: Record<string, string> = {
+  teal: '#14B8A0', tealLight: '#2DD4BF',
+  blue: '#3B82F6', blueLight: '#60A5FA',
+  purple: '#8B5CF6', purpleLight: '#A78BFA',
+  amber: '#F59E0B', red: '#EF4444', green: '#22C55E',
+  cyan: '#06B6D4', orange: '#F97316', pink: '#EC4899',
+};
+
+const resolveIcon = (name: string): React.ElementType =>
+  ICON_MAP[name] ?? CheckCircle;
+
+const resolveColor = (key: string): string =>
+  COLOR_MAP[key] ?? '#14B8A0';
 
 const fadeUp = (delay = 0, dur = 0.55) => ({
   initial: { opacity: 0, y: 22 },
@@ -137,6 +162,46 @@ const ARCHITECTURE_STEPS = [
     title: 'Public Portfolio',
     label: 'portfolio-main · :5173',
     desc: 'Anyone with the link sees this. Reads from the same API and renders your portfolio beautifully — no login required.',
+  },
+];
+
+const HOW_TO_USE_STEPS = [
+  {
+    step: '01', color: C.purple, icon: Shield,
+    title: 'Login to your admin dashboard',
+    bullets: [
+      'Navigate to your portfolio-fe deployment URL',
+      'Enter credentials to receive a signed JWT token',
+      'Session stays active until you sign out',
+    ],
+  },
+  {
+    step: '02', color: C.teal, icon: Database,
+    title: 'Build your profile',
+    bullets: [
+      'Fill in About, skills, work experience, and education',
+      'Upload profile photo and project images — all stored on Cloudinary',
+      'Add projects with live demo links, GitHub URLs, and tech tags',
+      'Create certifications with credential IDs and verification links',
+    ],
+  },
+  {
+    step: '03', color: C.blue, icon: Palette,
+    title: 'Customise your theme',
+    bullets: [
+      'Choose from 10+ colour palettes in the Theme settings',
+      'The public portfolio reflects the change on next page load',
+      'No CSS knowledge or rebuild required',
+    ],
+  },
+  {
+    step: '04', color: C.amber, icon: Eye,
+    title: 'Share your live portfolio',
+    bullets: [
+      "Your public portfolio is already live at portfolio-main's URL",
+      'Paste the link in job applications, LinkedIn, or your email signature',
+      'Watch visitor analytics in the dashboard Overview panel',
+    ],
   },
 ];
 
@@ -532,16 +597,22 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
   const [bannerUrl, setBannerUrl] = useState<string | null>(null);
   const [profileMaster, setProfileMaster] = useState<any>(null);
   const [apiStatus, setApiStatus] = useState<'loading' | 'ok' | 'down'>('loading');
+  const [landingData, setLandingData] = useState<LandingPageData | null>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const heroRef = useRef<HTMLDivElement>(null);
   const platformSettingsService = usePlatformSettingsService();
+  const landingService = useLandingPageService();
 
   useEffect(() => {
     platformSettingsService.getSettings().then((res: any) => {
       const url = res?.data?.data?.bannerImageUrl;
       if (url) setBannerUrl(url);
     });
+
+    landingService.getPage().then((res: any) => {
+      if (res?.data?.data) setLandingData(res.data.data);
+    }).catch(() => {});
 
     fetch('/api/v1/health')
       .then((r) => setApiStatus(r.ok ? 'ok' : 'down'))
@@ -563,6 +634,40 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
 
   const springX = useSpring(mouseX, { stiffness: 60, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 60, damping: 20 });
+
+  // ── Backend-driven config + derived display arrays ────────────────────────
+  const cfg = landingData?.config;
+
+  const heroEyebrow = cfg?.heroEyebrow || 'Full-Stack Portfolio Platform';
+  const heroHeadline1 = cfg?.heroHeadline1 || 'Your portfolio,';
+  const heroHeadline2 = cfg?.heroHeadline2 || 'fully managed.';
+  const heroDescription = cfg?.heroDescription || 'A three-app system — admin dashboard, REST API, and public portfolio — that lets you manage your entire professional story from one place, without ever editing code.';
+  const heroPrimaryCtaText = cfg?.heroPrimaryCtaText || 'Open Dashboard';
+  const heroSecondaryCtaText = cfg?.heroSecondaryCtaText || 'How it works';
+  const heroTrustBadges = cfg?.heroTrustBadges?.length ? cfg.heroTrustBadges : ['Self-hosted', 'No vendor lock-in', 'JWT secured', 'Cloudinary CDN'];
+  const ctaBadgeText = cfg?.ctaBadgeText || 'Ready to get started?';
+  const ctaHeadline = cfg?.ctaHeadline || 'Your professional story deserves a great home';
+  const ctaDescription = cfg?.ctaDescription || 'Log in to your admin dashboard and start building. Add your first experience entry, upload a project screenshot, and watch your public portfolio come to life — in minutes.';
+  const ctaButtonText = cfg?.ctaButtonText || 'Open Dashboard';
+  const ctaTrustPoints = cfg?.ctaTrustPoints?.length ? cfg.ctaTrustPoints : ['No credit card required', 'Fully self-hosted', 'Open source'];
+
+  const activeFeatures = landingData?.features?.filter(f => f.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
+  const displayFeatures = activeFeatures.length > 0
+    ? activeFeatures.map(f => ({ icon: resolveIcon(f.iconName), color: resolveColor(f.colorKey), title: f.title, desc: f.description }))
+    : FEATURES;
+
+  const activeFaqs = landingData?.faqs?.filter(f => f.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
+  const displayFaqs = activeFaqs.length > 0
+    ? activeFaqs.map(f => ({ q: f.question, a: f.answer }))
+    : FAQS;
+
+  const activeSteps = landingData?.steps?.filter(s => s.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
+  const displaySteps = activeSteps.length > 0
+    ? activeSteps.map(s => ({ step: s.stepNumber, color: resolveColor(s.colorKey), icon: resolveIcon(s.iconName), title: s.title, bullets: s.bullets }))
+    : null;
+
+  const activeAudience = landingData?.audienceCards?.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
+  const activeTestimonials = landingData?.testimonials?.filter(t => t.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
 
   return (
     <div style={{
@@ -714,13 +819,13 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 transition={{ duration: 2, repeat: Infinity }}
                 style={{ width: 6, height: 6, borderRadius: '50%', background: C.teal, display: 'inline-block', flexShrink: 0 }}
               />
-              Full-Stack Portfolio Platform
+              {heroEyebrow}
             </motion.div>
 
             {/* Headline */}
             <motion.div variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: CUBIC } } }}>
               <h1 style={{ fontWeight: 900, fontSize: 'clamp(44px, 6vw, 80px)', lineHeight: 0.95, letterSpacing: '-0.045em', margin: 0, color: C.text }}>
-                Your portfolio,
+                {heroHeadline1}
               </h1>
               <h1 style={{
                 fontWeight: 900,
@@ -733,7 +838,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}>
-                fully managed.
+                {heroHeadline2}
               </h1>
             </motion.div>
 
@@ -742,7 +847,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.1 } } }}
               style={{ fontSize: 'clamp(14px, 1.5vw, 17px)', lineHeight: 1.8, color: C.textSub, maxWidth: 480, margin: '0 0 36px' }}
             >
-              A three-app system — admin dashboard, REST API, and public portfolio — that lets you manage your entire professional story from one place, without ever editing code.
+              {heroDescription}
             </motion.p>
 
             {/* CTAs */}
@@ -762,7 +867,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                   boxShadow: `0 0 28px rgba(20,184,160,0.38)`,
                 }}
               >
-                <LogIn size={16} /> Open Dashboard
+                <LogIn size={16} /> {heroPrimaryCtaText}
               </motion.button>
 
               <a
@@ -777,7 +882,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 onMouseEnter={(e) => { e.currentTarget.style.color = C.text; e.currentTarget.style.borderColor = C.tealBorder; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = C.textSub; e.currentTarget.style.borderColor = C.borderMid; }}
               >
-                How it works <ArrowRight size={14} />
+                {heroSecondaryCtaText} <ArrowRight size={14} />
               </a>
             </motion.div>
 
@@ -786,7 +891,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4, delay: 0.4 } } }}
               style={{ display: 'flex', gap: 22, marginTop: 28, flexWrap: 'wrap' }}
             >
-              {['Self-hosted', 'No vendor lock-in', 'JWT secured', 'Cloudinary CDN'].map((t) => (
+              {heroTrustBadges.map((t) => (
                 <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: C.muted, fontFamily: 'monospace' }}>
                   <CheckCircle size={12} style={{ color: C.teal, flexShrink: 0 }} /> {t}
                 </span>
@@ -1082,7 +1187,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           </motion.div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-            {FEATURES.map(({ icon: Icon, color, title, desc }, i) => (
+            {displayFeatures.map(({ icon: Icon, color, title, desc }, i) => (
               <motion.div
                 key={title}
                 {...fadeUp(i * 0.07)}
@@ -1227,49 +1332,11 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {[
-              {
-                step: '01', color: C.purple, icon: Shield,
-                title: 'Login to your admin dashboard',
-                bullets: [
-                  'Navigate to your portfolio-fe deployment URL',
-                  'Enter credentials to receive a signed JWT token',
-                  'Session stays active until you sign out',
-                ],
-              },
-              {
-                step: '02', color: C.teal, icon: Database,
-                title: 'Build your profile',
-                bullets: [
-                  'Fill in About, skills, work experience, and education',
-                  'Upload profile photo and project images — all stored on Cloudinary',
-                  'Add projects with live demo links, GitHub URLs, and tech tags',
-                  'Create certifications with credential IDs and verification links',
-                ],
-              },
-              {
-                step: '03', color: C.blue, icon: Palette,
-                title: 'Customise your theme',
-                bullets: [
-                  'Choose from 10+ colour palettes in the Theme settings',
-                  'The public portfolio reflects the change on next page load',
-                  'No CSS knowledge or rebuild required',
-                ],
-              },
-              {
-                step: '04', color: C.amber, icon: Eye,
-                title: 'Share your live portfolio',
-                bullets: [
-                  'Your public portfolio is already live at portfolio-main\'s URL',
-                  'Paste the link in job applications, LinkedIn, or your email signature',
-                  'Watch visitor analytics in the dashboard Overview panel',
-                ],
-              },
-            ].map(({ step, color, icon: Icon, title, bullets }, i) => (
+            {(displaySteps ?? HOW_TO_USE_STEPS).map(({ step, color, icon: Icon, title, bullets }, i, arr) => (
               <motion.div key={step} {...fadeUp(i * 0.1)}>
                 <div style={{
                   display: 'flex', gap: 32, padding: '40px 0',
-                  borderBottom: i < 3 ? `1px solid ${C.border}` : undefined,
+                  borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : undefined,
                 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                     <div style={{
@@ -1280,7 +1347,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                     }}>
                       <Icon size={22} />
                     </div>
-                    {i < 3 && (
+                    {i < arr.length - 1 && (
                       <div style={{ width: 1, flex: 1, minHeight: 24, background: `linear-gradient(to bottom, ${color}35, transparent)` }} />
                     )}
                   </div>
@@ -1352,6 +1419,109 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         </motion.div>
       </section>
 
+      {/* ── Audience cards (dynamic) ──────────────────────────── */}
+      {activeAudience.length > 0 && (
+        <section style={{ padding: '80px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
+              <SectionLabel>Who this is for</SectionLabel>
+              <SectionTitle>Built for every professional</SectionTitle>
+            </motion.div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+              {activeAudience.map((aud, i) => {
+                const AudIcon = resolveIcon(aud.iconName);
+                const audColor = resolveColor(aud.colorKey);
+                return (
+                  <motion.div key={aud.id ?? i} {...fadeUp(i * 0.07)}>
+                    <div style={{
+                      padding: '26px 24px', borderRadius: 18,
+                      background: C.surface, border: `1px solid ${C.border}`,
+                      height: '100%',
+                    }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: 12,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: `${audColor}10`, border: `1px solid ${audColor}22`, color: audColor,
+                        marginBottom: 16,
+                      }}>
+                        <AudIcon size={20} />
+                      </div>
+                      <h3 style={{ fontWeight: 700, fontSize: 14.5, marginBottom: 8, color: C.text }}>{aud.title}</h3>
+                      <p style={{ fontSize: 12.5, lineHeight: 1.75, color: C.textSub, margin: 0 }}>{aud.description}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Testimonials (dynamic) ────────────────────────────── */}
+      {activeTestimonials.length > 0 && (
+        <section style={{ padding: '80px clamp(20px, 5vw, 72px)', background: C.surface, position: 'relative', zIndex: 1 }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
+              <SectionLabel>What people say</SectionLabel>
+              <SectionTitle>Trusted by developers</SectionTitle>
+            </motion.div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+              {activeTestimonials.map((t, i) => (
+                <motion.div key={t.id ?? i} {...fadeUp(i * 0.08)}>
+                  <div style={{
+                    padding: '28px 26px', borderRadius: 18,
+                    background: C.bg, border: `1px solid ${C.border}`,
+                    height: '100%', display: 'flex', flexDirection: 'column', gap: 16,
+                  }}>
+                    <div style={{ fontSize: 36, lineHeight: 1, color: `${C.teal}35`, fontFamily: 'Georgia, serif' }}>"</div>
+                    <p style={{ fontSize: 13.5, lineHeight: 1.8, color: C.textSub, margin: 0, flex: 1 }}>{t.content}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {t.avatarUrl ? (
+                        <img src={t.avatarUrl} alt={t.authorName} style={{
+                          width: 40, height: 40, borderRadius: '50%',
+                          border: `2px solid ${C.tealBorder}`, objectFit: 'cover', flexShrink: 0,
+                        }} />
+                      ) : (
+                        <div style={{
+                          width: 40, height: 40, borderRadius: '50%',
+                          background: `${C.teal}20`, border: `2px solid ${C.tealBorder}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 16, color: C.teal, fontWeight: 700, flexShrink: 0,
+                        }}>
+                          {t.authorName.charAt(0)}
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{t.authorName}</div>
+                        <div style={{ fontSize: 11.5, color: C.muted }}>
+                          {t.authorRole}{t.authorCompany ? ` · ${t.authorCompany}` : ''}
+                        </div>
+                      </div>
+                      {t.linkedinUrl && (
+                        <a
+                          href={t.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: C.muted, transition: 'color 0.2s', flexShrink: 0 }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = C.blue; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = C.muted; }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                            <rect x="2" y="9" width="4" height="12"/>
+                            <circle cx="4" cy="4" r="2"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── FAQ ───────────────────────────────────────────────── */}
       <section id="faq" style={{ padding: '80px clamp(20px, 5vw, 72px)', background: C.surface, position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -1361,7 +1531,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {FAQS.map(({ q, a }, i) => (
+            {displayFaqs.map(({ q, a }, i) => (
               <motion.div key={i} {...fadeUp(i * 0.05)}>
                 <div style={{
                   borderRadius: 12, background: C.bg,
@@ -1432,17 +1602,17 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             fontSize: 10.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.12em',
             color: C.teal, background: C.tealDim, border: `1px solid ${C.tealBorder}`,
           }}>
-            Ready to get started?
+            {ctaBadgeText}
           </div>
 
           <h2 style={{
             fontWeight: 800, fontSize: 'clamp(26px, 4vw, 42px)', letterSpacing: '-0.03em',
             lineHeight: 1.15, marginBottom: 14, position: 'relative',
           }}>
-            Your professional story deserves a great home
+            {ctaHeadline}
           </h2>
           <p style={{ fontSize: 15, color: C.textSub, marginBottom: 36, position: 'relative', lineHeight: 1.75 }}>
-            Log in to your admin dashboard and start building. Add your first experience entry, upload a project screenshot, and watch your public portfolio come to life — in minutes.
+            {ctaDescription}
           </p>
 
           <motion.button
@@ -1457,11 +1627,11 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               boxShadow: `0 0 32px rgba(20,184,160,0.38)`, position: 'relative',
             }}
           >
-            <LogIn size={17} /> Open Dashboard
+            <LogIn size={17} /> {ctaButtonText}
           </motion.button>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 24, flexWrap: 'wrap' }}>
-            {['No credit card required', 'Fully self-hosted', 'Open source'].map((t) => (
+            {ctaTrustPoints.map((t) => (
               <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: C.muted, fontFamily: 'monospace' }}>
                 <CheckCircle size={12} style={{ color: C.teal }} /> {t}
               </span>

@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CircularProgress } from '@mui/material';
 import {
-    LuLayoutDashboard, LuZap, LuMessageSquare, LuLayers, LuGlobe, LuStar,
+    LuLayoutDashboard, LuZap, LuMessageSquare, LuLayers, LuGlobe, LuStar, LuImage,
 } from 'react-icons/lu';
+import BannerTab from '../../templates/Settings/BannerTab';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import useLandingPageService from '../../../services/useLandingPageService';
 import type {
@@ -239,6 +240,12 @@ const LandingManagement = () => {
                     onDelete={id => confirmDelete('testimonial', id)}
                 />
             ),
+        },
+        {
+            label: 'Dashboard Banner',
+            value: 'banner',
+            icon: <LuImage size={14} />,
+            component: <BannerTab />,
         },
     ];
 
