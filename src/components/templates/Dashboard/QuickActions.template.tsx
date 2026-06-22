@@ -46,7 +46,7 @@ const QuickActionsTemplate: React.FC = () => {
             style={{
               padding: "16px 14px 14px",
               background: isDark ? colors.neutral100 : colors.neutral0,
-              border: `1px solid ${colors.neutral200}`,
+              border: `1.5px solid ${colors.neutral300}`,
               borderRadius: 14,
               cursor: "pointer",
               outline: "none",

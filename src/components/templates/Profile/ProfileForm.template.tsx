@@ -24,7 +24,7 @@ const SectionCard = ({ title, subtitle, icon: Icon, actions, children, }: {
 }) => {
   const colors = useColors();
   return (
-    <section className="rounded-2xl border p-4 sm:p-6 space-y-6" style={{ background: colors.neutral0, borderColor: colors.neutral200, boxShadow: `0 1px 4px rgba(0,0,0,0.04)` }}>
+    <section className="rounded-2xl border p-4 sm:p-6 space-y-6" style={{ background: colors.neutral0, borderColor: colors.neutral300, boxShadow: `0 1px 4px rgba(0,0,0,0.04)` }}>
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-lg shrink-0" style={{ backgroundColor: colors.primary50 }}>

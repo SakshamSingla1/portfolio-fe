@@ -76,7 +76,7 @@ const StyledButton = styled(MuiButton, {
     tertiaryContained: {
       backgroundColor: colors.neutral0,
       color: colors.neutral700,
-      border: `1px solid ${colors.neutral200}`,
+      border: `1.5px solid ${colors.neutral300}`,
       "&:hover": { 
         backgroundColor: colors.neutral50,
         borderColor: colors.neutral300,

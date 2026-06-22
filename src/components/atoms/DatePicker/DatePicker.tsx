@@ -76,7 +76,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                             sx: {
                                 "& .MuiPaper-root": {
                                     backgroundColor: colors.neutral0,
-                                    border: `1px solid ${colors.neutral200}`,
+                                    border: `1.5px solid ${colors.neutral300}`,
                                     boxShadow: `0 12px 32px -4px ${colors.neutral900}30`,
                                     borderRadius: "16px",
                                     color: colors.neutral900,

@@ -123,7 +123,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                         sx: {
                             borderRadius: '14px',
                             boxShadow: '0 16px 40px -8px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
-                            border: '1px solid var(--color-neutral-200)',
+                            border: '1.5px solid var(--color-neutral-300)',
                             marginTop: '6px',
                             backgroundColor: 'var(--color-neutral-0)',
                             color: 'var(--color-neutral-800)',

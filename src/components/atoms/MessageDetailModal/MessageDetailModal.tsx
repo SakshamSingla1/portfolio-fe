@@ -58,7 +58,7 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                 <div
                     className="flex items-start justify-between px-8 py-6 border-b"
                     style={{
-                        borderColor: colors.neutral200,
+                        borderColor: colors.neutral300,
                         backgroundColor: colors.neutral50,
                     }}
                 >
@@ -100,7 +100,7 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                         className="rounded-2xl p-6"
                         style={{
                             backgroundColor: colors.neutral50,
-                            border: `1px solid ${colors.neutral200}`
+                            border: `1.5px solid ${colors.neutral300}`
                         }}
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,7 +139,7 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                             className="rounded-2xl p-6 text-sm leading-relaxed whitespace-pre-wrap max-h-[320px] overflow-y-auto custom-scroll"
                             style={{
                                 backgroundColor: colors.neutral50,
-                                border: `1px solid ${colors.neutral200}`,
+                                border: `1.5px solid ${colors.neutral300}`,
                                 color: colors.neutral800,
                                 boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)"
                             }}
@@ -151,7 +151,7 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                 <div
                     className="flex justify-end px-8 py-5 border-t"
                     style={{
-                        borderColor: colors.neutral200,
+                        borderColor: colors.neutral300,
                         backgroundColor: colors.neutral50
                     }}
                 >

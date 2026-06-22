@@ -50,7 +50,7 @@ const SettingsTemplate: React.FC = () => {
         className="rounded-2xl overflow-hidden mb-4"
         style={{
           background: colors.neutral0,
-          border: `1px solid ${colors.neutral200}`,
+          border: `1.5px solid ${colors.neutral300}`,
           boxShadow: cardShadow,
         }}
       >
@@ -81,7 +81,7 @@ const SettingsTemplate: React.FC = () => {
         className="rounded-2xl overflow-hidden"
         style={{
           background: colors.neutral0,
-          border: `1px solid ${colors.neutral200}`,
+          border: `1.5px solid ${colors.neutral300}`,
           boxShadow: cardShadow,
         }}
       >

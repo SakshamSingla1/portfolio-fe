@@ -117,7 +117,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
       className={`rounded-2xl overflow-hidden ${className}`}
       style={{
         background: colors.neutral0,
-        border: `1px solid ${colors.neutral200}`,
+        border: `1.5px solid ${colors.neutral300}`,
         boxShadow: cardShadow,
       }}
     >

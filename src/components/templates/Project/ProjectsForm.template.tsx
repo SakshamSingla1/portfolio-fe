@@ -190,7 +190,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     const cardStyle: React.CSSProperties = {
         background: colors.neutral0,
-        border: `1px solid ${colors.neutral200}`,
+        border: `1.5px solid ${colors.neutral300}`,
     };
 
     const sectionTitleStyle: React.CSSProperties = {
@@ -383,7 +383,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                 <div key={index} className="relative group/img-container w-[260px]">
                                     <div
                                         className="relative p-2 rounded-sm shadow-inner group-hover/img-container:shadow-xl group-hover/img-container:shadow-blue-500/5 transition-all duration-500"
-                                        style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}` }}
+                                        style={{ background: colors.neutral50, border: `1.5px solid ${colors.neutral300}` }}
                                     >
                                         <ImageUpload
                                             label={isPrimary ? "Primary Project Cover" : `Additional Asset ${index + 1}`}

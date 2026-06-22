@@ -204,7 +204,7 @@ const AdminModules = ({ colors }: { colors: any }) => (
             >
               <div
                 className="h-12 w-12 rounded-[14px] flex items-center justify-center shrink-0 shadow-sm transition-transform duration-300 group-hover/item:scale-110"
-                style={{ backgroundColor: colors.neutral0, border: `1px solid ${colors.neutral200}40` }}
+                style={{ backgroundColor: colors.neutral0, border: `1.5px solid ${colors.neutral300}40` }}
               >
                 <m.icon style={{ fontSize: 22, color: colors.primary500 }} />
               </div>
@@ -411,7 +411,7 @@ export default function HelpPage() {
             className="h-20 w-20 rounded-[24px] flex items-center justify-center shadow-2xl relative"
             style={{
               backgroundColor: colors.neutral0,
-              border: `1px solid ${colors.neutral200}40`,
+              border: `1.5px solid ${colors.neutral300}40`,
               boxShadow: `0 20px 40px ${colors.neutral900}10`
             }}
           >

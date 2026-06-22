@@ -284,7 +284,7 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
             style={{
               background: isActive ? `linear-gradient(135deg, ${primaryColor}, ${accentColor})` : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
               color: isActive ? "white" : colors.neutral500,
-              border: isActive ? "none" : `1px solid ${colors.neutral200}10`
+              border: isActive ? "none" : `1.5px solid ${colors.neutral300}10`
             }}
           >
             {isAssigning ? (

@@ -328,7 +328,7 @@ const TableV2: React.FC<TableProps> = ({
                                 width: '54px',
                                 height: "28px",
                                 borderRadius: '8px',
-                                border: `1px solid ${colors.neutral200}`,
+                                border: `1.5px solid ${colors.neutral300}`,
                                 paddingLeft: '8px',
                                 fontSize: '14px',
                                 backgroundColor: colors.neutral0,

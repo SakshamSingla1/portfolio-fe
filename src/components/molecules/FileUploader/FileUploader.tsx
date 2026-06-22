@@ -83,7 +83,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         }
     };
 
-    const border = `1px solid ${colors.neutral200}`;
+    const border = `1.5px solid ${colors.neutral300}`;
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

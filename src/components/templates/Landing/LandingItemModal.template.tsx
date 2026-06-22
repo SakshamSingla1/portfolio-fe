@@ -49,7 +49,7 @@ const TagsInput: React.FC<TagsInputProps> = ({ label, value, onChange }) => {
                         flex: 1,
                         '& .MuiOutlinedInput-root': {
                             background: colors.neutral0,
-                            '& fieldset': { borderColor: colors.neutral200 },
+                            '& fieldset': { borderColor: colors.neutral300 },
                             '&:hover fieldset': { borderColor: colors.neutral300 },
                         },
                         '& input': { color: colors.neutral900 },
@@ -68,7 +68,7 @@ const TagsInput: React.FC<TagsInputProps> = ({ label, value, onChange }) => {
                             sx={{
                                 background: colors.neutral100,
                                 color: colors.neutral700,
-                                border: `1px solid ${colors.neutral200}`,
+                                border: `1.5px solid ${colors.neutral300}`,
                                 '& .MuiChip-deleteIcon': { color: colors.neutral400 },
                             }}
                         />
@@ -143,7 +143,7 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '10px 14px',
                 background: colors.neutral0,
-                border: `1px solid ${colors.neutral200}`,
+                border: `1.5px solid ${colors.neutral300}`,
                 borderRadius: 10,
             }}
         >
@@ -184,7 +184,7 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
             PaperProps={{
                 sx: {
                     background: colors.neutral0,
-                    border: `1px solid ${colors.neutral200}`,
+                    border: `1.5px solid ${colors.neutral300}`,
                     borderRadius: '16px',
                     boxShadow: isDark
                         ? `0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)`

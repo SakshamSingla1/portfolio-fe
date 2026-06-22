@@ -219,7 +219,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
         >
             <div className="p-6">
                 <div className="space-y-8">
-                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral200 }}>
+                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                             Role Details
@@ -249,7 +249,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                         </div>
                     </div>
 
-                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral200 }}>
+                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                             Role Status
@@ -268,13 +268,13 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                         />
                     </div>
 
-                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral200 }}>
+                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                             Permissions
                         </h3>
                         <div>
-                            <div className="rounded-lg p-4 mb-6 border" style={{ backgroundColor: colors.neutral100, borderColor: colors.neutral200 }}>
+                            <div className="rounded-lg p-4 mb-6 border" style={{ backgroundColor: colors.neutral100, borderColor: colors.neutral300 }}>
                                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                                     <div className="flex items-center gap-4">
                                         <div className="text-sm font-medium" style={{ color: colors.neutral700 }}>
@@ -319,9 +319,9 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                                     const hasFilteredPermissions = filteredPermissions.length > 0;
 
                                     return (
-                                        <div key={navlink.id} className="rounded-lg overflow-hidden transition-all duration-200 border" style={{ borderColor: colors.neutral200 }}>
+                                        <div key={navlink.id} className="rounded-lg overflow-hidden transition-all duration-200 border" style={{ borderColor: colors.neutral300 }}>
                                             {/* Navlink Header */}
-                                            <div className="px-4 py-3 border-b" style={{ backgroundColor: colors.neutral100, borderColor: colors.neutral200 }}>
+                                            <div className="px-4 py-3 border-b" style={{ backgroundColor: colors.neutral100, borderColor: colors.neutral300 }}>
                                                 <div className="flex justify-between items-center">
                                                     <div className="flex items-center gap-3">
                                                         <button

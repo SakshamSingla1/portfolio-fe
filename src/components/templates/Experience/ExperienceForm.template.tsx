@@ -127,7 +127,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
 
     const cardStyle: React.CSSProperties = {
         background: colors.neutral0,
-        border: `1px solid ${colors.neutral200}`,
+        border: `1.5px solid ${colors.neutral300}`,
     };
 
     const sectionTitleStyle: React.CSSProperties = {

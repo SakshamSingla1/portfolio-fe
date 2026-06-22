@@ -273,7 +273,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
   return (
     <div
       className="mt-4 rounded-xl overflow-hidden"
-      style={{ border: `1px solid ${colors.neutral200}` }}
+      style={{ border: `1.5px solid ${colors.neutral300}` }}
     >
       {/* Header — toggle */}
       <button
@@ -427,7 +427,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     background: isDark
       ? `linear-gradient(135deg, ${colors.neutral50} 0%, ${colors.neutral0} 100%)`
       : `linear-gradient(135deg, #fafbff 0%, #ffffff 100%)`,
-    border: `1px solid ${colors.neutral200}`,
+    border: `1.5px solid ${colors.neutral300}`,
     borderRadius: 20,
     overflow: "hidden",
     boxShadow: isDark
@@ -527,7 +527,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                     className="rounded-xl p-3"
                     style={{
                       background: isDark ? colors.neutral100 : colors.neutral50,
-                      border: `1px solid ${colors.neutral200}`,
+                      border: `1.5px solid ${colors.neutral300}`,
                     }}
                   >
                     <MetricCell label={label} value={value} delay={delay} />
@@ -541,7 +541,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                   className="rounded-xl p-3"
                   style={{
                     background: isDark ? colors.neutral100 : colors.neutral50,
-                    border: `1px solid ${colors.neutral200}`,
+                    border: `1.5px solid ${colors.neutral300}`,
                   }}
                 >
                   <span
@@ -565,7 +565,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                 className="rounded-xl p-4 flex flex-col"
                 style={{
                   background: isDark ? colors.neutral100 : colors.neutral50,
-                  border: `1px solid ${colors.neutral200}`,
+                  border: `1.5px solid ${colors.neutral300}`,
                   flex: 1,
                 }}
               >
@@ -589,7 +589,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
               className="rounded-xl p-4"
               style={{
                 background: isDark ? colors.neutral100 : colors.neutral50,
-                border: `1px solid ${colors.neutral200}`,
+                border: `1.5px solid ${colors.neutral300}`,
               }}
             >
               <span
@@ -606,7 +606,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
         {/* ── Footer row ─────────────────────────────── */}
         <div
           className="flex items-center justify-between mt-4 pt-4"
-          style={{ borderTop: `1px solid ${colors.neutral200}` }}
+          style={{ borderTop: `1.5px solid ${colors.neutral300}` }}
         >
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">

@@ -207,7 +207,7 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
             padding: "12px",
             width: 220,
             boxShadow: `0 32px 64px -12px ${colors.neutral900}35`,
-            border: `1px solid ${colors.neutral200}`,
+            border: `1.5px solid ${colors.neutral300}`,
           },
         }}
       >

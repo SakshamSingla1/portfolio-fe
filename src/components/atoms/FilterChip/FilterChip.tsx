@@ -127,7 +127,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
         displayEmpty
         disableUnderline
         className={twMerge(
-          "text-sm border border-gray-200 !rounded-2xl transition-all duration-300 bg-white text-gray-900",
+          "text-sm border border-gray-300 !rounded-2xl transition-all duration-300 bg-white text-gray-900",
           value.length > 0 && "bg-blue-50/50 border-blue-200 hover:bg-blue-50/70",
           "hover:border-blue-400 hover:shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/60 focus-within:shadow-[0_4px_16px_rgba(59,130,246,0.08)]",
           className
@@ -141,7 +141,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
               maxHeight: "none",
               borderRadius: "14px",
               marginTop: "8px",
-              border: "1px solid var(--color-neutral-200)",
+              border: "1.5px solid var(--color-neutral-300)",
               boxShadow: "0 16px 40px -8px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)",
               backgroundColor: "var(--color-neutral-0)",
               ...MenuProps?.PaperProps?.sx

@@ -18,7 +18,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onEdit, onView, onDelete 
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
-    border: `1px solid ${colors.neutral200}`,
+    border: `1.5px solid ${colors.neutral300}`,
     background: "transparent",
     cursor: "pointer",
     transition: "all 0.18s ease",

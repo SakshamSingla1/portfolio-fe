@@ -46,7 +46,7 @@ const StatCard: React.FC<{
       className="rounded-xl border flex flex-col items-center justify-center text-center p-4 transition-all duration-300 hover:shadow-sm"
       style={{
         background: colors.neutral50,
-        borderColor: colors.neutral200,
+        borderColor: colors.neutral300,
       }}
     >
       {icon && (
@@ -110,7 +110,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
         className="rounded-2xl overflow-hidden mb-4"
         style={{
           background: colors.neutral0,
-          border: `1px solid ${colors.neutral200}`,
+          border: `1.5px solid ${colors.neutral300}`,
           boxShadow: cardShadow,
         }}
       >
@@ -136,7 +136,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
                   style={{
                     background: isDark ? colors.neutral100 : colors.neutral100,
                     color: colors.neutral500,
-                    border: `1px solid ${colors.neutral200}`,
+                    border: `1.5px solid ${colors.neutral300}`,
                   }}
                 >
                   {count}
@@ -196,7 +196,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
                   style={{
                     background: colors.neutral100,
                     color: colors.neutral800,
-                    border: `1px solid ${colors.neutral200}`,
+                    border: `1.5px solid ${colors.neutral300}`,
                     fontWeight: 500,
                     cursor: "pointer",
                   }}
@@ -260,7 +260,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
         className="rounded-2xl overflow-hidden"
         style={{
           background: colors.neutral0,
-          border: `1px solid ${colors.neutral200}`,
+          border: `1.5px solid ${colors.neutral300}`,
           boxShadow: cardShadow,
         }}
       >

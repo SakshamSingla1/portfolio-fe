@@ -175,7 +175,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
 
   const containerStyle = {
     background: colors.neutral0,
-    border: `1px solid ${colors.neutral200}`,
+    border: `1.5px solid ${colors.neutral300}`,
     borderRadius: "20px",
     overflow: "hidden",
     boxShadow: isDark
@@ -202,8 +202,8 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
             <div
               key={s.label}
               style={{
-                borderRight: isRightEdge ? "none" : `1px solid ${colors.neutral200}`,
-                borderBottom: isBottomRow ? "none" : (isMobile && i < 2 ? `1px solid ${colors.neutral200}` : "none"),
+                borderRight: isRightEdge ? "none" : `1.5px solid ${colors.neutral300}`,
+                borderBottom: isBottomRow ? "none" : (isMobile && i < 2 ? `1.5px solid ${colors.neutral300}` : "none"),
               }}
             >
               <HeroStatCell
@@ -230,7 +230,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
               <div
                 key={s.label}
                 style={{
-                  borderRight: i < SECONDARY_STATS.length - 1 ? `1px solid ${colors.neutral200}` : "none",
+                  borderRight: i < SECONDARY_STATS.length - 1 ? `1.5px solid ${colors.neutral300}` : "none",
                   minWidth: 74,
                   flexShrink: 0,
                 }}
@@ -247,7 +247,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
             return (
               <div
                 key={s.label}
-                style={{ borderRight: i < SECONDARY_STATS.length - 1 ? `1px solid ${colors.neutral200}` : "none" }}
+                style={{ borderRight: i < SECONDARY_STATS.length - 1 ? `1.5px solid ${colors.neutral300}` : "none" }}
               >
                 <SecondaryStatCell {...s} value={value} index={i} />
               </div>

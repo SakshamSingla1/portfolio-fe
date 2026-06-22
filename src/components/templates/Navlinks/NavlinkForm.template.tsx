@@ -77,7 +77,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
         <div className="space-y-8">
           <div
             className="p-6 rounded-xl shadow-sm border"
-            style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral200 }}
+            style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral300 }}
           >
             <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
               <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#f97316' }} />
@@ -141,7 +141,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
 
           <div
             className="p-6 rounded-xl shadow-sm border"
-            style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral200 }}
+            style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral300 }}
           >
             <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
               <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#22c55e' }} />

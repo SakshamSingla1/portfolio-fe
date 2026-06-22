@@ -27,7 +27,7 @@ const useStyles = createUseStyles({
     marginTop: 12,
     padding: 16,
     borderRadius: 12,
-    border: `1px solid ${colors.neutral200}`,
+    border: `1.5px solid ${colors.neutral300}`,
     background: colors.neutral50,
     color: colors.neutral900,
     lineHeight: 1.6,

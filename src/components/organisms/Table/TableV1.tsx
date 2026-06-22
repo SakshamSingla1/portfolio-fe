@@ -72,7 +72,7 @@ const useStyles = createUseStyles((colors: any) => ({
   tableContainer: {
     borderRadius: '0.75rem',
     overflow: 'hidden',
-    border: `1px solid ${colors.neutral200}`,
+    border: `1.5px solid ${colors.neutral300}`,
     backgroundColor: colors.neutral0 || 'white',
     transition: 'all 0.2s ease-in-out',
   },
@@ -80,7 +80,7 @@ const useStyles = createUseStyles((colors: any) => ({
     backgroundColor: colors.primary50,
     color: colors.primary700,
     padding: '1rem 1.5rem',
-    borderBottom: `1px solid ${colors.neutral200}`,
+    borderBottom: `1.5px solid ${colors.neutral300}`,
     '& h2': {
       margin: 0,
       fontSize: '1.25rem',
@@ -179,7 +179,7 @@ const useStyles = createUseStyles((colors: any) => ({
   },
   pagination: {
     backgroundColor: colors.neutral0 || 'white',
-    borderTop: `1px solid ${colors.neutral200}`,
+    borderTop: `1.5px solid ${colors.neutral300}`,
     padding: '0.15rem 1.0rem',
     display: 'flex',
     justifyContent: 'flex-end',
@@ -228,7 +228,7 @@ const useStyles = createUseStyles((colors: any) => ({
       },
     },
     '& .MuiTablePagination-select': {
-      border: `1px solid ${colors.neutral200}`,
+      border: `1.5px solid ${colors.neutral300}`,
       borderRadius: '0.375rem',
       color: colors.neutral700,
       '@media (max-width: 768px)': {
@@ -257,7 +257,7 @@ const useStyles = createUseStyles((colors: any) => ({
   mobileCard: {
     backgroundColor: colors.neutral0 || 'white',
     borderRadius: '0.5rem',
-    border: `1px solid ${colors.neutral200}`,
+    border: `1.5px solid ${colors.neutral300}`,
     padding: '0',
     marginBottom: '0.75rem',
     cursor: 'pointer',
