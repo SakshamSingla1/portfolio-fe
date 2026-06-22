@@ -9,7 +9,7 @@ export const CONTACT_US_URLS = {
 };
 
 export interface ContactUs {
-    id?: string;
+    id?: number | null;
     name: string;
     email: string;
     message: string;
@@ -41,7 +41,7 @@ export const useContactUsService = () => {
         return request(API_METHOD.GET, url, user, null, {params});
     };
 
-    const markAsRead = (id: string) => {
+    const markAsRead = (id: number | null) => {
         const url = replaceUrlParams(CONTACT_US_URLS.MARK_AS_READ, { id });
         return request(API_METHOD.PATCH, url, user);
     };

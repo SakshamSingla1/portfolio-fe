@@ -16,7 +16,7 @@ const EditLogoPage = () => {
     const handleSubmit = async (values: Logo) => {
         try {
             if (!id) return;
-            const response = await logoService.update(String(id), values);
+            const response = await logoService.update(id ? Number(id) : null, values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);
                 navigate(ADMIN_ROUTES.LOGO);
@@ -28,7 +28,7 @@ const EditLogoPage = () => {
         }
     }
 
-    const getLogo = async (id: string | null) => {
+    const getLogo = async (id: number | null) => {
         try {
             const response = await logoService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -41,7 +41,7 @@ const EditLogoPage = () => {
 
     useEffect(() => {
         if (id) {
-            getLogo(String(id));
+            getLogo(id ? Number(id) : null);
         }
     }, [id]);
 

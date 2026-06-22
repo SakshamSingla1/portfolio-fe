@@ -16,8 +16,8 @@ const DashboardPage: React.FC = () => {
             }
             return null;
         },
-        refetchInterval: 30_000,       // refresh view count every 30 s
-        refetchIntervalInBackground: false,  // pause when tab is hidden
+        refetchInterval: 30_000,
+        refetchIntervalInBackground: false,
     });
 
     return (

@@ -11,7 +11,7 @@ export const CERTIFICATION_URLS = {
 };
 
 export interface Certification {
-    id?: string;
+    id?: number | null;
     title: string;
     issuer: string;
     issueDate: string;
@@ -50,17 +50,17 @@ export const useCertificationService = () => {
     const create = (certification: CertificationRequest) =>
         request(API_METHOD.POST, CERTIFICATION_URLS.GET_ALL, user, certification);
 
-    const update = (id: string | null, certification: CertificationRequest) => {
+    const update = (id: number | null, certification: CertificationRequest) => {
         const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, certification);
     };
 
-    const remove = (id: string) => {
+    const remove = (id: number | null) => {
         const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };
 
-    const getById = (id: string | null) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
         return request(API_METHOD.GET, url, user, null);
     };

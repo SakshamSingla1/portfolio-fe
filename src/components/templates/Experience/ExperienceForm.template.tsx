@@ -113,7 +113,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         return skills.map((skill) => ({
             label: <div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" />{skill.logoName}</div>,
             title: skill.logoName,
-            value: skill.id,
+            value: skill.id ?? 0,
         }));
     }, [skills]);
 
@@ -138,7 +138,6 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         <FormShell
             title={mode === MODE.ADD ? "Add New Experience" : mode === MODE.EDIT ? "Edit Experience" : "Experience Details"}
             subtitle={mode === MODE.ADD ? "Add your professional experience to your portfolio" : mode === MODE.EDIT ? "Update your experience information" : "View experience details"}
-            accentColor="#10b981"
             onBack={() => navigate(-1)}
         >
             <div className="p-6 space-y-8">

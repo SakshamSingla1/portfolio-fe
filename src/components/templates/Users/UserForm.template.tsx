@@ -68,7 +68,7 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
                 }
                 
                 if (values.roleId !== user.roleId) {
-                    await profileService.updateUserRole(user.id, { roleId: values.roleId });
+                    await profileService.updateUserRole(user.id, { roleid: Number(values.roleId) || null });
                     showSnackbar('success', 'User role updated successfully');
                 }
                 
@@ -132,7 +132,7 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
                             <CustomRadioGroup
                                 name="roleId"
                                 options={RoleOptions}
-                                value={formik.values.roleId}
+                                value={formik.values.roleId ? String(formik.values.roleId) : ""}
                                 onChange={(e) =>
                                     formik.setFieldValue("roleId", e.target.value)
                                 }

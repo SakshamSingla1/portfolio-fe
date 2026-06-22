@@ -11,7 +11,7 @@ export const ACHIEVEMENT_URLS = {
 };
 
 export interface Achievement {
-    id?: string;
+    id?: number | null;
     title: string;
     issuer: string;
     achievedAt: string;
@@ -50,17 +50,17 @@ export const useAchievementService = () => {
     const create = (achievement: AchievementRequest) =>
         request(API_METHOD.POST, ACHIEVEMENT_URLS.GET_ALL, user, achievement);
 
-    const update = (id: string | null, achievement: AchievementRequest) => {
+    const update = (id: number | null, achievement: AchievementRequest) => {
         const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, achievement);
     };
 
-    const remove = (id: string) => {
+    const remove = (id: number | null) => {
         const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };
 
-    const getById = (id: string | null) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
         return request(API_METHOD.GET, url, user, null);
     };

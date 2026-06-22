@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
+import { HTTP_STATUS, StatusOptions, type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import { useResumeService , type DocumentUploadResponse , type ResumeSearchParams} from '../../../services/useResumeService';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import ResumeTable from '../../templates/Resume/ResumeTable.template';
+import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 
 const ResumeListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -56,7 +57,7 @@ const ResumeListPage: React.FC = () => {
         setPagination({ ...pagination, currentPage: 0 })
     }
 
-    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
+    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPagination((prevPagination) => ({
             ...prevPagination,
             currentPage: newPage
@@ -87,7 +88,32 @@ const ResumeListPage: React.FC = () => {
 
     return (
         <div>
-            <ResumeTable resumes={resumes} pagination={pagination} handleFiltersChange={handleFiltersChange} handlePaginationChange={handlePaginationChange} handleRowsPerPageChange={handleRowsPerPageChange} filters={filters} />
+            <ResumeTable 
+                resumes={resumes} 
+                pagination={pagination} 
+                handlePaginationChange={handlePaginationChange} 
+                handleRowsPerPageChange={handleRowsPerPageChange} 
+                searchValue={filters.search}
+                onSearchChange={(val) => handleFiltersChange("search", val)}
+                filterContent={
+                    <div className="w-full sm:w-72">
+                        <AutoCompleteInput
+                            label=""
+                            placeHolder="Select Status"
+                            options={StatusOptions}
+                            value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                            onChange={(option: any) => {
+                                if (option) {
+                                    handleFiltersChange("status", option.value);
+                                } else {
+                                    handleFiltersChange("status", "");
+                                }
+                            }}
+                            onSearch={() => { }}
+                        />
+                    </div>
+                }
+            />
         </div>
     )
 }

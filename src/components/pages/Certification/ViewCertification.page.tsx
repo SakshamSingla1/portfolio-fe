@@ -12,9 +12,9 @@ const ViewCertificationPage = () => {
     const { showSnackbar } = useSnackbar();
     const [certification, setCertification] = useState<Certification | null>(null);
 
-    const getCertification = async (id: string | null) => {
+    const getCertification = async (id: number | null) => {
         try {
-            const response = await certificationService.getById(String(id));
+            const response = await certificationService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 setCertification(response.data.data);
             }
@@ -25,7 +25,7 @@ const ViewCertificationPage = () => {
 
     useEffect(() => {
         if (id) {
-            getCertification(String(id));
+            getCertification(id ? Number(id) : null);
         }
     }, [id]);
 

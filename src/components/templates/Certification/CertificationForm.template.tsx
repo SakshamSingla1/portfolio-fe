@@ -103,7 +103,6 @@ const CertificationFormTemplate = ({
         <FormShell
             title={mode === MODE.ADD ? "Add Certification" : mode === MODE.EDIT ? "Edit Certification" : "Certification Details"}
             subtitle={mode === MODE.ADD ? "Add a professional certification" : mode === MODE.EDIT ? "Update certification information" : "View certification information"}
-            accentColor="#06b6d4"
             onBack={() => navigate(-1)}
         >
             <div className="p-6 space-y-8">

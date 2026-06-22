@@ -5,20 +5,14 @@ import ContactUsTableTemplate from '../../templates/ContactUs/ContactUsTable.tem
 import { useContactUsService, type ContactUs, type ContactUsFilterParams } from '../../../services/useContactUsService';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from '../../../hooks/useSnackBar';
-import TextField from '../../atoms/TextField/TextField';
-import { InputAdornment } from '@mui/material';
-import { FiFilter, FiSearch, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const ContactUsListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const contactUsService = useContactUsService();
     const { showSnackbar } = useSnackbar();
     const queryClient = useQueryClient();
-    const isMobile = useIsMobile();
 
-    const [showFilters, setShowFilters] = useState<boolean>(false);
     const [filters, setFiltersTo] = useState<any>({
         search: searchParams.get("search") || "",
     });
@@ -63,7 +57,7 @@ const ContactUsListPage: React.FC = () => {
         setPagination((prev) => ({ ...prev, currentPage: 0 }));
     };
 
-    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement>, newPage: number) => {
+    const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPagination((prev) => ({ ...prev, currentPage: newPage }));
     };
 
@@ -72,7 +66,7 @@ const ContactUsListPage: React.FC = () => {
         setPagination((prev) => ({ ...prev, pageSize: newRowsPerPage }));
     };
 
-    const handleMarkRead = async (id?: string) => {
+    const handleMarkRead = async (id?: number | null) => {
         if (!id) return;
         try {
             const response = await contactUsService.markAsRead(id);
@@ -82,7 +76,7 @@ const ContactUsListPage: React.FC = () => {
                     return {
                         ...old,
                         content: old.content.map((item: ContactUs) =>
-                            item.id === id ? { ...item, status: "READ" } : item
+                            String(item.id) === String(id) ? { ...item, status: "READ" } : item
                         ),
                     };
                 });
@@ -103,78 +97,15 @@ const ContactUsListPage: React.FC = () => {
     }, [filters.search, pagination]);
 
     return (
-        <div className="grid gap-y-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Contact Us Inquiries
-                        </h1>
-                    </div>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className={`${isMobile ? '' : 'flex justify-start items-end space-x-4'}`}>
-                    {isMobile ? (
-                        <div className="w-full">
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
-                            >
-                                <span className="flex items-center">
-                                    <FiFilter />
-                                    <span className="ml-2">Filters</span>
-                                </span>
-                                <span className="transform transition-transform">
-                                    {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-                                </span>
-                            </button>
-
-                            {showFilters && (
-                                <div className="space-y-3 p-4">
-                                    <TextField
-                                        label='Search'
-                                        variant="outlined"
-                                        placeholder="Search inquiries..."
-                                        value={filters.search}
-                                        name='search'
-                                        onChange={(event) => handleFiltersChange("search", event.target.value)}
-                                        InputProps={{
-                                            startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment>,
-                                        }}
-                                        fullWidth
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="w-[250px]">
-                            <TextField
-                                label=''
-                                variant="outlined"
-                                placeholder="Search inquiries..."
-                                value={filters.search}
-                                name='search'
-                                onChange={(event) => handleFiltersChange("search", event.target.value)}
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start" className='pl-[11px]'><FiSearch /></InputAdornment>,
-                                }}
-                                fullWidth
-                            />
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <ContactUsTableTemplate
-                contactUs={contactUs}
-                pagination={currentPagination}
-                handlePaginationChange={handlePaginationChange}
-                handleRowsPerPageChange={handleRowsPerPageChange}
-                handleMarkRead={handleMarkRead}
-            />
-        </div>
+        <ContactUsTableTemplate
+            contactUs={contactUs}
+            pagination={currentPagination}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
+            handleMarkRead={handleMarkRead}
+            searchValue={filters.search}
+            onSearchChange={(val) => handleFiltersChange("search", val)}
+        />
     );
 };
 

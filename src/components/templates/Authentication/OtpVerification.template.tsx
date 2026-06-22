@@ -59,24 +59,24 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
                 if (response.status === HTTP_STATUS.OK) {
                     const user = response.data.data;
                     setAuthenticatedUser({
-                    id: user.id,
-                    fullName: user.fullName,
-                    userName: user.userName,
-                    email: user.email,
-                    phone: user.phone,
-                    roleId: user.roleId,
-                    roleName: user.roleName,
-                    status: user.status,
-                    emailVerified: user.emailVerified,
-                    phoneVerified: user.phoneVerified,
-                    token: user.token
-                });
+                        id: user.id,
+                        fullName: user.fullName,
+                        userName: user.userName,
+                        email: user.email,
+                        phone: user.phone,
+                        roleId: user.roleId,
+                        roleName: user.roleName,
+                        status: user.status,
+                        emailVerified: user.emailVerified,
+                        phoneVerified: user.phoneVerified,
+                        token: user.token
+                    });
 
-                setDefaultTheme(user.defaultTheme);
-                setRolePermissions(user.rolePermissions);
+                    setDefaultTheme(user.defaultTheme);
+                    setRolePermissions(user.rolePermissions);
 
-                navigate(`/dashboard`);
-                showSnackbar('success', 'Login successful!');
+                    navigate(`dashboard`);
+                    showSnackbar('success', 'Login successful!');
                 }
             }
         } catch (error) {
@@ -111,7 +111,7 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
     }, [timer]);
 
     return (
-        <motion.div 
+        <motion.div
             className="w-full p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -128,7 +128,7 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
                 Back
             </button>
             <div className="text-center mb-6 flex flex-col items-center">
-                <motion.div 
+                <motion.div
                     className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-3xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20"
                     whileHover={{ scale: 1.05, rotate: 5 }}
                     transition={{ type: "spring", stiffness: 300, damping: 15 }}

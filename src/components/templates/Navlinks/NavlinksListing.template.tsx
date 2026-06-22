@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,20 +10,32 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { enumToNormalKey } from "../../../utils/helper";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface INavlinkListTableTemplateProps {
     navlinks: NavlinkResponse[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
+    filterContent?: React.ReactNode;
 }
 
-const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ navlinks, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ 
+    navlinks, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange,
+    filterContent
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -31,13 +43,13 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         }
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_EDIT, {
-                params: { id },
+                params: { id: String(id) },
                 query: query
             })
         );
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -45,13 +57,13 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         }
         navigate(
             makeRoute(ADMIN_ROUTES.NAVLINKS_VIEW, {
-                params: { id },
+                params: { id: String(id) },
                 query: query
             })
         );
     }
 
-    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => navlinks?.map((navlink: NavlinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -59,7 +71,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
         StatusOptions.find((status) => status.value === navlink.status)?.label,
-        Action(navlink.id ?? "")
+        Action(navlink.id ?? 0)
     ])
 
     const getTableColumns = () => [
@@ -72,7 +84,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -87,18 +99,18 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({ na
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Navigation Links" description="Portfolio navigation menu" count={pagination.totalRecords} accentColor="#f97316">
+        <ListingShell 
+            title="Navigation Links" 
+            description="Portfolio navigation menu" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Navigation Link" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.NAVLINKS_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+            filterContent={filterContent}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     )

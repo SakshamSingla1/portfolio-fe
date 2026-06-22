@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,20 +9,30 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { Testimonial } from "../../../services/useTestimonialService";
 import { DateUtils } from "../../../utils/helper";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface ITestimonialTableTemplateProps {
     testimonials: Testimonial[];
     pagination: IPagination;
     handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
 }
 
-const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ testimonials, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ 
+    testimonials, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -30,13 +40,13 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
         }
         navigate(
             makeRoute(ADMIN_ROUTES.TESTIMONIALS_EDIT, {
-                params: { id },
+                params: { id: String(id) },
                 query: query
             })
         );
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -44,13 +54,13 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
         }
         navigate(
             makeRoute(ADMIN_ROUTES.TESTIMONIALS_VIEW, {
-                params: { id },
+                params: { id: String(id) },
                 query: query
             })
         );
     }
 
-    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () =>
         testimonials.map((testimonial, index) => [
@@ -59,7 +69,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
             testimonial.order,
             DateUtils.dateTimeSecondToDate(testimonial.createdAt ?? ""),
             DateUtils.dateTimeSecondToDate(testimonial.updatedAt ?? ""),
-            Action(testimonial.id ?? "")
+            Action(testimonial.id ?? 0)
         ]
         );
 
@@ -73,7 +83,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -88,18 +98,17 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ te
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Testimonials" description="Recommendations and reviews" count={pagination.totalRecords} accentColor="#f43f5e">
+        <ListingShell 
+            title="Testimonials" 
+            description="Recommendations and reviews" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Testimonial" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.TESTIMONIALS_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     )

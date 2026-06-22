@@ -91,7 +91,6 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
         <FormShell
             title={mode === MODE.ADD ? "Add Education" : mode === MODE.EDIT ? "Edit Education" : "View Education"}
             subtitle={mode === MODE.ADD ? "Add your academic achievement to your profile" : mode === MODE.EDIT ? "Update your education information" : "View education details"}
-            accentColor="#3b82f6"
             breadcrumb="Education"
             onBack={onClose}
         >

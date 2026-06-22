@@ -30,7 +30,7 @@ import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 
 interface ColorCardProps {
   colorTheme: ColorTheme;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: number) => void;
 }
 
 const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
@@ -78,7 +78,7 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
       try {
         setIsAssigning(true);
         await assignThemeToUser({
-          themeId: colorTheme.id
+          themeId: colorTheme.id ?? null
         });
         setDefaultTheme(colorTheme);
       } catch {

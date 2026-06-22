@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FiArrowLeft } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface FormShellProps {
   title: string;
@@ -23,6 +24,7 @@ const FormShell: React.FC<FormShellProps> = ({
 }) => {
   const colors = useColors();
   const { isDark } = useTheme();
+  const isMobile = useIsMobile();
 
   const cardShadow = isDark
     ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
@@ -35,7 +37,7 @@ const FormShell: React.FC<FormShellProps> = ({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      style={{ padding: "16px 16px 24px" }}
+      style={{ padding: isMobile ? "8px 8px 16px" : "16px 16px 24px" }}
     >
       {/* ── Page header card ────────────────────────── */}
       <div
@@ -54,7 +56,7 @@ const FormShell: React.FC<FormShellProps> = ({
           }}
         />
 
-        <div className="px-5 py-4">
+        <div className={isMobile ? "px-4 py-3" : "px-5 py-4"}>
           {/* Breadcrumb / back navigation */}
           {(breadcrumb || onBack) && (
             <button
@@ -79,7 +81,7 @@ const FormShell: React.FC<FormShellProps> = ({
 
           <h1
             className="font-black tracking-tight"
-            style={{ fontSize: 20, color: colors.neutral900, letterSpacing: "-0.025em" }}
+            style={{ fontSize: isMobile ? 18 : 20, color: colors.neutral900, letterSpacing: "-0.025em" }}
           >
             {title}
           </h1>

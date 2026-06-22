@@ -11,7 +11,7 @@ import { useSnackbar } from '../../../hooks/useSnackBar';
 const SocialLinkEditPage: React.FC = () => {
     const navigate = useNavigate();
     const params = useParams();
-    const id = String(params.id);
+    const id = params.id ? Number(params.id) : null;
     
     const { showSnackbar } = useSnackbar();
 

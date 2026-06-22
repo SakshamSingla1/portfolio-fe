@@ -58,7 +58,7 @@ export interface TableColumn {
 }
 
 export interface TableSchema {
-    id: string;
+    id: number;
     rowKey?: string;
     title?: string;
     pagination: Pagination;

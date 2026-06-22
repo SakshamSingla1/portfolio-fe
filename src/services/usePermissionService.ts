@@ -17,7 +17,7 @@ export interface PermissionRequestDTO {
 }
 
 export interface PermissionResponseDTO {
-    id: string;
+    id?: number | null;
     name: string;
     createdAt: string;
     updatedAt: string;
@@ -28,7 +28,7 @@ export interface PermissionResponseDTO {
 }
 
 export interface Permission {
-    id: string;
+    id?: number | null;
     name: string;
     createdAt: string;
     updatedAt: string;
@@ -57,7 +57,7 @@ export const usePermissionService = () => {
         );
     };
 
-    const updatePermission = (id: string, permissionData: PermissionRequestDTO) => {
+    const updatePermission = (id: number | null, permissionData: PermissionRequestDTO) => {
         const url = replaceUrlParams(PERMISSION_URLS.UPDATE, { id });
         return request(
             API_METHOD.PUT,
@@ -67,7 +67,7 @@ export const usePermissionService = () => {
         );
     };
 
-    const deletePermission = (id: string) => {
+    const deletePermission = (id: number | null) => {
         const url = replaceUrlParams(PERMISSION_URLS.DELETE, { id });
         return request(
             API_METHOD.DELETE,
@@ -76,7 +76,7 @@ export const usePermissionService = () => {
         );
     };
 
-    const getPermissionById = (id: string) => {
+    const getPermissionById = (id: number | null) => {
         const url = replaceUrlParams(PERMISSION_URLS.GET_BY_ID, { id });
         return request(
             API_METHOD.GET,

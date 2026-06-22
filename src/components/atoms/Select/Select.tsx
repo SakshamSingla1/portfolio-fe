@@ -4,63 +4,10 @@ import {
   MenuItem,
   type SelectProps as MuiSelectProps,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { twMerge } from "tailwind-merge";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import downArrowIcon from "../../../assets/icons/downArrowFilled.svg";
 import { capitalizeFirstLetter } from "../../../utils/helper";
-import { useColors } from "../../../utils/types";
-
-const StyledSelect = styled(MuiSelect)<{ colors: any }>(({ colors }) => ({
-  width: "100%",
-
-  "& .MuiInputBase-root": {
-    minHeight: 52,
-    padding: "0 12px",
-    display: "flex",
-    alignItems: "center",
-
-    backgroundColor: colors.neutral50,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: 12,
-    fontSize: 16,
-    color: colors.neutral900,
-
-    transition: "all 0.2s ease-in-out",
-
-    "&:hover": {
-      borderColor: colors.primary300,
-    },
-
-    "&.Mui-focused": {
-      borderColor: colors.primary500,
-      boxShadow: `0 0 0 3px ${colors.primary100}`,
-    },
-  },
-
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-
-  "&.Mui-disabled .MuiInputBase-root": {
-    backgroundColor: colors.neutral50,
-    borderColor: colors.neutral200,
-    color: colors.neutral400,
-    "& .MuiSelect-select": {
-        WebkitTextFillColor: `${colors.neutral400} !important`,
-    }
-  },
-
-  "&.Mui-error .MuiInputBase-root": {
-    borderColor: colors.error500,
-    backgroundColor: colors.error50,
-  },
-
-  "& .MuiSelect-select": {
-    padding: "13px 12px",
-    display: "flex",
-    alignItems: "center",
-  },
-}));
 
 interface Option {
   value: string | number;
@@ -89,14 +36,14 @@ const Select: React.FC<SelectProps> = ({
   onChange,
   error,
   disabled,
+  className,
   ...props
 }) => {
-  const colors = useColors();
   const [open, setOpen] = useState(false);
 
   const renderValue = (selected: any) => {
     if (selected === "" || selected === undefined || selected === null) {
-      return <span style={{ color: colors.neutral400 }}>{placeholder}</span>;
+      return <span className="text-gray-400 font-normal">{placeholder}</span>;
     }
 
     if (typeof selected === "string") {
@@ -112,21 +59,14 @@ const Select: React.FC<SelectProps> = ({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <div className="flex flex-col gap-1.5 w-full">
       {label && (
-        <label
-          style={{
-            color: colors.neutral700,
-            fontSize: 14,
-            fontWeight: 500,
-            marginLeft: 8,
-          }}
-        >
+        <label className="text-gray-700 text-sm font-semibold ml-2 select-none tracking-tight">
           {label}
         </label>
       )}
 
-      <StyledSelect
+      <MuiSelect
         {...props}
         value={value ?? ""}
         error={error}
@@ -136,33 +76,50 @@ const Select: React.FC<SelectProps> = ({
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         onChange={(e) => onChange?.(e.target.value as string | number)}
-        colors={colors}
+        className={twMerge(
+          "w-full text-base border border-gray-200 hover:border-blue-400 hover:shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/60 focus-within:shadow-[0_4px_16px_rgba(59,130,246,0.08)] !rounded-2xl transition-all duration-300 bg-white text-gray-900",
+          error && "border-red-500 bg-red-50/30 focus-within:border-red-500 focus-within:ring-red-100/60 focus-within:shadow-[0_4px_16px_rgba(239,68,68,0.08)]",
+          disabled && "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60 hover:shadow-none hover:border-gray-200",
+          className
+        )}
+        sx={{
+          "& .MuiSelect-select": {
+            padding: "13px 16px",
+            display: "flex",
+            alignItems: "center",
+          },
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none",
+          },
+        }}
         MenuProps={{
           PaperProps: {
             sx: {
-              backgroundColor: colors.neutral0,
-              boxShadow: `0 12px 32px -4px ${colors.neutral900}20`,
-              borderRadius: "12px",
+              backgroundColor: "var(--color-neutral-0)",
+              boxShadow: "0 16px 40px -8px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)",
+              borderRadius: "14px",
               marginTop: "8px",
-              border: `1px solid ${colors.neutral200}`,
+              border: "1px solid var(--color-neutral-200)",
               "& .MuiMenuItem-root": {
                 margin: "4px 8px",
-                borderRadius: "8px",
-                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                color: colors.neutral800,
+                padding: "10px 14px",
+                borderRadius: "10px",
+                transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                color: "var(--color-neutral-800)",
                 fontSize: 14,
+                fontWeight: 500,
                 "&:hover": {
-                  backgroundColor: colors.neutral50,
-                  color: colors.primary600,
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 2px 8px -2px rgba(0,0,0,0.05)",
+                  backgroundColor: "var(--color-neutral-50)",
+                  color: "var(--color-primary-600)",
+                  transform: "translateX(4px)",
+                  boxShadow: "0 2px 12px -4px rgba(0,0,0,0.06)",
                 },
                 "&.Mui-selected": {
-                  backgroundColor: colors.primary50,
-                  color: colors.primary700,
+                  backgroundColor: "var(--color-primary-50)",
+                  color: "var(--color-primary-700)",
                   fontWeight: 600,
                   "&:hover": {
-                      backgroundColor: colors.primary100,
+                      backgroundColor: "var(--color-primary-100)",
                   }
                 }
               }
@@ -178,10 +135,9 @@ const Select: React.FC<SelectProps> = ({
                   alt="Arrow"
                   width={20}
                   height={20}
+                  className="mr-3 transition-all duration-300 ease-in-out pointer-events-none hover:scale-110"
                   style={{
-                    marginRight: 8,
                     transform: open ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.2s ease",
                   }}
                 />
               )
@@ -192,7 +148,7 @@ const Select: React.FC<SelectProps> = ({
             {option.label}
           </MenuItem>
         ))}
-      </StyledSelect>
+      </MuiSelect>
 
       {error && helperText && <ErrorMessage message={helperText} />}
     </div>

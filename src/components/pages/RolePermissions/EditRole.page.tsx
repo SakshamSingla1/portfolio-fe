@@ -16,7 +16,7 @@ const EditRolePage: React.FC = () => {
 
     const handleSubmit = async (values: RoleRequestBodyDTO) => {
         try {
-            const response = await roleService.updateRole(id!, values);
+            const response = await roleService.updateRole(id ? Number(id) : null, values);
             if(response.status === HTTP_STATUS.OK) {
                 navigate(makeRoute(ADMIN_ROUTES.ROLE, {}));
             }
@@ -25,7 +25,7 @@ const EditRolePage: React.FC = () => {
         }
     };
 
-    const loadRoleDetails = async (id: string) => {
+    const loadRoleDetails = async (id: number | null) => {
         try {
             const response = await roleService.getRolePermissionsByRoleId(id);
             if(response.status === HTTP_STATUS.OK) {
@@ -38,7 +38,7 @@ const EditRolePage: React.FC = () => {
 
     useEffect(() => {
         if (id) {
-            loadRoleDetails(id);
+            loadRoleDetails(id ? Number(id) : null);
         }
     }, [id]);
 

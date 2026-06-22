@@ -28,7 +28,7 @@ const LandingTestimonialsTableTemplate: React.FC<LandingTestimonialsTableProps> 
     );
 
     const schema = {
-        id: 'testimonials-table',
+        id: 5,
         hover: true,
         columns: [
             { label: 'Author', key: 'authorName', type: 'string' as ColumnType, props: {} },

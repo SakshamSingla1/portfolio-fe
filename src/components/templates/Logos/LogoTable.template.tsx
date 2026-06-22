@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -8,38 +8,48 @@ import ListingShell from "../Shared/ListingShell.template";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { type Logo } from '../../../services/useLogoService';
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface LogoTableTemplateProps {
     logos: Logo[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
 }
 
-const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ logos, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ 
+    logos, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.LOGO_EDIT, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.LOGO_EDIT, { query, params: { id: String(id) } }));
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.LOGO_VIEW, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.LOGO_VIEW, { query, params: { id: String(id) } }));
     }
 
-    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => logos?.map((logo: Logo, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -47,7 +57,7 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ logos, pagination
         <img src={logo.url} alt={logo.name} className="w-8 h-8 bg-[#FFFFFF] rounded-sm p-1" title={logo.name} />,
         DateUtils.dateTimeSecondToDate(logo.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(logo.updatedAt ?? ""),
-        Action(logo.id ?? "")
+        Action(logo.id ?? 0)
     ])
 
     const getTableColumns = () => [
@@ -60,7 +70,7 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ logos, pagination
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -75,17 +85,17 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({ logos, pagination
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Logos" description="Technology logos and icons" count={pagination.totalRecords} accentColor="#8b5cf6">
+        <ListingShell 
+            title="Logos" 
+            description="Technology logos and icons" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Logo" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.LOGO_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     )

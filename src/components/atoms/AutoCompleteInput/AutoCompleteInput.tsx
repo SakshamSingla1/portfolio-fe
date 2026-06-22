@@ -3,13 +3,12 @@ import Autocomplete, {
     type AutocompleteChangeReason,
 } from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-import { createUseStyles } from "react-jss";
 import { FiChevronDown, FiX } from "react-icons/fi";
-
 import { useDebounce } from "../../../utils/helper";
 import { DEBOUNCE_TIME } from "../../../utils/constant";
 import TextField from "../TextField/TextField";
 import { useColors } from "../../../utils/types";
+import { twMerge } from "tailwind-merge";
 
 export interface AutoCompleteOption {
     label: string | React.ReactNode;
@@ -35,132 +34,6 @@ interface AutoCompleteInputProps {
     required?: boolean;
 }
 
-const useStyles = createUseStyles({
-    container: {
-        width: "100%",
-        "&.disabled": {
-            opacity: 0.6,
-            pointerEvents: "none",
-        },
-    },
-
-    autoComplete: (colors: any) => ({
-        "& .MuiOutlinedInput-root": {
-            backgroundColor: colors.neutral0,
-            borderRadius: "10px",
-            paddingRight: "8px",
-            minHeight: "48px",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-
-            "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: colors.neutral200,
-                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                borderWidth: "1px",
-            },
-
-            "&:hover": {
-                backgroundColor: colors.neutral50,
-            },
-
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: colors.primary300,
-            },
-
-            "&:hover svg": {
-                color: colors.neutral700,
-            },
-
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: colors.primary500,
-                borderWidth: "1px",
-                boxShadow: `0 0 0 3px ${colors.primary100}`,
-            },
-
-            "&.Mui-focused svg": {
-                color: colors.primary500,
-            },
-
-            "&.Mui-disabled": {
-                backgroundColor: colors.neutral50,
-                "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: colors.neutral200,
-                },
-                "& input": {
-                    WebkitTextFillColor: `${colors.neutral400} !important`,
-                    color: `${colors.neutral400} !important`,
-                },
-                "& svg": {
-                    color: colors.neutral400,
-                },
-                cursor: "not-allowed",
-            },
-
-            "&.Mui-error .MuiOutlinedInput-notchedOutline": {
-                borderColor: colors.error500,
-                boxShadow: `0 0 0 3px ${colors.error50}`,
-            },
-
-            "& .MuiAutocomplete-input": {
-                padding: "4px 8px !important",
-            },
-
-            "& svg": {
-                color: colors.neutral500,
-                transition: "color 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            }
-        },
-
-        "& .MuiAutocomplete-endAdornment": {
-            top: "50%",
-            transform: "translateY(-50%)",
-            right: "8px",
-            display: "flex",
-            alignItems: "center",
-        },
-
-        "& .MuiAutocomplete-popupIndicator": {
-            color: colors.neutral500,
-            transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            padding: 4,
-            "&:hover": {
-                backgroundColor: "rgba(0,0,0,0.04)"
-            }
-        },
-
-        "& .MuiAutocomplete-clearIndicator": {
-            color: colors.neutral400,
-            padding: 4,
-            transition: "all 0.2s ease",
-            "&:hover": {
-                color: colors.error600,
-                backgroundColor: "rgba(0,0,0,0.04)"
-            }
-        },
-
-        "& .MuiAutocomplete-noOptions": {
-            padding: "20px",
-            fontSize: "14px",
-            color: colors.neutral500,
-            textAlign: "center",
-            fontWeight: 500,
-        },
-
-        "& .MuiAutocomplete-loading": {
-            padding: "20px",
-            fontSize: "14px",
-            color: colors.neutral500,
-            textAlign: "center",
-        }
-    }),
-
-    helperText: (colors: any) => ({
-        marginTop: 6,
-        marginLeft: 8,
-        fontSize: 12,
-        color: colors.neutral500,
-    }),
-});
-
 const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     label,
     options,
@@ -178,7 +51,6 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     loading = false,
 }) => {
     const colors = useColors();
-    const classes = useStyles(colors);
     const [open, setOpen] = useState(false);
 
     const debouncedSearch = useDebounce((val: string) => {
@@ -228,10 +100,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     );
 
     return (
-        <div
-            className={`${classes.container} ${isDisabled ? "disabled" : ""
-                } ${className}`}
-        >
+        <div className={twMerge("w-full transition-opacity duration-200", isDisabled && "opacity-60 pointer-events-none select-none", className)}>
             <Autocomplete
                 {...autoCompleteProps}
                 id={id ?? label ?? "autocomplete"}
@@ -246,25 +115,25 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                 disableClearable={!value}
                 popupIcon={<FiChevronDown />}
                 clearIcon={<FiX />}
-                className={classes.autoComplete}
                 onChange={handleChange}
                 onInputChange={handleInputChange}
                 onBlur={onBlur}
                 slotProps={{
                     paper: {
                         sx: {
-                            borderRadius: '12px',
-                            boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)',
-                            border: `1px solid ${colors.neutral200}`,
+                            borderRadius: '14px',
+                            boxShadow: '0 16px 40px -8px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
+                            border: '1px solid var(--color-neutral-200)',
                             marginTop: '6px',
-                            backgroundColor: colors.neutral0,
-                            color: colors.neutral800,
+                            backgroundColor: 'var(--color-neutral-0)',
+                            color: 'var(--color-neutral-800)',
                         }
                     },
                     listbox: {
                         sx: {
-                            padding: '6px 0',
-                            backgroundColor: colors.neutral0,
+                            padding: '6px',
+                            backgroundColor: 'var(--color-neutral-0)',
+                            overflowX: 'hidden',
                             '& .MuiAutocomplete-option': {
                                 padding: "10px 14px",
                                 display: "flex",
@@ -272,45 +141,31 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                                 gap: "12px",
                                 fontSize: "14px",
                                 cursor: "pointer",
-                                color: colors.neutral800,
+                                color: "var(--color-neutral-800)",
                                 borderRadius: "8px",
                                 margin: "4px 8px",
                                 border: "1px solid transparent",
-                                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
 
                                 "&[aria-selected='true']": {
-                                    backgroundColor: `${colors.primary50} !important`,
-                                    color: colors.primary700,
-                                    borderColor: colors.primary200,
+                                    backgroundColor: "var(--color-primary-50) !important",
+                                    color: "var(--color-primary-700)",
+                                    borderColor: "var(--color-primary-200)",
                                     fontWeight: 600,
                                 },
 
                                 "&.Mui-focused, &:hover": {
-                                    backgroundColor: `${colors.neutral50} !important`,
-                                    borderColor: colors.neutral200,
-                                    color: colors.primary700,
-                                    transform: "translateX(4px)",
+                                    backgroundColor: "var(--color-neutral-50) !important",
+                                    borderColor: "var(--color-neutral-200)",
+                                    color: "var(--color-primary-700)",
                                     boxShadow: "0 2px 12px -4px rgba(0,0,0,0.08)",
                                 },
-                            },
-                            '& .MuiAutocomplete-noOptions': {
-                                padding: "20px",
-                                fontSize: "14px",
-                                color: colors.neutral500,
-                                textAlign: "center",
-                                fontWeight: 500,
-                            },
-                            '& .MuiAutocomplete-loading': {
-                                padding: "20px",
-                                fontSize: "14px",
-                                color: colors.neutral500,
-                                textAlign: "center",
                             },
                             '&::-webkit-scrollbar': {
                                 width: '6px',
                             },
                             '&::-webkit-scrollbar-thumb': {
-                                backgroundColor: colors.neutral300,
+                                backgroundColor: 'var(--color-neutral-300)',
                                 borderRadius: '10px',
                             },
                         }
@@ -324,6 +179,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                         error={error}
                         helperText={helperText}
                         required={required}
+                        disabled={isDisabled}
                         InputProps={{
                             ...params.InputProps,
                             endAdornment: (
@@ -338,6 +194,14 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                                 </>
                             ),
                         }}
+                        sx={{
+                            "& .MuiInputBase-root": {
+                                paddingRight: "8px !important",
+                            },
+                            "& input": {
+                                padding: "13px 14px !important",
+                            }
+                        }}
                     />
                 )}
                 renderOption={(props, option) => {
@@ -345,7 +209,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                     return (
                         <li {...optionProps} key={key}>
                             {option.icon && (
-                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 20 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 25 }}>
                                     {option.icon}
                                 </span>
                             )}
@@ -356,7 +220,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
             />
 
             {helperText && !error && (
-                <div className={classes.helperText}>{helperText}</div>
+                <div className="mt-1.5 ml-2 text-xs text-gray-500 select-none">{helperText}</div>
             )}
         </div>
     );

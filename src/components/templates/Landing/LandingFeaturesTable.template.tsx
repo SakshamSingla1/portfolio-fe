@@ -28,7 +28,7 @@ const LandingFeaturesTableTemplate: React.FC<LandingFeaturesTableProps> = ({
     );
 
     const schema = {
-        id: 'features-table',
+        id: 3,
         hover: true,
         columns: [
             { label: 'Title', key: 'title', type: 'string' as ColumnType, props: {} },

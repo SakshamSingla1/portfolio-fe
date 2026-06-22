@@ -32,11 +32,11 @@ export interface Project {
     projectEndDate: string;
     workStatus: string;
     projectImages: ImageValue[];
-    skillIds: string[];
+    skillIds: (number | string)[];
 }
 
 export interface ProjectResponse {
-    id: string;
+    id?: number | null;
     projectName: string;
     projectDescription: string;
     githubRepositories: string[];
@@ -65,7 +65,7 @@ export const useProjectService = () => {
         return request(API_METHOD.GET, url, user, null, null, null);
     };
 
-    const getById = (id: string | null) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
         return request(API_METHOD.GET, url, user, null, null, null);
     };
@@ -75,12 +75,12 @@ export const useProjectService = () => {
         return request(API_METHOD.POST, url, user, project);
     };
 
-    const update = (id: string | null, project: Project) => {
+    const update = (id: number | null, project: Project) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, project);
     };
 
-    const deleteProject = (id: string) => {
+    const deleteProject = (id: number | null) => {
         const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };

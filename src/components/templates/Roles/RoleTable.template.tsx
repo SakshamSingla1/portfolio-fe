@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,35 +9,49 @@ import { type RoleListResponseDTO } from "../../../services/useRoleService";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import { ADMIN_ROUTES } from "../../../utils/constant";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface RoleTableTemplateProps {
     users: RoleListResponseDTO[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
+    filterContent?: React.ReactNode;
 }
 
-const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ 
+    users, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange,
+    filterContent
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id?: number | null) => {
+        if (!id) return;
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.ROLE_EDIT, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.ROLE_EDIT, { query, params: { id: String(id) } }));
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id?: number | null) => {
+        if (!id) return;
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.ROLE_VIEW, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.ROLE_VIEW, { query, params: { id: String(id) } }));
     }
 
     const Action = (role: RoleListResponseDTO) => <ActionButtons onEdit={() => handleEdit(role.id)} onView={() => handleView(role.id)} />;
@@ -61,7 +75,7 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -76,18 +90,18 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ users, pagination
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Roles" description="User roles and permissions" count={pagination.totalRecords} accentColor="#0ea5e9">
+        <ListingShell 
+            title="Roles" 
+            description="User roles and permissions" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Role" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.ROLE_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+            filterContent={filterContent}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     )

@@ -110,7 +110,6 @@ const AchievementFormTemplate = ({
         <FormShell
             title={mode === MODE.ADD ? "Add Achievement" : mode === MODE.EDIT ? "Edit Achievement" : "Achievement Details"}
             subtitle={mode === MODE.ADD ? "Add a professional achievement" : mode === MODE.EDIT ? "Update achievement information" : "View achievement information"}
-            accentColor="#f59e0b"
             onBack={() => navigate(-1)}
         >
             <div className="p-6 space-y-8">

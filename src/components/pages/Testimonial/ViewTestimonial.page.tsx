@@ -12,9 +12,9 @@ const ViewTestimonialPage = () => {
     const { showSnackbar } = useSnackbar();
     const [testimonial, setTestimonial] = useState<Testimonial | null>(null);
 
-    const getTestimonial = async (id: string | null) => {
+    const getTestimonial = async (id: number | null) => {
         try {
-            const response = await testimonialService.getById(String(id));
+            const response = await testimonialService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 setTestimonial(response.data.data);
             }
@@ -25,7 +25,7 @@ const ViewTestimonialPage = () => {
 
     useEffect(() => {
         if (id) {
-            getTestimonial(String(id));
+            getTestimonial(id ? Number(id) : null);
         }
     }, [id]);
 

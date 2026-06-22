@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -8,18 +8,29 @@ import { type TemplateResponse } from "../../../services/useTemplateService";
 import { FiEdit, FiEye } from "react-icons/fi";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
+import ListingShell from "../Shared/ListingShell.template";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface TemplateListTableTemplateProps {
     templates: TemplateResponse[];
     pagination: IPagination;
     handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
 }
 
-const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ templates, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ 
+    templates, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
     const handleEdit = (name: string) => {
         const query = {
@@ -75,7 +86,7 @@ const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ t
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -90,18 +101,19 @@ const TemplateListTableTemplate: React.FC<TemplateListTableTemplateProps> = ({ t
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <TableV1 schema={getSchema()} records={getRecords()} />
+        <ListingShell 
+            title="Templates" 
+            description="Portfolio templates and layouts" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Template" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.TEMPLATES_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+        >
+            <TableV1 schema={getSchema()} records={getRecords()} />
+        </ListingShell>
     )
 }
 export default TemplateListTableTemplate;

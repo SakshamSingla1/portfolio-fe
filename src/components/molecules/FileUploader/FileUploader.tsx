@@ -71,8 +71,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         }
     };
 
-    const handleDelete = async (id: string) => {
-        setDeletingId(id);
+    const handleDelete = async (id: string | number | null) => {
+        setDeletingId(String(id));
         const res = await service.deleteFile(id);
         setDeletingId(null);
         if (res?.status === HTTP_STATUS.OK) {

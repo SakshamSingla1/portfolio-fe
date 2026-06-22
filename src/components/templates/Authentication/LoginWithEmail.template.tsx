@@ -33,9 +33,9 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
     const navigate = useNavigate();
     const { setAuthenticatedUser, setDefaultTheme, setRolePermissions } =
         useAuthenticatedUser();
-    const [showPassword,setShowPassword] = useState<boolean>(false);
-    
-    const [isLoading,setIsLoading ] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { showSnackbar } = useSnackbar();
 
     const formik = useFormik<AuthLoginDTO>({
@@ -67,7 +67,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                 setDefaultTheme(user.defaultTheme);
                 setRolePermissions(user.rolePermissions);
 
-                navigate(`/dashboard`);
+                navigate(`dashboard`);
                 showSnackbar('success', 'Login successful!');
             } catch (error) {
                 console.error("Login failed:", error);
@@ -79,7 +79,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
     });
 
     return (
-        <motion.div 
+        <motion.div
             className="w-full"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -87,7 +87,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
         >
             <div className="p-8">
                 <div className="text-center mb-6 flex flex-col items-center">
-                    <motion.div 
+                    <motion.div
                         className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-3xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20"
                         whileHover={{ scale: 1.05, rotate: 5 }}
                         transition={{ type: "spring", stiffness: 300, damping: 15 }}

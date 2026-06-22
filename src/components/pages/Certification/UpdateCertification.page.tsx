@@ -16,7 +16,7 @@ const EditCertificationPage = () => {
     const handleSubmit = async (values: CertificationRequest) => {
         try {
             if (!id) return;
-            const response = await certificationService.update(String(id), values);
+            const response = await certificationService.update(id ? Number(id) : null, values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);
                 navigate(ADMIN_ROUTES.CERTIFICATIONS);
@@ -28,7 +28,7 @@ const EditCertificationPage = () => {
         }
     }
 
-    const getCertification = async (id: string | null) => {
+    const getCertification = async (id: number | null) => {
         try {
             const response = await certificationService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -41,7 +41,7 @@ const EditCertificationPage = () => {
 
     useEffect(() => {
         if (id) {
-            getCertification(String(id));
+            getCertification(id ? Number(id) : null);
         }
     }, [id]);
 

@@ -15,7 +15,7 @@ const EditUserPage: React.FC = () => {
 
     const loadUser = async () => {
         try {
-            const response = await profileService.getUserById(String(id));
+            const response = await profileService.getUserById(id ? Number(id) : null);
             setUserTo(response.data.data);
         } catch (error) {
             console.error("Error loading user:", error);

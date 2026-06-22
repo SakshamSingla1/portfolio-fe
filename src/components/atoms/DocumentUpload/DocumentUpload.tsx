@@ -6,7 +6,7 @@ import {FaFilePdf,FaFileExcel,FaFilePowerpoint,FaFileWord,FaFileCsv} from "react
 import type { IconType } from "react-icons";
 
 interface DocumentValue {
-  id?: string;
+  id?: number | string | null;
   name: string;
   url: string;
 }

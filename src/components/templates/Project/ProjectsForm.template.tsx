@@ -26,7 +26,7 @@ const validationSchema = Yup.object({
         "description-required",
         "Description is required",
         (value) => !isRichTextEmpty(value)
-    ), skillIds: Yup.array().of(Yup.string()).min(1, "Select at least one technology"),
+    ), skillIds: Yup.array().of(Yup.mixed()).min(1, "Select at least one technology"),
     projectStartDate: Yup.date().required("Start date is required"),
     projectEndDate: Yup.date()
         .min(Yup.ref("projectStartDate"), "End date must be after start date")
@@ -73,7 +73,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             projectEndDate: projects?.projectEndDate || "",
             workStatus: projects?.workStatus || WorkStatusType.CURRENT,
             projectImages: projects?.projectImages || [],
-            skillIds: projects?.skills?.map(s => s.id) || [],
+            skillIds: projects?.skills?.map(s => s.id).filter((id): id is number => id !== null && id !== undefined) || [],
         },
         enableReinitialize: true,
         validationSchema,
@@ -139,7 +139,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     const skillOptions = useMemo(
         () =>
             skills
-                .filter(skill => !formik.values.skillIds.includes(skill.id))
+                .filter(skill => skill.id !== null && skill.id !== undefined && !formik.values.skillIds.includes(skill.id))
                 .map(skill => ({
                     label: (
                         <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             {skill.logoName}
                         </div>
                     ),
-                    value: skill.id,
+                    value: skill.id ?? 0,
                     title: skill.logoName,
                     original: skill,
                 })),
@@ -201,7 +201,6 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         <FormShell
             title={mode === MODE.ADD ? "Add Project" : mode === MODE.EDIT ? "Edit Project" : "Project Details"}
             subtitle={mode === MODE.ADD ? "Showcase your work and contributions" : mode === MODE.EDIT ? "Update project details" : "View project information"}
-            accentColor="#8b5cf6"
             onBack={() => navigate(-1)}
         >
             <div className="p-6 space-y-8">
@@ -276,9 +275,9 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                 onDelete={() => {
                                     formik.setFieldValue(
                                         "skillIds",
-                                        formik.values.skillIds.filter(id => id !== skill.id)
+                                        formik.values.skillIds.filter(id => String(id) !== String(skill.id))
                                     );
-                                    setSelectedSkillObjects(prev => prev.filter(s => s.id !== skill.id));
+                                    setSelectedSkillObjects(prev => prev.filter(s => String(s.id) !== String(skill.id)));
                                 }}
                                 disabled={mode === MODE.VIEW}
                             />

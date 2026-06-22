@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,45 +9,55 @@ import { type ProjectResponse, WorkStatusType } from "../../../services/useProje
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { SkillDropdown } from "../../../services/useSkillService";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface ProjectsTableTemplateProps {
     projects: ProjectResponse[];
     pagination: IPagination;
     handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
 }
 
-const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ 
+    projects, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_EDIT, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_EDIT, { query, params: { id: String(id) } }));
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query, params: { id: String(id) } }));
     }
 
-    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => projects?.map((project: ProjectResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         project.projectName,
         getTechImages(project.skills),
         project.workStatus === WorkStatusType.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate || ""),
-        Action(project.id ?? "")
+        Action(project.id ?? 0)
     ])
 
     const getTechImages = (skills: SkillDropdown[]) => {
@@ -74,7 +84,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -89,18 +99,17 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ projects,
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Projects" description="Portfolio projects and case studies" count={pagination.totalRecords} accentColor="#8b5cf6">
+        <ListingShell 
+            title="Projects" 
+            description="Portfolio projects and case studies" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Project" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.PROJECTS_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     );

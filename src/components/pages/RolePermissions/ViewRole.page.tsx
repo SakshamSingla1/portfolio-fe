@@ -12,7 +12,7 @@ const ViewRolePage: React.FC = () => {
 
     const [roleDetails, setRoleDetails] = useState<RolePermissionResponseDTO | null>(null);
 
-    const loadRoleDetails = async (id: string) => {
+    const loadRoleDetails = async (id: number | null) => {
         try {
             const response = await roleService.getRolePermissionsByRoleId(id);
             if (response.status === HTTP_STATUS.OK) {
@@ -25,7 +25,7 @@ const ViewRolePage: React.FC = () => {
 
     useEffect(() => {
         if (id) {
-            loadRoleDetails(id);
+            loadRoleDetails(id ? Number(id) : null);
         }
     }, [id]);
 

@@ -15,6 +15,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import GlassCard from "../../atoms/GlassCard/GlassCard";
 import ColorCard from "./ColorCard.template";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { useNavigate } from "react-router-dom";
+import { ADMIN_ROUTES } from "../../../utils/constant";
+import ListingShell from "../Shared/ListingShell.template";
 
 import { TablePagination, IconButton } from "@mui/material";
 import { type IPagination } from "../../../utils/types";
@@ -106,10 +109,11 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     onRefresh
 }) => {
     const colors = useColors();
+    const navigate = useNavigate();
     const { activeThemeName, resetTheme, isPreviewActive, isDark } = useTheme();
     const { deleteColorTheme } = useColorThemeService();
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         if (window.confirm("Are you sure you want to delete this theme?")) {
             try {
                 await deleteColorTheme(id);
@@ -121,14 +125,14 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     };
 
     return (
-        <div className="relative w-full mx-auto py-6 sm:py-10 px-4 sm:px-6">
+        <div className="relative w-full mx-auto px-4 sm:px-6">
             <AnimatePresence>
                 {isPreviewActive && (
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="mb-12"
+                        className="py-4"
                     >
                         <GlassCard className="border-primary-500/30" style={{ borderColor: `${colors.primary500}50` }}>
                             <div className="flex items-center justify-between">
@@ -153,82 +157,95 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                {colorThemes.map((theme, i) => (
-                    <motion.div
-                        key={theme.id || theme.themeName}
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ delay: i * 0.05, duration: 0.5, ease: "easeOut" }}
-                    >
-                        <ColorCard
-                            colorTheme={theme}
-                            onDelete={handleDelete}
-                        />
-                    </motion.div>
-                ))}
-            </div>
+            <ListingShell
+                title="Color Themes"
+                description="Custom portfolio style presets"
+                count={pagination.totalRecords}
+                isAddButtonVisible={true}
+                addButtonLabel="Add Theme"
+                addButtonOnClick={() => navigate(ADMIN_ROUTES.COLOR_THEME_ADD)}
+            >
+                <div className="p-6">
+                    {colorThemes.length > 0 && (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                                {colorThemes.map((theme, i) => (
+                                    <motion.div
+                                        key={theme.id || theme.themeName}
+                                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        transition={{ delay: i * 0.05, duration: 0.5, ease: "easeOut" }}
+                                    >
+                                        <ColorCard
+                                            colorTheme={theme}
+                                            onDelete={handleDelete}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </div>
 
-            {colorThemes.length > 0 && (
-                <div
-                    className="rounded-2xl border shadow-sm overflow-hidden transition-colors duration-300 px-4"
-                    style={{
-                        backgroundColor: isDark ? `${colors.neutral0}05` : colors.neutral0,
-                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        backdropFilter: 'blur(10px)'
-                    }}
-                >
-                    <TablePagination
-                        component="div"
-                        count={pagination.totalRecords}
-                        page={pagination.currentPage}
-                        onPageChange={handlePaginationChange}
-                        rowsPerPage={pagination.pageSize}
-                        onRowsPerPageChange={handleRowsPerPageChange}
-                        rowsPerPageOptions={[6, 12, 18, 24]}
-                        ActionsComponent={TablePaginationActions}
-                        sx={{
-                            border: 'none',
-                            '.MuiTablePagination-toolbar': {
-                                paddingY: '12px',
-                                color: colors.neutral900,
-                            },
-                            '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
-                                fontWeight: 700,
-                                textTransform: 'uppercase',
-                                fontSize: '10px',
-                                letterSpacing: '0.1em',
-                                opacity: 0.6,
-                                color: colors.neutral900,
-                            },
-                            '.MuiTablePagination-select': {
-                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                                borderRadius: '8px',
-                                paddingY: '4px',
-                                paddingX: '8px',
-                                marginRight: '8px',
-                                fontWeight: 700,
-                                fontSize: '12px',
-                                color: colors.neutral900,
-                                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-                            },
-                            '.MuiTablePagination-selectIcon': {
-                                color: colors.neutral900,
-                            }
-                        }}
-                    />
-                </div>
-            )}
+                            <div
+                                className="rounded-2xl border shadow-sm overflow-hidden transition-colors duration-300 px-4"
+                                style={{
+                                    backgroundColor: isDark ? `${colors.neutral0}05` : colors.neutral0,
+                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                    backdropFilter: 'blur(10px)'
+                                }}
+                            >
+                                <TablePagination
+                                    component="div"
+                                    count={pagination.totalRecords}
+                                    page={pagination.currentPage}
+                                    onPageChange={handlePaginationChange}
+                                    rowsPerPage={pagination.pageSize}
+                                    onRowsPerPageChange={handleRowsPerPageChange}
+                                    rowsPerPageOptions={[6, 12, 18, 24]}
+                                    ActionsComponent={TablePaginationActions}
+                                    sx={{
+                                        border: 'none',
+                                        '.MuiTablePagination-toolbar': {
+                                            paddingY: '12px',
+                                            color: colors.neutral900,
+                                        },
+                                        '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            fontSize: '10px',
+                                            letterSpacing: '0.1em',
+                                            opacity: 0.6,
+                                            color: colors.neutral900,
+                                        },
+                                        '.MuiTablePagination-select': {
+                                            border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                                            borderRadius: '8px',
+                                            paddingY: '4px',
+                                            paddingX: '8px',
+                                            marginRight: '8px',
+                                            fontWeight: 700,
+                                            fontSize: '12px',
+                                            color: colors.neutral900,
+                                            backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                                        },
+                                        '.MuiTablePagination-selectIcon': {
+                                            color: colors.neutral900,
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </>
+                    )}
 
-            {colorThemes.length === 0 && (
-                <div className="py-32 flex flex-col items-center justify-center text-center">
-                    <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6 opacity-20">
-                        <TbPalette size={40} />
-                    </div>
-                    <h3 className="font-black text-xl uppercase tracking-tighter opacity-20">No Engine Configs Found</h3>
-                    <p className="text-xs mt-2 opacity-10 uppercase tracking-[0.3em] font-bold">Initialize a new theme to begin</p>
+                    {colorThemes.length === 0 && (
+                        <div className="py-32 flex flex-col items-center justify-center text-center">
+                            <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6 opacity-20">
+                                <TbPalette size={40} />
+                            </div>
+                            <h3 className="font-black text-xl uppercase tracking-tighter opacity-20">No Engine Configs Found</h3>
+                            <p className="text-xs mt-2 opacity-10 uppercase tracking-[0.3em] font-bold">Initialize a new theme to begin</p>
+                        </div>
+                    )}
                 </div>
-            )}
+            </ListingShell>
 
             <div
                 className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100]"

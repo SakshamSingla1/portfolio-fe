@@ -11,7 +11,7 @@ export const TESTIMONIAL_URLS = {
 };
 
 export interface Testimonial {
-    id?: string;
+    id?: number | null;
     name: string;
     message: string;
     role: string;
@@ -48,28 +48,28 @@ export interface TestimonialFilterParams {
 export const useTestimonialService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
-    
+
     const create = (testimonial: TestimonialRequest) =>
         request(API_METHOD.POST, TESTIMONIAL_URLS.GET_ALL, user, testimonial);
 
-    const update = (id: string | null, testimonial: TestimonialRequest) => {
+    const update = (id: number | null, testimonial: TestimonialRequest) => {
         const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, testimonial);
     };
 
-    const remove = (id: string) => {
+    const remove = (id: number | null) => {
         const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };
 
-    const getById = (id: string | null) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
         return request(API_METHOD.GET, url, user, null);
     };
 
-    const getAll = (params : TestimonialFilterParams) => {
+    const getAll = (params: TestimonialFilterParams) => {
         const url = TESTIMONIAL_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, {params});
+        return request(API_METHOD.GET, url, user, null, { params });
     };
 
     const uploadImage = (file: File) =>

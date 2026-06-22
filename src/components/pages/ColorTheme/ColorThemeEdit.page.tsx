@@ -12,7 +12,7 @@ const ColorThemeEditPage: React.FC = () => {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
     const { id } = useParams();
-    const themeId = String(id);
+    const themeId = id ? Number(id) : null;
 
     const colorThemeService = useColorThemeService();
 
@@ -20,7 +20,7 @@ const ColorThemeEditPage: React.FC = () => {
 
     const editColorTheme = async (values: ColorTheme) => {
         try {
-            const response = await colorThemeService.updateColorTheme(String(colorTheme?.id), values);
+            const response = await colorThemeService.updateColorTheme(colorTheme?.id ?? null, values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', 'Color theme updated successfully');
                 navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME, {}));

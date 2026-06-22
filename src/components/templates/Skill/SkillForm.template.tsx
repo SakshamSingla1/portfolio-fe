@@ -14,7 +14,7 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object().shape({
-    logoId: Yup.string()
+    logoId: Yup.number()
         .nullable()
         .required('Skill Logo ID is required'),
     level: Yup.string()
@@ -42,7 +42,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     const formik = useFormik<Skill>({
         initialValues: {
-            logoId: skill?.logoId || "",
+            logoid: skill?.logoid || null,
             level: skill?.level || SkillLevelType.BEGINNER,
             category: skill?.category || "",
         },
@@ -71,15 +71,15 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                 const fetchedLogos = response?.data?.data?.content || [];
                 setLogos(fetchedLogos);
 
-                if (formik.values.logoId) {
-                    const existing = fetchedLogos.find((l: Logo) => l.id === String(formik.values.logoId));
+                if (formik.values.logoid) {
+                    const existing = fetchedLogos.find((l: Logo) => l.id === formik.values.logoid);
                     if (existing) setSelectedLogo(existing);
                 }
             }
         } catch {
             setLogos([]);
         }
-    }, [logoService, formik.values.logoId]);
+    }, [logoService, formik.values.logoid]);
 
     const logoOptions = logos.map((logo) => ({
         label: (
@@ -89,7 +89,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
             </div>
         ),
         title: logo.name,
-        value: String(logo.id),
+        value: String(logo.id ?? ""),
     }));
 
 
@@ -105,7 +105,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         <FormShell
             title={mode === MODE.ADD ? "Add New Skill" : mode === MODE.EDIT ? "Edit Skill" : "Skill Details"}
             subtitle={mode === MODE.ADD ? "Add a new skill to your portfolio" : mode === MODE.EDIT ? "Update your skill information" : "View skill details"}
-            accentColor="#6366f1"
             breadcrumb="Skills"
             onBack={onClose}
         >
@@ -132,25 +131,25 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                 label="Skill"
                                 placeHolder="Search and select a skill (e.g., React, Node.js)"
                                 options={logoOptions}
-                                value={logoOptions.find(option => option.value === formik.values.logoId) || null}
+                                value={logoOptions.find(option => option.value === String(formik.values.logoid)) || null}
                                 onSearch={search => loadLogoDropdown(search)}
                                 onChange={value => {
-                                    formik.setFieldValue("logoId", value?.value ?? null);
+                                    formik.setFieldValue("logoid", value?.value ? Number(value.value) : null);
                                     formik.setFieldValue("logoName", typeof value?.title === "string" ? value.title : "");
                                     formik.setFieldValue(
                                         "logoUrl",
-                                        logos.find(l => l.id === value?.value)?.url || ""
+                                        logos.find(l => String(l.id) === String(value?.value))?.url || ""
                                     );
-                                    setSelectedLogo(logos.find(l => l.id === value?.value) || null);
+                                    setSelectedLogo(logos.find(l => String(l.id) === String(value?.value)) || null);
                                 }}
                                 required={true}
-                                error={formik.touched.logoId && Boolean(formik.errors.logoId)}
-                                helperText={Boolean(formik.touched.logoId && formik.errors.logoId) ? formik.errors.logoId : ""}
+                                error={formik.touched.logoid && Boolean(formik.errors.logoid)}
+                                helperText={Boolean(formik.touched.logoid && formik.errors.logoid) ? formik.errors.logoid : ""}
                                 isDisabled={mode === MODE.VIEW}
                             />
-                            {formik.errors.logoId && formik.touched.logoId && (
+                            {formik.errors.logoid && formik.touched.logoid && (
                                 <div className="text-red-500 text-xs mt-1">
-                                    {formik.errors.logoId as string}
+                                    {formik.errors.logoid}
                                 </div>
                             )}
                         </div>

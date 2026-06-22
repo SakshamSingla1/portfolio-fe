@@ -28,7 +28,7 @@ const LandingStepsTableTemplate: React.FC<LandingStepsTableProps> = ({
     );
 
     const schema = {
-        id: 'steps-table',
+        id: 4,
         hover: true,
         columns: [
             { label: 'Step #', key: 'stepNumber', type: 'custom' as ColumnType, props: {} },

@@ -69,12 +69,12 @@ export interface ProfileRequest {
 }
 
 export interface UserResponse {
-    id: string;
+    id?: number | null;
     fullName: string;
     userName: string;
     email: string;
     status: string;
-    roleId: string;
+    roleId?: number | null;
     roleName: string;
     profileImageUrl: string;
     emailVerified: string;
@@ -92,7 +92,7 @@ export interface StatusUpdateRequest {
 }
 
 export interface RoleUpdateRequest {
-    roleId: string;
+    roleid: number | null;
 }
 
 export interface GetProfilesParams {
@@ -142,7 +142,7 @@ export const useProfileService = () => {
         return request(API_METHOD.GET, PROFILE_URLS.ADMIN_GET_ALL_USERS, user, null, params ? { params } : null);
     };
 
-    const getUserById = (id: string) => {
+    const getUserById = (id: number | null) => {
         return request(
             API_METHOD.GET,
             replaceUrlParams(PROFILE_URLS.ADMIN_GET_USER_BY_ID, { id }),
@@ -150,7 +150,7 @@ export const useProfileService = () => {
         );
     };
 
-    const updateUserStatus = (id: string, body: StatusUpdateRequest) => {
+    const updateUserStatus = (id: number | null, body: StatusUpdateRequest) => {
         return request(
             API_METHOD.PUT,
             replaceUrlParams(PROFILE_URLS.ADMIN_UPDATE_STATUS, { id }),
@@ -159,7 +159,7 @@ export const useProfileService = () => {
         );
     };
 
-    const updateUserRole = (id: string, body: RoleUpdateRequest) => {
+    const updateUserRole = (id: number | null, body: RoleUpdateRequest) => {
         return request(
             API_METHOD.PUT,
             replaceUrlParams(PROFILE_URLS.ADMIN_UPDATE_ROLE, { id }),
@@ -168,7 +168,7 @@ export const useProfileService = () => {
         );
     };
 
-    const toggleUserVerification = (id: string) => {
+    const toggleUserVerification = (id: number | null) => {
         return request(
             API_METHOD.PUT,
             replaceUrlParams(PROFILE_URLS.ADMIN_TOGGLE_VERIFY, { id }),

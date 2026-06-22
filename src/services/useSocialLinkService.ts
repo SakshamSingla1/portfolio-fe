@@ -4,8 +4,8 @@ import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 const SOCIAL_LINK_URLS = {
-    SOCIAL_LINK : "/social-links",
-    SOCIAL_LINK_BY_ID : "/social-links/:id"
+    SOCIAL_LINK: "/social-links",
+    SOCIAL_LINK_BY_ID: "/social-links/:id"
 }
 
 export interface SocialLink {
@@ -16,7 +16,7 @@ export interface SocialLink {
 }
 
 export interface SocialLinkResponse {
-    id: string;
+    id?: number | null;
     platform: string;
     url: string;
     order: string;
@@ -42,7 +42,7 @@ export const useSocialLinkService = () => {
         return request(API_METHOD.GET, url, user, null, { params }, null);
     };
 
-    const getById = (id: string | null) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
         return request(API_METHOD.GET, url, user, null, null, null);
     };
@@ -52,12 +52,12 @@ export const useSocialLinkService = () => {
         return request(API_METHOD.POST, url, user, socialLink);
     };
 
-    const update = (id: string | null, socialLink: SocialLink) => {
+    const update = (id: number | null, socialLink: SocialLink) => {
         const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
         return request(API_METHOD.PUT, url, user, socialLink);
     };
 
-    const deleteSocialLink = (id: string) => {
+    const deleteSocialLink = (id: number | null) => {
         const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };
@@ -70,4 +70,3 @@ export const useSocialLinkService = () => {
         deleteSocialLink,
     };
 }
-        

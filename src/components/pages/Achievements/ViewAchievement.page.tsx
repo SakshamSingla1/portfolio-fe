@@ -12,9 +12,9 @@ const ViewAchievementPage = () => {
     const { showSnackbar } = useSnackbar();
     const [achievement, setAchievement] = useState<Achievement | null>(null);
 
-    const getAchievement = async (id: string | null) => {
+    const getAchievement = async (id: number | null) => {
         try {
-            const response = await achievementService.getById(String(id));
+            const response = await achievementService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
                 setAchievement(response.data.data);
             }
@@ -25,7 +25,7 @@ const ViewAchievementPage = () => {
 
     useEffect(() => {
         if (id) {
-            getAchievement(String(id));
+            getAchievement(id ? Number(id) : null);
         }
     }, [id]);
 

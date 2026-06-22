@@ -25,7 +25,7 @@ export interface TemplateRequest {
 }
 
 export interface TemplateResponse {
-    id: string;
+    id?: number | null;
     name: string;
     subject: string;
     body: string;

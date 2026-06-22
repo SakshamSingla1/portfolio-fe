@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,38 +9,48 @@ import { type ExperienceResponse, EmploymentStatus } from "../../../services/use
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { DateUtils } from "../../../utils/helper";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface ExperienceTableTemplateProps {
     experiences: ExperienceResponse[];
     pagination: IPagination;
     handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
 }
 
-const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ experiences, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ 
+    experiences, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_EDIT, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_EDIT, { query, params: { id: String(id) } }));
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_VIEW, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_VIEW, { query, params: { id: String(id) } }));
     }
 
-    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => experiences?.map((experience: ExperienceResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -48,7 +58,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ exper
         experience.jobTitle,
         experience.location,
         experience.employmentStatus === EmploymentStatus.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(experience.endDate || ""),
-        Action(experience.id ?? "")
+        Action(experience.id ?? 0)
     ])
 
     const getTableColumns = () => [
@@ -61,7 +71,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ exper
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -76,17 +86,17 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ exper
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Experience" description="Work history and roles" count={pagination.totalRecords} accentColor="#10b981">
+        <ListingShell 
+            title="Experience" 
+            description="Work history and roles" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Experience" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.EXPERIENCE_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     );

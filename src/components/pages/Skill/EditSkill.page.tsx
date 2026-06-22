@@ -16,7 +16,7 @@ const SkillEditDetailsPage = () => {
     const handleSubmit = async (values: Skill) => {
             try {
                 if (!id) return;
-                const response = await skillService.update(String(id), values);
+                const response = await skillService.update(id ? Number(id) : null, values);
                 if (response?.status === HTTP_STATUS.OK) {
                     showSnackbar('success',`${response?.data?.message}`);
                     navigate(ADMIN_ROUTES.SKILL);
@@ -28,7 +28,7 @@ const SkillEditDetailsPage = () => {
             }
         }
 
-    const getSkill = async (id: string | null) => {
+    const getSkill = async (id: number | null) => {
         try {
             const response = await skillService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -41,7 +41,7 @@ const SkillEditDetailsPage = () => {
 
     useEffect(() => {
         if (id) {
-            getSkill(String(id));
+            getSkill(id ? Number(id) : null);
         }
     }, [id]);
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -8,20 +8,30 @@ import ListingShell from "../Shared/ListingShell.template";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES, DEGREE_OPTIONS } from "../../../utils/constant";
 import type { Education } from "../../../services/useEducationService";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface IEducationsTableTemplateProps {
     educations: Education[];
     pagination: IPagination;
     handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
 }
 
-const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educations, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ 
+    educations, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange
+}) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -29,13 +39,13 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
         }
         navigate(
             makeRoute(ADMIN_ROUTES.EDUCATION_EDIT, {
-                params: { id },
+                params: { id: String(id) },
                 query: query
             })
         );
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -43,13 +53,13 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
         }
         navigate(
             makeRoute(ADMIN_ROUTES.EDUCATION_VIEW, {
-                params: { id },
+                params: { id: String(id) },
                 query: query
             })
         );
     }
 
-    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;;
+    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;;
 
     const getRecords = () => educations?.map((education: Education, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -57,7 +67,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
         DEGREE_OPTIONS.find(opt => opt.value === education.degree)?.label ?? "",
         education.startYear ?? "",
         education.endYear ?? "",
-        Action(education.id ?? "")
+        Action(education.id ?? 0)
     ])
 
     const getTableColumns = () => [
@@ -70,7 +80,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -85,18 +95,17 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ educ
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Education" description="Academic background and degrees" count={pagination.totalRecords} accentColor="#3b82f6">
+        <ListingShell 
+            title="Education" 
+            description="Academic background and degrees" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Education" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.EDUCATION_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     );

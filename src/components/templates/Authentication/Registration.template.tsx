@@ -63,9 +63,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
                 if (response.status === 200) {
                     setEmail(values.email);
                     setIsRegisterFlow(true);
-                    // otp verification
-                    // setAuthState(AUTH_STATE.OTP_VERIFICATION);
-                    setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL);
+                    setAuthState(AUTH_STATE.OTP_VERIFICATION);
                     showSnackbar('success', 'Registration successful.');
                 }
             } catch (error) {
@@ -78,7 +76,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
     });
 
     return (
-        <motion.div 
+        <motion.div
             className="w-full"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -86,7 +84,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({ setEmail, setAuthSt
         >
             <div className="p-8">
                 <div className="text-center mb-6 flex flex-col items-center">
-                    <motion.div 
+                    <motion.div
                         className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-3xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20"
                         whileHover={{ scale: 1.05, rotate: 5 }}
                         transition={{ type: "spring", stiffness: 300, damping: 15 }}

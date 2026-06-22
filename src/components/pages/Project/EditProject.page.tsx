@@ -16,7 +16,7 @@ const EditProjectPage = () => {
     const handleSubmit = async (values: Project) => {
         try {
             if (!id) return;
-            const response = await projectService.update(String(id), values);
+            const response = await projectService.update(id ? Number(id) : null, values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);
                 navigate(ADMIN_ROUTES.PROJECTS);
@@ -28,7 +28,7 @@ const EditProjectPage = () => {
         }
     }
 
-    const getProject = async (id: string | null) => {
+    const getProject = async (id: number | null) => {
         try {
             const response = await projectService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -41,7 +41,7 @@ const EditProjectPage = () => {
 
     useEffect(() => {
         if (id) {
-            getProject(String(id));
+            getProject(id ? Number(id) : null);
         }
     }, [id]);
 

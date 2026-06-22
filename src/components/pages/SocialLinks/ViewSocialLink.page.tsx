@@ -12,7 +12,7 @@ const ViewSocialLinkPage = () => {
     const { showSnackbar } = useSnackbar();
     const [socialLink, setSocialLink] = useState<SocialLinkResponse | null>(null);
 
-    const getSocialLink = async (id: string | null) => {
+    const getSocialLink = async (id: number | null) => {
         try {
             const response = await socialLinkService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -25,7 +25,7 @@ const ViewSocialLinkPage = () => {
 
     useEffect(() => {
         if (id) {
-            getSocialLink(String(id));
+            getSocialLink(id ? Number(id) : null);
         }
     }, [id]);
 

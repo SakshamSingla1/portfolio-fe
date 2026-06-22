@@ -16,7 +16,7 @@ const EditAchievementPage = () => {
     const handleSubmit = async (values: AchievementRequest) => {
         try {
             if (!id) return;
-            const response = await achievementService.update(String(id), values);
+            const response = await achievementService.update(id ? Number(id) : null, values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);
                 navigate(ADMIN_ROUTES.ACHIEVEMENTS);
@@ -28,7 +28,7 @@ const EditAchievementPage = () => {
         }
     }
 
-    const getAchievement = async (id: string | null) => {
+    const getAchievement = async (id: number | null) => {
         try {
             const response = await achievementService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -41,7 +41,7 @@ const EditAchievementPage = () => {
 
     useEffect(() => {
         if (id) {
-            getAchievement(String(id));
+            getAchievement(id ? Number(id) : null);
         }
     }, [id]);
 

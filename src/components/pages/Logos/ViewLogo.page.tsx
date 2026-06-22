@@ -12,7 +12,7 @@ const ViewLogoPage = () => {
     const { showSnackbar } = useSnackbar();
     const [logo, setLogo] = useState<Logo | null>(null);
 
-    const getLogo = async (id: string | null) => {
+    const getLogo = async (id: number | null) => {
         try {
             const response = await logoService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -25,7 +25,7 @@ const ViewLogoPage = () => {
 
     useEffect(() => {
         if (id) {
-            getLogo(String(id));
+            getLogo(id ? Number(id) : null);
         }
     }, [id]);
 

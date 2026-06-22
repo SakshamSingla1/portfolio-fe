@@ -28,7 +28,7 @@ const LandingFaqsTableTemplate: React.FC<LandingFaqsTableProps> = ({
     );
 
     const schema = {
-        id: 'faqs-table',
+        id: 2,
         hover: true,
         columns: [
             { label: 'Question', key: 'question', type: 'string' as ColumnType, props: {} },

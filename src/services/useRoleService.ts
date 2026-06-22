@@ -12,7 +12,7 @@ export const ROLE_URLS = {
 };
 
 export interface ModulePermissionDTO {
-    navLinkId: string;
+    navLinkid: number | null;
     name: string;
     path: string;
     navGroup: string;
@@ -21,12 +21,12 @@ export interface ModulePermissionDTO {
 }
 
 export interface PermissionDTO {
-    id: string;
+    id?: number | null;
     name: string;
 }
 
 export interface RoleListResponseDTO {
-    id: string;
+    id?: number | null;
     name: string;
     description: string;
     status: string;
@@ -48,12 +48,12 @@ export interface AuditableResponse {
 }
 
 export interface RolePermissionRequestDTO {
-    navLinkId: string;
-    permissionId: string;
+    navLinkid: number | null;
+    permissionid: number | null;
 }
 
 export interface RolePermissionResponseDTO extends AuditableResponse {
-    id: string;
+    id?: number | null;
     name: string;
     description: string;
     status: string;
@@ -93,7 +93,7 @@ export const useRoleService = () => {
         );
     };
 
-    const updateRole = (id: string, roleData: RoleRequestBodyDTO) => {
+    const updateRole = (id: number | null, roleData: RoleRequestBodyDTO) => {
         const url = replaceUrlParams(ROLE_URLS.UPDATE, { id });
         return request(
             API_METHOD.PUT,
@@ -103,7 +103,7 @@ export const useRoleService = () => {
         );
     };
 
-    const getRolePermissionsByRoleId = (id: string) => {
+    const getRolePermissionsByRoleId = (id: number | null) => {
         const url = replaceUrlParams(ROLE_URLS.GET_ROLE_PERMISSIONS, { id });
         return request(
             API_METHOD.GET,

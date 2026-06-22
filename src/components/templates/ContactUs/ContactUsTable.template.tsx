@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -8,18 +8,29 @@ import { DateUtils } from "../../../utils/helper";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface ContactUsTableTemplateProps {
     contactUs: ContactUs[];
     pagination: IPagination;
-    handlePaginationChange: (event: any, newPage: number) => void;
-    handleRowsPerPageChange: (event: any) => void;
-    handleMarkRead: (id: string) => void;
+    handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleMarkRead: (id: number | null) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
 }
 
-const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contactUs, pagination, handlePaginationChange, handleRowsPerPageChange, handleMarkRead }) => {
+const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ 
+    contactUs, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange, 
+    handleMarkRead,
+    searchValue,
+    onSearchChange
+}) => {
 
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
     const [selectedMessage, setSelectedMessage] = useState<ContactUs | null>(null);
 
     const handleView = async (message: ContactUs) => {
@@ -29,7 +40,7 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
     const handleClose = () => {
         setSelectedMessage(null);
         if (selectedMessage?.status === 'UNREAD') {
-            handleMarkRead(selectedMessage.id ?? '');
+            handleMarkRead(selectedMessage.id ?? 0);
         }
     }
 
@@ -56,7 +67,7 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -71,17 +82,15 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ contact
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Messages" description="Visitor inquiries and contact" count={pagination.totalRecords} accentColor="#a855f7">
+        <ListingShell 
+            title="Messages" 
+            description="Visitor inquiries and contact" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={false}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+        >
             <>
                 <TableV1
                     schema={getSchema()}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -10,41 +10,53 @@ import type { SocialLinkResponse } from "../../../services/useSocialLinkService"
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import { ADMIN_ROUTES } from "../../../utils/constant";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface SocialLinksTableTemplateProps {
     socialLinks: SocialLinkResponse[];
     pagination: IPagination;
     handlePaginationChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
+    filterContent?: React.ReactNode;
 }
 
-const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ socialLinks, pagination, handlePaginationChange, handleRowsPerPageChange }) => {
+const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ 
+    socialLinks, 
+    pagination, 
+    handlePaginationChange, 
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange,
+    filterContent
+}) => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
             status: searchParams.get("status") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_EDIT, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_EDIT, { query, params: { id: String(id) } }));
     }
 
-    const handleView = (id: string) => {
+    const handleView = (id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
             status: searchParams.get("status") || "",
         }
-        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_VIEW, { query, params: { id: id } }));
+        navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_VIEW, { query, params: { id: String(id) } }));
     }
 
-    const Action = (id: string) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
 
     const getRecords = () => socialLinks?.map((sl: SocialLinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
@@ -52,7 +64,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
         sl.status,
         DateUtils.dateTimeSecondToDate(sl.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(sl.updatedAt ?? ""),
-        Action(sl.id ?? "")
+        Action(sl.id ?? 0)
     ]);
 
     const getTableColumns = () => [
@@ -65,7 +77,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
     ];
 
     const getSchema = () => ({
-        id: "social-links-table",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -80,18 +92,18 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ soc
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Social Links" description="Online profiles and presence" count={pagination.totalRecords} accentColor="#ec4899">
+        <ListingShell 
+            title="Social Links" 
+            description="Online profiles and presence" 
+            count={pagination.totalRecords} 
+            isAddButtonVisible={true} 
+            addButtonLabel="Add Social Link" 
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.SOCIAL_LINKS_ADD)}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+            filterContent={filterContent}
+        >
             <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     )

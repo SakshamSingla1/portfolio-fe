@@ -1,41 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { HTTP_STATUS, StatusOptions, type IPagination } from "../../../utils/types";
-import TextField from "../../atoms/TextField/TextField";
-import { InputAdornment } from '@mui/material';
 import TableV1 from "../../organisms/Table/TableV1";
 import ListingShell from "../Shared/ListingShell.template";
-import { type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
-import { FiSearch, FiChevronDown, FiChevronUp, FiFilter } from "react-icons/fi";
+import { type DocumentUploadResponse } from "../../../services/useResumeService";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
-import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import { CgUnblock } from "react-icons/cg";
 import { MdDelete } from "react-icons/md";
 import { useResumeService } from "../../../services/useResumeService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { DateUtils } from "../../../utils/helper";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface ResumeTableTemplateProps {
     resumes: DocumentUploadResponse[];
     pagination: IPagination;
-    handleFiltersChange: (name: string, value: any) => void;
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
-    filters: ResumeSearchParams;
+    searchValue?: string;
+    onSearchChange?: (val: string) => void;
+    filterContent?: React.ReactNode;
 }
 
-const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagination, handleFiltersChange, handlePaginationChange, handleRowsPerPageChange, filters }) => {
+const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
+    resumes,
+    pagination,
+    handlePaginationChange,
+    handleRowsPerPageChange,
+    searchValue,
+    onSearchChange,
+    filterContent
+}) => {
     const { showSnackbar } = useSnackbar();
 
     const resumeService = useResumeService();
 
-    const [isMobile, setIsMobile] = useState<boolean>(false);
-    const [showFilters, setShowFilters] = useState<boolean>(false);
+    const isMobile = useIsMobile();
 
-    const handleActivateResume = async (id: string) => {
+    const handleActivateResume = async (id?: number | null) => {
+        if (!id) return;
         try {
-            const response = await resumeService.activateResume({ resumeId: id });
+            const response = await resumeService.activateResume({ resumeid: id });
             if (response.status === HTTP_STATUS.OK) {
                 showSnackbar('success', 'Resume activated successfully');
                 window.location.reload();
@@ -53,7 +59,8 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
         window.open(url, '_blank');
     }
 
-    const handleDeleteResume = async (id: string) => {
+    const handleDeleteResume = async (id?: number | null) => {
+        if (!id) return;
         try {
             const response = await resumeService.deleteResume(id);
             if (response.status === HTTP_STATUS.OK) {
@@ -108,7 +115,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
     ]
 
     const getSchema = () => ({
-        id: "1",
+        id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
             total: pagination.totalRecords,
@@ -123,117 +130,17 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({ resumes, pagi
         striped: true
     });
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
     return (
-        <ListingShell title="Resumes" description="Manage your resume files" count={pagination.totalRecords} accentColor="#10b981">
-            <div className="grid gap-y-4">
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-800">
-                                Resume List
-                            </h1>
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                    <div className={`${isMobile ? '' : 'flex justify-between items-end space-x-4'}`}>
-                        {isMobile ? (
-                            <div className="w-full">
-                                <button
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    className="w-full flex items-center justify-between p-3 bg-gray-100 rounded-lg mb-3"
-                                >
-                                    <span className="flex items-center">
-                                        <FiFilter />
-                                        <span className="ml-2">Filters</span>
-                                    </span>
-                                    <span className="transform transition-transform">
-                                        {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-                                    </span>
-                                </button>
-                                {showFilters && (
-                                    <div className="flex flex-col gap-4">
-                                        <AutoCompleteInput
-                                            label=""
-                                            placeHolder="Select Status"
-                                            options={StatusOptions}
-                                            value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
-                                            onChange={(option: any) => {
-                                                if (option) {
-                                                    handleFiltersChange("status", option.value);
-                                                } else {
-                                                    handleFiltersChange("status", "");
-                                                }
-                                            }}
-                                            onSearch={() => { }}
-                                        />
-                                        <TextField
-                                            label=''
-                                            variant="outlined"
-                                            placeholder="Search..."
-                                            value={filters.search}
-                                            name='search'
-                                            onChange={(event) => {
-                                                handleFiltersChange("search", event.target.value)
-                                            }}
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start"> <FiSearch /></InputAdornment>,
-                                            }}
-                                            fullWidth
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex gap-4">
-                                <div className="w-[250px]">
-                                    <AutoCompleteInput
-                                        label=""
-                                        placeHolder="Select Status"
-                                        options={StatusOptions}
-                                        value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
-                                        onChange={(option: any) => {
-                                            if (option) {
-                                                handleFiltersChange("status", option.value);
-                                            } else {
-                                                handleFiltersChange("status", "");
-                                            }
-                                        }}
-                                        onSearch={() => { }}
-                                    />
-                                </div>
-                                <div className="w-[250px]">
-                                    <TextField
-                                        label=''
-                                        variant="outlined"
-                                        placeholder="Search...."
-                                        value={filters.search}
-                                        name='search'
-                                        onChange={(event) => {
-                                            handleFiltersChange("search", event.target.value)
-                                        }}
-                                        InputProps={{
-                                            startAdornment: <InputAdornment position="start" className='pl-[11px]'> <FiSearch /></InputAdornment>,
-                                        }}
-                                        fullWidth
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-                <TableV1 schema={getSchema()} records={getRecords()} />
-            </div>
+        <ListingShell
+            title="Resumes"
+            description="Manage your resume files"
+            count={pagination.totalRecords}
+            isAddButtonVisible={false}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+            filterContent={filterContent}
+        >
+            <TableV1 schema={getSchema()} records={getRecords()} />
         </ListingShell>
     )
 }

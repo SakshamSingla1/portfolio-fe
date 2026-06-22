@@ -70,7 +70,6 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
     <FormShell
       title={title}
       subtitle={subtitle}
-      accentColor="#f97316"
       breadcrumb="Navlinks"
       onBack={() => navigate(-1)}
     >

@@ -1,79 +1,6 @@
 import MuiTextField, { type TextFieldProps } from "@mui/material/TextField";
-import { styled } from "@mui/system";
-import { useColors } from "../../../utils/types";
 import React from "react";
-
-const StyledTextField = styled(MuiTextField)<{ colors: any }>(
-  ({ colors }) => ({
-    width: "100%",
-
-    "& .MuiInputBase-root": {
-      border: `1px solid ${colors.neutral200}`,
-      borderRadius: 4,
-      fontSize: 16,
-      transition: "all 0.2s ease-in-out",
-
-      "&:hover": {
-        borderColor: colors.primary300,
-      },
-
-      "&:hover svg": {
-        color: colors.neutral700,
-      },
-
-      "&.Mui-focused": {
-        borderColor: colors.primary500,
-        boxShadow: `0 0 0 3px ${colors.primary100}`,
-      },
-
-      "&.Mui-focused svg": {
-        color: colors.primary500,
-      },
-
-      "&.Mui-disabled": {
-        backgroundColor: colors.neutral50,
-        borderColor: colors.neutral200,
-        cursor: "not-allowed",
-        "& input, & textarea": {
-          WebkitTextFillColor: `${colors.neutral400} !important`,
-          color: `${colors.neutral400} !important`,
-        },
-        "& svg": {
-          color: colors.neutral400,
-        }
-      },
-
-      "& input, & textarea": {
-        padding: "13px 12px",
-        color: colors.neutral900,
-
-        "&::placeholder": {
-          color: colors.neutral400,
-        },
-
-        "&:-webkit-autofill": {
-          WebkitBoxShadow: `0 0 0 1000px ${colors.neutral50} inset`,
-          WebkitTextFillColor: colors.neutral900,
-        },
-      },
-
-      "& svg": {
-        color: colors.neutral500,
-        transition: "color 0.2s ease-in-out",
-      },
-    },
-
-    "& .MuiOutlinedInput-notchedOutline": {
-      border: "none",
-    },
-
-    "& .Mui-error .MuiInputBase-root": {
-      backgroundColor: colors.error50,
-      borderColor: colors.error500,
-    },
-  })
-);
-
+import { twMerge } from "tailwind-merge";
 
 interface Props extends Omit<TextFieldProps, "label" | "helperText" | "error"> {
   label?: string;
@@ -88,52 +15,54 @@ const TextField: React.FC<Props> = ({
   error,
   required,
   InputProps,
+  className,
   ...props
 }) => {
-  const colors = useColors();
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "6px",
-        width: "100%",
-      }}
-    >
+    <div className="flex flex-col gap-1.5 w-full">
       {label && (
-        <label
-          style={{
-            color: colors.neutral700,
-            fontSize: 14,
-            fontWeight: 500,
-            marginLeft: 8,
-          }}
-        >
-          {label} {required && <span style={{ color: colors.error600 }}>*</span>}
+        <label className="text-gray-700 text-sm font-semibold ml-2 select-none tracking-tight">
+          {label} {required && <span className="text-red-500 font-bold">*</span>}
         </label>
       )}
 
-      <StyledTextField
+      <MuiTextField
         {...props}
-        colors={colors}
         label=""
         error={error}
         helperText={null}
+        variant="outlined"
         InputProps={{
           ...InputProps,
           readOnly: InputProps?.readOnly,
+          className: twMerge(
+            "w-full text-base border border-gray-200 hover:border-blue-400 hover:shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/60 focus-within:shadow-[0_4px_16px_rgba(59,130,246,0.08)] !rounded-2xl transition-all duration-300 ease-in-out bg-white text-gray-900",
+            error && "border-red-500 bg-red-50/30 focus-within:border-red-500 focus-within:ring-red-100/60 focus-within:shadow-[0_4px_16px_rgba(239,68,68,0.08)]",
+            props.disabled && "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60 hover:shadow-none hover:border-gray-200",
+            className
+          ),
+        }}
+        sx={{
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none",
+          },
+          "& input, & textarea": {
+            padding: "16px 16px",
+            color: "inherit",
+            fontFamily: "inherit",
+          },
+          "& svg": {
+            color: "var(--color-neutral-400)",
+            transition: "color 0.25s ease",
+            "&:hover": {
+              color: "var(--color-neutral-600)",
+            }
+          },
         }}
       />
 
       {error && helperText && (
-        <span
-          style={{
-            fontSize: 12,
-            marginLeft: 8,
-            color: colors.error600,
-          }}
-        >
+        <span className="text-xs ml-2 text-red-500 font-semibold select-none tracking-tight animate-fade-in">
           {helperText}
         </span>
       )}

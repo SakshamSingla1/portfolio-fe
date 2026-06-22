@@ -7,13 +7,13 @@ import { useParams } from 'react-router-dom';
 
 const NavlinkViewPage: React.FC = () => {
     const params = useParams();
-    const id = String(params.id);
+    const id = params.id ? Number(params.id) : null;
 
     const navlinkService = useNavlinkService();
 
     const [navlink, setNavlink] = useState<NavlinkResponse | null>(null);
 
-    const loadNavlink = async (id: string) => {
+    const loadNavlink = async (id: number | null) => {
         try {
             const response = await navlinkService.getNavlinkById(id);
             if (response?.status === HTTP_STATUS.OK) {

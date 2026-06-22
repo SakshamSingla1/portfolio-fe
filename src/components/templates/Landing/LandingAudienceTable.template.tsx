@@ -28,7 +28,7 @@ const LandingAudienceTableTemplate: React.FC<LandingAudienceTableProps> = ({
     );
 
     const schema = {
-        id: 'audience-table',
+        id: 1,
         hover: true,
         columns: [
             { label: 'Title', key: 'title', type: 'string' as ColumnType, props: {} },

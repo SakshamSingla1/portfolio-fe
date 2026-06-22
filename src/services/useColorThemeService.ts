@@ -33,7 +33,7 @@ export interface ColorPalette {
 }
 
 export interface ColorTheme {
-    id?: string;
+    id?: number | null;
     themeName: string;
     palette: ColorPalette;
     createdAt?: string | null;
@@ -47,7 +47,7 @@ export const useColorThemeService = () => {
         return request(API_METHOD.GET, COLOR_THEME_URLS.GET_COLOR_THEME, user, null, { params });
     }
 
-    const getColorThemeById = async (id: string) => {
+    const getColorThemeById = async (id: number | null) => {
         return request(API_METHOD.GET, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user);
     }
 
@@ -55,11 +55,11 @@ export const useColorThemeService = () => {
         return request(API_METHOD.POST, COLOR_THEME_URLS.GET_COLOR_THEME, user, colorTheme);
     }
 
-    const updateColorTheme = async (id: string, colorTheme: ColorTheme) => {
+    const updateColorTheme = async (id: number | null, colorTheme: ColorTheme) => {
         return request(API_METHOD.PUT, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user, colorTheme);
     }
 
-    const deleteColorTheme = async (id: string) => {
+    const deleteColorTheme = async (id: number | null) => {
         return request(API_METHOD.DELETE, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user);
     }
 

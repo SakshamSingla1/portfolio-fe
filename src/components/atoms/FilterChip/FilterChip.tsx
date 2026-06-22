@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { createUseStyles } from "react-jss";
 import {
   Select as MuiMultiSelect,
   MenuItem,
@@ -15,6 +14,7 @@ import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import { FiSearch, FiChevronDown } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
+import { twMerge } from "tailwind-merge";
 
 export interface IMultiSelectOption {
   label: string;
@@ -33,164 +33,8 @@ interface MultiSelectInputProps {
   searchable?: boolean;
   showSelectAll?: boolean;
   MenuProps?: Partial<MenuProps>;
+  className?: string;
 }
-
-interface StyleProps {
-  hasSelectedOptions: boolean;
-  colors: any;
-  minWidth?: string;
-}
-
-const useStyles = createUseStyles({
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    minWidth: ({ minWidth }: StyleProps) => minWidth || 280,
-  },
-
-  label: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: ({ colors }: StyleProps) => colors.neutral800,
-    letterSpacing: "0.2px",
-  },
-
-  select: {
-    borderRadius: 10,
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    border: ({ colors }: StyleProps) => `1px solid ${colors.neutral200}`,
-    background: ({ hasSelectedOptions, colors }: StyleProps) =>
-      hasSelectedOptions ? colors.primary50 : colors.neutral0,
-    padding: "6px 12px",
-
-    "&:hover": {
-      borderColor: ({ colors }: StyleProps) => colors.primary300,
-      background: ({ colors, hasSelectedOptions }: StyleProps) =>
-        hasSelectedOptions ? colors.primary100 : colors.neutral50,
-    },
-
-    "&.Mui-focused": {
-      borderColor: ({ colors }: StyleProps) => colors.primary500,
-      boxShadow: ({ colors }: StyleProps) =>
-        `0 0 0 3px ${colors.primary100}`,
-    },
-
-    "& .MuiSelect-select": {
-      display: "flex",
-      flexWrap: "wrap",
-      gap: 6,
-      padding: "6px 24px 6px 4px !important",
-      minHeight: 24,
-      alignItems: "center"
-    },
-
-    "& .MuiSelect-icon": {
-      color: ({ colors }: StyleProps) => colors.neutral500,
-      transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-      position: "absolute",
-      top: "50%",
-      right: "12px",
-      transform: "translateY(-50%)",
-    },
-    "& .MuiSelect-iconOpen": {
-      transform: "translateY(-50%) rotate(180deg)",
-    }
-  },
-
-  header: {
-    position: "sticky",
-    top: 0,
-    zIndex: 2,
-    background: ({ colors }: StyleProps) => colors.neutral0,
-    padding: "16px 16px 12px",
-    borderBottom: ({ colors }: StyleProps) => `1px solid ${colors.neutral100}`,
-  },
-
-  chip: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-    padding: "4px 10px",
-    borderRadius: 16,
-    fontSize: 12,
-    fontWeight: 500,
-    transition: "all 0.2s ease",
-    background: ({ colors }: StyleProps) => colors.primary100,
-    color: ({ colors }: StyleProps) => colors.primary800,
-    border: ({ colors }: StyleProps) => `1px solid ${colors.primary200}`,
-    "&:hover": {
-      background: ({ colors }: StyleProps) => colors.primary200,
-      transform: "translateY(-1px)",
-    }
-  },
-
-  chipClose: {
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "50%",
-    padding: 2,
-    marginRight: -4,
-    transition: "all 0.2s ease",
-    color: ({ colors }: StyleProps) => colors.primary600,
-    "&:hover": {
-      background: "rgba(0,0,0,0.06)",
-      color: ({ colors }: StyleProps) => colors.error600,
-    }
-  },
-
-  searchContainer: {
-    padding: "10px 12px",
-  },
-
-  footer: {
-    position: "sticky",
-    bottom: 0,
-    zIndex: 2,
-    background: ({ colors }: StyleProps) => colors.neutral0,
-    padding: "12px 16px",
-    borderTop: ({ colors }: StyleProps) => `1px solid ${colors.neutral100}`,
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-
-  scrollContainer: {
-    maxHeight: ({ maxHeight }: any) => maxHeight || 300,
-    overflowY: "auto",
-    background: ({ colors }: StyleProps) => colors.neutral0,
-    "&::-webkit-scrollbar": {
-      width: "6px",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: ({ colors }: StyleProps) => colors.neutral300,
-      borderRadius: "10px",
-    },
-  },
-
-  divider: {
-    margin: "4px 0",
-    opacity: 0.6,
-  },
-
-  menuItem: {
-    margin: "4px 8px",
-    borderRadius: "8px",
-    border: "1px solid transparent",
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    backgroundColor: ({ colors }: StyleProps) => colors.neutral0,
-    color: ({ colors }: StyleProps) => colors.neutral800,
-    "&:hover": {
-      backgroundColor: ({ colors }: StyleProps) => colors.neutral50,
-      borderColor: ({ colors }: StyleProps) => colors.neutral200,
-      color: ({ colors }: StyleProps) => colors.primary600,
-      transform: "translateY(-1px)",
-      boxShadow: "0 2px 8px -2px rgba(0,0,0,0.05)",
-    }
-  }
-});
 
 const FilterChip: React.FC<MultiSelectInputProps> = ({
   options,
@@ -200,17 +44,13 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
   placeholder = "Select...",
   isSingleSelect = false,
   minWidth = "280px",
+  maxHeight = "300px",
   searchable = true,
   showSelectAll = true,
   MenuProps,
+  className,
 }) => {
   const colors = useColors();
-  const classes = useStyles({
-    hasSelectedOptions: value.length > 0,
-    colors,
-    minWidth,
-  });
-
   const [open, setOpen] = useState(false);
   const [tempSelected, setTempSelected] = useState<IMultiSelectOption[]>(value);
   const [searchTerm, setSearchTerm] = useState("");
@@ -271,8 +111,12 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
   };
 
   return (
-    <div className={classes.container}>
-      {label && <div className={classes.label}>{label}</div>}
+    <div className="flex flex-col gap-1.5 w-full" style={{ minWidth }}>
+      {label && (
+        <div className="text-xs font-semibold text-gray-800 tracking-wide select-none">
+          {label}
+        </div>
+      )}
 
       <MuiMultiSelect
         open={open}
@@ -282,7 +126,12 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
         value={value.map((v) => v.value)}
         displayEmpty
         disableUnderline
-        className={classes.select}
+        className={twMerge(
+          "text-sm border border-gray-200 !rounded-2xl transition-all duration-300 bg-white text-gray-900",
+          value.length > 0 && "bg-blue-50/50 border-blue-200 hover:bg-blue-50/70",
+          "hover:border-blue-400 hover:shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/60 focus-within:shadow-[0_4px_16px_rgba(59,130,246,0.08)]",
+          className
+        )}
         IconComponent={FiChevronDown}
         MenuProps={{
           ...MenuProps,
@@ -290,27 +139,51 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
             ...MenuProps?.PaperProps,
             sx: {
               maxHeight: "none",
-              borderRadius: "12px",
-              marginTop: "6px",
-              border: `1px solid ${colors.neutral200}`,
-              boxShadow: "0 10px 40px -10px rgba(0,0,0,0.1)",
-              backgroundColor: colors.neutral0,
+              borderRadius: "14px",
+              marginTop: "8px",
+              border: "1px solid var(--color-neutral-200)",
+              boxShadow: "0 16px 40px -8px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)",
+              backgroundColor: "var(--color-neutral-0)",
               ...MenuProps?.PaperProps?.sx
             },
           },
         }}
+        sx={{
+          "& .MuiSelect-select": {
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "6px",
+            padding: "6px 32px 6px 12px !important",
+            minHeight: "24px",
+            alignItems: "center",
+          },
+          "& .MuiSelect-icon": {
+            color: "var(--color-neutral-500)",
+            transition: "transform 0.3s ease-in-out",
+            right: "12px",
+          },
+          "& .MuiSelect-iconOpen": {
+            transform: "rotate(180deg)",
+          },
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none",
+          },
+        }}
         renderValue={() =>
           value.length === 0 ? (
-            <span style={{ color: colors.neutral400, fontWeight: 400 }}>{placeholder}</span>
+            <span className="text-gray-400 font-normal">{placeholder}</span>
           ) : (
             value.map((option) => (
-              <div key={option.value} className={classes.chip}>
+              <div
+                key={option.value}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100/80 text-blue-700 hover:bg-blue-200 border border-blue-200/50 hover:border-blue-300/50 transition-all duration-200 hover:scale-[1.03] select-none"
+              >
                 {option.label}
                 <span
-                  className={classes.chipClose}
+                  className="cursor-pointer flex items-center justify-center rounded-full p-0.5 hover:bg-black/10 hover:text-red-600 transition-all"
                   onMouseDown={(e) => handleDeleteChip(e, option)}
                 >
-                  <CloseIcon style={{ fontSize: 14 }} />
+                  <CloseIcon style={{ fontSize: 13 }} />
                 </span>
               </div>
             ))
@@ -318,7 +191,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
         }
       >
         {searchable && (
-          <div className={classes.header}>
+          <div className="sticky top-0 z-10 bg-white px-4 py-3 border-b border-gray-100">
             <TextField
               size="small"
               placeholder="Search options..."
@@ -329,7 +202,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <FiSearch style={{ color: colors.neutral400 }} />
+                    <FiSearch className="text-gray-400" />
                   </InputAdornment>
                 ),
               }}
@@ -338,7 +211,10 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
         )}
 
         {showSelectAll && !isSingleSelect && filteredOptions.length > 0 && (
-          <MenuItem onClick={toggleSelectAll} className={classes.menuItem}>
+          <MenuItem
+            onClick={toggleSelectAll}
+            className="mx-2 my-1 p-2 rounded-lg border border-transparent hover:bg-gray-50 hover:border-gray-200 hover:text-blue-600 active:scale-[0.99] transition-all duration-200"
+          >
             <ListItemIcon style={{ minWidth: 32 }}>
               <Checkbox
                 checked={tempSelected.length === options.length && options.length > 0}
@@ -354,11 +230,14 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
           </MenuItem>
         )}
 
-        {showSelectAll && !isSingleSelect && <Divider className={classes.divider} />}
+        {showSelectAll && !isSingleSelect && <Divider className="my-1 opacity-60" />}
 
-        <div className={classes.scrollContainer}>
+        <div
+          className="overflow-y-auto bg-white scrollbar-thin scrollbar-thumb-gray-200"
+          style={{ maxHeight }}
+        >
           {filteredOptions.length === 0 ? (
-            <div style={{ padding: "20px", textAlign: "center", color: colors.neutral400, fontSize: 14 }}>
+            <div className="py-8 text-center text-gray-400 text-sm select-none">
               No options found
             </div>
           ) : (
@@ -366,7 +245,7 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
               <MenuItem
                 key={option.value}
                 onClick={() => handleChange(option)}
-                className={classes.menuItem}
+                className="mx-2 my-1 p-2 rounded-lg border border-transparent hover:bg-gray-50 hover:border-gray-200 hover:text-blue-600 active:scale-[0.99] transition-all duration-200"
               >
                 {!isSingleSelect && (
                   <ListItemIcon style={{ minWidth: 32 }}>
@@ -396,12 +275,12 @@ const FilterChip: React.FC<MultiSelectInputProps> = ({
           )}
         </div>
 
-        <Divider className={classes.divider} />
+        <Divider className="my-1 opacity-60" />
 
-        <div className={classes.footer}>
+        <div className="sticky bottom-0 z-10 bg-white px-4 py-3 border-t border-gray-100 flex justify-between gap-3">
           <Button
             variant="secondaryContained"
-            label="Clear Selection"
+            label="Clear"
             onClick={handleClear}
             className="w-full"
           />

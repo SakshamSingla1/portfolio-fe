@@ -30,7 +30,7 @@ export interface ExperienceRequest {
 }
 
 export interface ExperienceResponse {
-  id?: string;
+  id?: number | null;
   companyName: string;
   jobTitle: string;
   location: string;
@@ -57,7 +57,7 @@ export const useExperienceService = () => {
     return request(API_METHOD.GET, url, user, null, { params });
   };
 
-  const getById = (id: string) => {
+  const getById = (id: number | null) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id: String(id) });
     return request(API_METHOD.GET, url, user, null);
   };
@@ -65,12 +65,12 @@ export const useExperienceService = () => {
   const create = (experience: ExperienceRequest) =>
     request(API_METHOD.POST, EXPERIENCE_URLS.CREATE, user, experience);
 
-  const update = (id: string, experience: ExperienceRequest) => {
+  const update = (id: number | null, experience: ExperienceRequest) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id: String(id) });
     return request(API_METHOD.PUT, url, user, experience);
   };
 
-  const remove = (id: string) => {
+  const remove = (id: number | null) => {
     const url = replaceUrlParams(EXPERIENCE_URLS.GET_BY_ID, { id: String(id) });
     return request(API_METHOD.DELETE, url, user, null);
   };

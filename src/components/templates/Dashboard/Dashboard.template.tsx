@@ -102,17 +102,14 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   const { user } = useContext(AuthenticatedUserContext);
   const navigate = useNavigate();
 
-  const fullName     = dashboardData?.profileSummary?.fullName || user?.fullName || "";
+  const fullName = dashboardData?.profileSummary?.fullName || user?.fullName || "";
   const profileTitle = dashboardData?.profileSummary?.title || "";
-  const profileLoc   = dashboardData?.profileSummary?.location || "";
-  const profileImg   = dashboardData?.profileSummary?.profileImageUrl || "";
-  const firstName    = fullName.split(" ")[0] || "there";
+  const profileLoc = dashboardData?.profileSummary?.location || "";
+  const profileImg = dashboardData?.profileSummary?.profileImageUrl || "";
+  const firstName = fullName.split(" ")[0] || "there";
 
-  const cardShadow = isDark
-    ? "0 1px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)"
-    : "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)";
+  const cardShadow = isDark ? "0 1px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)" : "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)";
 
-  /* ─── Card shell ─────────────────────────────────────────── */
   const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({
     children, className = "",
   }) => (
@@ -128,7 +125,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
     </div>
   );
 
-  /* ─── Section label ──────────────────────────────────────── */
   const SectionLabel: React.FC<{
     children: React.ReactNode;
     count?: number;
@@ -179,7 +175,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
     </div>
   );
 
-  /* ─── Focus strip insights ───────────────────────────────── */
   const buildFocusChips = () => {
     if (!dashboardData) return [];
     const chips: Array<{ label: string; color: string; route?: string }> = [];

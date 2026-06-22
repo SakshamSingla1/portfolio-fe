@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 const ColorThemeViewPage: React.FC = () => {
     const colorThemeService = useColorThemeService();
     const params = useParams();
-    const themeId = String(params.id);
+    const themeId = params.id ? Number(params.id) : null;
     const [colorTheme, setColorTheme] = useState<ColorTheme | null>(null);
 
     const loadColorThemeData = async () => {

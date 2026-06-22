@@ -16,7 +16,7 @@ const EditTestimonialPage = () => {
     const handleSubmit = async (values: TestimonialRequest) => {
         try {
             if (!id) return;
-            const response = await testimonialService.update(String(id), values);
+            const response = await testimonialService.update(id ? Number(id) : null, values);
             if (response?.status === HTTP_STATUS.OK) {
                 showSnackbar('success', `${response?.data?.message}`);
                 navigate(ADMIN_ROUTES.TESTIMONIALS);
@@ -28,7 +28,7 @@ const EditTestimonialPage = () => {
         }
     }
 
-    const getTestimonial = async (id: string | null) => {
+    const getTestimonial = async (id: number | null) => {
         try {
             const response = await testimonialService.getById(id);
             if (response?.status === HTTP_STATUS.OK && response.data) {
@@ -41,7 +41,7 @@ const EditTestimonialPage = () => {
 
     useEffect(() => {
         if (id) {
-            getTestimonial(String(id));
+            getTestimonial(id ? Number(id) : null);
         }
     }, [id]);
 

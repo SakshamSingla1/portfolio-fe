@@ -9,7 +9,7 @@ export const LOGO_URLS = {
 };
 
 export interface Logo {
-  id?: string | null;
+  id?: number | null;
   name: string;
   url: string;
   createdAt?: string;
@@ -22,11 +22,11 @@ export interface LogoRequest {
 }
 
 export interface LogoFilterParams {
-    search?: string;
-    page?: string;
-    size?: string;
-    sortDir?: string;
-    sortBy?: string;
+  search?: string;
+  page?: string;
+  size?: string;
+  sortDir?: string;
+  sortBy?: string;
 }
 
 export const useLogoService = () => {
@@ -37,7 +37,7 @@ export const useLogoService = () => {
     return request(API_METHOD.GET, url, user, null, { params });
   };
 
-  const getById = (id: string | null) => {
+  const getById = (id: number | null) => {
     const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
     return request(API_METHOD.GET, url, user, null);
   };
@@ -47,12 +47,12 @@ export const useLogoService = () => {
     return request(API_METHOD.POST, url, user, logo);
   };
 
-  const update = (id: string, logo: LogoRequest) => {
+  const update = (id: number | null, logo: LogoRequest) => {
     const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
     return request(API_METHOD.PUT, url, user, logo);
   };
 
-  const remove = (id: string) => {
+  const remove = (id: number | null) => {
     const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
     return request(API_METHOD.DELETE, url, user, null);
   };

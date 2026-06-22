@@ -117,7 +117,6 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
     <FormShell
       title={title}
       subtitle="Manage your project and skill iconography with automated DevIcon integration."
-      accentColor="#8b5cf6"
       breadcrumb="Logos"
       onBack={() => navigate(-1)}
     >

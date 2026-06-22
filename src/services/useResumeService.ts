@@ -11,7 +11,7 @@ export const RESUME_URLS = {
 };
 
 export interface DocumentUploadResponse {
-  id: string;
+  id?: number | null;
   fileName: string;
   fileUrl: string;
   publicId: string;
@@ -29,7 +29,7 @@ export interface ResumeSearchParams {
 }
 
 export interface ResumeActivateRequest {
-  resumeId: string;
+  resumeid: number | null;
 }
 
 export const useResumeService = () => {
@@ -53,11 +53,11 @@ export const useResumeService = () => {
 
   const activateResume = (data: ResumeActivateRequest) => {
     const url = RESUME_URLS.ACTIVATE;
-    return request(API_METHOD.PUT, url, user, null, { params: { resumeId: data.resumeId } });
+    return request(API_METHOD.PUT, url, user, null, { params: { resumeId: data.resumeid } });
   };
 
-  const deleteResume = (resumeId: string) => {
-    const url = replaceUrlParams(RESUME_URLS.DELETE, { resumeId });
+  const deleteResume = (resumeid: number | null) => {
+    const url = replaceUrlParams(RESUME_URLS.DELETE, { resumeid });
     return request(API_METHOD.DELETE, url, user, null);
   };
 

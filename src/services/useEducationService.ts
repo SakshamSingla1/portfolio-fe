@@ -15,7 +15,7 @@ export const GradeType = [
 ];
 
 export interface Education {
-    id?: string;
+    id?: number | null;
     institution: string;
     degree: string;
     fieldOfStudy: string;
@@ -41,17 +41,17 @@ export const useEducationService = () => {
     const create = (education: Education) =>
         request(API_METHOD.POST, EDUCATION_URLS.GET_ALL, user, education);
 
-    const update = (id: string | null, education: Education) => {
+    const update = (id: number | null, education: Education) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
         return request(API_METHOD.PUT, url, user, education);
     };
 
-    const remove = (id: string) => {
+    const remove = (id: number | null) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
         return request(API_METHOD.DELETE, url, user, null);
     };
 
-    const getById = (id: string | null) => {
+    const getById = (id: number | null) => {
         const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
         return request(API_METHOD.GET, url, user, null);
     };
