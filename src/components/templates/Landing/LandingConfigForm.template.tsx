@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse, LinearProgress, InputAdornment } from '@mui/material';
-import { LuSave } from 'react-icons/lu';
+import { LuSave, LuImage } from 'react-icons/lu';
 import { FiChevronDown, FiPlus, FiX, FiZap, FiTarget } from 'react-icons/fi';
 import Button from '../../atoms/Button/Button';
 import TextField from '../../atoms/TextField/TextField';
-import { useColors } from '../../../utils/types';
+import ImageUpload, { type ImageValue } from '../../atoms/ImageUpload/ImageUpload';
+import useFileService from '../../../services/useFileService';
+import type { ImageUploadResponse } from '../../../services/useProfileService';
+import { useColors, HTTP_STATUS } from '../../../utils/types';
 import type { LandingConfig } from '../../../services/useLandingPageService';
 
 // ── Char Counter ───────────────────────────────────────────────────────────────
@@ -278,8 +281,9 @@ const FieldWithCount: React.FC<{ children: React.ReactNode; value: string; max: 
 );
 
 // ── Completion helpers ─────────────────────────────────────────────────────────
-const HERO_TOTAL = 7;
-const CTA_TOTAL  = 5;
+const HERO_TOTAL   = 7;
+const CTA_TOTAL    = 5;
+const BANNER_TOTAL = 1;
 
 const heroFilled = (c: LandingConfig) =>
     [c.heroEyebrow, c.heroHeadline1, c.heroHeadline2, c.heroDescription, c.heroPrimaryCtaText, c.heroSecondaryCtaText]
@@ -301,10 +305,50 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
     config, saving, onChange, onSave,
 }) => {
     const colors = useColors();
+    const fileService = useFileService();
+
+    const [bannerValue, setBannerValue]     = useState<ImageValue | null>(null);
+    const [bannerAssetId, setBannerAssetId] = useState<string | number | null>(null);
+
+    useEffect(() => {
+        fileService.getByResource('singleton', 'BANNER').then((res: any) => {
+            if (res?.status === HTTP_STATUS.OK) {
+                const data = res.data?.data;
+                const asset = Array.isArray(data)
+                    ? (data.find((a: any) => a.isPrimary) ?? data[0])
+                    : data;
+                if (asset?.path) {
+                    setBannerValue({ url: asset.path, publicId: String(asset.id) });
+                    setBannerAssetId(asset.id);
+                }
+            }
+        });
+    }, []);
+
+    const handleBannerUpload = async (file: File): Promise<ImageUploadResponse> => {
+        const res = await fileService.upload(file, 'singleton', 'BANNER', { isPrimary: true, sortOrder: 0 });
+        if (res?.status === HTTP_STATUS.OK) {
+            const asset = res.data?.data;
+            if (bannerAssetId) fileService.deleteFile(bannerAssetId);
+            setBannerAssetId(asset.id);
+            return { url: asset.path, publicId: String(asset.id) };
+        }
+        throw new Error('Upload failed');
+    };
+
+    const handleBannerChange = (val: ImageValue | null) => {
+        setBannerValue(val);
+        if (!val && bannerAssetId) {
+            fileService.deleteFile(bannerAssetId);
+            setBannerAssetId(null);
+        }
+    };
+
     const hFilled     = heroFilled(config);
     const cFilled     = ctaFilled(config);
-    const totalFilled = hFilled + cFilled;
-    const totalFields = HERO_TOTAL + CTA_TOTAL;
+    const bFilled     = bannerValue ? 1 : 0;
+    const totalFilled = hFilled + cFilled + bFilled;
+    const totalFields = HERO_TOTAL + CTA_TOTAL + BANNER_TOTAL;
     const overallPct  = Math.round((totalFilled / totalFields) * 100);
 
     useEffect(() => {
@@ -480,6 +524,30 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
                             max={5}
                         />
                     </div>
+                </div>
+            </SectionCard>
+
+            {/* ── Banner Image ─────────────────────────────────────────────── */}
+            <SectionCard
+                icon={<LuImage size={18} />}
+                title="Hero Banner Image"
+                description="Visual image displayed in the landing page hero section"
+                accentColor={colors.success600}
+                filled={bFilled}
+                total={BANNER_TOTAL}
+                defaultOpen={false}
+            >
+                <div className="mt-2">
+                    <ImageUpload
+                        label="Banner Image"
+                        value={bannerValue}
+                        onChange={handleBannerChange}
+                        onUpload={handleBannerUpload}
+                        aspectRatio="wide"
+                        maxWidth="100%"
+                        placeholder="Drop hero banner image here"
+                        helperText="Recommended: 1600 × 900 px or wider · PNG / JPG / WebP"
+                    />
                 </div>
             </SectionCard>
 

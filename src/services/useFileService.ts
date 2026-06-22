@@ -16,7 +16,7 @@ export interface IFileAsset {
     id: string | number | null;
     location: string | null;
     path: string;
-    resourceId: string | number | null;
+    resourceId: string | null;
     resourceType: string;
     mimeType: string;
     metaData: string | null;
