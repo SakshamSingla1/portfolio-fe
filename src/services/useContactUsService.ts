@@ -6,6 +6,7 @@ import { replaceUrlParams } from "../utils/helper";
 export const CONTACT_US_URLS = {
     GET_BY_PROFILE: "/contact-us",
     MARK_AS_READ: "/contact-us/:id/mark-read",
+    REPLY: "/contact-us/:id/reply",
 };
 
 export interface ContactUs {
@@ -16,6 +17,8 @@ export interface ContactUs {
     phone: string;
     status: string;
     createdAt: string;
+    replyMessage?: string | null;
+    repliedAt?: string | null;
 }
 
 export interface ContactUsRequest {
@@ -46,9 +49,15 @@ export const useContactUsService = () => {
         return request(API_METHOD.PATCH, url, user);
     };
 
+    const reply = (id: number, message: string) => {
+        const url = replaceUrlParams(CONTACT_US_URLS.REPLY, { id });
+        return request(API_METHOD.POST, url, user, { message });
+    };
+
     return {
         getByProfile,
         markAsRead,
+        reply,
     };
 };
 
