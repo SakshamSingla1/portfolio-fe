@@ -22,15 +22,17 @@ interface ButtonProps extends Omit<MuiButtonProps, "variant" | "size"> {
   iconButton?: React.ReactNode;
   size?: CustomSize;
   buttonWithImg?: boolean;
+  rounded?: boolean;
 }
 
 const StyledButton = styled(MuiButton, {
-  shouldForwardProp: (prop) => prop !== "$variant" && prop !== "$size" && prop !== "colors",
+  shouldForwardProp: (prop) => prop !== "$variant" && prop !== "$size" && prop !== "$rounded" && prop !== "colors",
 })<{
   $variant: CustomVariant;
   $size: CustomSize;
+  $rounded?: boolean;
   colors: any;
-}>(({ colors, $variant, $size }) => ({
+}>(({ colors, $variant, $size, $rounded }) => ({
   textTransform: "capitalize",
   fontWeight: 600,
   lineHeight: 1,
@@ -38,10 +40,10 @@ const StyledButton = styled(MuiButton, {
   transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
 
   ...( {
-    extraSmall: { minHeight: 32, padding: "4px 12px", fontSize: 13, borderRadius: 6 },
-    small: { minHeight: 36, padding: "6px 16px", fontSize: 14, borderRadius: 8 },
-    medium: { minHeight: 40, padding: "8px 20px", fontSize: 15, borderRadius: 10 },
-    large: { minHeight: 48, padding: "12px 24px", fontSize: 16, borderRadius: 12 },
+    extraSmall: { minHeight: 32, padding: "4px 12px", fontSize: 13, borderRadius: $rounded ? 9999 : 6 },
+    small: { minHeight: 36, padding: "6px 16px", fontSize: 14, borderRadius: $rounded ? 9999 : 8 },
+    medium: { minHeight: 40, padding: "8px 20px", fontSize: 15, borderRadius: $rounded ? 9999 : 10 },
+    large: { minHeight: 48, padding: "12px 24px", fontSize: 16, borderRadius: $rounded ? 9999 : 20 },
   }[$size]),
 
   "&:active": {
@@ -118,6 +120,7 @@ const Button: React.FC<ButtonProps> = ({
   iconButton,
   isLoading,
   buttonWithImg,
+  rounded=true,
   disabled,
   ...props
 }) => {
@@ -140,6 +143,7 @@ const Button: React.FC<ButtonProps> = ({
       colors={colors}
       $variant={variant}
       $size={size}
+      $rounded={rounded}
       variant="text"
       disableRipple
       disableElevation
