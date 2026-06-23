@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { FiShield, FiShieldOff, FiCheck, FiArrowLeft, FiCopy, FiKey, FiLock } from "react-icons/fi";
@@ -7,7 +7,6 @@ import { useAuthService } from "../../../services/useAuthService";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import Button from "../../atoms/Button/Button";
-import TextField from "../../atoms/TextField/TextField";
 
 type TabView = "idle" | "setup" | "disable";
 
@@ -26,13 +25,60 @@ const TwoFactorTab: React.FC = () => {
 
     const [view, setView] = useState<TabView>("idle");
     const [isLoading, setIsLoading] = useState(false);
-    const [totpCode, setTotpCode] = useState("");
+    const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
     const [qrData, setQrData] = useState<{ secret: string; otpAuthUrl: string } | null>(null);
     const [copied, setCopied] = useState(false);
 
+    const inputRefs = useRef<Array<React.RefObject<HTMLInputElement>>>(
+        Array.from({ length: 6 }, () => React.createRef<HTMLInputElement>())
+    );
+
+    const totpCode = otp.join("");
     const isEnabled = !!user?.isTwoFactorEnabled;
 
-    const reset = () => { setView("idle"); setTotpCode(""); setQrData(null); };
+    const reset = () => {
+        setView("idle");
+        setOtp(Array(6).fill(""));
+        setQrData(null);
+    };
+
+    const clearOtp = () => {
+        setOtp(Array(6).fill(""));
+        inputRefs.current[0].current?.focus();
+    };
+
+    const handleOtpChange = (index: number, value: string) => {
+        if (value === "" || /^\d$/.test(value)) {
+            const next = [...otp];
+            next[index] = value;
+            setOtp(next);
+            if (value && index < 5) inputRefs.current[index + 1].current?.focus();
+        }
+    };
+
+    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>, onEnter: () => void) => {
+        if (e.key === "Backspace" && !otp[index] && index > 0) {
+            inputRefs.current[index - 1].current?.focus();
+        } else if (e.key === "ArrowLeft" && index > 0) {
+            inputRefs.current[index - 1].current?.focus();
+        } else if (e.key === "ArrowRight" && index < 5) {
+            inputRefs.current[index + 1].current?.focus();
+        } else if (e.key === "Enter" && totpCode.length === 6) {
+            onEnter();
+        }
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const paste = e.clipboardData.getData("text").trim();
+        if (/^\d+$/.test(paste)) {
+            const digits = paste.slice(0, 6).split("");
+            const next = Array(6).fill("");
+            digits.forEach((d, i) => { next[i] = d; });
+            setOtp(next);
+            inputRefs.current[Math.min(digits.length - 1, 5)].current?.focus();
+        }
+    };
 
     const handleBeginSetup = async () => {
         try {
@@ -56,7 +102,7 @@ const TwoFactorTab: React.FC = () => {
             showSnackbar("success", "Two-factor authentication enabled");
         } catch {
             showSnackbar("error", "Invalid code. Please try again.");
-            setTotpCode("");
+            clearOtp();
         } finally {
             setIsLoading(false);
         }
@@ -71,7 +117,7 @@ const TwoFactorTab: React.FC = () => {
             showSnackbar("success", "Two-factor authentication disabled");
         } catch {
             showSnackbar("error", "Invalid code. Please try again.");
-            setTotpCode("");
+            clearOtp();
         } finally {
             setIsLoading(false);
         }
@@ -84,32 +130,38 @@ const TwoFactorTab: React.FC = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const codeInput = (onSubmit: () => void) => (
-        <div className="flex flex-col items-center gap-4 mt-2 w-full max-w-[240px] mx-auto">
-            <TextField
-                autoFocus
-                value={totpCode}
-                disabled={isLoading}
-                placeholder="······"
-                onChange={e => setTotpCode(e.target.value.replace(/\D/g, ""))}
-                onKeyDown={(e: React.KeyboardEvent) => e.key === "Enter" && totpCode.length === 6 && onSubmit()}
-                inputProps={{ maxLength: 6 }}
-                sx={{
-                    "& .MuiInputBase-root": {
-                        border: `2px solid ${totpCode.length > 0 ? colors.primary500 : colors.neutral300} !important`,
-                        boxShadow: totpCode.length > 0 ? `0 0 0 4px ${colors.primary500}18` : "none",
-                        transition: "all 0.2s",
-                    },
-                    "& input": {
-                        textAlign: "center",
-                        fontSize: "1.75rem",
-                        letterSpacing: "0.6rem",
-                        fontWeight: 900,
-                        paddingLeft: "0.6rem",
-                    },
-                }}
-            />
-            <p className="text-xs text-center" style={{ color: colors.neutral400 }}>
+    const otpBoxes = (onSubmit: () => void) => (
+        <div className="flex flex-col items-center gap-3 mt-2">
+            <div className="flex gap-2.5 justify-center">
+                {otp.map((digit, i) => (
+                    <motion.input
+                        key={i}
+                        ref={inputRefs.current[i]}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={1}
+                        value={digit}
+                        disabled={isLoading}
+                        autoFocus={i === 0}
+                        onChange={e => handleOtpChange(i, e.target.value)}
+                        onKeyDown={e => handleKeyDown(i, e, onSubmit)}
+                        onPaste={handlePaste}
+                        className="text-center font-bold rounded-xl focus:outline-none transition-all duration-200"
+                        style={{
+                            width: 44,
+                            height: 52,
+                            fontSize: "1.375rem",
+                            border: `1.5px solid ${digit ? colors.primary500 : colors.neutral200}`,
+                            background: digit ? `${colors.primary500}08` : colors.neutral50,
+                            color: colors.neutral900,
+                            boxShadow: digit ? `0 0 0 3px ${colors.primary500}18` : "none",
+                        }}
+                        whileTap={{ scale: 0.93 } as any}
+                    />
+                ))}
+            </div>
+            <p className="text-xs" style={{ color: colors.neutral400 }}>
                 Code refreshes every 30 seconds
             </p>
         </div>
@@ -122,7 +174,6 @@ const TwoFactorTab: React.FC = () => {
             transition={{ duration: 0.3 }}
             style={{ padding: "24px", width: "100%" }}
         >
-            {/* Header */}
             <div className="flex items-center gap-2 mb-1">
                 <div
                     className="flex items-center justify-center p-2 rounded-xl"
@@ -139,15 +190,12 @@ const TwoFactorTab: React.FC = () => {
             </p>
 
             <AnimatePresence mode="wait">
-
-                {/* ── IDLE ───────────────────────────────────────────── */}
                 {view === "idle" && (
                     <motion.div key="idle" {...slide}>
-                        {/* Status pill */}
                         <div
                             className="flex items-center gap-3 rounded-2xl p-4 mb-7"
                             style={{
-                                background: isEnabled ? `${colors.primary500}0d` : `${colors.neutral100}`,
+                                background: isEnabled ? `${colors.primary500}0d` : colors.neutral100,
                                 border: `1.5px solid ${isEnabled ? colors.primary300 : colors.neutral200}`,
                             }}
                         >
@@ -181,7 +229,6 @@ const TwoFactorTab: React.FC = () => {
                                 {isEnabled ? "On" : "Off"}
                             </span>
                         </div>
-
                         <div className="flex justify-center">
                             {isEnabled ? (
                                 <Button
@@ -202,8 +249,6 @@ const TwoFactorTab: React.FC = () => {
                         </div>
                     </motion.div>
                 )}
-
-                {/* ── SETUP ──────────────────────────────────────────── */}
                 {view === "setup" && qrData && (
                     <motion.div key="setup" {...slide}>
                         <button
@@ -215,11 +260,10 @@ const TwoFactorTab: React.FC = () => {
                             <FiArrowLeft size={13} /> Back
                         </button>
 
-                        {/* Step 1 — scan */}
                         <div className="flex flex-col items-center mb-6">
                             <div
                                 className="rounded-2xl p-4 mb-4"
-                                style={{ background: "#fff", border: `1.5px solid ${colors.neutral200}`, boxShadow: `0 4px 16px rgba(0,0,0,0.06)` }}
+                                style={{ background: "#fff", border: `1.5px solid ${colors.neutral200}`, boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}
                             >
                                 <QRCodeSVG value={qrData.otpAuthUrl} size={180} />
                             </div>
@@ -227,18 +271,14 @@ const TwoFactorTab: React.FC = () => {
                                 Scan with Google Authenticator or Authy
                             </p>
                             <p className="text-xs text-center mb-4" style={{ color: colors.neutral400 }}>
-                                Can't scan the code? Add the key manually:
+                                Can't scan? Add the key manually:
                             </p>
-                            {/* Secret key */}
                             <div
                                 className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 w-full max-w-sm"
                                 style={{ background: colors.neutral100, border: `1px solid ${colors.neutral200}` }}
                             >
                                 <FiKey size={13} style={{ color: colors.neutral400, flexShrink: 0 }} />
-                                <span
-                                    className="flex-1 text-xs font-mono tracking-widest truncate select-all"
-                                    style={{ color: colors.neutral700 }}
-                                >
+                                <span className="flex-1 text-xs font-mono tracking-widest truncate select-all" style={{ color: colors.neutral700 }}>
                                     {qrData.secret}
                                 </span>
                                 <button
@@ -250,8 +290,6 @@ const TwoFactorTab: React.FC = () => {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Step 2 — confirm */}
                         <div
                             className="rounded-xl px-4 py-3 mb-5"
                             style={{ background: `${colors.primary500}08`, border: `1px solid ${colors.primary200}` }}
@@ -260,9 +298,7 @@ const TwoFactorTab: React.FC = () => {
                                 Step 2 — Enter the 6-digit code from your app to confirm setup
                             </p>
                         </div>
-
-                        {codeInput(handleConfirmEnable)}
-
+                        {otpBoxes(handleConfirmEnable)}
                         <div className="flex justify-center mt-5">
                             <Button
                                 label={isLoading ? "Verifying…" : "Confirm & Enable"}
@@ -274,8 +310,6 @@ const TwoFactorTab: React.FC = () => {
                         </div>
                     </motion.div>
                 )}
-
-                {/* ── DISABLE ────────────────────────────────────────── */}
                 {view === "disable" && (
                     <motion.div key="disable" {...slide}>
                         <button
@@ -297,13 +331,11 @@ const TwoFactorTab: React.FC = () => {
                                     Confirm with your authenticator app
                                 </p>
                                 <p className="text-xs leading-relaxed" style={{ color: colors.neutral500 }}>
-                                    Enter the current 6-digit code to verify you still have access before disabling 2FA.
+                                    Enter the current 6-digit code to verify access before disabling 2FA.
                                 </p>
                             </div>
                         </div>
-
-                        {codeInput(handleDisable)}
-
+                        {otpBoxes(handleDisable)}
                         <div className="flex justify-center mt-5">
                             <Button
                                 label={isLoading ? "Disabling…" : "Disable 2FA"}
@@ -315,7 +347,6 @@ const TwoFactorTab: React.FC = () => {
                         </div>
                     </motion.div>
                 )}
-
             </AnimatePresence>
         </motion.div>
     );
