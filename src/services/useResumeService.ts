@@ -29,7 +29,7 @@ export interface ResumeSearchParams {
 }
 
 export interface ResumeActivateRequest {
-  resumeid: number | null;
+  resumeId: number | null;
 }
 
 export const useResumeService = () => {
@@ -53,11 +53,11 @@ export const useResumeService = () => {
 
   const activateResume = (data: ResumeActivateRequest) => {
     const url = RESUME_URLS.ACTIVATE;
-    return request(API_METHOD.PUT, url, user, null, { params: { resumeId: data.resumeid } });
+    return request(API_METHOD.PUT, url, user, null, { params: { resumeId: data.resumeId } });
   };
 
-  const deleteResume = (resumeid: number | null) => {
-    const url = replaceUrlParams(RESUME_URLS.DELETE, { resumeid });
+  const deleteResume = (resumeId: number | null) => {
+    const url = replaceUrlParams(RESUME_URLS.DELETE, { resumeId });
     return request(API_METHOD.DELETE, url, user, null);
   };
 

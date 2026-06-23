@@ -68,7 +68,7 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
                 }
                 
                 if (values.roleId !== user.roleId) {
-                    await profileService.updateUserRole(user.id, { roleid: Number(values.roleId) || null });
+                    await profileService.updateUserRole(user.id, { roleId: Number(values.roleId) || null });
                     showSnackbar('success', 'User role updated successfully');
                 }
                 

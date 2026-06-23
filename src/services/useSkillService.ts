@@ -18,7 +18,7 @@ export const SkillLevelType = {
 } as const;
 
 export interface Skill {
-    logoid: number | null;
+    logoId: number | null;
     level: string;
     category: string;
 }
@@ -31,7 +31,7 @@ export interface SkillDropdown {
 
 export interface SkillResponse {
     id?: number | null;
-    logoid: number | null;
+    logoId: number | null;
     logoName: string;
     logoUrl: string;
     category: string;

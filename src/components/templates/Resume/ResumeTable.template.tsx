@@ -41,7 +41,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
     const handleActivateResume = async (id?: number | null) => {
         if (!id) return;
         try {
-            const response = await resumeService.activateResume({ resumeid: id });
+            const response = await resumeService.activateResume({ resumeId: id });
             if (response.status === HTTP_STATUS.OK) {
                 showSnackbar('success', 'Resume activated successfully');
                 window.location.reload();

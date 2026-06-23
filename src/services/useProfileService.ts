@@ -92,7 +92,7 @@ export interface StatusUpdateRequest {
 }
 
 export interface RoleUpdateRequest {
-    roleid: number | null;
+    roleId: number | null;
 }
 
 export interface GetProfilesParams {

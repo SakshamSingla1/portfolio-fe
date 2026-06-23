@@ -42,7 +42,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     const formik = useFormik<Skill>({
         initialValues: {
-            logoid: skill?.logoid || null,
+            logoId: skill?.logoId || null,
             level: skill?.level || SkillLevelType.BEGINNER,
             category: skill?.category || "",
         },
@@ -71,15 +71,15 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                 const fetchedLogos = response?.data?.data?.content || [];
                 setLogos(fetchedLogos);
 
-                if (formik.values.logoid) {
-                    const existing = fetchedLogos.find((l: Logo) => l.id === formik.values.logoid);
+                if (formik.values.logoId) {
+                    const existing = fetchedLogos.find((l: Logo) => l.id === formik.values.logoId);
                     if (existing) setSelectedLogo(existing);
                 }
             }
         } catch {
             setLogos([]);
         }
-    }, [logoService, formik.values.logoid]);
+    }, [logoService, formik.values.logoId]);
 
     const logoOptions = logos.map((logo) => ({
         label: (
@@ -131,10 +131,10 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                 label="Skill"
                                 placeHolder="Search and select a skill (e.g., React, Node.js)"
                                 options={logoOptions}
-                                value={logoOptions.find(option => option.value === String(formik.values.logoid)) || null}
+                                value={logoOptions.find(option => option.value === String(formik.values.logoId)) || null}
                                 onSearch={search => loadLogoDropdown(search)}
                                 onChange={value => {
-                                    formik.setFieldValue("logoid", value?.value ? Number(value.value) : null);
+                                    formik.setFieldValue("logoId", value?.value ? Number(value.value) : null);
                                     formik.setFieldValue("logoName", typeof value?.title === "string" ? value.title : "");
                                     formik.setFieldValue(
                                         "logoUrl",
@@ -143,13 +143,13 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                     setSelectedLogo(logos.find(l => String(l.id) === String(value?.value)) || null);
                                 }}
                                 required={true}
-                                error={formik.touched.logoid && Boolean(formik.errors.logoid)}
-                                helperText={Boolean(formik.touched.logoid && formik.errors.logoid) ? formik.errors.logoid : ""}
+                                error={formik.touched.logoId && Boolean(formik.errors.logoId)}
+                                helperText={Boolean(formik.touched.logoId && formik.errors.logoId) ? formik.errors.logoId : ""}
                                 isDisabled={mode === MODE.VIEW}
                             />
-                            {formik.errors.logoid && formik.touched.logoid && (
+                            {formik.errors.logoId && formik.touched.logoId && (
                                 <div className="text-red-500 text-xs mt-1">
-                                    {formik.errors.logoid}
+                                    {formik.errors.logoId}
                                 </div>
                             )}
                         </div>
