@@ -12,7 +12,7 @@ export const ROLE_URLS = {
 };
 
 export interface ModulePermissionDTO {
-    navLinkid: number | null;
+    navLinkId: number | null;
     name: string;
     path: string;
     navGroup: string;
@@ -48,8 +48,8 @@ export interface AuditableResponse {
 }
 
 export interface RolePermissionRequestDTO {
-    navLinkid: number | null;
-    permissionid: number | null;
+    navLinkId: number | null;
+    permissionId: number | null;
 }
 
 export interface RolePermissionResponseDTO extends AuditableResponse {

@@ -26,8 +26,8 @@ const validationSchema = Yup.object({
     status: Yup.string().required('Status is required'),
     rolePermissions: Yup.array().of(
         Yup.object({
-            navLinkid: Yup.number().nullable().required('Navlink ID is required'),
-            permissionid: Yup.number().nullable().required('Permission ID is required')
+            navLinkId: Yup.number().nullable().required('Navlink ID is required'),
+            permissionId: Yup.number().nullable().required('Permission ID is required')
         })
     ).min(0, 'At least one permission should be selected')
 });
@@ -51,8 +51,8 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
             status: roleDetails?.status || Status.ACTIVE,
             rolePermissions: roleDetails?.navLinks?.flatMap((navlink) =>
                 navlink.permissions.map((permission) => ({
-                    navLinkid: navlink.navLinkid,
-                    permissionid: permission.id ?? null
+                    navLinkId: navlink.navLinkId,
+                    permissionId: permission.id ?? null
                 }))
             ) || []
         },
@@ -95,10 +95,10 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
         loadPermissions();
     }, []);
 
-    const handlePermissionToggle = (navLinkid: any, permissionid: any) => {
+    const handlePermissionToggle = (navLinkId: any, permissionId: any) => {
         const currentPermissions = formik.values.rolePermissions;
         const existingIndex = currentPermissions.findIndex(
-            p => String(p.navLinkid) === String(navLinkid) && String(p.permissionid) === String(permissionid)
+            p => String(p.navLinkId) === String(navLinkId) && String(p.permissionId) === String(permissionId)
         );
 
         if (existingIndex >= 0) {
@@ -111,40 +111,40 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
             // Add permission
             formik.setFieldValue('rolePermissions', [
                 ...currentPermissions,
-                { navLinkid, permissionid }
+                { navLinkId, permissionId }
             ]);
         }
     };
 
-    const isPermissionSelected = (navLinkid: any, permissionid: any) => {
+    const isPermissionSelected = (navLinkId: any, permissionId: any) => {
         return formik.values.rolePermissions.some(
-            p => String(p.navLinkid) === String(navLinkid) && String(p.permissionid) === String(permissionid)
+            p => String(p.navLinkId) === String(navLinkId) && String(p.permissionId) === String(permissionId)
         );
     };
 
-    const handleSelectAllForNavlink = (navLinkid: any) => {
+    const handleSelectAllForNavlink = (navLinkId: any) => {
         const currentPermissions = formik.values.rolePermissions;
 
         // Remove all existing permissions for this navlink
         const otherPermissions = currentPermissions.filter(
-            p => String(p.navLinkid) !== String(navLinkid)
+            p => String(p.navLinkId) !== String(navLinkId)
         );
 
         // Add all permissions for this navlink
         const newPermissions = permissions.map(permission => ({
-            navLinkid,
-            permissionid: permission.id ?? null
+            navLinkId,
+            permissionId: permission.id ?? null
         }));
 
         formik.setFieldValue('rolePermissions', [...otherPermissions, ...newPermissions]);
     };
 
-    const handleUpdateAllForNavlink = (navLinkid: any) => {
+    const handleUpdateAllForNavlink = (navLinkId: any) => {
         const currentPermissions = formik.values.rolePermissions;
 
         // Remove all existing permissions for this navlink
         const otherPermissions = currentPermissions.filter(
-            p => String(p.navLinkid) !== String(navLinkid)
+            p => String(p.navLinkId) !== String(navLinkId)
         );
 
         formik.setFieldValue('rolePermissions', otherPermissions);
@@ -177,8 +177,8 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     const handleSelectAllNavlinks = () => {
         const allPermissions = navlinks.flatMap(navlink =>
             permissions.map(permission => ({
-                navLinkid: navlink.id ?? null,
-                permissionid: permission.id ?? null
+                navLinkId: navlink.id ?? null,
+                permissionId: permission.id ?? null
             }))
         );
         formik.setFieldValue('rolePermissions', allPermissions);
