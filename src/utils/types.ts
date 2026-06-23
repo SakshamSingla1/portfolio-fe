@@ -61,7 +61,8 @@ export const AUTH_STATE = {
     REGISTER: "register",
     FORGOT_PASSWORD: "forgot-password",
     RESET_PASSWORD: "reset-password",
-    OTP_VERIFICATION: "otp-verification"
+    OTP_VERIFICATION: "otp-verification",
+    TWO_FACTOR_VERIFY: "two-factor-verify"
 } as const;
 
 export type AUTH_STATE = typeof AUTH_STATE[keyof typeof AUTH_STATE];

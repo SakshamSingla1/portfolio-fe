@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 
 interface LoginWithEmailProps {
     setAuthState: (authState: AUTH_STATE) => void;
+    setPendingToken: (token: string) => void;
 }
 
 const validationSchema = Yup.object({
@@ -22,7 +23,7 @@ const validationSchema = Yup.object({
     password: Yup.string().required("Password is required"),
 });
 
-const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
+const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendingToken }) => {
     const colors = useColors();
     const authService = useAuthService();
     const navigate = useNavigate();
@@ -39,6 +40,11 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState }) => {
                 setIsLoading(true);
                 const response = await authService.login(values);
                 const user = response.data.data;
+                if (user.twoFactorRequired) {
+                    setPendingToken(user.pendingToken);
+                    setAuthState(AUTH_STATE.TWO_FACTOR_VERIFY);
+                    return;
+                }
                 setAuthenticatedUser({
                     id: user.id, fullName: user.fullName, userName: user.userName,
                     email: user.email, phone: user.phone, roleId: user.roleId,

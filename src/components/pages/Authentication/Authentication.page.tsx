@@ -9,6 +9,7 @@ import OtpVerificationTemplate from "../../templates/Authentication/OtpVerificat
 import ForgotPasswordTemplate from "../../templates/Authentication/ForgotPassword.template";
 import ResetPasswordTemplate from "../../templates/Authentication/ResetPassword.template";
 import RegistrationTemplate from "../../templates/Authentication/Registration.template";
+import TwoFactorVerificationTemplate from "../../templates/Authentication/TwoFactorVerification.template";
 
 const Authentication: React.FC = () => {
   const [authState, setAuthState] = useState<AUTH_STATE | null>(null);
@@ -17,6 +18,7 @@ const Authentication: React.FC = () => {
   const [phone, setPhone] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [isRegisterFlow, setIsRegisterFlow] = useState(false);
+  const [pendingToken, setPendingToken] = useState<string>("");
 
   useEffect(() => {
     try {
@@ -40,7 +42,7 @@ const Authentication: React.FC = () => {
         );
 
       case AUTH_STATE.LOGIN_WITH_EMAIL:
-        return <LoginWithEmailTemplate setAuthState={setAuthState} />;
+        return <LoginWithEmailTemplate setAuthState={setAuthState} setPendingToken={setPendingToken} />;
 
       case AUTH_STATE.LOGIN_WITH_PHONE:
         return (
@@ -62,6 +64,14 @@ const Authentication: React.FC = () => {
           />
         );
 
+      case AUTH_STATE.TWO_FACTOR_VERIFY:
+        return (
+          <TwoFactorVerificationTemplate
+            pendingToken={pendingToken}
+            setAuthState={setAuthState}
+          />
+        );
+
       case AUTH_STATE.FORGOT_PASSWORD:
         return <ForgotPasswordTemplate setAuthState={setAuthState} />;
 
@@ -69,7 +79,7 @@ const Authentication: React.FC = () => {
         return <ResetPasswordTemplate setAuthState={setAuthState} />;
 
       default:
-        return <LoginWithEmailTemplate setAuthState={setAuthState} />;
+        return <LoginWithEmailTemplate setAuthState={setAuthState} setPendingToken={setPendingToken} />;
     }
   };
 

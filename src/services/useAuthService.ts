@@ -14,6 +14,9 @@ export const AUTH_URLS = {
     CHANGE_PASSWORD : "auth/change-password",
     REQUEST_EMAIL_CHANGE : "auth/request-email-change",
     VERIFY_EMAIL_CHANGE : "auth/verify-email-change", 
+    VERIFY_2FA : "auth/2fa/verify",
+    SET_2FA : "auth/2fa/setup",
+    TOGGLE_2FA : "auth/2fa/toggle",
 }
 
 export interface AuthRegisterDTO {
@@ -59,6 +62,16 @@ export interface RequestEmailChangeDTO {
 export interface VerifyEmailChangeDTO {
     newEmail: string;
     otp: string;
+}
+
+export interface TwoFactorVerifyDTO {
+    pendingToken: string;
+    totpCode: string;
+}
+
+export interface TwoFactorSetupResponseDTO { 
+    secret: string;
+    otpAuthUrl: string; 
 }
 
 export const useAuthService = () => {
@@ -110,6 +123,18 @@ export const useAuthService = () => {
         return request(API_METHOD.PUT, AUTH_URLS.VERIFY_EMAIL_CHANGE, user, data);
     }
 
+    const verify2Fa = async (data: TwoFactorVerifyDTO) => {
+        return request(API_METHOD.POST, AUTH_URLS.VERIFY_2FA, null, data);
+    }
+
+    const setup2Fa = async () => {
+        return request(API_METHOD.POST, AUTH_URLS.SET_2FA, user);
+    }
+
+    const toggle2Fa = async (totpCode: string) => {
+        return request(API_METHOD.PUT, AUTH_URLS.TOGGLE_2FA, user, { totpCode });
+    }
+
     return {
         login,
         register,
@@ -122,5 +147,8 @@ export const useAuthService = () => {
         changePassword,
         changeEmailRequest,
         changeEmailVerify,
+        verify2Fa,
+        setup2Fa,
+        toggle2Fa,
     }
 }
