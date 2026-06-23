@@ -19,6 +19,7 @@ export interface AuthenticatedUserType {
     emailVerified: string;
     phoneVerified: string;
     token: string;
+    isTwoFactorEnabled?: boolean;
 }
 
 export interface AuthenticatedUserContextType {

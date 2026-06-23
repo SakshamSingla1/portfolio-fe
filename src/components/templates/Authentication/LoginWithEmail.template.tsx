@@ -50,7 +50,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendin
                     email: user.email, phone: user.phone, roleId: user.roleId,
                     roleName: user.roleName, status: user.status,
                     emailVerified: user.emailVerified, phoneVerified: user.phoneVerified,
-                    token: user.token,
+                    token: user.token, isTwoFactorEnabled: user.isTwoFactorEnabled,
                 });
                 setDefaultTheme(user.defaultTheme);
                 setRolePermissions(user.rolePermissions);

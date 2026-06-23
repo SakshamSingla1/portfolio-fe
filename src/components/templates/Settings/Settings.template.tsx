@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { FiLock, FiShield, FiSettings, FiImage } from "react-icons/fi";
+import { FiLock, FiShield, FiSettings } from "react-icons/fi";
 import { motion } from "framer-motion";
 import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import PasswordTab from "./PasswordTab";
 import ChangeEmailTab from "./ChangeEmailTab";
-import BannerTab from "./BannerTab";
+import TwoFactorTab from "./TwoFactorTab";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 
@@ -31,10 +31,10 @@ const SettingsTemplate: React.FC = () => {
       component: <ChangeEmailTab />,
     },
     {
-      label: "Landing Banner",
-      value: "banner",
-      icon: <FiImage />,
-      component: <BannerTab />,
+      label: "Two-Factor Auth",
+      value: "2fa",
+      icon: <FiShield />,
+      component: <TwoFactorTab />,
     },
   ];
 
