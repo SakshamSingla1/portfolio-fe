@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
-import { AUTH_STATE, HTTP_STATUS } from "../../../utils/types";
+import { AUTH_STATE, HTTP_STATUS, useColors } from "../../../utils/types";
 import { useSearchParams } from "react-router-dom";
 import { InputAdornment, IconButton } from "@mui/material";
 import Button from "../../atoms/Button/Button";
@@ -18,167 +18,130 @@ interface ResetPasswordProps {
 
 const validationSchema = Yup.object({
   token: Yup.string().required("Token is required"),
-
   newPassword: Yup.string()
     .required("Password is required")
     .min(6, "Password must be at least 6 characters"),
-
   confirmPassword: Yup.string()
     .required("Confirm Password is required")
     .oneOf([Yup.ref("newPassword")], "Passwords must match"),
 });
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
+  const colors = useColors();
   const authService = useAuthService();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { showSnackbar } = useSnackbar();
 
   const formik = useFormik<PasswordResetConfirmDTO>({
-    initialValues: {
-      token: searchParams.get("token") || "",
-      newPassword: "",
-      confirmPassword: "",
-    },
+    initialValues: { token: searchParams.get("token") || "", newPassword: "", confirmPassword: "" },
     validationSchema,
     onSubmit: async (values) => {
       try {
         setIsLoading(true);
-
-        const response = await authService.resetPassword({
-          token: values.token,
-          newPassword: values.newPassword,
-        });
-
+        const response = await authService.resetPassword({ token: values.token, newPassword: values.newPassword });
         if (response.status === HTTP_STATUS.OK) {
           setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL);
-          showSnackbar('success', 'Password reset successful! You can now login with your new password.');
+          showSnackbar("success", "Password reset successful! You can now login with your new password.");
         } else {
-          showSnackbar('error', 'Password reset failed. Please try again.');
+          showSnackbar("error", "Password reset failed. Please try again.");
         }
-      } catch (error) {
-        console.error("Password reset failed:", error);
-        showSnackbar('error', 'Password reset failed. Please try again.');
+      } catch {
+        showSnackbar("error", "Password reset failed. Please try again.");
       } finally {
         setIsLoading(false);
       }
     },
   });
 
+  const iconStyle = { color: "rgba(255,255,255,0.3)" };
+
   return (
-    <motion.div 
+    <motion.div
       className="w-full"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div className="p-8">
-        <div className="text-center mb-6 flex flex-col items-center">
-          <motion.div 
-            className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-3xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20"
-            whileHover={{ scale: 1.05, rotate: 5 }}
+      <div className="px-8 py-10">
+        <div className="mb-8">
+          <motion.div
+            className="inline-flex items-center justify-center p-3 rounded-2xl mb-4 text-white text-2xl"
+            style={{
+              background: `linear-gradient(135deg, ${colors.primary500}, ${colors.primary700})`,
+              boxShadow: `0 8px 24px -4px ${colors.primary500}50`,
+            }}
+            whileHover={{ scale: 1.05, rotate: 4 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
           >
             <FiLock />
           </motion.div>
-          <h2 className="text-2xl text-slate-800 font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">Reset Password</h2>
-          <p className="text-gray-600 mt-1">
-            Enter the token sent to your email and set a new password.
+          <h2 className="text-2xl font-black tracking-tight" style={{ color: "rgba(255,255,255,0.92)" }}>
+            Reset your password
+          </h2>
+          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
+            Enter your new password below
           </p>
         </div>
-        <div className="flex flex-col gap-y-8">
+
+        <div className="space-y-5">
           <TextField
-            fullWidth
-            name="newPassword"
-            type={showPassword ? "text" : "password"}
-            label="New Password"
-            value={formik.values.newPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            fullWidth name="newPassword" type={showPassword ? "text" : "password"} label="New Password"
+            value={formik.values.newPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FiLock className="text-gray-400" />
-                </InputAdornment>
-              ),
+              startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                    size="small"
-                  >
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small" style={iconStyle}>
                     {showPassword ? <FiEyeOff /> : <FiEye />}
                   </IconButton>
                 </InputAdornment>
-              )
+              ),
             }}
             error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
             helperText={formik.touched.newPassword && formik.errors.newPassword ? String(formik.errors.newPassword) : ""}
           />
           <div>
             <TextField
-              fullWidth
-              name="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              label="Confirm Password"
-              value={formik.values.confirmPassword}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
+              fullWidth name="confirmPassword" type={showConfirmPassword ? "text" : "password"} label="Confirm Password"
+              value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
               InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FiLock className="text-gray-400" />
-                  </InputAdornment>
-                ),
+                startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      edge="end"
-                      size="small"
-                    >
+                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" size="small" style={iconStyle}>
                       {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
                     </IconButton>
                   </InputAdornment>
-                )
+                ),
               }}
-              error={
-                formik.touched.confirmPassword &&
-                Boolean(formik.errors.confirmPassword)
-              }
-              helperText={
-                formik.touched.confirmPassword &&
-                  formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""
-              }
+              error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+              helperText={formik.touched.confirmPassword && formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""}
             />
             <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />
           </div>
-          <div className="flex justify-center items-center">
-            <Button
-              label="Reset Password"
-              variant="primaryContained"
-              disabled={isLoading}
-              onClick={() => formik.handleSubmit()}
-            />
-          </div>
-          <div className="text-center mt-5">
-            <p className="text-sm text-gray-600">
-              Remember your password?{" "}
-              <span
-                className="text-green-600 cursor-pointer font-medium hover:underline"
-                onClick={() => setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL)}
-              >
-                Sign in
-              </span>
-            </p>
-          </div>
         </div>
 
+        <div className="mt-6">
+          <Button
+            label={isLoading ? "Resetting…" : "Reset Password"}
+            variant="primaryContained" fullWidth
+            disabled={isLoading} onClick={() => formik.handleSubmit()}
+          />
+        </div>
+
+        <p className="text-sm text-center mt-6" style={{ color: "rgba(255,255,255,0.45)" }}>
+          Remember your password?{" "}
+          <span
+            className="font-semibold cursor-pointer hover:underline"
+            style={{ color: colors.primary400 }}
+            onClick={() => setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL)}
+          >
+            Sign in
+          </span>
+        </p>
       </div>
     </motion.div>
   );
