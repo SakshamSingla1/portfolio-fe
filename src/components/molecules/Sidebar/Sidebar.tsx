@@ -4,7 +4,7 @@ import {
   FiHome, FiBriefcase, FiLogOut
 } from "react-icons/fi";
 import { LuGraduationCap, LuFolderKanban, LuAward, LuShieldCheck } from "react-icons/lu";
-import { TbCode, TbUser, TbMessageChatbot, TbBell, TbSettings, TbLink, TbShare, TbLayoutDashboard, TbUsers, TbHelp, TbIcons } from "react-icons/tb";
+import { TbCode, TbUser, TbMessageChatbot, TbBell, TbSettings, TbLink, TbShare, TbLayoutDashboard, TbUsers, TbHelp, TbIcons, TbBrowser, TbChartBar } from "react-icons/tb";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { CgFileDocument } from "react-icons/cg";
 import { createUseStyles } from "react-jss";
@@ -37,7 +37,9 @@ const getIconForItem = (itemName: string) => {
     USERS: <TbUsers />,
     ROLES_AND_PERMISSIONS: <LuShieldCheck />,
     HELP: <TbHelp />,
-    LOGOS: <TbIcons />
+    LOGOS: <TbIcons />,
+    MAIN_PAGE: <TbBrowser />,
+    ANALYTICS: <TbChartBar />,
   };
   return iconMap[itemName] || <FiHome />;
 };
