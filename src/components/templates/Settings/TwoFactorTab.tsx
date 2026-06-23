@@ -7,6 +7,7 @@ import { useAuthService } from "../../../services/useAuthService";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import Button from "../../atoms/Button/Button";
+import TextField from "../../atoms/TextField/TextField";
 
 type TabView = "idle" | "setup" | "disable";
 
@@ -84,22 +85,29 @@ const TwoFactorTab: React.FC = () => {
     };
 
     const codeInput = (onSubmit: () => void) => (
-        <div className="flex flex-col items-center gap-4 mt-2">
-            <input
+        <div className="flex flex-col items-center gap-4 mt-2 w-full max-w-[240px] mx-auto">
+            <TextField
                 autoFocus
-                maxLength={6}
                 value={totpCode}
                 disabled={isLoading}
-                onChange={e => setTotpCode(e.target.value.replace(/\D/g, ""))}
                 placeholder="······"
-                className="text-center text-3xl tracking-[0.65rem] font-black rounded-2xl px-6 py-4 w-full max-w-[220px] focus:outline-none transition-all duration-200"
-                style={{
-                    border: `2px solid ${totpCode.length > 0 ? colors.primary500 : colors.neutral300}`,
-                    background: colors.neutral50,
-                    color: colors.neutral900,
-                    boxShadow: totpCode.length > 0 ? `0 0 0 4px ${colors.primary500}18` : "none",
+                onChange={e => setTotpCode(e.target.value.replace(/\D/g, ""))}
+                onKeyDown={(e: React.KeyboardEvent) => e.key === "Enter" && totpCode.length === 6 && onSubmit()}
+                inputProps={{ maxLength: 6 }}
+                sx={{
+                    "& .MuiInputBase-root": {
+                        border: `2px solid ${totpCode.length > 0 ? colors.primary500 : colors.neutral300} !important`,
+                        boxShadow: totpCode.length > 0 ? `0 0 0 4px ${colors.primary500}18` : "none",
+                        transition: "all 0.2s",
+                    },
+                    "& input": {
+                        textAlign: "center",
+                        fontSize: "1.75rem",
+                        letterSpacing: "0.6rem",
+                        fontWeight: 900,
+                        paddingLeft: "0.6rem",
+                    },
                 }}
-                onKeyDown={e => e.key === "Enter" && totpCode.length === 6 && onSubmit()}
             />
             <p className="text-xs text-center" style={{ color: colors.neutral400 }}>
                 Code refreshes every 30 seconds
