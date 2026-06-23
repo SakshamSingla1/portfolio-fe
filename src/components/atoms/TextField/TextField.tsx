@@ -21,7 +21,7 @@ const TextField: React.FC<Props> = ({
   return (
     <div className="flex flex-col gap-1.5 w-full">
       {label && (
-        <label className="text-gray-700 dark:text-neutral-300 text-sm font-semibold ml-2 select-none tracking-tight">
+        <label className="text-gray-700 text-sm font-semibold ml-2 select-none tracking-tight">
           {label} {required && <span className="text-red-500 font-bold">*</span>}
         </label>
       )}
@@ -36,9 +36,9 @@ const TextField: React.FC<Props> = ({
           ...InputProps,
           readOnly: InputProps?.readOnly,
           className: twMerge(
-            "w-full text-base border border-gray-300 dark:border-neutral-600 hover:border-blue-400 hover:shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/60 focus-within:shadow-[0_4px_16px_rgba(59,130,246,0.08)] !rounded-2xl transition-all duration-300 ease-in-out bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100",
-            error && "border-red-400 bg-red-50/30 dark:bg-red-950/20 focus-within:border-red-500 focus-within:ring-red-100/60 focus-within:shadow-[0_4px_16px_rgba(239,68,68,0.08)]",
-            props.disabled && "bg-gray-50 dark:bg-neutral-900 border-gray-200 dark:border-neutral-700 cursor-not-allowed opacity-60 hover:shadow-none hover:border-gray-200 dark:hover:border-neutral-700",
+            "w-full text-base border border-gray-300 hover:border-blue-400 hover:shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/60 focus-within:shadow-[0_4px_16px_rgba(59,130,246,0.08)] !rounded-2xl transition-all duration-300 ease-in-out bg-white text-gray-900",
+            error && "border-red-400 bg-red-50/30 focus-within:border-red-500 focus-within:ring-red-100/60 focus-within:shadow-[0_4px_16px_rgba(239,68,68,0.08)]",
+            props.disabled && "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60 hover:shadow-none hover:border-gray-200",
             className
           ),
         }}
