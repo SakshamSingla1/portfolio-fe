@@ -3,7 +3,7 @@ import TextField from "../../atoms/TextField/TextField";
 import { type AuthLoginDTO, useAuthService } from "../../../services/useAuthService";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { FiLock, FiMail, FiPhone } from "react-icons/fi";
+import { FiMail, FiPhone } from "react-icons/fi";
 import { AUTH_STATE, HTTP_STATUS, useColors } from "../../../utils/types";
 import Button from "../../atoms/Button/Button";
 import { useState } from "react";
