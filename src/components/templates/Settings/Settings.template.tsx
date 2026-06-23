@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { FiLock, FiShield, FiSettings } from "react-icons/fi";
+import { FiLock, FiShield, FiSettings, FiSearch } from "react-icons/fi";
 import { motion } from "framer-motion";
 import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import PasswordTab from "./PasswordTab";
 import ChangeEmailTab from "./ChangeEmailTab";
 import TwoFactorTab from "./TwoFactorTab";
+import SeoTab from "./SeoTab";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 
@@ -35,6 +36,12 @@ const SettingsTemplate: React.FC = () => {
       value: "2fa",
       icon: <FiShield />,
       component: <TwoFactorTab />,
+    },
+    {
+      label: "SEO",
+      value: "seo",
+      icon: <FiSearch />,
+      component: <SeoTab />,
     },
   ];
 
