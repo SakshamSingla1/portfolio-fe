@@ -5,7 +5,7 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IDailyView, IPortfolioView } from "../../../services/useDashboardService";
-import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink } from "react-icons/fi";
+import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe } from "react-icons/fi";
 
 interface ViewAnalyticsProps {
   viewStats: IViewStats | null | undefined;
@@ -20,7 +20,39 @@ const EMPTY_VIEW_STATS: IViewStats = {
   resumeDownloads: 0,
   weeklyTrend: [],
   deviceBreakdown: {},
+  browserBreakdown: {},
+  locationBreakdown: {},
   recentViews: [],
+};
+
+/* ─── Helpers ────────────────────────────────────────────────────── */
+const countryFlag = (cc?: string): string => {
+  if (!cc || cc.length !== 2) return "🌐";
+  return cc.toUpperCase().replace(/./g, (c) =>
+    String.fromCodePoint(c.charCodeAt(0) + 127397)
+  );
+};
+
+// Timestamp comes from backend as "2026-06-25T07:00:00Z" (UTC).
+// new Date() parses the Z suffix and converts to local time automatically.
+const relTime = (iso: string): string => {
+  const diff = Date.now() - new Date(iso).getTime();
+  const s = Math.floor(diff / 1000);
+  const m = Math.floor(s / 60);
+  const h = Math.floor(m / 60);
+  const d = Math.floor(h / 24);
+  if (s < 60)  return "just now";
+  if (m < 60)  return `${m}m ago`;
+  if (h < 24)  return `${h}h ago`;
+  if (d === 1) return "yesterday";
+  if (d < 30)  return `${d}d ago`;
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
+
+const exactTime = (iso: string): string => {
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) +
+    "  " + d.toLocaleDateString([], { month: "short", day: "numeric" });
 };
 
 /* ─── Sparkline ─────────────────────────────────────────────────── */
@@ -51,7 +83,6 @@ const Sparkline: React.FC<{ data: IDailyView[]; color: string; height?: number }
     fillPath = `${linePath} L ${W} ${height} L 0 ${height} Z`;
   }
 
-  // Highest value point for the dot
   const peakIdx = counts.indexOf(max);
   const peak = pts[peakIdx];
 
@@ -84,7 +115,6 @@ const Sparkline: React.FC<{ data: IDailyView[]; color: string; height?: number }
             transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
           />
         )}
-        {/* Peak dot */}
         {peak && (
           <motion.circle
             cx={peak.x}
@@ -99,8 +129,6 @@ const Sparkline: React.FC<{ data: IDailyView[]; color: string; height?: number }
           />
         )}
       </svg>
-
-      {/* Day labels */}
       <div className="flex justify-between mt-1 px-0.5">
         {data.map((d, i) => (
           <span
@@ -166,7 +194,7 @@ const MetricCell: React.FC<{
     <div className={`flex flex-col ${hero ? "gap-1" : "gap-0.5"}`}>
       <div className="flex items-start gap-2">
         <span
-          className={`font-black tabular-nums leading-none`}
+          className="font-black tabular-nums leading-none"
           style={{
             fontSize: hero ? "clamp(28px, 4vw, 42px)" : "clamp(18px, 2.5vw, 26px)",
             color: accent ?? colors.neutral900,
@@ -187,26 +215,26 @@ const MetricCell: React.FC<{
   );
 };
 
-/* ─── Device bar ────────────────────────────────────────────────── */
-const DeviceBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
+/* ─── Generic horizontal bar breakdown ─────────────────────────── */
+const BreakdownBars: React.FC<{
+  items: { key: string; label: string; color: string; icon?: React.ReactNode }[];
+  breakdown: Record<string, number>;
+}> = ({ items, breakdown }) => {
   const colors = useColors();
   const total = Object.values(breakdown).reduce((a, b) => a + b, 0) || 1;
 
-  const DEVICES = [
-    { key: "DESKTOP", label: "Desktop", color: "#3b82f6", Icon: FiMonitor },
-    { key: "MOBILE",  label: "Mobile",  color: "#8b5cf6", Icon: FiSmartphone },
-    { key: "TABLET",  label: "Tablet",  color: "#f59e0b", Icon: FiTablet },
-  ];
-
   return (
     <div className="flex flex-col gap-2.5">
-      {DEVICES.map(({ key, label, color, Icon }) => {
+      {items.map(({ key, label, color, icon }) => {
         const count = breakdown[key] ?? 0;
         const pct = Math.round((count / total) * 100);
         return (
           <div key={key} className="flex items-center gap-2">
-            <Icon size={11} style={{ color, flexShrink: 0 }} />
-            <span className="text-[10px] font-semibold w-14" style={{ color: colors.neutral500 }}>
+            {icon
+              ? <span style={{ color, flexShrink: 0, fontSize: 11 }}>{icon}</span>
+              : <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+            }
+            <span className="text-[10px] font-semibold w-14 truncate" style={{ color: colors.neutral500 }}>
               {label}
             </span>
             <div
@@ -234,22 +262,93 @@ const DeviceBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ brea
   );
 };
 
-/* ─── Relative time ─────────────────────────────────────────────── */
-const relTime = (iso: string): string => {
-  const diff = Date.now() - new Date(iso).getTime();
-  const s = Math.floor(diff / 1000);
-  const m = Math.floor(s / 60);
-  const h = Math.floor(m / 60);
-  const d = Math.floor(h / 24);
-  if (s < 60)  return "just now";
-  if (m < 60)  return `${m}m ago`;
-  if (h < 24)  return `${h}h ago`;
-  if (d === 1) return "yesterday";
-  if (d < 30)  return `${d}d ago`;
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+/* ─── Device breakdown ──────────────────────────────────────────── */
+const DeviceBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => (
+  <BreakdownBars
+    breakdown={breakdown}
+    items={[
+      { key: "DESKTOP", label: "Desktop", color: "#3b82f6", icon: <FiMonitor size={11} /> },
+      { key: "MOBILE",  label: "Mobile",  color: "#8b5cf6", icon: <FiSmartphone size={11} /> },
+      { key: "TABLET",  label: "Tablet",  color: "#f59e0b", icon: <FiTablet size={11} /> },
+    ]}
+  />
+);
+
+/* ─── Browser breakdown ─────────────────────────────────────────── */
+const BROWSER_COLORS: Record<string, string> = {
+  Chrome:  "#4285f4",
+  Firefox: "#ff6611",
+  Safari:  "#0070c9",
+  Edge:    "#0078d7",
+  Opera:   "#ff1b2d",
+  Other:   "#94a3b8",
 };
 
-/* ─── View History section ──────────────────────────────────────── */
+const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
+  const sorted = Object.entries(breakdown)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  if (!sorted.length) return null;
+
+  return (
+    <BreakdownBars
+      breakdown={breakdown}
+      items={sorted.map(([key]) => ({
+        key,
+        label: key,
+        color: BROWSER_COLORS[key] ?? BROWSER_COLORS.Other,
+      }))}
+    />
+  );
+};
+
+/* ─── Location breakdown (top countries) ───────────────────────── */
+const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
+  const colors = useColors();
+  const sorted = Object.entries(breakdown)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  if (!sorted.length) return null;
+
+  const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
+  const PALETTE = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      {sorted.map(([country, count], i) => {
+        const pct = Math.round((count / total) * 100);
+        return (
+          <div key={country} className="flex items-center gap-2">
+            <span className="text-sm shrink-0" style={{ lineHeight: 1 }}>
+              {countryFlag(undefined)}
+            </span>
+            <span className="text-[10px] font-semibold flex-1 truncate" style={{ color: colors.neutral500 }}>
+              {country}
+            </span>
+            <div
+              className="rounded-full overflow-hidden"
+              style={{ height: 5, width: 60, background: colors.neutral100 }}
+            >
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: PALETTE[i] }}
+                initial={{ width: 0 }}
+                animate={{ width: `${pct}%` }}
+                transition={{ duration: 0.9, ease: "easeOut", delay: 0.3 + i * 0.05 }}
+              />
+            </div>
+            <span className="text-[10px] font-bold tabular-nums w-7 text-right" style={{ color: colors.neutral600 }}>
+              {pct}%
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/* ─── View History ──────────────────────────────────────────────── */
 const DEVICE_ICON: Record<string, React.ReactNode> = {
   DESKTOP: <FiMonitor size={12} />,
   MOBILE:  <FiSmartphone size={12} />,
@@ -275,7 +374,6 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
       className="mt-4 rounded-xl overflow-hidden"
       style={{ border: `1.5px solid ${colors.neutral300}` }}
     >
-      {/* Header — toggle */}
       <button
         onClick={() => setExpanded((p) => !p)}
         className="w-full flex items-center justify-between px-4 py-3 text-left"
@@ -288,18 +386,12 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
       >
         <div className="flex items-center gap-2">
           <FiClock size={11} style={{ color: colors.neutral400 }} />
-          <span
-            className="text-[10px] font-black uppercase tracking-[0.1em]"
-            style={{ color: colors.neutral500 }}
-          >
+          <span className="text-[10px] font-black uppercase tracking-[0.1em]" style={{ color: colors.neutral500 }}>
             Visitor History
           </span>
           <span
             className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-            style={{
-              background: isDark ? colors.neutral200 : colors.neutral200,
-              color: colors.neutral600,
-            }}
+            style={{ background: colors.neutral200, color: colors.neutral600 }}
           >
             {views.length}
           </span>
@@ -309,62 +401,88 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
           : <FiChevronDown size={13} style={{ color: colors.neutral400 }} />}
       </button>
 
-      {/* Rows */}
       {expanded && (
-        <div
-          className="overflow-y-auto"
-          style={{ maxHeight: 300, background: colors.neutral0 }}
-        >
+        <div className="overflow-y-auto" style={{ maxHeight: 360, background: colors.neutral0 }}>
           {shown.map((v, i) => {
             const devColor = DEVICE_COLOR[v.device] ?? "#94a3b8";
             const devIcon  = DEVICE_ICON[v.device] ?? <FiMonitor size={12} />;
+            const flag     = countryFlag(v.countryCode);
+            const location = v.city && v.country
+              ? `${v.city}, ${v.country}`
+              : v.country ?? null;
+
             return (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: -4 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.03, duration: 0.2 }}
-                className="flex items-center gap-3 px-4 py-2.5"
-                style={{
-                  borderTop: i > 0 ? `1px solid ${colors.neutral100}` : "none",
-                }}
+                className="flex items-start gap-3 px-4 py-3"
+                style={{ borderTop: i > 0 ? `1px solid ${colors.neutral100}` : "none" }}
               >
                 {/* Device icon */}
                 <div
-                  className="shrink-0 rounded-lg flex items-center justify-center"
+                  className="shrink-0 rounded-lg flex items-center justify-center mt-0.5"
                   style={{ width: 28, height: 28, background: `${devColor}14`, color: devColor }}
                 >
                   {devIcon}
                 </div>
 
                 {/* Details */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
+                <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                  {/* Row 1: device + browser/OS */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-[11px] font-semibold" style={{ color: colors.neutral700 }}>
                       {v.device.charAt(0) + v.device.slice(1).toLowerCase()}
                     </span>
-                    {v.referrer && v.referrer !== "Direct" && (
+                    {v.browser && (
                       <>
                         <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
-                        <span className="flex items-center gap-0.5 text-[10px]" style={{ color: colors.neutral500 }}>
-                          <FiLink size={9} />
-                          <span className="truncate max-w-[120px]">{v.referrer}</span>
-                        </span>
+                        <span className="text-[10px]" style={{ color: colors.neutral500 }}>{v.browser}</span>
                       </>
                     )}
-                    {(!v.referrer || v.referrer === "Direct") && (
+                    {v.os && (
                       <>
                         <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
-                        <span className="text-[10px]" style={{ color: colors.neutral400 }}>Direct</span>
+                        <span className="text-[10px]" style={{ color: colors.neutral500 }}>{v.os}</span>
                       </>
                     )}
                   </div>
+
+                  {/* Row 2: location */}
+                  {location && (
+                    <div className="flex items-center gap-1">
+                      <span className="text-[11px]">{flag}</span>
+                      <span className="text-[10px]" style={{ color: colors.neutral500 }}>{location}</span>
+                      {v.language && (
+                        <>
+                          <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
+                          <span className="text-[10px]" style={{ color: colors.neutral400 }}>{v.language}</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Row 3: referrer */}
+                  {v.referrer && v.referrer !== "Direct" ? (
+                    <div className="flex items-center gap-0.5">
+                      <FiLink size={9} style={{ color: colors.neutral400 }} />
+                      <span className="text-[10px] truncate max-w-[160px]" style={{ color: colors.neutral400 }}>
+                        {v.referrer}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-[10px]" style={{ color: colors.neutral400 }}>Direct</span>
+                  )}
                 </div>
 
                 {/* Right: time + session */}
                 <div className="shrink-0 flex flex-col items-end gap-0.5">
-                  <span className="text-[10px] font-medium" style={{ color: colors.neutral400 }}>
+                  <span className="text-[10px] font-medium" style={{ color: colors.neutral500 }}>
                     {relTime(v.timestamp)}
+                  </span>
+                  <span className="text-[9px]" style={{ color: colors.neutral400 }}>
+                    {exactTime(v.timestamp)}
                   </span>
                   {v.sessionId && (
                     <span
@@ -379,13 +497,12 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
             );
           })}
 
-          {/* Show more / less */}
           {views.length > 8 && (
             <button
               onClick={() => setExpanded((p) => !p)}
               className="w-full py-2.5 text-[11px] font-semibold text-center"
               style={{
-                background: isDark ? colors.neutral50 : colors.neutral50,
+                background: colors.neutral50,
                 color: colors.neutral500,
                 border: "none",
                 borderTop: `1px solid ${colors.neutral100}`,
@@ -418,6 +535,8 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     resumeDownloads,
     weeklyTrend = [],
     deviceBreakdown = {},
+    browserBreakdown = {},
+    locationBreakdown = {},
     recentViews = [],
   } = viewStats;
 
@@ -435,6 +554,25 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       : `0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)`,
   };
 
+  const panelStyle: React.CSSProperties = {
+    background: isDark ? colors.neutral100 : colors.neutral50,
+    border: `1.5px solid ${colors.neutral300}`,
+    borderRadius: 12,
+    padding: 16,
+  };
+
+  const panelLabel = (text: string, icon?: React.ReactNode) => (
+    <div className="flex items-center gap-1.5 mb-3">
+      {icon}
+      <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: colors.neutral400 }}>
+        {text}
+      </span>
+    </div>
+  );
+
+  const hasBrowserData = Object.keys(browserBreakdown).length > 0;
+  const hasLocationData = Object.keys(locationBreakdown).length > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -443,12 +581,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       style={cardStyle}
     >
       {/* ── Top accent line ─────────────────────────── */}
-      <div
-        style={{
-          height: 3,
-          background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})`,
-        }}
-      />
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})` }} />
 
       <div className="p-4 sm:p-5">
 
@@ -456,24 +589,15 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
         <div className="flex items-center justify-between mb-4 sm:mb-5">
           <div className="flex items-center gap-2">
             <LivePulse active={viewsToday > 0} />
-            <span
-              className="text-[10px] font-black uppercase tracking-[0.12em]"
-              style={{ color: colors.primary700 }}
-            >
+            <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: colors.primary700 }}>
               {viewsToday > 0 ? "Live" : "Analytics"} · Portfolio Views
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span
-              className="hidden sm:flex items-center gap-1 text-[10px] font-medium"
-              style={{ color: colors.neutral400 }}
-            >
+            <span className="hidden sm:flex items-center gap-1 text-[10px] font-medium" style={{ color: colors.neutral400 }}>
               <FiUsers size={10} /> {uniqueVisitors.toLocaleString()} unique
             </span>
-            <span
-              className="flex items-center gap-1 text-[10px] font-medium"
-              style={{ color: colors.neutral400 }}
-            >
+            <span className="flex items-center gap-1 text-[10px] font-medium" style={{ color: colors.neutral400 }}>
               <FiDownload size={10} /> {resumeDownloads} CV
             </span>
           </div>
@@ -484,52 +608,29 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
           {/* Left: metrics ──────────────────────────── */}
           <div className={isMobile ? "" : "col-span-7"}>
-
-            {/* Hero metric + secondary row */}
             <div className="flex flex-col gap-4">
 
               {/* Today hero */}
               <div
                 className="rounded-2xl p-4"
-                style={{
-                  background: isDark
-                    ? `${ACCENT}15`
-                    : `${ACCENT}08`,
-                  border: `1px solid ${ACCENT}20`,
-                }}
+                style={{ background: isDark ? `${ACCENT}15` : `${ACCENT}08`, border: `1px solid ${ACCENT}20` }}
               >
                 <div className="flex items-end justify-between gap-4">
-                  <MetricCell
-                    label="Views Today"
-                    value={viewsToday}
-                    delay={0}
-                    accent={ACCENT}
-                    hero
-                  />
-                  {/* Sparkline in the hero area */}
+                  <MetricCell label="Views Today" value={viewsToday} delay={0} accent={ACCENT} hero />
                   <div className="flex-1 min-w-0 hidden sm:block">
-                    {weeklyTrend.length > 0 && (
-                      <Sparkline data={weeklyTrend} color={ACCENT} height={52} />
-                    )}
+                    {weeklyTrend.length > 0 && <Sparkline data={weeklyTrend} color={ACCENT} height={52} />}
                   </div>
                 </div>
               </div>
 
-              {/* Secondary metrics row */}
-              <div className={`grid gap-3 ${isMobile ? "grid-cols-3" : "grid-cols-3"}`}>
+              {/* Secondary metrics */}
+              <div className="grid gap-3 grid-cols-3">
                 {[
                   { label: "This Week",  value: viewsThisWeek,  delay: 80 },
                   { label: "This Month", value: viewsThisMonth, delay: 140 },
                   { label: "All Time",   value: totalViews,     delay: 200 },
                 ].map(({ label, value, delay }) => (
-                  <div
-                    key={label}
-                    className="rounded-xl p-3"
-                    style={{
-                      background: isDark ? colors.neutral100 : colors.neutral50,
-                      border: `1.5px solid ${colors.neutral300}`,
-                    }}
-                  >
+                  <div key={label} className="rounded-xl p-3" style={panelStyle}>
                     <MetricCell label={label} value={value} delay={delay} />
                   </div>
                 ))}
@@ -537,43 +638,42 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
               {/* Mobile sparkline */}
               {isMobile && weeklyTrend.length > 0 && (
-                <div
-                  className="rounded-xl p-3"
-                  style={{
-                    background: isDark ? colors.neutral100 : colors.neutral50,
-                    border: `1.5px solid ${colors.neutral300}`,
-                  }}
-                >
-                  <span
-                    className="text-[9px] font-black uppercase tracking-widest block mb-2"
-                    style={{ color: colors.neutral400 }}
-                  >
+                <div className="rounded-xl p-3" style={panelStyle}>
+                  <span className="text-[9px] font-black uppercase tracking-widest block mb-2" style={{ color: colors.neutral400 }}>
                     7-Day Trend
                   </span>
                   <Sparkline data={weeklyTrend} color={ACCENT} height={48} />
                 </div>
               )}
+
+              {/* Browser + Location row (below metrics on left) */}
+              {!isMobile && (hasBrowserData || hasLocationData) && (
+                <div className="grid gap-4 grid-cols-2">
+                  {hasBrowserData && (
+                    <div style={panelStyle}>
+                      {panelLabel("Browsers")}
+                      <BrowserBreakdown breakdown={browserBreakdown} />
+                    </div>
+                  )}
+                  {hasLocationData && (
+                    <div style={panelStyle}>
+                      {panelLabel("Top Countries", <FiGlobe size={10} style={{ color: colors.neutral400 }} />)}
+                      <LocationBreakdown breakdown={locationBreakdown} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Right: sparkline (desktop) + device breakdown ─── */}
+          {/* Right column ───────────────────────────── */}
           <div className={`flex flex-col gap-4 ${isMobile ? "" : "col-span-5"}`}>
 
             {/* Desktop sparkline */}
             {!isMobile && weeklyTrend.length > 0 && (
-              <div
-                className="rounded-xl p-4 flex flex-col"
-                style={{
-                  background: isDark ? colors.neutral100 : colors.neutral50,
-                  border: `1.5px solid ${colors.neutral300}`,
-                  flex: 1,
-                }}
-              >
+              <div className="rounded-xl p-4 flex flex-col" style={{ ...panelStyle, flex: 1 }}>
                 <div className="flex items-center justify-between mb-3">
-                  <span
-                    className="text-[9px] font-black uppercase tracking-widest"
-                    style={{ color: colors.neutral400 }}
-                  >
+                  <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: colors.neutral400 }}>
                     7-Day Trend
                   </span>
                   <FiEye size={11} style={{ color: colors.neutral400 }} />
@@ -585,25 +685,28 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
             )}
 
             {/* Device breakdown */}
-            <div
-              className="rounded-xl p-4"
-              style={{
-                background: isDark ? colors.neutral100 : colors.neutral50,
-                border: `1.5px solid ${colors.neutral300}`,
-              }}
-            >
-              <span
-                className="text-[9px] font-black uppercase tracking-widest block mb-3"
-                style={{ color: colors.neutral400 }}
-              >
-                Device Breakdown
-              </span>
+            <div style={panelStyle}>
+              {panelLabel("Devices")}
               <DeviceBreakdown breakdown={deviceBreakdown} />
             </div>
+
+            {/* Mobile: browser + location stacked */}
+            {isMobile && hasBrowserData && (
+              <div style={panelStyle}>
+                {panelLabel("Browsers")}
+                <BrowserBreakdown breakdown={browserBreakdown} />
+              </div>
+            )}
+            {isMobile && hasLocationData && (
+              <div style={panelStyle}>
+                {panelLabel("Top Countries", <FiGlobe size={10} style={{ color: colors.neutral400 }} />)}
+                <LocationBreakdown breakdown={locationBreakdown} />
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ── Footer row ─────────────────────────────── */}
+        {/* ── Footer ─────────────────────────────────── */}
         <div
           className="flex items-center justify-between mt-4 pt-4"
           style={{ borderTop: `1.5px solid ${colors.neutral300}` }}

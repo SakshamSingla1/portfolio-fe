@@ -25,6 +25,13 @@ export interface IPortfolioView {
     referrer: string;
     timestamp: string;
     sessionId: string;
+    browser?: string;
+    os?: string;
+    language?: string;
+    timezone?: string;
+    country?: string;
+    city?: string;
+    countryCode?: string;
 }
 
 export interface IViewStats {
@@ -36,6 +43,8 @@ export interface IViewStats {
     resumeDownloads: number;
     weeklyTrend: IDailyView[];
     deviceBreakdown: Record<string, number>;
+    browserBreakdown: Record<string, number>;
+    locationBreakdown: Record<string, number>;
     recentViews: IPortfolioView[];
 }
 
