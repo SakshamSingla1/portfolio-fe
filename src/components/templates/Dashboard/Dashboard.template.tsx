@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { type IDashboardSummary, type IViewStats } from "../../../services/useDashboardService";
+import { type IDashboardSummary, type IViewStats, type IStats } from "../../../services/useDashboardService";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
@@ -96,6 +96,76 @@ const FocusChip: React.FC<FocusChipProps> = ({ label, color, onClick }) => (
     {onClick && <FiArrowRight size={9} color={color} />}
   </button>
 );
+
+/* ─── Engagement Strip ───────────────────────────────────────────── */
+const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
+  viewStats,
+  stats,
+}) => {
+  const colors = useColors();
+  const { isDark } = useTheme();
+
+  const { totalViews, resumeDownloads, uniqueVisitors } = viewStats;
+  const { totalMessages } = stats;
+
+  const fmt = (n: number) =>
+    totalViews > 0 ? ((n / totalViews) * 100).toFixed(1) + "%" : "—";
+
+  const items = [
+    {
+      label: "Contact Rate",
+      value: fmt(totalMessages),
+      detail: `${totalMessages} message${totalMessages !== 1 ? "s" : ""} · ${totalViews.toLocaleString()} views`,
+      color: "#f43f5e",
+    },
+    {
+      label: "CV Download Rate",
+      value: fmt(resumeDownloads),
+      detail: `${resumeDownloads} download${resumeDownloads !== 1 ? "s" : ""} · ${totalViews.toLocaleString()} views`,
+      color: "#8b5cf6",
+    },
+    {
+      label: "Unique Rate",
+      value: fmt(uniqueVisitors),
+      detail: `${uniqueVisitors.toLocaleString()} unique · ${totalViews.toLocaleString()} total`,
+      color: "#10b981",
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      {items.map(({ label, value, detail, color }) => (
+        <motion.div
+          key={label}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="rounded-xl p-3"
+          style={{
+            background: isDark ? `${color}12` : `${color}08`,
+            border: `1px solid ${color}22`,
+          }}
+        >
+          <div
+            className="font-black tabular-nums"
+            style={{ fontSize: 17, color, letterSpacing: "-0.03em", lineHeight: 1 }}
+          >
+            {value}
+          </div>
+          <div
+            className="font-black uppercase mt-1"
+            style={{ fontSize: 8, letterSpacing: "0.1em", color: colors.neutral500, lineHeight: 1.2 }}
+          >
+            {label}
+          </div>
+          <div className="mt-1.5 text-[9px]" style={{ color: colors.neutral400, lineHeight: 1.3 }}>
+            {detail}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
 
 const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) => {
   const colors = useColors();
@@ -307,11 +377,23 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             );
           })()}
 
+          {/* ─ Engagement Strip ─────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.08 }}
+          >
+            <EngagementStrip
+              viewStats={dashboardData.viewStats ?? EMPTY_VIEW_STATS}
+              stats={dashboardData.stats}
+            />
+          </motion.div>
+
           {/* ─ View Analytics ───────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
+            transition={{ duration: 0.45, delay: 0.1 }}
           >
             <ViewAnalyticsTemplate viewStats={dashboardData.viewStats ?? EMPTY_VIEW_STATS} />
           </motion.div>

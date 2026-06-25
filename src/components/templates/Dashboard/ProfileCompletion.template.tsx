@@ -1,11 +1,24 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import type { IProfileCompletion } from "../../../services/useDashboardService";
 import { useCountUp } from "../../../hooks/useCountUp";
-import { FiCheck, FiMinus } from "react-icons/fi";
+import { FiCheck, FiMinus, FiArrowRight } from "react-icons/fi";
+
+const SECTION_ROUTES: Record<string, string> = {
+  "Profile Basics":  "/profile",
+  "Projects":        "/projects",
+  "Skills":          "/skills",
+  "Experience":      "/experience",
+  "Education":       "/education",
+  "Testimonials":    "/testimonials",
+  "Certifications":  "/certifications",
+  "Achievements":    "/achievements",
+  "Social Links":    "/social-links",
+};
 
 interface ProfileCompletionProps {
   profileCompletion: IProfileCompletion;
@@ -47,6 +60,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
   const colors = useColors();
   const { isDark } = useTheme();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const animatedPct = useCountUp(percentage);
 
   const isComplete = percentage === 100;
@@ -142,46 +156,75 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
 
       {/* Section grid — 3 columns of status pills */}
       <div className="mt-4 w-full grid grid-cols-3 gap-1.5">
-        {segments.map((seg) => (
-          <div
-            key={seg.key}
-            className="flex items-center gap-1.5 rounded-lg px-2 py-1.5"
-            style={{
-              background: seg.complete
-                ? (isDark ? `${seg.color}22` : `${seg.color}10`)
-                : (isDark ? colors.neutral100 : colors.neutral50),
-            }}
-          >
-            {/* Status indicator */}
-            <div
-              className="shrink-0 flex items-center justify-center rounded-full"
-              style={{
-                width: 14,
-                height: 14,
-                background: seg.complete ? `${seg.color}28` : "transparent",
-                border: seg.complete ? "none" : `1.5px solid ${isDark ? colors.neutral600 : colors.neutral300}`,
-                color: seg.complete ? seg.color : (isDark ? colors.neutral500 : colors.neutral400),
-              }}
-            >
-              {seg.complete
-                ? <FiCheck size={8} strokeWidth={3} />
-                : <FiMinus size={8} strokeWidth={2.5} />
-              }
-            </div>
+        {segments.map((seg) => {
+          const route = SECTION_ROUTES[seg.key];
+          const isClickable = !seg.complete && !!route;
 
-            <span
-              className="font-medium leading-tight truncate"
-              style={{
-                fontSize: "8.5px",
-                color: seg.complete
-                  ? seg.color
-                  : (isDark ? colors.neutral500 : colors.neutral400),
-              }}
+          const pill = (
+            <>
+              <div
+                className="shrink-0 flex items-center justify-center rounded-full"
+                style={{
+                  width: 14,
+                  height: 14,
+                  background: seg.complete ? `${seg.color}28` : "transparent",
+                  border: seg.complete
+                    ? "none"
+                    : `1.5px solid ${isDark ? colors.neutral600 : colors.neutral300}`,
+                  color: seg.complete
+                    ? seg.color
+                    : isDark ? colors.neutral500 : colors.neutral400,
+                }}
+              >
+                {seg.complete
+                  ? <FiCheck size={8} strokeWidth={3} />
+                  : <FiMinus size={8} strokeWidth={2.5} />}
+              </div>
+              <span
+                className="font-medium leading-tight truncate flex-1"
+                style={{
+                  fontSize: "8.5px",
+                  color: seg.complete
+                    ? seg.color
+                    : isDark ? colors.neutral500 : colors.neutral400,
+                }}
+              >
+                {seg.key}
+              </span>
+              {isClickable && (
+                <FiArrowRight
+                  size={7}
+                  style={{ color: colors.neutral400, flexShrink: 0 }}
+                />
+              )}
+            </>
+          );
+
+          const baseStyle = {
+            background: seg.complete
+              ? isDark ? `${seg.color}22` : `${seg.color}10`
+              : isDark ? colors.neutral100 : colors.neutral50,
+          };
+
+          return isClickable ? (
+            <button
+              key={seg.key}
+              onClick={() => navigate(route)}
+              className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition-opacity hover:opacity-70 w-full text-left"
+              style={{ ...baseStyle, border: "none", cursor: "pointer" }}
             >
-              {seg.key}
-            </span>
-          </div>
-        ))}
+              {pill}
+            </button>
+          ) : (
+            <div
+              key={seg.key}
+              className="flex items-center gap-1.5 rounded-lg px-2 py-1.5"
+              style={baseStyle}
+            >
+              {pill}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

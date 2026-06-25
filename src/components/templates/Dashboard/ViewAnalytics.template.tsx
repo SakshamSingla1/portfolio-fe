@@ -348,6 +348,136 @@ const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ br
   );
 };
 
+/* ─── Traffic Sources ───────────────────────────────────────────── */
+const SOURCE_COLORS: Record<string, string> = {
+  direct:    "#94a3b8",
+  google:    "#4285f4",
+  linkedin:  "#0a66c2",
+  github:    "#24292e",
+  twitter:   "#1d9bf0",
+  facebook:  "#1877f2",
+  instagram: "#e1306c",
+  youtube:   "#ff0000",
+  reddit:    "#ff4500",
+  bing:      "#00809d",
+};
+
+const getSourceColor = (src: string): string => {
+  if (src === "Direct") return SOURCE_COLORS.direct;
+  const lower = src.toLowerCase();
+  for (const [key, color] of Object.entries(SOURCE_COLORS)) {
+    if (lower.includes(key)) return color;
+  }
+  return "#8b5cf6";
+};
+
+const TrafficSources: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
+  const colors = useColors();
+  if (!views?.length) return null;
+
+  const counts: Record<string, number> = {};
+  views.forEach((v) => {
+    const src = v.referrer && v.referrer !== "Direct" ? v.referrer : "Direct";
+    counts[src] = (counts[src] || 0) + 1;
+  });
+
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      {sorted.map(([src, count]) => {
+        const pct = Math.round((count / total) * 100);
+        const color = getSourceColor(src);
+        return (
+          <div key={src} className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+            <span className="text-[10px] font-semibold w-16 truncate" style={{ color: colors.neutral500 }}>
+              {src}
+            </span>
+            <div className="flex-1 rounded-full overflow-hidden" style={{ height: 5, background: colors.neutral100 }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: color }}
+                initial={{ width: 0 }}
+                animate={{ width: `${pct}%` }}
+                transition={{ duration: 0.9, ease: "easeOut", delay: 0.3 }}
+              />
+            </div>
+            <span className="text-[10px] font-bold tabular-nums w-7 text-right" style={{ color: colors.neutral600 }}>
+              {pct}%
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/* ─── Peak Visit Hours ───────────────────────────────────────────── */
+const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
+  const colors = useColors();
+  const ACCENT = colors.primary600;
+
+  const hours = new Array(24).fill(0) as number[];
+  views?.forEach((v) => {
+    if (v.timestamp) {
+      const h = new Date(v.timestamp).getHours();
+      if (h >= 0 && h < 24) hours[h]++;
+    }
+  });
+
+  const max = Math.max(...hours, 1);
+  const peakHour = hours.indexOf(Math.max(...hours));
+
+  const fmt = (h: number): string => {
+    if (h === 0) return "12AM";
+    if (h === 12) return "12PM";
+    return h < 12 ? `${h}AM` : `${h - 12}PM`;
+  };
+
+  return (
+    <div>
+      <div className="flex items-end gap-[1.5px]" style={{ height: 36 }}>
+        {hours.map((count, h) => {
+          const hp = (count / max) * 100;
+          const isPeak = h === peakHour && count > 0;
+          return (
+            <motion.div
+              key={h}
+              className="flex-1 rounded-[1px]"
+              style={{
+                height: `${Math.max(hp, 4)}%`,
+                background: isPeak ? ACCENT : count > 0 ? `${ACCENT}55` : colors.neutral100,
+                transformOrigin: "bottom",
+              }}
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ duration: 0.35, delay: h * 0.012, ease: "easeOut" }}
+            />
+          );
+        })}
+      </div>
+      <div className="flex justify-between mt-1.5">
+        {["12AM", "6AM", "12PM", "6PM"].map((lbl) => (
+          <span key={lbl} className="text-[8px]" style={{ color: colors.neutral400 }}>
+            {lbl}
+          </span>
+        ))}
+      </div>
+      {max > 1 && (
+        <div className="mt-2 flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: ACCENT }} />
+          <span className="text-[10px]" style={{ color: colors.neutral500 }}>
+            Peak at <strong style={{ color: colors.neutral700 }}>{fmt(peakHour)}</strong>
+            {" · "}{hours[peakHour]} visit{hours[peakHour] !== 1 ? "s" : ""}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 /* ─── View History ──────────────────────────────────────────────── */
 const DEVICE_ICON: Record<string, React.ReactNode> = {
   DESKTOP: <FiMonitor size={12} />,
@@ -705,6 +835,20 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
             )}
           </div>
         </div>
+
+        {/* ── Traffic Sources + Peak Hours ────────────── */}
+        {recentViews.length > 0 && (
+          <div className={`mt-4 grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
+            <div style={panelStyle}>
+              {panelLabel("Traffic Sources", <FiLink size={10} style={{ color: colors.neutral400 }} />)}
+              <TrafficSources views={recentViews} />
+            </div>
+            <div style={panelStyle}>
+              {panelLabel("Peak Hours", <FiClock size={10} style={{ color: colors.neutral400 }} />)}
+              <PeakHours views={recentViews} />
+            </div>
+          </div>
+        )}
 
         {/* ── Footer ─────────────────────────────────── */}
         <div
