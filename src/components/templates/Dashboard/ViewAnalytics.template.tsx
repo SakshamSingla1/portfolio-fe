@@ -15,6 +15,7 @@ const EMPTY_VIEW_STATS: IViewStats = {
   totalViews: 0,
   viewsToday: 0,
   viewsThisWeek: 0,
+  viewsLastWeek: 0,
   viewsThisMonth: 0,
   uniqueVisitors: 0,
   resumeDownloads: 0,
@@ -478,6 +479,145 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
   );
 };
 
+/* ─── World Map ─────────────────────────────────────────────────── */
+const COUNTRY_COORDS: Record<string, [number, number]> = {
+  "United States": [38, -97],   "United Kingdom": [54, -2],
+  "India":         [20, 77],    "Germany":        [51, 10],
+  "France":        [46, 2],     "Canada":         [56, -96],
+  "Australia":     [-25, 133],  "Pakistan":       [30, 70],
+  "Brazil":        [-10, -55],  "Japan":          [36, 138],
+  "China":         [35, 105],   "Russia":         [60, 100],
+  "South Korea":   [37, 128],   "Netherlands":    [52, 5],
+  "Italy":         [42, 12],    "Spain":          [40, -4],
+  "Mexico":        [23, -102],  "Indonesia":      [-5, 120],
+  "Turkey":        [39, 35],    "Saudi Arabia":   [24, 45],
+  "Poland":        [52, 20],    "Sweden":         [62, 15],
+  "Switzerland":   [47, 8],     "Singapore":      [1, 104],
+  "UAE":           [24, 54],    "South Africa":   [-29, 25],
+  "Nigeria":       [10, 8],     "Egypt":          [27, 30],
+  "Argentina":     [-34, -64],  "Colombia":       [4, -74],
+  "Malaysia":      [4, 109],    "Thailand":       [15, 101],
+  "Vietnam":       [14, 108],   "Philippines":    [13, 122],
+  "Bangladesh":    [23, 90],    "Ukraine":        [49, 32],
+  "Portugal":      [39, -8],    "Belgium":        [51, 4],
+  "Austria":       [47, 14],    "Denmark":        [56, 10],
+  "New Zealand":   [-41, 172],  "Ireland":        [53, -8],
+  "Romania":       [46, 25],    "Chile":          [-35, -71],
+  "Norway":        [62, 10],    "Finland":        [64, 26],
+  "Czech Republic":[50, 16],    "Israel":         [31, 35],
+  "Iran":          [32, 53],    "Morocco":        [32, -5],
+  "Ghana":         [8, -2],     "Kenya":          [-1, 37],
+};
+
+const DOT_PALETTE = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444","#0ea5e9","#f43f5e","#06b6d4"];
+
+const ll2xy = (lat: number, lon: number, W: number, H: number): [number, number] => [
+  ((lon + 180) / 360) * W,
+  ((90 - lat) / 180) * H,
+];
+
+const WorldMap: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
+  const colors = useColors();
+  const { isDark } = useTheme();
+
+  const W = 400;
+  const H = 200;
+  const sorted = Object.entries(breakdown).sort((a, b) => b[1] - a[1]);
+  const maxCount = sorted.length ? sorted[0][1] : 1;
+  const totalCount = sorted.reduce((s, [, v]) => s + v, 0) || 1;
+
+  if (!sorted.length) return null;
+
+  const gridColor = isDark ? colors.neutral200 : colors.neutral100;
+  const equatorColor = isDark ? colors.neutral300 : colors.neutral200;
+
+  return (
+    <div>
+      <svg
+        width="100%"
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{
+          display: "block",
+          borderRadius: 8,
+          background: isDark ? colors.neutral100 : colors.neutral50,
+        }}
+      >
+        {/* Latitude grid lines */}
+        {[60, 30, 0, -30, -60].map((lat) => {
+          const [, y] = ll2xy(lat, 0, W, H);
+          return (
+            <line key={lat} x1={0} y1={y} x2={W} y2={y}
+              stroke={lat === 0 ? equatorColor : gridColor}
+              strokeWidth={lat === 0 ? 0.8 : 0.4}
+              strokeDasharray={lat === 0 ? undefined : "2,5"}
+            />
+          );
+        })}
+        {/* Longitude grid lines */}
+        {[-120, -60, 0, 60, 120].map((lon) => {
+          const [x] = ll2xy(0, lon, W, H);
+          return (
+            <line key={lon} x1={x} y1={0} x2={x} y2={H}
+              stroke={lon === 0 ? equatorColor : gridColor}
+              strokeWidth={lon === 0 ? 0.8 : 0.4}
+              strokeDasharray={lon === 0 ? undefined : "2,5"}
+            />
+          );
+        })}
+
+        {/* Country dots */}
+        {sorted.map(([country, count], i) => {
+          const coords = COUNTRY_COORDS[country];
+          if (!coords) return null;
+          const [x, y] = ll2xy(coords[0], coords[1], W, H);
+          const r = 2.5 + (count / maxCount) * 7;
+          const color = DOT_PALETTE[i % DOT_PALETTE.length];
+          return (
+            <motion.g key={country}>
+              <title>{country}: {count} visit{count !== 1 ? "s" : ""}</title>
+              {i === 0 && (
+                <motion.circle cx={x} cy={y} r={r + 5}
+                  fill="none" stroke={color} strokeWidth={0.8}
+                  initial={{ opacity: 0.5, scale: 1 }}
+                  animate={{ opacity: 0, scale: 2 }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut" }}
+                  style={{ transformOrigin: `${x}px ${y}px` }}
+                />
+              )}
+              <motion.circle cx={x} cy={y} r={r}
+                fill={color} fillOpacity={0.82}
+                stroke={isDark ? colors.neutral0 : "#fff"}
+                strokeWidth={0.8}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: i * 0.07, type: "spring", stiffness: 300 }}
+                style={{ transformOrigin: `${x}px ${y}px` }}
+              />
+            </motion.g>
+          );
+        })}
+      </svg>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+        {sorted.slice(0, 6).map(([country, count], i) => (
+          <div key={country} className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full shrink-0"
+              style={{ background: DOT_PALETTE[i % DOT_PALETTE.length] }} />
+            <span className="text-[9px] font-medium" style={{ color: colors.neutral500 }}>
+              {country}{" "}
+              <span className="font-bold" style={{ color: colors.neutral700 }}>
+                {Math.round((count / totalCount) * 100)}%
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 /* ─── View History ──────────────────────────────────────────────── */
 const DEVICE_ICON: Record<string, React.ReactNode> = {
   DESKTOP: <FiMonitor size={12} />,
@@ -660,6 +800,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     totalViews,
     viewsToday,
     viewsThisWeek,
+    viewsLastWeek = 0,
     viewsThisMonth,
     uniqueVisitors,
     resumeDownloads,
@@ -669,6 +810,14 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     locationBreakdown = {},
     recentViews = [],
   } = viewStats;
+
+  // Week-over-week delta — null when there's no prior data to compare
+  const wowDelta: number | null =
+    viewsLastWeek > 0
+      ? Math.round(((viewsThisWeek - viewsLastWeek) / viewsLastWeek) * 100)
+      : viewsThisWeek > 0
+      ? null  // first week of data, no comparison yet
+      : null;
 
   const ACCENT = colors.primary600;
 
@@ -755,8 +904,14 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
               {/* Secondary metrics */}
               <div className="grid gap-3 grid-cols-3">
+                {/* This Week — includes WoW delta */}
+                <div className="rounded-xl p-3" style={panelStyle}>
+                  <div className="flex items-start justify-between gap-1">
+                    <MetricCell label="This Week" value={viewsThisWeek} delay={80} />
+                    {wowDelta !== null && <TrendChip value={wowDelta} />}
+                  </div>
+                </div>
                 {[
-                  { label: "This Week",  value: viewsThisWeek,  delay: 80 },
                   { label: "This Month", value: viewsThisMonth, delay: 140 },
                   { label: "All Time",   value: totalViews,     delay: 200 },
                 ].map(({ label, value, delay }) => (
@@ -847,6 +1002,14 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
               {panelLabel("Peak Hours", <FiClock size={10} style={{ color: colors.neutral400 }} />)}
               <PeakHours views={recentViews} />
             </div>
+          </div>
+        )}
+
+        {/* ── Visitor World Map ───────────────────────── */}
+        {hasLocationData && (
+          <div className="mt-4" style={panelStyle}>
+            {panelLabel("Visitor Locations", <FiGlobe size={10} style={{ color: colors.neutral400 }} />)}
+            <WorldMap breakdown={locationBreakdown} />
           </div>
         )}
 

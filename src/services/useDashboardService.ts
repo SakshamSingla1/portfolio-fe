@@ -38,6 +38,7 @@ export interface IViewStats {
     totalViews: number;
     viewsToday: number;
     viewsThisWeek: number;
+    viewsLastWeek: number;
     viewsThisMonth: number;
     uniqueVisitors: number;
     resumeDownloads: number;

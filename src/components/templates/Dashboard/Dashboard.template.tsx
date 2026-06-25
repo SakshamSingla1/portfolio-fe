@@ -23,6 +23,7 @@ const EMPTY_VIEW_STATS: IViewStats = {
   totalViews: 0,
   viewsToday: 0,
   viewsThisWeek: 0,
+  viewsLastWeek: 0,
   viewsThisMonth: 0,
   uniqueVisitors: 0,
   resumeDownloads: 0,
@@ -251,9 +252,23 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
     if (!dashboardData) return [];
     const chips: Array<{ label: string; color: string; route?: string }> = [];
 
+    // Stale unread messages get highest priority (amber warning before generic unread count)
+    const STALE_MS = 48 * 3_600_000;
+    const staleCount = dashboardData.recentMessages.filter(
+      (m) => m.status?.toUpperCase() === "UNREAD" && Date.now() - new Date(m.createdAt).getTime() > STALE_MS
+    ).length;
+    if (staleCount > 0) {
+      chips.push({
+        label: `${staleCount} message${staleCount !== 1 ? "s" : ""} unread 48h+`,
+        color: "#f59e0b",
+        route: "/messages",
+      });
+    }
+
     const unread = dashboardData.stats?.unreadMessages ?? 0;
-    if (unread > 0) {
-      chips.push({ label: `${unread} unread ${unread === 1 ? "message" : "messages"}`, color: "#f43f5e", route: "/messages" });
+    const freshUnread = unread - staleCount;
+    if (freshUnread > 0) {
+      chips.push({ label: `${freshUnread} unread ${freshUnread === 1 ? "message" : "messages"}`, color: "#f43f5e", route: "/messages" });
     }
 
     const pct = dashboardData.profileCompletion?.percentage ?? 100;

@@ -55,6 +55,10 @@ const getAvatarColor = (name: string, isDark: boolean) => {
   return isDark ? AVATAR_PALETTES_DARK[idx] : AVATAR_PALETTES[idx];
 };
 
+const STALE_HOURS = 48;
+const isStale = (dateString: string): boolean =>
+  Date.now() - new Date(dateString).getTime() > STALE_HOURS * 3_600_000;
+
 const STATUS_META: Record<string, { color: string; label: string }> = {
   UNREAD:   { color: "#3b82f6", label: "Unread" },
   READ:     { color: "#10b981", label: "Read" },
@@ -95,9 +99,17 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
     <div className="space-y-2">
       {messages.map((msg, i) => {
         const isUnread = msg.status?.toUpperCase() === "UNREAD";
+        const stale = isUnread && isStale(msg.createdAt);
         const { bg, fg } = getAvatarColor(msg.name || "?", isDark);
         const initials = getInitials(msg.name);
         const { color: statusColor, label: statusLabel } = getStatusMeta(msg.status);
+        const accentColor = stale ? "#f59e0b" : colors.primary500;
+        const borderColor = stale ? "#f59e0b40" : (isUnread ? colors.primary200 : colors.neutral200);
+        const bgColor = stale
+          ? (isDark ? "#78350f30" : "#fffbeb")
+          : isUnread
+          ? (isDark ? colors.primary900 : colors.primary50)
+          : (isDark ? colors.neutral50 : colors.neutral50);
 
         return (
           <motion.div
@@ -107,17 +119,15 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             transition={{ delay: i * 0.05, duration: 0.3 }}
             className="flex items-start gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden"
             style={{
-              background: isUnread
-                ? (isDark ? `${colors.primary900}` : colors.primary50)
-                : (isDark ? colors.neutral50 : colors.neutral50),
-              border: `1px solid ${isUnread ? colors.primary200 : colors.neutral200}`,
+              background: bgColor,
+              border: `1px solid ${borderColor}`,
             }}
           >
-            {/* Unread accent bar */}
+            {/* Unread / stale accent bar */}
             {isUnread && (
               <div
                 className="absolute left-0 top-0 bottom-0 rounded-l-xl"
-                style={{ width: 3, background: colors.primary500 }}
+                style={{ width: 3, background: accentColor }}
               />
             )}
 
@@ -169,13 +179,13 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
               </div>
             </div>
 
-            {/* Unread badge */}
+            {/* Unread / stale badge */}
             {isUnread && (
               <div
                 className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full self-start mt-0.5"
-                style={{ background: colors.primary500, color: "#fff" }}
+                style={{ background: accentColor, color: "#fff" }}
               >
-                New
+                {stale ? "48h+" : "New"}
               </div>
             )}
           </motion.div>
