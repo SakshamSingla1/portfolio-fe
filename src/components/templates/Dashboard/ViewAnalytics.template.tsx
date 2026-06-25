@@ -225,37 +225,50 @@ const BreakdownBars: React.FC<{
   const total = Object.values(breakdown).reduce((a, b) => a + b, 0) || 1;
 
   return (
-    <div className="flex flex-col gap-2.5">
-      {items.map(({ key, label, color, icon }) => {
+    <div className="flex flex-col gap-3">
+      {items.map(({ key, label, color, icon }, idx) => {
         const count = breakdown[key] ?? 0;
         const pct = Math.round((count / total) * 100);
         return (
-          <div key={key} className="flex items-center gap-2">
-            {icon
-              ? <span style={{ color, flexShrink: 0, fontSize: 11 }}>{icon}</span>
-              : <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-            }
-            <span className="text-[10px] font-semibold w-14 truncate" style={{ color: colors.neutral500 }}>
-              {label}
-            </span>
+          <div key={key}>
+            {/* Label row */}
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                {icon
+                  ? <span style={{ color, flexShrink: 0, fontSize: 12 }}>{icon}</span>
+                  : <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                }
+                <span className="text-[10px] font-semibold" style={{ color: colors.neutral600 }}>
+                  {label}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[12px] font-black tabular-nums" style={{ color }}>
+                  {pct}%
+                </span>
+                {count > 0 && (
+                  <span className="text-[9px]" style={{ color: colors.neutral400 }}>
+                    ({count})
+                  </span>
+                )}
+              </div>
+            </div>
+            {/* Bar track */}
             <div
-              className="flex-1 rounded-full overflow-hidden"
-              style={{ height: 5, background: colors.neutral100 }}
+              className="relative rounded-full overflow-hidden"
+              style={{ height: 8, background: colors.neutral100 }}
             >
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: color }}
+                style={{
+                  background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)`,
+                  boxShadow: pct > 0 ? `0 0 6px ${color}55` : "none",
+                }}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
-                transition={{ duration: 0.9, ease: "easeOut", delay: 0.5 }}
+                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: idx * 0.06 + 0.2 }}
               />
             </div>
-            <span
-              className="text-[10px] font-bold tabular-nums w-7 text-right"
-              style={{ color: colors.neutral600 }}
-            >
-              {pct}%
-            </span>
           </div>
         );
       })}
@@ -304,44 +317,61 @@ const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ bre
 };
 
 /* ─── Location breakdown (top countries) ───────────────────────── */
+const COUNTRY_TO_CODE: Record<string, string> = {
+  "United States":"US","United Kingdom":"GB","India":"IN","Germany":"DE","France":"FR",
+  "Canada":"CA","Australia":"AU","Pakistan":"PK","Brazil":"BR","Japan":"JP","China":"CN",
+  "Russia":"RU","South Korea":"KR","Netherlands":"NL","Italy":"IT","Spain":"ES","Mexico":"MX",
+  "Indonesia":"ID","Turkey":"TR","Saudi Arabia":"SA","Poland":"PL","Sweden":"SE","Switzerland":"CH",
+  "Singapore":"SG","UAE":"AE","South Africa":"ZA","Nigeria":"NG","Egypt":"EG","Argentina":"AR",
+  "Colombia":"CO","Malaysia":"MY","Thailand":"TH","Vietnam":"VN","Philippines":"PH","Bangladesh":"BD",
+  "Ukraine":"UA","Portugal":"PT","Belgium":"BE","Austria":"AT","Denmark":"DK","New Zealand":"NZ",
+  "Ireland":"IE","Romania":"RO","Chile":"CL","Norway":"NO","Finland":"FI","Czech Republic":"CZ",
+  "Israel":"IL","Iran":"IR","Morocco":"MA","Ghana":"GH","Kenya":"KE",
+};
+const LOC_PALETTE = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444"];
+
 const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
   const colors = useColors();
-  const sorted = Object.entries(breakdown)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-
+  const sorted = Object.entries(breakdown).sort((a, b) => b[1] - a[1]).slice(0, 5);
   if (!sorted.length) return null;
 
   const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
-  const PALETTE = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
 
   return (
-    <div className="flex flex-col gap-2.5">
+    <div className="flex flex-col gap-3">
       {sorted.map(([country, count], i) => {
         const pct = Math.round((count / total) * 100);
+        const color = LOC_PALETTE[i];
+        const cc = COUNTRY_TO_CODE[country];
+        const flag = cc ? countryFlag(cc) : "🌐";
         return (
-          <div key={country} className="flex items-center gap-2">
-            <span className="text-sm shrink-0" style={{ lineHeight: 1 }}>
-              {countryFlag(undefined)}
-            </span>
-            <span className="text-[10px] font-semibold flex-1 truncate" style={{ color: colors.neutral500 }}>
-              {country}
-            </span>
-            <div
-              className="rounded-full overflow-hidden"
-              style={{ height: 5, width: 60, background: colors.neutral100 }}
-            >
+          <div key={country}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[13px] leading-none shrink-0">{flag}</span>
+                <span className="text-[10px] font-semibold truncate max-w-[80px]" style={{ color: colors.neutral600 }}>
+                  {country}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[12px] font-black tabular-nums" style={{ color }}>
+                  {pct}%
+                </span>
+                <span className="text-[9px]" style={{ color: colors.neutral400 }}>({count})</span>
+              </div>
+            </div>
+            <div className="rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: PALETTE[i] }}
+                style={{
+                  background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)`,
+                  boxShadow: `0 0 6px ${color}55`,
+                }}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
-                transition={{ duration: 0.9, ease: "easeOut", delay: 0.3 + i * 0.05 }}
+                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.07 + 0.2 }}
               />
             </div>
-            <span className="text-[10px] font-bold tabular-nums w-7 text-right" style={{ color: colors.neutral600 }}>
-              {pct}%
-            </span>
           </div>
         );
       })}
@@ -386,28 +416,38 @@ const TrafficSources: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
   const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
 
   return (
-    <div className="flex flex-col gap-2.5">
-      {sorted.map(([src, count]) => {
+    <div className="flex flex-col gap-3">
+      {sorted.map(([src, count], i) => {
         const pct = Math.round((count / total) * 100);
         const color = getSourceColor(src);
         return (
-          <div key={src} className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-            <span className="text-[10px] font-semibold w-16 truncate" style={{ color: colors.neutral500 }}>
-              {src}
-            </span>
-            <div className="flex-1 rounded-full overflow-hidden" style={{ height: 5, background: colors.neutral100 }}>
+          <div key={src}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                <span className="text-[10px] font-semibold truncate max-w-[90px]" style={{ color: colors.neutral600 }}>
+                  {src}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[12px] font-black tabular-nums" style={{ color }}>
+                  {pct}%
+                </span>
+                <span className="text-[9px]" style={{ color: colors.neutral400 }}>({count})</span>
+              </div>
+            </div>
+            <div className="rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: color }}
+                style={{
+                  background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)`,
+                  boxShadow: `0 0 6px ${color}55`,
+                }}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
-                transition={{ duration: 0.9, ease: "easeOut", delay: 0.3 }}
+                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.07 + 0.2 }}
               />
             </div>
-            <span className="text-[10px] font-bold tabular-nums w-7 text-right" style={{ color: colors.neutral600 }}>
-              {pct}%
-            </span>
           </div>
         );
       })}
@@ -437,42 +477,69 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
     return h < 12 ? `${h}AM` : `${h - 12}PM`;
   };
 
+  // Top-3 hours sorted by count
+  const top3 = [...hours.map((c, h) => [h, c] as [number, number])]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([h]) => h);
+
+  const barBg = (h: number, count: number): string => {
+    if (count === 0) return colors.neutral100;
+    const rank = top3.indexOf(h);
+    if (rank === 0) return `linear-gradient(180deg, ${ACCENT} 0%, ${ACCENT}25 100%)`;
+    if (rank === 1) return `linear-gradient(180deg, ${ACCENT}bb 0%, ${ACCENT}18 100%)`;
+    if (rank === 2) return `linear-gradient(180deg, ${ACCENT}80 0%, ${ACCENT}10 100%)`;
+    return `linear-gradient(180deg, ${ACCENT}45 0%, ${ACCENT}08 100%)`;
+  };
+
   return (
     <div>
-      <div className="flex items-end gap-[1.5px]" style={{ height: 36 }}>
+      <div className="flex items-end gap-[2px]" style={{ height: 64 }}>
         {hours.map((count, h) => {
           const hp = (count / max) * 100;
-          const isPeak = h === peakHour && count > 0;
           return (
             <motion.div
               key={h}
-              className="flex-1 rounded-[1px]"
+              className="flex-1 rounded-t-[2px]"
               style={{
-                height: `${Math.max(hp, 4)}%`,
-                background: isPeak ? ACCENT : count > 0 ? `${ACCENT}55` : colors.neutral100,
+                height: `${Math.max(hp, count > 0 ? 5 : 2)}%`,
+                background: barBg(h, count),
                 transformOrigin: "bottom",
+                boxShadow: top3[0] === h && count > 0
+                  ? `0 -2px 8px ${ACCENT}55`
+                  : "none",
               }}
               initial={{ scaleY: 0 }}
               animate={{ scaleY: 1 }}
-              transition={{ duration: 0.35, delay: h * 0.012, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: h * 0.015, ease: [0.34, 1.2, 0.64, 1] }}
             />
           );
         })}
       </div>
-      <div className="flex justify-between mt-1.5">
-        {["12AM", "6AM", "12PM", "6PM"].map((lbl) => (
-          <span key={lbl} className="text-[8px]" style={{ color: colors.neutral400 }}>
+      {/* Time axis */}
+      <div className="flex justify-between mt-1.5 px-0.5">
+        {["12AM", "6AM", "12PM", "6PM", "11PM"].map((lbl) => (
+          <span key={lbl} className="text-[8px] font-medium" style={{ color: colors.neutral400 }}>
             {lbl}
           </span>
         ))}
       </div>
+      {/* Peak annotation */}
       {max > 1 && (
-        <div className="mt-2 flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: ACCENT }} />
-          <span className="text-[10px]" style={{ color: colors.neutral500 }}>
-            Peak at <strong style={{ color: colors.neutral700 }}>{fmt(peakHour)}</strong>
-            {" · "}{hours[peakHour]} visit{hours[peakHour] !== 1 ? "s" : ""}
-          </span>
+        <div className="mt-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: ACCENT }} />
+            <span className="text-[10px]" style={{ color: colors.neutral500 }}>
+              Peak at{" "}
+              <strong style={{ color: colors.neutral700 }}>{fmt(peakHour)}</strong>
+              {" · "}{hours[peakHour]} visit{hours[peakHour] !== 1 ? "s" : ""}
+            </span>
+          </div>
+          {top3[1] !== undefined && hours[top3[1]] > 0 && (
+            <span className="text-[9px]" style={{ color: colors.neutral400 }}>
+              2nd: {fmt(top3[1])}
+            </span>
+          )}
         </div>
       )}
     </div>
