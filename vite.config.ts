@@ -10,23 +10,10 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
+          // Only split libs with no circular deps / no createContext at eval time
           if (id.includes('react-icons')) return 'vendor-icons';
-          if (id.includes('@mui') || id.includes('@emotion')) return 'vendor-mui';
           if (id.includes('framer-motion')) return 'vendor-motion';
           if (id.includes('@tanstack')) return 'vendor-query';
-          // React + all libs that call React.createContext at module eval time
-          // (react-jss, react-helmet-async, etc.) must stay together in one
-          // chunk so React is guaranteed to be initialized before they run.
-          if (
-            id.includes('node_modules/react/') ||
-            id.includes('node_modules/react-dom/') ||
-            id.includes('node_modules/react-router') ||
-            id.includes('node_modules/scheduler/') ||
-            id.includes('react-jss') ||
-            id.includes('/jss') ||
-            id.includes('react-helmet') ||
-            id.includes('axios')
-          ) return 'vendor-react';
         },
       },
     },
