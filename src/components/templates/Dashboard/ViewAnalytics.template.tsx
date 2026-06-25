@@ -26,7 +26,7 @@ const EMPTY_VIEW_STATS: IViewStats = {
   recentViews: [],
 };
 
-/* ─── Helpers ────────────────────────────────────────────────────── */
+
 const countryFlag = (cc?: string): string => {
   if (!cc || cc.length !== 2) return "🌐";
   return cc.toUpperCase().replace(/./g, (c) =>
@@ -34,8 +34,8 @@ const countryFlag = (cc?: string): string => {
   );
 };
 
-// Timestamp comes from backend as "2026-06-25T07:00:00Z" (UTC).
-// new Date() parses the Z suffix and converts to local time automatically.
+
+
 const relTime = (iso: string): string => {
   const diff = Date.now() - new Date(iso).getTime();
   const s = Math.floor(diff / 1000);
@@ -56,7 +56,7 @@ const exactTime = (iso: string): string => {
     "  " + d.toLocaleDateString([], { month: "short", day: "numeric" });
 };
 
-/* ─── Sparkline ─────────────────────────────────────────────────── */
+
 const Sparkline: React.FC<{ data: IDailyView[]; color: string; height?: number }> = ({
   data, color, height = 56,
 }) => {
@@ -145,7 +145,7 @@ const Sparkline: React.FC<{ data: IDailyView[]; color: string; height?: number }
   );
 };
 
-/* ─── Live pulse dot ────────────────────────────────────────────── */
+
 const LivePulse: React.FC<{ active?: boolean }> = ({ active = true }) => (
   <span className="relative inline-flex h-2.5 w-2.5">
     {active && (
@@ -161,7 +161,7 @@ const LivePulse: React.FC<{ active?: boolean }> = ({ active = true }) => (
   </span>
 );
 
-/* ─── Trend chip ────────────────────────────────────────────────── */
+
 const TrendChip: React.FC<{ value: number | null }> = ({ value }) => {
   if (value === null || value === undefined) return null;
   const up = value >= 0;
@@ -179,7 +179,7 @@ const TrendChip: React.FC<{ value: number | null }> = ({ value }) => {
   );
 };
 
-/* ─── Big metric cell ───────────────────────────────────────────── */
+
 const MetricCell: React.FC<{
   label: string;
   value: number;
@@ -216,7 +216,7 @@ const MetricCell: React.FC<{
   );
 };
 
-/* ─── Generic horizontal bar breakdown ─────────────────────────── */
+
 const BreakdownBars: React.FC<{
   items: { key: string; label: string; color: string; icon?: React.ReactNode }[];
   breakdown: Record<string, number>;
@@ -231,7 +231,7 @@ const BreakdownBars: React.FC<{
         const pct = Math.round((count / total) * 100);
         return (
           <div key={key}>
-            {/* Label row */}
+            {}
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
                 {icon
@@ -253,7 +253,7 @@ const BreakdownBars: React.FC<{
                 )}
               </div>
             </div>
-            {/* Bar track */}
+            {}
             <div
               className="relative rounded-full overflow-hidden"
               style={{ height: 8, background: colors.neutral100 }}
@@ -276,7 +276,7 @@ const BreakdownBars: React.FC<{
   );
 };
 
-/* ─── Device breakdown ──────────────────────────────────────────── */
+
 const DeviceBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => (
   <BreakdownBars
     breakdown={breakdown}
@@ -288,7 +288,7 @@ const DeviceBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ brea
   />
 );
 
-/* ─── Browser breakdown ─────────────────────────────────────────── */
+
 const BROWSER_COLORS: Record<string, string> = {
   Chrome:  "#4285f4",
   Firefox: "#ff6611",
@@ -316,7 +316,7 @@ const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ bre
   );
 };
 
-/* ─── Location breakdown (top countries) ───────────────────────── */
+
 const COUNTRY_TO_CODE: Record<string, string> = {
   "United States":"US","United Kingdom":"GB","India":"IN","Germany":"DE","France":"FR",
   "Canada":"CA","Australia":"AU","Pakistan":"PK","Brazil":"BR","Japan":"JP","China":"CN",
@@ -379,7 +379,7 @@ const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ br
   );
 };
 
-/* ─── Traffic Sources ───────────────────────────────────────────── */
+
 const SOURCE_COLORS: Record<string, string> = {
   direct:    "#94a3b8",
   google:    "#4285f4",
@@ -455,7 +455,7 @@ const TrafficSources: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
   );
 };
 
-/* ─── Peak Visit Hours ───────────────────────────────────────────── */
+
 const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
   const colors = useColors();
   const ACCENT = colors.primary600;
@@ -477,7 +477,7 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
     return h < 12 ? `${h}AM` : `${h - 12}PM`;
   };
 
-  // Top-3 hours sorted by count
+  
   const top3 = [...hours.map((c, h) => [h, c] as [number, number])]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
@@ -516,7 +516,7 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
           );
         })}
       </div>
-      {/* Time axis */}
+      {}
       <div className="flex justify-between mt-1.5 px-0.5">
         {["12AM", "6AM", "12PM", "6PM", "11PM"].map((lbl) => (
           <span key={lbl} className="text-[8px] font-medium" style={{ color: colors.neutral400 }}>
@@ -524,7 +524,7 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
           </span>
         ))}
       </div>
-      {/* Peak annotation */}
+      {}
       {max > 1 && (
         <div className="mt-2.5 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -546,146 +546,9 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
   );
 };
 
-/* ─── World Map ─────────────────────────────────────────────────── */
-const COUNTRY_COORDS: Record<string, [number, number]> = {
-  "United States": [38, -97],   "United Kingdom": [54, -2],
-  "India":         [20, 77],    "Germany":        [51, 10],
-  "France":        [46, 2],     "Canada":         [56, -96],
-  "Australia":     [-25, 133],  "Pakistan":       [30, 70],
-  "Brazil":        [-10, -55],  "Japan":          [36, 138],
-  "China":         [35, 105],   "Russia":         [60, 100],
-  "South Korea":   [37, 128],   "Netherlands":    [52, 5],
-  "Italy":         [42, 12],    "Spain":          [40, -4],
-  "Mexico":        [23, -102],  "Indonesia":      [-5, 120],
-  "Turkey":        [39, 35],    "Saudi Arabia":   [24, 45],
-  "Poland":        [52, 20],    "Sweden":         [62, 15],
-  "Switzerland":   [47, 8],     "Singapore":      [1, 104],
-  "UAE":           [24, 54],    "South Africa":   [-29, 25],
-  "Nigeria":       [10, 8],     "Egypt":          [27, 30],
-  "Argentina":     [-34, -64],  "Colombia":       [4, -74],
-  "Malaysia":      [4, 109],    "Thailand":       [15, 101],
-  "Vietnam":       [14, 108],   "Philippines":    [13, 122],
-  "Bangladesh":    [23, 90],    "Ukraine":        [49, 32],
-  "Portugal":      [39, -8],    "Belgium":        [51, 4],
-  "Austria":       [47, 14],    "Denmark":        [56, 10],
-  "New Zealand":   [-41, 172],  "Ireland":        [53, -8],
-  "Romania":       [46, 25],    "Chile":          [-35, -71],
-  "Norway":        [62, 10],    "Finland":        [64, 26],
-  "Czech Republic":[50, 16],    "Israel":         [31, 35],
-  "Iran":          [32, 53],    "Morocco":        [32, -5],
-  "Ghana":         [8, -2],     "Kenya":          [-1, 37],
-};
 
-const DOT_PALETTE = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444","#0ea5e9","#f43f5e","#06b6d4"];
 
-const ll2xy = (lat: number, lon: number, W: number, H: number): [number, number] => [
-  ((lon + 180) / 360) * W,
-  ((90 - lat) / 180) * H,
-];
 
-const WorldMap: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
-  const colors = useColors();
-  const { isDark } = useTheme();
-
-  const W = 400;
-  const H = 200;
-  const sorted = Object.entries(breakdown).sort((a, b) => b[1] - a[1]);
-  const maxCount = sorted.length ? sorted[0][1] : 1;
-  const totalCount = sorted.reduce((s, [, v]) => s + v, 0) || 1;
-
-  if (!sorted.length) return null;
-
-  const gridColor = isDark ? colors.neutral200 : colors.neutral100;
-  const equatorColor = isDark ? colors.neutral300 : colors.neutral200;
-
-  return (
-    <div>
-      <svg
-        width="100%"
-        viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="xMidYMid meet"
-        style={{
-          display: "block",
-          borderRadius: 8,
-          background: isDark ? colors.neutral100 : colors.neutral50,
-        }}
-      >
-        {/* Latitude grid lines */}
-        {[60, 30, 0, -30, -60].map((lat) => {
-          const [, y] = ll2xy(lat, 0, W, H);
-          return (
-            <line key={lat} x1={0} y1={y} x2={W} y2={y}
-              stroke={lat === 0 ? equatorColor : gridColor}
-              strokeWidth={lat === 0 ? 0.8 : 0.4}
-              strokeDasharray={lat === 0 ? undefined : "2,5"}
-            />
-          );
-        })}
-        {/* Longitude grid lines */}
-        {[-120, -60, 0, 60, 120].map((lon) => {
-          const [x] = ll2xy(0, lon, W, H);
-          return (
-            <line key={lon} x1={x} y1={0} x2={x} y2={H}
-              stroke={lon === 0 ? equatorColor : gridColor}
-              strokeWidth={lon === 0 ? 0.8 : 0.4}
-              strokeDasharray={lon === 0 ? undefined : "2,5"}
-            />
-          );
-        })}
-
-        {/* Country dots */}
-        {sorted.map(([country, count], i) => {
-          const coords = COUNTRY_COORDS[country];
-          if (!coords) return null;
-          const [x, y] = ll2xy(coords[0], coords[1], W, H);
-          const r = 2.5 + (count / maxCount) * 7;
-          const color = DOT_PALETTE[i % DOT_PALETTE.length];
-          return (
-            <motion.g key={country}>
-              <title>{country}: {count} visit{count !== 1 ? "s" : ""}</title>
-              {i === 0 && (
-                <motion.circle cx={x} cy={y} r={r + 5}
-                  fill="none" stroke={color} strokeWidth={0.8}
-                  initial={{ opacity: 0.5, scale: 1 }}
-                  animate={{ opacity: 0, scale: 2 }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut" }}
-                  style={{ transformOrigin: `${x}px ${y}px` }}
-                />
-              )}
-              <motion.circle cx={x} cy={y} r={r}
-                fill={color} fillOpacity={0.82}
-                stroke={isDark ? colors.neutral0 : "#fff"}
-                strokeWidth={0.8}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: i * 0.07, type: "spring", stiffness: 300 }}
-                style={{ transformOrigin: `${x}px ${y}px` }}
-              />
-            </motion.g>
-          );
-        })}
-      </svg>
-
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
-        {sorted.slice(0, 6).map(([country, count], i) => (
-          <div key={country} className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full shrink-0"
-              style={{ background: DOT_PALETTE[i % DOT_PALETTE.length] }} />
-            <span className="text-[9px] font-medium" style={{ color: colors.neutral500 }}>
-              {country}{" "}
-              <span className="font-bold" style={{ color: colors.neutral700 }}>
-                {Math.round((count / totalCount) * 100)}%
-              </span>
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-/* ─── View History ──────────────────────────────────────────────── */
 const DEVICE_ICON: Record<string, React.ReactNode> = {
   DESKTOP: <FiMonitor size={12} />,
   MOBILE:  <FiSmartphone size={12} />,
@@ -757,7 +620,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
                 className="flex items-start gap-3 px-4 py-3"
                 style={{ borderTop: i > 0 ? `1px solid ${colors.neutral100}` : "none" }}
               >
-                {/* Device icon */}
+                {}
                 <div
                   className="shrink-0 rounded-lg flex items-center justify-center mt-0.5"
                   style={{ width: 28, height: 28, background: `${devColor}14`, color: devColor }}
@@ -765,9 +628,9 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
                   {devIcon}
                 </div>
 
-                {/* Details */}
+                {}
                 <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                  {/* Row 1: device + browser/OS */}
+                  {}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-[11px] font-semibold" style={{ color: colors.neutral700 }}>
                       {v.device.charAt(0) + v.device.slice(1).toLowerCase()}
@@ -786,7 +649,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
                     )}
                   </div>
 
-                  {/* Row 2: location */}
+                  {}
                   {location && (
                     <div className="flex items-center gap-1">
                       <span className="text-[11px]">{flag}</span>
@@ -800,7 +663,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
                     </div>
                   )}
 
-                  {/* Row 3: referrer */}
+                  {}
                   {v.referrer && v.referrer !== "Direct" ? (
                     <div className="flex items-center gap-0.5">
                       <FiLink size={9} style={{ color: colors.neutral400 }} />
@@ -813,7 +676,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
                   )}
                 </div>
 
-                {/* Right: time + session */}
+                {}
                 <div className="shrink-0 flex flex-col items-end gap-0.5">
                   <span className="text-[10px] font-medium" style={{ color: colors.neutral500 }}>
                     {relTime(v.timestamp)}
@@ -855,7 +718,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
   );
 };
 
-/* ─── Main component ─────────────────────────────────────────────── */
+
 const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawStats }) => {
   const colors = useColors();
   const { isDark } = useTheme();
@@ -878,12 +741,12 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     recentViews = [],
   } = viewStats;
 
-  // Week-over-week delta — null when there's no prior data to compare
+  
   const wowDelta: number | null =
     viewsLastWeek > 0
       ? Math.round(((viewsThisWeek - viewsLastWeek) / viewsLastWeek) * 100)
       : viewsThisWeek > 0
-      ? null  // first week of data, no comparison yet
+      ? null  
       : null;
 
   const ACCENT = colors.primary600;
@@ -926,12 +789,12 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
       style={cardStyle}
     >
-      {/* ── Top accent line ─────────────────────────── */}
+      {}
       <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})` }} />
 
       <div className="p-4 sm:p-5">
 
-        {/* ── Header ──────────────────────────────────── */}
+        {}
         <div className="flex items-center justify-between mb-4 sm:mb-5">
           <div className="flex items-center gap-2">
             <LivePulse active={viewsToday > 0} />
@@ -949,14 +812,14 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
           </div>
         </div>
 
-        {/* ── Main grid ───────────────────────────────── */}
+        {}
         <div className={`grid gap-4 sm:gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
 
-          {/* Left: metrics ──────────────────────────── */}
+          {}
           <div className={isMobile ? "" : "col-span-7"}>
             <div className="flex flex-col gap-4">
 
-              {/* Today hero */}
+              {}
               <div
                 className="rounded-2xl p-4"
                 style={{ background: isDark ? `${ACCENT}15` : `${ACCENT}08`, border: `1px solid ${ACCENT}20` }}
@@ -969,9 +832,9 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                 </div>
               </div>
 
-              {/* Secondary metrics */}
+              {}
               <div className="grid gap-3 grid-cols-3">
-                {/* This Week — includes WoW delta */}
+                {}
                 <div className="rounded-xl p-3" style={panelStyle}>
                   <div className="flex items-start justify-between gap-1">
                     <MetricCell label="This Week" value={viewsThisWeek} delay={80} />
@@ -988,7 +851,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                 ))}
               </div>
 
-              {/* Mobile sparkline */}
+              {}
               {isMobile && weeklyTrend.length > 0 && (
                 <div className="rounded-xl p-3" style={panelStyle}>
                   <span className="text-[9px] font-black uppercase tracking-widest block mb-2" style={{ color: colors.neutral400 }}>
@@ -998,7 +861,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                 </div>
               )}
 
-              {/* Browser + Location row (below metrics on left) */}
+              {}
               {!isMobile && (hasBrowserData || hasLocationData) && (
                 <div className="grid gap-4 grid-cols-2">
                   {hasBrowserData && (
@@ -1018,10 +881,10 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
             </div>
           </div>
 
-          {/* Right column ───────────────────────────── */}
+          {}
           <div className={`flex flex-col gap-4 ${isMobile ? "" : "col-span-5"}`}>
 
-            {/* Desktop sparkline */}
+            {}
             {!isMobile && weeklyTrend.length > 0 && (
               <div className="rounded-xl p-4 flex flex-col" style={{ ...panelStyle, flex: 1 }}>
                 <div className="flex items-center justify-between mb-3">
@@ -1036,13 +899,13 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
               </div>
             )}
 
-            {/* Device breakdown */}
+            {}
             <div style={panelStyle}>
               {panelLabel("Devices")}
               <DeviceBreakdown breakdown={deviceBreakdown} />
             </div>
 
-            {/* Mobile: browser + location stacked */}
+            {}
             {isMobile && hasBrowserData && (
               <div style={panelStyle}>
                 {panelLabel("Browsers")}
@@ -1058,7 +921,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
           </div>
         </div>
 
-        {/* ── Traffic Sources + Peak Hours ────────────── */}
+        {}
         {recentViews.length > 0 && (
           <div className={`mt-4 grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
             <div style={panelStyle}>
@@ -1072,15 +935,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
           </div>
         )}
 
-        {/* ── Visitor World Map ───────────────────────── */}
-        {hasLocationData && (
-          <div className="mt-4" style={panelStyle}>
-            {panelLabel("Visitor Locations", <FiGlobe size={10} style={{ color: colors.neutral400 }} />)}
-            <WorldMap breakdown={locationBreakdown} />
-          </div>
-        )}
-
-        {/* ── Footer ─────────────────────────────────── */}
+        {}
         <div
           className="flex items-center justify-between mt-4 pt-4"
           style={{ borderTop: `1.5px solid ${colors.neutral300}` }}
@@ -1110,7 +965,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
           </span>
         </div>
 
-        {/* ── View History ────────────────────────────── */}
+        {}
         <ViewHistorySection views={recentViews} />
       </div>
     </motion.div>
