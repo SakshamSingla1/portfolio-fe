@@ -56,8 +56,9 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendin
                 setRolePermissions(user.rolePermissions);
                 navigate("dashboard");
                 showSnackbar("success", "Login successful!");
-            } catch {
-                showSnackbar("error", "Invalid email or password. Please try again.");
+            } catch (err: unknown) {
+                const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+                showSnackbar("error", msg || "Invalid email or password. Please try again.");
             } finally {
                 setIsLoading(false);
             }
