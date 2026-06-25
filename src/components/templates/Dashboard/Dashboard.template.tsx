@@ -29,6 +29,8 @@ const EMPTY_VIEW_STATS: IViewStats = {
   weeklyTrend: [],
   deviceBreakdown: {},
   recentViews: [],
+  browserBreakdown: {},
+  locationBreakdown: {}
 };
 
 const getGreeting = (): string => {
