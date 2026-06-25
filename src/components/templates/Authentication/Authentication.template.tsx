@@ -52,125 +52,114 @@ const AuthenticationTemplate: React.FC<AuthenticationTemplateProps> = ({
     : `radial-gradient(ellipse at 30% 20%, #1e293b 0%, #020617 60%)`;
 
   return (
-    <div
-      style={{
-        background: pageBg,
-        height: "100vh",
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "1rem",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {/* Noise texture */}
+    <>
+      {/* Fixed background layer — stays in place while content scrolls */}
       <div
-        className="fixed inset-0 pointer-events-none z-[0]"
-        style={{ backgroundImage: NOISE_SVG, opacity: isDark ? 0.06 : 0.04 }}
-      />
-
-      {/* Primary orb — top-left */}
-      <motion.div
         style={{
-          position: "absolute",
-          top: "-10%",
-          left: "-10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${colors.primary500}30 0%, transparent 70%)`,
-          filter: "blur(70px)",
-          pointerEvents: "none",
+          position: "fixed",
+          inset: 0,
+          background: pageBg,
           zIndex: 0,
-        }}
-        animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, 30, 0] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Primary orb — bottom-right */}
-      <motion.div
-        style={{
-          position: "absolute",
-          bottom: "-10%",
-          right: "-10%",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${colors.primary700}22 0%, transparent 70%)`,
-          filter: "blur(90px)",
           pointerEvents: "none",
-          zIndex: 0,
         }}
-        animate={{ scale: [1, 1.3, 1], x: [0, -40, 0], y: [0, -60, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
-
-      {/* Subtle center glow */}
-      <motion.div
-        style={{
-          position: "absolute",
-          top: "40%",
-          left: "40%",
-          width: "280px",
-          height: "280px",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${colors.primary600}14 0%, transparent 70%)`,
-          filter: "blur(60px)",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-        animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      />
-
-      <div
-        className={`relative w-full flex md:w-10/12 lg:w-9/12 md:min-h-[650px] lg:min-h-[700px] mx-auto ${
-          isDesktopView ? "flex-row items-stretch" : "flex-col items-center justify-center"
-        }`}
-        style={{ zIndex: 2 }}
       >
-        {!isDesktopView && showOnboarding && (
-          <div className="w-full flex justify-center items-center mt-4 mb-6">
-            <div
-              className="w-full overflow-hidden rounded-2xl shadow-2xl"
-              style={{
-                backgroundColor: "rgba(10,15,30,0.85)",
-                backdropFilter: "blur(20px)",
-                border: `1px solid rgba(255,255,255,0.06)`,
-              }}
-            >
+        <div
+          style={{ position: "absolute", inset: 0, backgroundImage: NOISE_SVG, opacity: isDark ? 0.06 : 0.04 }}
+        />
+        <motion.div
+          style={{
+            position: "absolute", top: "-10%", left: "-10%",
+            width: "500px", height: "500px", borderRadius: "50%",
+            background: `radial-gradient(circle, ${colors.primary500}30 0%, transparent 70%)`,
+            filter: "blur(70px)",
+          }}
+          animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, 30, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          style={{
+            position: "absolute", bottom: "-10%", right: "-10%",
+            width: "600px", height: "600px", borderRadius: "50%",
+            background: `radial-gradient(circle, ${colors.primary700}22 0%, transparent 70%)`,
+            filter: "blur(90px)",
+          }}
+          animate={{ scale: [1, 1.3, 1], x: [0, -40, 0], y: [0, -60, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+        <motion.div
+          style={{
+            position: "absolute", top: "40%", left: "40%",
+            width: "280px", height: "280px", borderRadius: "50%",
+            background: `radial-gradient(circle, ${colors.primary600}14 0%, transparent 70%)`,
+            filter: "blur(60px)",
+          }}
+          animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+      </div>
+
+      {/* Scrollable content layer — grows with content, scrolls the page */}
+      <div
+        style={{
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          padding: "1.5rem 1rem",
+          position: "relative",
+          zIndex: 2,
+          overflowX: "hidden",
+        }}
+      >
+        <div
+          className={`relative w-full flex md:w-10/12 lg:w-9/12 mx-auto my-auto ${
+            isDesktopView ? "flex-row items-stretch" : "flex-col items-center justify-center"
+          }`}
+          style={{ minHeight: isDesktopView ? "600px" : "auto" }}
+        >
+          {!isDesktopView && showOnboarding && (
+            <div className="w-full flex justify-center items-center mt-4 mb-6">
+              <div
+                className="w-full overflow-hidden rounded-2xl shadow-2xl"
+                style={{
+                  backgroundColor: "rgba(10,15,30,0.85)",
+                  backdropFilter: "blur(20px)",
+                  border: `1px solid rgba(255,255,255,0.06)`,
+                }}
+              >
+                <OnboardingSection onFlip={onFlip} />
+              </div>
+            </div>
+          )}
+
+          {isDesktopView && (
+            <div className="w-full flex">
               <OnboardingSection onFlip={onFlip} />
             </div>
-          </div>
-        )}
+          )}
 
-        {isDesktopView && (
-          <div className="w-full flex">
-            <OnboardingSection onFlip={onFlip} />
-          </div>
-        )}
-
-        {!(!isDesktopView && showOnboarding) && (
-          <div
-            className={`dark ${
-              isDesktopView
-                ? "w-full min-h-full rounded-tr-3xl rounded-br-3xl flex items-center justify-center p-10"
-                : "w-full rounded-2xl p-6"
-            }`}
-            style={{
-              backgroundColor: "rgba(12, 16, 32, 0.96)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              backdropFilter: "blur(28px)",
-              boxShadow: "0 32px 64px -16px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
-            }}
-          >
-            {children}
-          </div>
-        )}
+          {!(!isDesktopView && showOnboarding) && (
+            <div
+              className={`dark ${
+                isDesktopView
+                  ? "w-full rounded-tr-3xl rounded-br-3xl flex items-center justify-center"
+                  : "w-full rounded-2xl"
+              }`}
+              style={{
+                backgroundColor: "rgba(12, 16, 32, 0.96)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                backdropFilter: "blur(28px)",
+                boxShadow: "0 32px 64px -16px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
+                padding: isDesktopView ? "2.5rem" : "1.5rem",
+              }}
+            >
+              {children}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

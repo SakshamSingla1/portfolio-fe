@@ -73,8 +73,8 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
         >
-            <div className="px-8 py-8">
-                <div className="mb-7">
+            <div className="px-8 py-5">
+                <div className="mb-4">
                     <motion.div
                         className="inline-flex items-center justify-center p-3 rounded-2xl mb-4 text-white text-2xl"
                         style={{
@@ -94,7 +94,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
                     </p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                     <TextField
                         fullWidth id="fullName" name="fullName" label="Full Name"
                         value={formik.values.fullName} onChange={formik.handleChange}
