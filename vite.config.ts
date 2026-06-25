@@ -13,13 +13,16 @@ export default defineConfig({
           if (id.includes('react-icons')) return 'vendor-icons';
           if (id.includes('@mui') || id.includes('@emotion')) return 'vendor-mui';
           if (id.includes('framer-motion')) return 'vendor-motion';
-          if (id.includes('react-jss') || id.includes('/jss')) return 'vendor-jss';
           if (id.includes('@tanstack')) return 'vendor-query';
+          // react-jss calls React.createContext at eval time — must be in the
+          // same chunk as React so execution order is guaranteed
           if (
             id.includes('node_modules/react/') ||
             id.includes('node_modules/react-dom/') ||
             id.includes('node_modules/react-router') ||
-            id.includes('node_modules/scheduler/')
+            id.includes('node_modules/scheduler/') ||
+            id.includes('react-jss') ||
+            id.includes('/jss')
           ) return 'vendor-react';
           return 'vendor-misc';
         },
