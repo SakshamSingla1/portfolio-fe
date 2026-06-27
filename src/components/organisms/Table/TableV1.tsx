@@ -285,6 +285,10 @@ const useStyles = createUseStyles((colors: any) => ({
     fontSize: '0.8125rem',
     flex: 1,
     textAlign: 'right',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
   mobileCardDropdownArrow: {
     display: 'flex',
@@ -495,7 +499,7 @@ const TableV1: React.FC<TableProps> = ({
       case "date": return <DateCell data={data} props={props} />;
       case "datetime": return <DateTimeCell data={data} props={props} />;
       case "currency": return <CurrencyCell data={data} props={props} />;
-      default: return <StringCell data={data} props={props} />;
+      default: return React.isValidElement(data) ? data : <StringCell data={data} props={props} />;
     }
   };
 

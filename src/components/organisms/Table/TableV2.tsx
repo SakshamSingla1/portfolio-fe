@@ -220,7 +220,7 @@ const getCellView = (data: any, columnProps: TableColumn) => {
         case "currency":
             return <CurrencyCell data={data} props={props} />;
         default:
-            return <StringCell data={data} props={props} />;
+            return React.isValidElement(data) ? data : <StringCell data={data} props={props} />;
     }
 };
 
