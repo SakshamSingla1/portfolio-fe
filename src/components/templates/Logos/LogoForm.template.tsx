@@ -41,8 +41,10 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
 
   const onClose = () => navigate(ADMIN_ROUTES.LOGO);
 
-  const devicon = (slug: string, variant = "original") =>
-    `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}/${slug}-${variant}.svg`;
+  const devicon = (slug: string, variant = "original") => {
+    const selectedVariant = slug === "java" ? "original-wordmark" : variant;
+    return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${slug}/${slug}-${selectedVariant}.svg`;
+  };
 
   const formik = useFormik<LogoRequest>({
     initialValues: {
@@ -88,7 +90,9 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
   useEffect(() => {
     const name = formik.values.name;
     const currentUrl = formik.values.url;
-    const isDevIconUrl = currentUrl.startsWith("https://cdn.jsdelivr.net/gh/devicons/devicon/icons/");
+    const isDevIconUrl =
+      currentUrl.startsWith("https://cdn.jsdelivr.net/gh/devicons/devicon/icons/") ||
+      currentUrl.startsWith("https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/");
 
     if (mode !== MODE.VIEW) {
       if (name && (!currentUrl || isDevIconUrl)) {
@@ -152,7 +156,7 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
                   color: formik.values.url ? colors.primary700 : colors.neutral400
                 }}
               >
-                {formik.values.url || "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/..."}
+                {formik.values.url || "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/..."}
               </div>
             </div>
           </div>
