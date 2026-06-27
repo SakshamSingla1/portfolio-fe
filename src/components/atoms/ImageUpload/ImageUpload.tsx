@@ -175,7 +175,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 </label>
             )}
 
-            <div className={`relative group/upload ${previewImage ? 'w-fit h-fit' : `w-full ${currentRatioClass}`} rounded-sm overflow-hidden transition-all duration-500 shadow-sm hover:shadow-xl`}>
+            <div className={`relative group/upload w-full ${currentRatioClass} rounded-sm overflow-hidden transition-all duration-500 shadow-sm hover:shadow-xl`}>
                 <AnimatePresence mode="wait">
                     {!previewImage ? (
                         <motion.div
@@ -228,9 +228,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                             key="preview"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className={`w-full relative overflow-hidden transition-all duration-500 rounded-2xl`}
+                            className={`w-full h-full relative overflow-hidden transition-all duration-500 rounded-2xl`}
                         >
-                            <img src={previewImage} alt="Preview" className="max-w-full h-auto block object-contain transition-transform duration-1000 group-hover/upload:scale-105" />
+                            <img src={previewImage} alt="Preview" className="w-full h-full block object-contain transition-transform duration-1000 group-hover/upload:scale-105" />
 
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/upload:opacity-100 transition-opacity duration-500 flex items-center justify-center gap-4">
                                 {showPreview && (
