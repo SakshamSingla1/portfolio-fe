@@ -36,8 +36,10 @@ const validationSchema = Yup.object().shape({
             "Description is required",
             (value) => !isRichTextEmpty(value)
         ),
+    gradeType: Yup.string()
+        .required('Grade type is required'),
     grade: Yup.string()
-        .required('Grade is required')
+        .required('Grade is required'),
 });
 
 interface EducationFormProps {

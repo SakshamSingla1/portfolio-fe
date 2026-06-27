@@ -165,7 +165,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                             )}
                             <button
                                 onClick={() => handleDelete(asset.id)}
-                                disabled={deletingId === asset.id}
+                                disabled={deletingId === String(asset.id)}
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
@@ -178,7 +178,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                                     color: colors.error500,
                                     cursor: "pointer",
                                     flexShrink: 0,
-                                    opacity: deletingId === asset.id ? 0.5 : 1,
+                                    opacity: deletingId === String(asset.id) ? 0.5 : 1,
                                 }}
                             >
                                 <FiTrash2 size={13} />

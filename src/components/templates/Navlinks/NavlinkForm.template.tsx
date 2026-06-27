@@ -22,7 +22,7 @@ const validationSchema = Yup.object({
   index: Yup.string().required('Index is required'),
   name: Yup.string().required('Name is required'),
   path: Yup.string().required('Path is required'),
-  roles: Yup.array().of(Yup.string()).min(1, 'At least one role is required'),
+  navGroup: Yup.string().required('Nav group is required'),
   status: Yup.string().required('Status is required'),
 });
 

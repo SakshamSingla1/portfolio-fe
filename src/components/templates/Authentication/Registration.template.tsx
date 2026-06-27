@@ -23,7 +23,9 @@ interface RegisterTemplateProps {
 const validationSchema = Yup.object({
     fullName: Yup.string().required("Name is required"),
     email: Yup.string().email("Enter a valid email").required("Email is required"),
-    phone: Yup.string().required("Phone number is required"),
+    phone: Yup.string()
+        .required("Phone number is required")
+        .matches(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
     password: Yup.string().min(6).required("Password is required"),
     confirmPassword: Yup.string()
         .required("Confirm Password is required")

@@ -135,11 +135,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                 onSearch={search => loadLogoDropdown(search)}
                                 onChange={value => {
                                     formik.setFieldValue("logoId", value?.value ? Number(value.value) : null);
-                                    formik.setFieldValue("logoName", typeof value?.title === "string" ? value.title : "");
-                                    formik.setFieldValue(
-                                        "logoUrl",
-                                        logos.find(l => String(l.id) === String(value?.value))?.url || ""
-                                    );
                                     setSelectedLogo(logos.find(l => String(l.id) === String(value?.value)) || null);
                                 }}
                                 required={true}
