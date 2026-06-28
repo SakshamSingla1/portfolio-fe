@@ -1,97 +1,112 @@
-import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, SORT_ENUM } from '../../../utils/types';
-import { initialPaginationValues } from '../../../utils/constant';
-import TemplateListTableTemplate from '../../templates/Templates/TemplateList.template';
-import { useTemplateService, type TemplateResponse, type TemplateFilterRequest } from '../../../services/useTemplateService';
-import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { FiMail, FiMessageSquare, FiMessageCircle, FiFileText } from "react-icons/fi";
+import { useSnackbar } from "../../../hooks/useSnackBar";
+import { HTTP_STATUS, SORT_ENUM } from "../../../utils/types";
+import type { IPagination } from "../../../utils/types";
+import { initialPaginationValues } from "../../../utils/constant";
+import { useTemplateService } from "../../../services/useTemplateService";
+import type { INotificationTemplate, ITemplateFilterRequest } from "../../../services/useTemplateService";
+import TemplateListTableTemplate from "../../templates/Templates/TemplateList.template";
+
+export type ChannelFilter = "all" | "email" | "sms" | "whatsapp";
 
 const TemplatesListingPage: React.FC = () => {
+    const { showSnackbar } = useSnackbar();
     const [searchParams, setSearchParams] = useSearchParams();
     const templateService = useTemplateService();
-    const { showSnackbar } = useSnackbar();
 
-    const initialFiltersValues: any = {
+    const [filters, setFiltersTo] = useState<any>({
         search: searchParams.get("search") || "",
-    };
-
-    const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
+    });
     const [pagination, setPagination] = useState<IPagination>({
         ...initialPaginationValues,
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [templates, setTemplatesTo] = useState<TemplateResponse[]>([]);
+    const [templates, setTemplatesTo] = useState<INotificationTemplate[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [channelFilter, setChannelFilter] = useState<ChannelFilter>("all");
+    const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
 
-    const refreshTemplates = async (page: string, size: string) => {
-        const params: TemplateFilterRequest = {
-            page: page,
-            size: size,
-            sortDir: SORT_ENUM.DESC,
-            sortBy: "createdAt",
-            search: filters?.search,
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(filters.search), 500);
+        return () => clearTimeout(timer);
+    }, [filters.search]);
+
+    const refreshTemplates = async (page: number, size: number) => {
+        setLoading(true);
+        const params: ITemplateFilterRequest = {
+            page,
+            size,
+            sort: SORT_ENUM.CREATED_AT_DESC,
+            search: filters.search,
         };
         await templateService.getAllTemplates(params)
             .then((res) => {
                 if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setTemplatesTo(res?.data?.data?.content);
+                    const { totalElements, totalPages } = res.data.data;
+                    setPagination(prev => ({ ...prev, totalPages, totalRecords: totalElements }));
+                    setTemplatesTo(res.data.data.content);
                 }
-            }).catch((error) => {
-                console.error("Error fetching templates:", error);
-                setTemplatesTo([]);
-                showSnackbar('error', 'Failed to load templates');
             })
-    }
+            .catch(() => {
+                showSnackbar("error", "Failed to load notification templates");
+                setTemplatesTo([]);
+            })
+            .finally(() => setLoading(false));
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
-        setFiltersTo({ ...filters, [name]: value ?? "" });
-        setPagination({ ...pagination, currentPage: 0 })
-    }
+        setFiltersTo((prev: any) => ({ ...prev, [name]: value ?? "" }));
+        setPagination(prev => ({ ...prev, currentPage: 0 }));
+    };
 
     const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-        setPagination((prevPagination) => ({
-            ...prevPagination,
-            currentPage: newPage
-        }));
-    }
+        setPagination(prev => ({ ...prev, currentPage: newPage }));
+    };
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newRowsPerPage = parseInt(event.target.value, 10);
-        setPagination((prevPagination) => ({
-            ...prevPagination,
-            pageSize: newRowsPerPage
-        }));
+        setPagination(prev => ({ ...prev, pageSize: parseInt(event.target.value, 10) }));
     };
 
     useEffect(() => {
-        refreshTemplates(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
+        refreshTemplates(pagination.currentPage, pagination.pageSize);
+    }, [debouncedSearch, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
-        const params: Record<string, string> = {
-            page: pagination.currentPage.toString(),
-            size: pagination.pageSize.toString(),
+        setSearchParams({
+            page: String(pagination.currentPage),
+            size: String(pagination.pageSize),
             search: filters.search ?? "",
-        };
-        setSearchParams(params);
-    }, [filters.search, pagination]);
+        });
+    }, [filters, pagination.currentPage, pagination.pageSize]);
+
+    const emailCount    = templates.filter(t => t.isEmail    === 1).length;
+    const smsCount      = templates.filter(t => t.isSms      === 1).length;
+    const whatsappCount = templates.filter(t => t.isWhatsapp === 1).length;
+
+    const stats = [
+        { label: "Total",     value: pagination.totalRecords, icon: <FiFileText size={14} /> },
+        { label: "Email",     value: emailCount,              icon: <FiMail size={14} /> },
+        { label: "SMS",       value: smsCount,                icon: <FiMessageSquare size={14} /> },
+        { label: "WhatsApp",  value: whatsappCount,           icon: <FiMessageCircle size={14} /> },
+    ];
 
     return (
-        <TemplateListTableTemplate 
-            templates={templates} 
-            pagination={pagination} 
-            handlePaginationChange={handlePaginationChange} 
-            handleRowsPerPageChange={handleRowsPerPageChange} 
-            searchValue={filters.search}
-            onSearchChange={(val) => handleFiltersChange("search", val)}
+        <TemplateListTableTemplate
+            templates={templates}
+            pagination={pagination}
+            handleFiltersChange={handleFiltersChange}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
+            filters={filters}
+            loading={loading}
+            channelFilter={channelFilter}
+            setChannelFilter={setChannelFilter}
+            stats={stats}
         />
-    )
-}
+    );
+};
 
 export default TemplatesListingPage;

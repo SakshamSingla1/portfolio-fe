@@ -55,8 +55,8 @@ export const ADMIN_ROUTES = {
 
     TEMPLATES: "/notifications",
     TEMPLATES_ADD: "/notifications/add",
-    TEMPLATES_EDIT: "/notifications/:name/edit",
-    TEMPLATES_VIEW: "/notifications/:name",
+    TEMPLATES_EDIT: "/notifications/:id/edit",
+    TEMPLATES_VIEW: "/notifications/:id",
 
     COLOR_THEME: "/themes",
     COLOR_THEME_ADD: "/themes/add",

@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+/* Make Tailwind dark: variants respond to html.dark class (set by ThemeContext) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Jodit editor: force content area to respect the app's dark/light mode ─── */
+/* .jodit-dark-wrapper is set on the wrapper div when isDark === true           */
+.jodit-dark-wrapper .jodit-container,
+.jodit-dark-wrapper .jodit-workplace,
+.jodit-dark-wrapper .jodit-wysiwyg {
+  background-color: var(--jodit-editor-bg) !important;
+  color:            var(--jodit-editor-color) !important;
+}
+/* Status bar and toolbar area */
+.jodit-dark-wrapper .jodit-status-bar {
+  background-color: var(--jodit-editor-bg) !important;
+  border-color:     var(--jodit-editor-border) !important;
+}
+
+/* editorCssClass targets the contenteditable div directly; custom props cascade from wrapper */
+.jodit-content-dark,
+.jodit-content-light {
+  background-color: var(--jodit-editor-bg) !important;
+  color:            var(--jodit-editor-color) !important;
+}
+
 @theme {
   --color-white: var(--color-neutral-0);
   --color-black: var(--color-neutral-950);
@@ -50,5 +74,76 @@
     .jodit-add-new-line, .jodit-add-new-line * {
         display: none !important;
         box-sizing: border-box;
+    }
+
+    /* ── Jodit Dark Mode ──────────────────────────────────────────────── */
+    /* Override Jodit CSS custom properties so the editor matches our design system */
+    html.dark {
+        --jd-color-background-default:        var(--color-neutral-900);
+        --jd-color-background-header:         var(--color-neutral-800);
+        --jd-color-background-header-hover:   var(--color-neutral-700);
+        --jd-color-background-button-hover:   var(--color-neutral-700);
+        --jd-color-background-selected:       var(--color-primary-900);
+        --jd-color-background-selection:      var(--color-primary-800);
+        --jd-color-border:                    var(--color-neutral-700);
+        --jd-color-text-default:              var(--color-neutral-100);
+        --jd-color-text-secondary:            var(--color-neutral-400);
+        --jd-color-icon:                      var(--color-neutral-400);
+        --jd-color-icon-hover:                var(--color-neutral-100);
+        --jd-color-panel:                     var(--color-neutral-800);
+    }
+
+    /* Element-level overrides as fallback for older Jodit versions */
+    html.dark .jodit-container:not(.jodit_inline) {
+        background: var(--color-neutral-900) !important;
+        border-color: var(--color-neutral-700) !important;
+    }
+    html.dark .jodit-workplace,
+    html.dark .jodit-wysiwyg {
+        background: var(--color-neutral-900) !important;
+        color: var(--color-neutral-100) !important;
+    }
+    html.dark .jodit-toolbar__box {
+        background: var(--color-neutral-800) !important;
+        border-bottom-color: var(--color-neutral-700) !important;
+    }
+    html.dark .jodit-toolbar-button__button {
+        color: var(--color-neutral-300) !important;
+    }
+    html.dark .jodit-toolbar-button__button:hover {
+        background: var(--color-neutral-700) !important;
+        color: var(--color-neutral-100) !important;
+    }
+    html.dark .jodit-status-bar {
+        background: var(--color-neutral-800) !important;
+        border-top-color: var(--color-neutral-700) !important;
+        color: var(--color-neutral-400) !important;
+    }
+    html.dark .jodit-popup__content {
+        background: var(--color-neutral-800) !important;
+        border-color: var(--color-neutral-700) !important;
+        color: var(--color-neutral-100) !important;
+    }
+    html.dark .jodit-ui-group:not(:last-child) {
+        border-right-color: var(--color-neutral-700) !important;
+    }
+    html.dark .jodit-popup .jodit-toolbar-button__button {
+        color: var(--color-neutral-200) !important;
+    }
+    html.dark .jodit-popup .jodit-toolbar-button__button:hover {
+        background: var(--color-neutral-700) !important;
+    }
+    html.dark .jodit-dialog__header {
+        background: var(--color-neutral-800) !important;
+        border-bottom-color: var(--color-neutral-700) !important;
+        color: var(--color-neutral-100) !important;
+    }
+    html.dark .jodit-dialog__content {
+        background: var(--color-neutral-900) !important;
+        color: var(--color-neutral-100) !important;
+    }
+    html.dark .jodit-dialog__footer {
+        background: var(--color-neutral-800) !important;
+        border-top-color: var(--color-neutral-700) !important;
     }
 }

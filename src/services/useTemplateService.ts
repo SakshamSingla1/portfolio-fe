@@ -1,36 +1,73 @@
-import { request } from "."
+import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
 
 export const TEMPLATE_URLS = {
-    GET_TEMPLATES: "templates",
-    GET_TEMPLATE_BY_NAME: "templates/:name",
+    CREATE_TEMPLATE:          "/notification-templates",
+    GET_TEMPLATE_BY_ID:       "/notification-templates/:id",
+    UPDATE_TEMPLATE_BY_ID:    "/notification-templates/:id",
+    GET_ALL_TEMPLATES:        "/notification-templates",
+    GET_TEMPLATE_VARIABLES:   "/notification-template-variables",
+};
+
+export interface INotificationTemplate {
+    id: number;
+    message: string;
+    messageTo: string;
+    subject: string;
+    messageBody: string;
+    emailTo: string;
+    emailCc: string;
+    emailBcc: string;
+    emailReplyTo: string;
+    template: string;
+    isSms: number;
+    isEmail: number;
+    isWhatsapp: number;
+    whatsappTemplateName: string;
+    whatsappTemplateBody: string;
+    additionalData: string;
+    dltTemplateId: string;
+    templateGroupId: number | null;
+    createdBy: number;
+    updatedBy: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
-export interface TemplateFilterRequest {
+export interface INotificationTemplateFormPayload {
+    message?: string;
+    messageTo?: string;
+    subject?: string;
+    messageBody?: string;
+    emailTo?: string;
+    emailCc?: string;
+    emailBcc?: string;
+    emailReplyTo?: string;
+    template: string;
+    isSms?: number;
+    isEmail?: number;
+    isWhatsapp?: number;
+    whatsappTemplateName?: string;
+    whatsappTemplateBody?: string;
+    additionalData?: string;
+    dltTemplateId?: string;
+    templateGroupId?: number | null;
+}
+
+export interface ITemplateFilterRequest {
     search?: string;
-    sortDir?: string;
-    sortBy?: string;
-    page: string;
-    size: string;
+    page: number;
+    size: number;
+    sort?: string;
+    templateGroupIdString?: string;
 }
 
-export interface TemplateRequest {
-    name: string;
-    subject: string;
-    body: string;
-    type: string;
-    status: string;
-}
-
-export interface TemplateResponse {
-    id?: number | null;
-    name: string;
-    subject: string;
-    body: string;
-    type: string;
-    status: string;
+export interface ITemplateVariable {
+    id: number;
+    variableName: string;
+    htmlContent: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -38,46 +75,26 @@ export interface TemplateResponse {
 export const useTemplateService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getAllTemplates = (params: TemplateFilterRequest) =>
-        request(API_METHOD.GET, TEMPLATE_URLS.GET_TEMPLATES, user, null, { params });
+    const createTemplate = (data: INotificationTemplateFormPayload) =>
+        request(API_METHOD.POST, TEMPLATE_URLS.CREATE_TEMPLATE, user, data, null, null);
 
-    const getTemplateByName = async (name: string) => {
-        return request(API_METHOD.GET, 
-            replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_NAME, { name }), 
-            user, 
-            null
-        );
-    };
+    const getTemplateById = (id: number) =>
+        request(API_METHOD.GET, replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_ID, { id }), user, null, null, null);
 
-    const createTemplate = async (template: TemplateRequest) => {
-        return request(API_METHOD.POST, 
-            TEMPLATE_URLS.GET_TEMPLATES, 
-            user, 
-            template
-        );
-    };
+    const updateTemplateById = (id: number, data: INotificationTemplateFormPayload) =>
+        request(API_METHOD.PUT, replaceUrlParams(TEMPLATE_URLS.UPDATE_TEMPLATE_BY_ID, { id }), user, data, null, null);
 
-    const updateTemplate = async (name: string, template: TemplateRequest) => {
-        return request(API_METHOD.PUT, 
-            replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_NAME, { name }), 
-            user, 
-            template
-        );
-    };
+    const getAllTemplates = (params: ITemplateFilterRequest) =>
+        request(API_METHOD.GET, TEMPLATE_URLS.GET_ALL_TEMPLATES, user, null, { params }, null);
 
-    const deleteTemplate = async (name: string) => {
-        return request(API_METHOD.DELETE, 
-            replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_NAME, { name }), 
-            user, 
-            null
-        );
-    };
+    const getTemplateVariables = (params: ITemplateFilterRequest) =>
+        request(API_METHOD.GET, TEMPLATE_URLS.GET_TEMPLATE_VARIABLES, user, null, { params }, null);
 
     return {
-        getAllTemplates,
-        getTemplateByName,
         createTemplate,
-        updateTemplate,
-        deleteTemplate,
+        getTemplateById,
+        updateTemplateById,
+        getAllTemplates,
+        getTemplateVariables,
     };
 };
