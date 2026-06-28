@@ -39,7 +39,7 @@ const TemplatesListingPage: React.FC = () => {
         const params: ITemplateFilterRequest = {
             page,
             size,
-            sort: SORT_ENUM.CREATED_AT_DESC,
+            sort: SORT_ENUM.DESC,
             search: filters.search,
         };
         await templateService.getAllTemplates(params)

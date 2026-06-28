@@ -1,15 +1,16 @@
 import React, { useMemo } from "react";
 import JoditEditor from "jodit-react";
-import type { Jodit } from "jodit-react";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useColors } from "../../../utils/types";
+
+type JoditInstance = React.ElementRef<typeof JoditEditor>;
 
 interface Props {
     value: string;
     onBlur: (content: string) => void;
     disabled?: boolean;
     placeholder?: string;
-    onEditorReady?: (editor: Jodit) => void;
+    onEditorReady?: (editor: JoditInstance) => void;
     minHeight?: number;
 }
 
@@ -61,7 +62,7 @@ const NotificationBodyEditor: React.FC<Props> = ({
         },
     }), [isDark, disabled, colors, placeholder, minHeight]);
 
-    const handleRef = (editor: Jodit | null) => {
+    const handleRef = (editor: JoditInstance | null) => {
         if (editor && onEditorReady) onEditorReady(editor);
     };
 

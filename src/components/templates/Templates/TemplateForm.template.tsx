@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import type { FormikProps } from "formik";
-import type { Jodit } from "jodit-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     FiSearch, FiEye, FiX, FiMail, FiMessageSquare, FiMessageCircle,
     FiCopy, FiCheck, FiZap,
 } from "react-icons/fi";
-import { useSnackbar } from "../../../hooks/useSnackBar";
 import { HTTP_STATUS, SORT_ENUM, useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
@@ -261,7 +259,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
 const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { showSnackbar } = useSnackbar();
     const templateService = useTemplateService();
     const colors = useColors();
     const { isDark } = useTheme();
@@ -271,9 +268,9 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
     const [varSearch, setVarSearch] = useState("");
     const [activeTab, setActiveTab] = useState("email");
     const [previewOpen, setPreviewOpen] = useState(false);
-    const editorRef = useRef<Jodit | null>(null);
+    const editorRef = useRef<any>(null);
 
-    const setEditorRef = (editor: Jodit | null) => {
+    const setEditorRef = (editor: any) => {
         if (editor) editorRef.current = editor;
     };
 
@@ -295,7 +292,7 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
     const loadVariables = async () => {
         setLoadingVars(true);
         try {
-            const res = await templateService.getTemplateVariables({ page: 0, size: 200, sort: SORT_ENUM.CREATED_AT_DESC, search: "" });
+            const res = await templateService.getTemplateVariables({ page: 0, size: 200, sort: SORT_ENUM.DESC, search: "" });
             if (res?.status === HTTP_STATUS.OK) setVariables(res.data.data.content);
         } catch {
             setVariables([]);
@@ -323,7 +320,7 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
     }, [variables, varSearch]);
 
     // Channel dot icon for tabs
-    const ChannelIcon = ({ Icon, isOn, colorOn }: { Icon: React.ElementType; isOn: boolean; colorOn: string }) => (
+    const ChannelIcon = ({ Icon, isOn }: { Icon: React.ElementType; isOn: boolean }) => (
         <span className="relative flex items-center">
             <Icon size={15} />
             {isOn && (
@@ -339,19 +336,19 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
         {
             label: "Email",
             value: "email",
-            icon: <ChannelIcon Icon={FiMail} isOn={formik.values.isEmail === 1} colorOn={colors.success500} />,
+            icon: <ChannelIcon Icon={FiMail} isOn={formik.values.isEmail === 1} />,
             component: <EmailNotificationForm formik={formik} setEditorRef={setEditorRef} insertVariable={insertVariable} />,
         },
         {
             label: "SMS",
             value: "sms",
-            icon: <ChannelIcon Icon={FiMessageSquare} isOn={formik.values.isSms === 1} colorOn={colors.success500} />,
+            icon: <ChannelIcon Icon={FiMessageSquare} isOn={formik.values.isSms === 1} />,
             component: <SmsNotificationForm formik={formik} setEditorRef={setEditorRef} insertVariable={insertVariable} />,
         },
         {
             label: "WhatsApp",
             value: "whatsapp",
-            icon: <ChannelIcon Icon={FiMessageCircle} isOn={formik.values.isWhatsapp === 1} colorOn={colors.success500} />,
+            icon: <ChannelIcon Icon={FiMessageCircle} isOn={formik.values.isWhatsapp === 1} />,
             component: <WhatsappNotificationForm formik={formik} setEditorRef={setEditorRef} insertVariable={insertVariable} />,
         },
     ];

@@ -1,6 +1,5 @@
 import React from "react";
 import type { FormikProps } from "formik";
-import type { Jodit } from "jodit-react";
 import { useColors } from "../../../utils/types";
 import TextField from "../../atoms/TextField/TextField";
 import NotificationBodyEditor from "../../molecules/NotificationBodyEditor/NotificationBodyEditor";
@@ -9,7 +8,7 @@ import type { INotificationTemplateFormPayload } from "../../../services/useTemp
 
 interface Props {
     formik: FormikProps<INotificationTemplateFormPayload>;
-    setEditorRef: (editor: Jodit | null) => void;
+    setEditorRef: (editor: any) => void;
     insertVariable: (varName: string) => void;
 }
 
