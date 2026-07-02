@@ -104,6 +104,8 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         setIsLoadingSkills(true);
         try {
             const response = await skillServiceRef.current.getByProfile({
+                page: "0",
+                size: "1000",
                 search: searchTerm || "",
             });
             if (response?.status === HTTP_STATUS.OK) {

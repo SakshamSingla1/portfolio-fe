@@ -67,7 +67,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         const params: LogoFilterParams = {
             search: searchTerm || "",
             page: "0",
-            size: "10"
+            size: "1000"
         };
         try {
             const response = await logoServiceRef.current.getAll(params);
@@ -138,8 +138,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                 placeHolder="Search and select a skill (e.g., React, Node.js)"
                                 options={logoOptions}
                                 value={logoOptions.find(option => option.value === String(formik.values.logoId)) || null}
-                                onSearch={loadLogoDropdown}
-                                loading={isLoadingLogos}
+                                onSearch={search => loadLogoDropdown(search)}
                                 onChange={value => {
                                     formik.setFieldValue("logoId", value?.value ? Number(value.value) : null);
                                     setSelectedLogo(logos.find(l => String(l.id) === String(value?.value)) || null);

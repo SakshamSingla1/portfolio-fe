@@ -95,7 +95,10 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     const loadSkills = useCallback(async (search = "") => {
         setIsLoadingSkills(true);
         try {
-            const res = await skillServiceRef.current.getByProfile({ search });
+            const res = await skillServiceRef.current.getByProfile({ 
+                page: "0",
+                size: "1000",
+                search });
             setSkills(res?.status === HTTP_STATUS.OK ? res.data.data.content : []);
         } catch {
             setSkills([]);
