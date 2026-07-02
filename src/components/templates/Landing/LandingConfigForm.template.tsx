@@ -10,6 +10,8 @@ import type { ImageUploadResponse } from '../../../services/useProfileService';
 import { useColors, HTTP_STATUS } from '../../../utils/types';
 import type { LandingConfig } from '../../../services/useLandingPageService';
 
+const PLATFORM_RESOURCE_ID = 1;
+
 // ── Char Counter ───────────────────────────────────────────────────────────────
 const CharCounter: React.FC<{ value: string; max: number }> = ({ value, max }) => {
     const colors = useColors();
@@ -311,12 +313,9 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
     const [bannerAssetId, setBannerAssetId] = useState<string | number | null>(null);
 
     useEffect(() => {
-        fileService.getByResource('singleton', 'BANNER').then((res: any) => {
+        fileService.getPublicSingleton('BANNER').then((res: any) => {
             if (res?.status === HTTP_STATUS.OK) {
-                const data = res.data?.data;
-                const asset = Array.isArray(data)
-                    ? (data.find((a: any) => a.isPrimary) ?? data[0])
-                    : data;
+                const asset = res.data?.data;
                 if (asset?.path) {
                     setBannerValue({ url: asset.path, publicId: String(asset.id) });
                     setBannerAssetId(asset.id);
@@ -326,7 +325,7 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
     }, []);
 
     const handleBannerUpload = async (file: File): Promise<ImageUploadResponse> => {
-        const res = await fileService.upload(file, 'singleton', 'BANNER', { isPrimary: true, sortOrder: 0 });
+        const res = await fileService.upload(file, PLATFORM_RESOURCE_ID, 'BANNER', { isPrimary: true, sortOrder: 0 });
         if (res?.status === HTTP_STATUS.OK) {
             const asset = res.data?.data;
             if (bannerAssetId) fileService.deleteFile(bannerAssetId);

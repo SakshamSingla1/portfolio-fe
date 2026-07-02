@@ -89,8 +89,11 @@ interface TableProps {
     };
     disableCondition?: (record: Record<string, any>) => boolean;
     isRounded?: boolean;
+    isLoading?: boolean;
     className?: string;
 }
+
+const SKELETON_WIDTHS = [55, 75, 45, 65, 80, 40, 70, 50, 60, 35];
 
 const useStyles = createUseStyles((colors: any) => ({
     tableContainer: {
@@ -203,6 +206,21 @@ const useStyles = createUseStyles((colors: any) => ({
             color: colors.primary500 || '#1565c0',
         },
     },
+    '@keyframes shimmer': {
+        from: { backgroundPosition: '200% 0' },
+        to:   { backgroundPosition: '-200% 0' },
+    },
+    skeletonCell: {
+        height: 12,
+        borderRadius: 6,
+        background: `linear-gradient(90deg, ${colors.neutral100 || '#f0f0f0'} 25%, ${colors.neutral50 || '#fafafa'} 50%, ${colors.neutral100 || '#f0f0f0'} 75%)`,
+        backgroundSize: '200% 100%',
+        animation: '$shimmer 1.4s ease-in-out infinite',
+    },
+    loadingOverlay: {
+        pointerEvents: 'none',
+        opacity: 0.6,
+    },
 }));
 
 const getCellView = (data: any, columnProps: TableColumn) => {
@@ -263,6 +281,85 @@ const SortableRow = ({ id, disabled, className, children }: SortableRowProps) =>
     );
 };
 
+function TablePaginationActions(props: TablePaginationActionsProps) {
+    const theme = useTheme();
+    const colors = useColors();
+    const { count, page, rowsPerPage, onPageChange } = props;
+    const [inputPage, setInputPage] = useState(page + 1);
+
+    const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        onPageChange(event, 0);
+    };
+
+    const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        onPageChange(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        onPageChange(event, page + 1);
+    };
+
+    const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    };
+
+    const handleInputPageChange = (event: any) => {
+        setInputPage(parseInt(event.target.value, 10));
+    };
+
+    const handleInputBlur = (event: any) => {
+        let val = inputPage;
+        if (val < 1) val = 1;
+        if (val > Math.ceil(count / rowsPerPage)) val = Math.ceil(count / rowsPerPage);
+        setInputPage(val);
+        onPageChange(event, val - 1);
+    };
+
+    return (
+        <div className={`flex gap-x-6 justify-end items-center`}>
+            <div className="flex gap-x-2.5 items-center text-xs text-gray-600 font-medium">
+                <div>Page</div>
+                <div>
+                    <Input
+                        type="number"
+                        value={inputPage}
+                        onChange={handleInputPageChange}
+                        onBlur={handleInputBlur}
+                        disableUnderline={true}
+                        inputProps={{ min: 1, max: Math.ceil(count / rowsPerPage) }}
+                        style={{
+                            width: '54px',
+                            height: "28px",
+                            borderRadius: '8px',
+                            border: `1.5px solid ${colors.neutral300}`,
+                            paddingLeft: '8px',
+                            fontSize: '14px',
+                            backgroundColor: colors.neutral0,
+                            color: colors.neutral800
+                        }}
+                    />
+                </div>
+                <div>of {Math.max(1, Math.ceil(count / rowsPerPage))}</div>
+            </div>
+
+            <div className='flex items-center'>
+                <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} style={{ color: page === 0 ? colors.neutral400 : colors.primary700 }}>
+                    {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+                </IconButton>
+                <IconButton onClick={handleBackButtonClick} disabled={page === 0} style={{ color: page === 0 ? colors.neutral400 : colors.primary700 }}>
+                    {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                </IconButton>
+                <IconButton onClick={handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} style={{ color: page >= Math.ceil(count / rowsPerPage) - 1 ? colors.neutral400 : colors.primary700 }}>
+                    {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+                </IconButton>
+                <IconButton onClick={handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} style={{ color: page >= Math.ceil(count / rowsPerPage) - 1 ? colors.neutral400 : colors.primary700 }}>
+                    {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+                </IconButton>
+            </div>
+        </div>
+    );
+}
+
 const TableV2: React.FC<TableProps> = ({
     schema,
     records,
@@ -274,88 +371,11 @@ const TableV2: React.FC<TableProps> = ({
     scroll,
     disableCondition,
     isRounded = true,
+    isLoading = false,
     className
 }) => {
     const colors = useColors();
     const classes = useStyles({ theme: colors });
-
-    function TablePaginationActions(props: TablePaginationActionsProps) {
-        const theme = useTheme();
-        const { count, page, rowsPerPage, onPageChange } = props;
-        const [inputPage, setInputPage] = useState(page + 1);
-
-        const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-            onPageChange(event, 0);
-        };
-
-        const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-            onPageChange(event, page - 1);
-        };
-
-        const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-            onPageChange(event, page + 1);
-        };
-
-        const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-            onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-        };
-
-        const handleInputPageChange = (event: any) => {
-            setInputPage(parseInt(event.target.value, 10));
-        };
-
-        const handleInputBlur = (event: any) => {
-            let val = inputPage;
-            if (val < 1) val = 1;
-            if (val > Math.ceil(count / rowsPerPage)) val = Math.ceil(count / rowsPerPage);
-            setInputPage(val);
-            onPageChange(event, val - 1);
-        };
-
-        return (
-            <div className={`flex gap-x-6 justify-end items-center`}>
-                <div className="flex gap-x-2.5 items-center text-xs text-gray-600 font-medium">
-                    <div>Page</div>
-                    <div>
-                        <Input
-                            type="number"
-                            value={inputPage}
-                            onChange={handleInputPageChange}
-                            onBlur={handleInputBlur}
-                            disableUnderline={true}
-                            inputProps={{ min: 1, max: Math.ceil(count / rowsPerPage) }}
-                            style={{
-                                width: '54px',
-                                height: "28px",
-                                borderRadius: '8px',
-                                border: `1.5px solid ${colors.neutral300}`,
-                                paddingLeft: '8px',
-                                fontSize: '14px',
-                                backgroundColor: colors.neutral0,
-                                color: colors.neutral800
-                            }}
-                        />
-                    </div>
-                    <div>of {Math.max(1, Math.ceil(count / rowsPerPage))}</div>
-                </div>
-
-                <div className='flex items-center'>
-                    <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} style={{ color: page === 0 ? colors.neutral400 : colors.primary700 }}>
-                        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-                    </IconButton>
-                    <IconButton onClick={handleBackButtonClick} disabled={page === 0} style={{ color: page === 0 ? colors.neutral400 : colors.primary700 }}>
-                        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-                    </IconButton>
-                    <IconButton onClick={handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} style={{ color: page >= Math.ceil(count / rowsPerPage) - 1 ? colors.neutral400 : colors.primary700 }}>
-                        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-                    </IconButton>
-                    <IconButton onClick={handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} style={{ color: page >= Math.ceil(count / rowsPerPage) - 1 ? colors.neutral400 : colors.primary700 }}>
-                        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-                    </IconButton>
-                </div>
-            </div>
-        );
-    }
 
     const tableStyle: React.CSSProperties = {
         minWidth: scroll?.x ? "100%" : "auto",
@@ -506,6 +526,31 @@ const TableV2: React.FC<TableProps> = ({
         const stickyLeftCheckbox = isReorderable ? "left-[32px]" : "left-0";
         const stickyLeftFirstColumn = isReorderable && showCheckboxes ? "left-[80px]" : isReorderable && !showCheckboxes ? "left-[32px]" : !isReorderable && showCheckboxes ? "left-[48px]" : "left-0";
 
+        if (isLoading) {
+            return Array.from({ length: schema.pagination.limit }, (_, i) => (
+                <tr key={`skeleton-${i}`} className={classes.tableRow}>
+                    {isReorderable && (
+                        <td className="w-[32px] p-3">
+                            <div className={classes.skeletonCell} style={{ width: 16, height: 16, borderRadius: 4 }} />
+                        </td>
+                    )}
+                    {showCheckboxes && (
+                        <td className="w-[48px] p-3">
+                            <div className={classes.skeletonCell} style={{ width: 18, height: 18, borderRadius: '50%' }} />
+                        </td>
+                    )}
+                    {schema.columns.map((col, j) => (
+                        <td key={col.key} className="px-3 py-4">
+                            <div
+                                className={classes.skeletonCell}
+                                style={{ width: `${SKELETON_WIDTHS[(i + j) % SKELETON_WIDTHS.length]}%` }}
+                            />
+                        </td>
+                    ))}
+                </tr>
+            ));
+        }
+
         if (records.length === 0) {
             return (
                 <tr>
@@ -608,7 +653,7 @@ const TableV2: React.FC<TableProps> = ({
     );
 
     return (
-        <div className={clsx(classes.tableContainer, className, isRounded && "rounded-2xl")}>
+        <div className={clsx(classes.tableContainer, className, isRounded && "rounded-2xl", isLoading && classes.loadingOverlay)}>
             {schema.title && (
                 <div className={classes.tableHeader}>
                     <h2>{schema.title}</h2>

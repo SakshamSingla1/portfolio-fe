@@ -4,6 +4,8 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
 const URLS = {
     UPLOAD: "/files/upload",
+    GET_SINGLETON: (resourceType: string) => `/files/${resourceType}/singleton`,
+    GET_PUBLIC_SINGLETON: (resourceType: string) => `/public/files/${resourceType}/singleton`,
     GET_BY_RESOURCE: (resourceType: string, resourceId: string | number | null) =>
         `/files/${resourceType}/${resourceId}`,
     GET_BY_ID: (id: string | number | null) => `/files/${id}`,
@@ -61,6 +63,12 @@ export const useFileService = () => {
         return request(API_METHOD.POST, URLS.UPLOAD, user, formData);
     };
 
+    const getSingleton = (resourceType: string) =>
+        request(API_METHOD.GET, URLS.GET_SINGLETON(resourceType), user, null);
+
+    const getPublicSingleton = (resourceType: string) =>
+        request(API_METHOD.GET, URLS.GET_PUBLIC_SINGLETON(resourceType), null, null);
+
     const getByResource = (resourceId: string | number | null, resourceType: string) =>
         request(
             API_METHOD.GET,
@@ -83,7 +91,7 @@ export const useFileService = () => {
             null
         );
 
-    return { upload, getByResource, getById, deleteFile, deleteByResource };
+    return { upload, getSingleton, getPublicSingleton, getByResource, getById, deleteFile, deleteByResource };
 };
 
 export default useFileService;

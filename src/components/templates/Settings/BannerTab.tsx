@@ -5,8 +5,8 @@ import { HTTP_STATUS, useColors } from "../../../utils/types";
 import usePlatformSettingsService, { type IPlatformSettings } from "../../../services/usePlatformSettingsService";
 import useFileService from "../../../services/useFileService";
 
-const BANNER_RESOURCE_ID = "singleton";
 const BANNER_RESOURCE_TYPE = "BANNER";
+const PLATFORM_RESOURCE_ID = 1;
 
 const BannerTab: React.FC = () => {
     const colors = useColors();
@@ -40,7 +40,7 @@ const BannerTab: React.FC = () => {
         const previousAssetId = settings?.bannerAssetId ?? null;
         setPreview(URL.createObjectURL(file));
         setUploading(true);
-        const res = await fileService.upload(file, BANNER_RESOURCE_ID, BANNER_RESOURCE_TYPE, {
+        const res = await fileService.upload(file, PLATFORM_RESOURCE_ID, BANNER_RESOURCE_TYPE, {
             isPrimary: true,
             sortOrder: 0,
         });

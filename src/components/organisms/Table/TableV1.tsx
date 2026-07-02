@@ -64,9 +64,12 @@ interface TableProps {
   records: any[][];
   className?: string;
   isRounded?: boolean;
+  isLoading?: boolean;
   onRowClick?: (row: any[]) => void;
   onRowSwipe?: (row: any[], direction: 'left' | 'right') => void;
 }
+
+const SKELETON_WIDTHS = [55, 75, 45, 65, 80, 40, 70, 50, 60, 35];
 
 const useStyles = createUseStyles((colors: any) => ({
   tableContainer: {
@@ -351,6 +354,28 @@ const useStyles = createUseStyles((colors: any) => ({
   swipeIndicatorRight: {
     right: '0.5rem',
   },
+  '@keyframes shimmer': {
+    from: { backgroundPosition: '200% 0' },
+    to:   { backgroundPosition: '-200% 0' },
+  },
+  skeletonCell: {
+    height: 12,
+    borderRadius: 6,
+    background: `linear-gradient(90deg, ${colors.neutral100 || '#f0f0f0'} 25%, ${colors.neutral50 || '#fafafa'} 50%, ${colors.neutral100 || '#f0f0f0'} 75%)`,
+    backgroundSize: '200% 100%',
+    animation: '$shimmer 1.4s ease-in-out infinite',
+  },
+  skeletonCard: {
+    backgroundColor: colors.neutral0 || 'white',
+    borderRadius: '0.5rem',
+    border: `1.5px solid ${colors.neutral200 || '#e0e5eb'}`,
+    padding: '1rem',
+    marginBottom: '0.75rem',
+  },
+  loadingOverlay: {
+    pointerEvents: 'none',
+    opacity: 0.6,
+  },
 }));
 
 const EmptyState: React.FC<{ colors: any }> = ({ colors }) => (
@@ -438,6 +463,7 @@ const TableV1: React.FC<TableProps> = ({
   schema,
   records,
   className,
+  isLoading = false,
   onRowClick,
 }) => {
   const colors = useColors();
@@ -567,7 +593,7 @@ const TableV1: React.FC<TableProps> = ({
   };
 
   return (
-    <div className={`${classes.tableContainer} ${className}`}>
+    <div className={clsx(classes.tableContainer, className, isLoading && classes.loadingOverlay)}>
       {schema.title && (
         <div className={classes.tableHeader}>
           <h2>{schema.title}</h2>
@@ -575,7 +601,18 @@ const TableV1: React.FC<TableProps> = ({
       )}
       {isMobile && mobileView === 'cards' && (
         <div className={classes.mobileCardContainer}>
-          {records.length === 0 ? (
+          {isLoading ? (
+            Array.from({ length: schema.pagination.limit }, (_, i) => (
+              <div key={`skeleton-card-${i}`} className={classes.skeletonCard}>
+                {schema.columns.slice(0, 3).map((col, j) => (
+                  <div key={col.key} style={{ marginBottom: j < 2 ? 12 : 0 }}>
+                    <div className={classes.skeletonCell} style={{ width: '40%', marginBottom: 6, height: 10 }} />
+                    <div className={classes.skeletonCell} style={{ width: `${SKELETON_WIDTHS[(i + j) % SKELETON_WIDTHS.length]}%` }} />
+                  </div>
+                ))}
+              </div>
+            ))
+          ) : records.length === 0 ? (
             <EmptyState colors={colors} />
           ) : (
             records.map((row, rowIndex) => renderMobileCard(row, rowIndex))
@@ -604,7 +641,20 @@ const TableV1: React.FC<TableProps> = ({
               </tr>
             </thead>
             <tbody className={classes.tableBody}>
-              {records.length === 0 ? (
+              {isLoading ? (
+                Array.from({ length: schema.pagination.limit }, (_, i) => (
+                  <tr key={`skeleton-${i}`}>
+                    {(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).map((col, j) => (
+                      <td key={col.key}>
+                        <div
+                          className={classes.skeletonCell}
+                          style={{ width: `${SKELETON_WIDTHS[(i + j) % SKELETON_WIDTHS.length]}%` }}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : records.length === 0 ? (
                 <tr>
                   <td
                     colSpan={(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).length}

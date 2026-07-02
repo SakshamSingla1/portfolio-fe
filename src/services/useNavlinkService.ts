@@ -7,7 +7,8 @@ export const NAVLINK_URLS = {
     BASE: "navlinks",
     BY_ID: "navlinks/:id",
     BY_ROLE: "navlinks/role/:role",
-    ALL: "navlinks/all"
+    ALL: "navlinks",
+    GROUPED: "navlinks/grouped",
 };
 
 export interface NavlinkFilterRequest {
