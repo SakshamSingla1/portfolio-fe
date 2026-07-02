@@ -194,8 +194,9 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
       {/* Hero row */}
       <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"}`}>
         {HERO_STATS.map((s, i) => {
-          const value = (stats as any)?.[s.key] ?? 0;
-          const unreadCount = s.key === "totalMessages" ? (stats.unreadMessages ?? 0) : undefined;
+          const { key: statKey, ...statProps } = s;
+          const value = (stats as any)?.[statKey] ?? 0;
+          const unreadCount = statKey === "totalMessages" ? (stats.unreadMessages ?? 0) : undefined;
           const isRightEdge = isMobile ? i % 2 === 1 : i === HERO_STATS.length - 1;
           const isBottomRow = isMobile && i >= 2;
           return (
@@ -207,7 +208,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
               }}
             >
               <HeroStatCell
-                {...s}
+                {...statProps}
                 value={value}
                 index={i}
                 unreadCount={unreadCount}
@@ -225,7 +226,8 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
       {isMobile ? (
         <div className="flex overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           {SECONDARY_STATS.map((s, i) => {
-            const value = (stats as any)?.[s.key] ?? 0;
+            const { key: statKey, ...statProps } = s;
+            const value = (stats as any)?.[statKey] ?? 0;
             return (
               <div
                 key={s.label}
@@ -235,7 +237,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
                   flexShrink: 0,
                 }}
               >
-                <SecondaryStatCell {...s} value={value} index={i} />
+                <SecondaryStatCell {...statProps} value={value} index={i} />
               </div>
             );
           })}
@@ -243,13 +245,14 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
       ) : (
         <div className="grid grid-cols-5">
           {SECONDARY_STATS.map((s, i) => {
-            const value = (stats as any)?.[s.key] ?? 0;
+            const { key: statKey, ...statProps } = s;
+            const value = (stats as any)?.[statKey] ?? 0;
             return (
               <div
                 key={s.label}
                 style={{ borderRight: i < SECONDARY_STATS.length - 1 ? `1.5px solid ${colors.neutral300}` : "none" }}
               >
-                <SecondaryStatCell {...s} value={value} index={i} />
+                <SecondaryStatCell {...statProps} value={value} index={i} />
               </div>
             );
           })}
