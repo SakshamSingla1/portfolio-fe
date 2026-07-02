@@ -37,7 +37,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     const [logos, setLogos] = useState<Logo[]>([]);
     const [selectedLogo, setSelectedLogo] = useState<Logo | null>(null);
-    const [isLoadingLogos, setIsLoadingLogos] = useState(false);
     const logoServiceRef = useRef(logoService);
     logoServiceRef.current = logoService;
 
@@ -63,7 +62,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     });
 
     const loadLogoDropdown = React.useCallback(async (searchTerm?: string) => {
-        setIsLoadingLogos(true);
         const params: LogoFilterParams = {
             search: searchTerm || "",
             page: "0",
@@ -76,8 +74,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
             }
         } catch {
             setLogos([]);
-        } finally {
-            setIsLoadingLogos(false);
         }
     }, []);
 
