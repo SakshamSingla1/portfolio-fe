@@ -447,6 +447,7 @@ export const SKILL_LEVEL_OPTIONS: Option[] = [
     { value: 'Beginner', label: 'Beginner' },
     { value: 'Intermediate', label: 'Intermediate' },
     { value: 'Advanced', label: 'Advanced' },
+    { value: 'Expert', label: 'Expert' },
 ];
 
 export const SKILL_CATEGORY_OPTIONS: Option[] = [
