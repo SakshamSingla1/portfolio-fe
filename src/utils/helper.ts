@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react';
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
@@ -65,11 +66,13 @@ export const useDebounce = <T extends any[]>(
   callback: (...args: T) => void,
   delay: number
 ) => {
-  let timeoutId: ReturnType<typeof setTimeout>;
-  return (...args: T) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => callback(...args), delay);
-  };
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+  return useCallback((...args: T) => {
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => callbackRef.current(...args), delay);
+  }, [delay]);
 };
 
 const saveToSessionStorage = (newObject: any) => {

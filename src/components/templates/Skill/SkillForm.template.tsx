@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import Button from "../../atoms/Button/Button";
 import { MODE, SKILL_CATEGORY_OPTIONS, SKILL_LEVEL_OPTIONS } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
@@ -37,6 +37,9 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
 
     const [logos, setLogos] = useState<Logo[]>([]);
     const [selectedLogo, setSelectedLogo] = useState<Logo | null>(null);
+    const [isLoadingLogos, setIsLoadingLogos] = useState(false);
+    const logoServiceRef = useRef(logoService);
+    logoServiceRef.current = logoService;
 
     const onClose = () => navigate(ADMIN_ROUTES.SKILL);
 
@@ -60,28 +63,25 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     });
 
     const loadLogoDropdown = React.useCallback(async (searchTerm?: string) => {
+        setIsLoadingLogos(true);
         const params: LogoFilterParams = {
             search: searchTerm || "",
             page: "0",
             size: "10"
         };
         try {
-            const response = await logoService.getAll(params);
+            const response = await logoServiceRef.current.getAll(params);
             if (response?.status === HTTP_STATUS.OK) {
-                const fetchedLogos = response?.data?.data?.content || [];
-                setLogos(fetchedLogos);
-
-                if (formik.values.logoId) {
-                    const existing = fetchedLogos.find((l: Logo) => l.id === formik.values.logoId);
-                    if (existing) setSelectedLogo(existing);
-                }
+                setLogos(response?.data?.data?.content || []);
             }
         } catch {
             setLogos([]);
+        } finally {
+            setIsLoadingLogos(false);
         }
-    }, [logoService, formik.values.logoId]);
+    }, []);
 
-    const logoOptions = logos.map((logo) => ({
+    const logoOptions = useMemo(() => logos.map((logo) => ({
         label: (
             <div className="flex items-center">
                 <img src={logo.url} alt={logo.name} className="w-6 h-6 mr-2 inline" />
@@ -90,12 +90,18 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         ),
         title: logo.name,
         value: String(logo.id ?? ""),
-    }));
-
+    })), [logos]);
 
     useEffect(() => {
         loadLogoDropdown();
     }, []);
+
+    useEffect(() => {
+        if (formik.values.logoId && logos.length > 0) {
+            const found = logos.find((l) => l.id === formik.values.logoId);
+            if (found) setSelectedLogo(found);
+        }
+    }, [formik.values.logoId, logos]);
 
     const cardShadow = isDark
         ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
@@ -132,7 +138,8 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                                 placeHolder="Search and select a skill (e.g., React, Node.js)"
                                 options={logoOptions}
                                 value={logoOptions.find(option => option.value === String(formik.values.logoId)) || null}
-                                onSearch={search => loadLogoDropdown(search)}
+                                onSearch={loadLogoDropdown}
+                                loading={isLoadingLogos}
                                 onChange={value => {
                                     formik.setFieldValue("logoId", value?.value ? Number(value.value) : null);
                                     setSelectedLogo(logos.find(l => String(l.id) === String(value?.value)) || null);

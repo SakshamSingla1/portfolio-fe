@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
@@ -60,6 +60,9 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
     const [selectedSkillObjects, setSelectedSkillObjects] = useState<SkillDropdown[]>(projects?.skills || []);
     const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [isLoadingSkills, setIsLoadingSkills] = useState(false);
+    const skillServiceRef = useRef(skillService);
+    skillServiceRef.current = skillService;
 
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
@@ -89,14 +92,17 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         },
     });
 
-    const loadSkills = async (search = "") => {
+    const loadSkills = useCallback(async (search = "") => {
+        setIsLoadingSkills(true);
         try {
-            const res = await skillService.getByProfile({ search });
+            const res = await skillServiceRef.current.getByProfile({ search });
             setSkills(res?.status === HTTP_STATUS.OK ? res.data.data.content : []);
         } catch {
             setSkills([]);
+        } finally {
+            setIsLoadingSkills(false);
         }
-    }
+    }, []);
 
     useEffect(() => {
         if (projects?.skills) {
@@ -244,9 +250,11 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
                     <AutoCompleteInput
                         label="Add Technology"
+                        placeHolder="Type to search technologies (React, Node.js, Python...)"
                         options={skillOptions}
                         value={null}
                         onSearch={loadSkills}
+                        loading={isLoadingSkills}
                         onChange={(o: any) => {
                             if (o && !formik.values.skillIds.includes(o.value)) {
                                 formik.setFieldValue("skillIds", [

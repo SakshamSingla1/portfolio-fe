@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import TextField from "../../atoms/TextField/TextField";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { isRichTextEmpty, titleModification } from "../../../utils/helper";
@@ -65,6 +65,10 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     const colors = useColors();
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
+    const [selectedSkillObjects, setSelectedSkillObjects] = useState<SkillDropdown[]>(experience?.skills || []);
+    const [isLoadingSkills, setIsLoadingSkills] = useState(false);
+    const skillServiceRef = useRef(skillService);
+    skillServiceRef.current = skillService;
 
     const onClose = () => navigate(ADMIN_ROUTES.EXPERIENCE);
 
@@ -97,8 +101,9 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
     });
 
     const loadSkills = React.useCallback(async (searchTerm?: string) => {
+        setIsLoadingSkills(true);
         try {
-            const response = await skillService.getByProfile({
+            const response = await skillServiceRef.current.getByProfile({
                 search: searchTerm || "",
             });
             if (response?.status === HTTP_STATUS.OK) {
@@ -106,24 +111,29 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
             }
         } catch {
             setSkills([]);
+        } finally {
+            setIsLoadingSkills(false);
         }
-    }, [skillService]);
+    }, []);
 
     const skillOptions = useMemo(() => {
-        return skills.map((skill) => ({
-            label: <div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" />{skill.logoName}</div>,
-            title: skill.logoName,
-            value: skill.id ?? 0,
-        }));
-    }, [skills]);
-
-    const selectedSkills = useMemo(() => {
-        return skills.filter(skill => formik.values.skillIds.includes(String(skill.id)));
+        return skills
+            .filter(skill => !formik.values.skillIds.includes(String(skill.id)))
+            .map((skill) => ({
+                label: <div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" />{skill.logoName}</div>,
+                title: skill.logoName,
+                value: skill.id ?? 0,
+                original: skill,
+            }));
     }, [skills, formik.values.skillIds]);
 
     useEffect(() => {
         loadSkills();
     }, []);
+
+    useEffect(() => {
+        if (experience?.skills) setSelectedSkillObjects(experience.skills);
+    }, [experience?.skills]);
 
     const cardStyle: React.CSSProperties = {
         background: colors.neutral0,
@@ -202,32 +212,29 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             options={skillOptions}
                             value={null}
                             onChange={(selectedOption: any) => {
-                                if (selectedOption) {
-                                    if (!formik.values.skillIds.includes(selectedOption.value)) {
-                                        formik.setFieldValue("skillIds", [...formik.values.skillIds, selectedOption.value]);
-                                    }
+                                if (selectedOption && !formik.values.skillIds.includes(String(selectedOption.value))) {
+                                    formik.setFieldValue("skillIds", [...formik.values.skillIds, String(selectedOption.value)]);
+                                    setSelectedSkillObjects(prev => [...prev, selectedOption.original]);
                                 }
                             }}
-                            onSearch={(value: string) => loadSkills(value)}
+                            onSearch={loadSkills}
+                            loading={isLoadingSkills}
                             required={true}
                             error={formik.touched.skillIds && Boolean(formik.errors.skillIds)}
                             helperText={formik.errors.skillIds && formik.touched.skillIds ? Array.isArray(formik.errors.skillIds) ? formik.errors.skillIds.join(', ') : formik.errors.skillIds : "Search and select the technologies used in this experience"}
                             isDisabled={mode === MODE.VIEW}
                         />
-                        {(selectedSkills.length > 0 || formik.values.skillIds.length > 0) && (
+                        {selectedSkillObjects.length > 0 && (
                             <div className="p-4 rounded-lg" style={{ background: colors.neutral50 }}>
                                 <p className="text-sm font-medium mb-3" style={{ color: colors.neutral800 }}>
-                                    Selected Technologies ({selectedSkills.length})
+                                    Selected Technologies ({selectedSkillObjects.length})
                                 </p>
                                 <div className="flex flex-wrap gap-2">
-                                    {selectedSkills.map((skill) => (
+                                    {selectedSkillObjects.map((skill) => (
                                         mode !== MODE.VIEW ? (
                                             <Chip key={skill.id} label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>} onDelete={() => {
-                                                const updatedTechs = formik.values.skillIds.filter((tech: any) => {
-                                                    const techId = typeof tech === 'object' && tech !== null && 'id' in tech ? tech.id : tech;
-                                                    return techId !== skill.id;
-                                                });
-                                                formik.setFieldValue("skillIds", updatedTechs);
+                                                formik.setFieldValue("skillIds", formik.values.skillIds.filter((id: any) => String(id) !== String(skill.id)));
+                                                setSelectedSkillObjects(prev => prev.filter(s => String(s.id) !== String(skill.id)));
                                             }} />
                                         ) : (
                                             <Chip key={skill.id} label={<div className="flex items-center gap-2"><img src={skill.logoUrl} alt={skill.logoName} className="w-6 h-6" /> {skill.logoName}</div>} onDelete={() => { }} />
