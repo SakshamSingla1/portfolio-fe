@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState, useEffect } from 'react';
 
 export interface ThemeColors {
   primary: string;
@@ -78,20 +78,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  const setActiveTheme = (themeName: string, colors: ThemeColors) => {
+  const setActiveTheme = useCallback((themeName: string, colors: ThemeColors) => {
     const root = document.documentElement;
     root.style.setProperty('--color-primary', colors.primary);
     root.style.setProperty('--color-accent', colors.accent);
-    // You can add more property injections here if needed
     setActiveThemeName(themeName);
     setIsPreviewActive(true);
-  };
+  }, []);
 
-  const setColorMode = (mode: 'light' | 'dark') => {
+  const setColorMode = useCallback((mode: 'light' | 'dark') => {
     setIsDark(mode === 'dark');
-  };
+  }, []);
 
-  const resetTheme = () => {
+  const resetTheme = useCallback(() => {
     const root = document.documentElement;
     root.style.removeProperty('--color-primary');
     root.style.removeProperty('--color-accent');
@@ -99,16 +98,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsPreviewActive(false);
     setActiveThemeName('Default');
     localStorage.removeItem('customTheme');
-  };
+  }, []);
 
-  const value: ThemeContextType = {
+  const value = useMemo<ThemeContextType>(() => ({
     isDark,
     isPreviewActive,
     activeThemeName,
     setColorMode,
     setActiveTheme,
     resetTheme,
-  };
+  }), [isDark, isPreviewActive, activeThemeName, setColorMode, setActiveTheme, resetTheme]);
 
   return (
     <ThemeContext.Provider value={value}>

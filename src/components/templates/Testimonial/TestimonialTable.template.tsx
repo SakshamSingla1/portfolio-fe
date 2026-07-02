@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -20,10 +20,10 @@ interface ITestimonialTableTemplateProps {
     onSearchChange?: (val: string) => void;
 }
 
-const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({ 
-    testimonials, 
-    pagination, 
-    handlePaginationChange, 
+const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
+    testimonials,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange
@@ -32,7 +32,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -44,9 +44,9 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -58,31 +58,18 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const records = useMemo(() => testimonials.map((testimonial, index) => [
+        pagination.currentPage * pagination.pageSize + index + 1,
+        testimonial.name,
+        testimonial.order,
+        DateUtils.dateTimeSecondToDate(testimonial.createdAt ?? ""),
+        DateUtils.dateTimeSecondToDate(testimonial.updatedAt ?? ""),
+        <ActionButtons key={testimonial.id} onEdit={() => handleEdit(testimonial.id ?? 0)} onView={() => handleView(testimonial.id ?? 0)} />
+    ]) ?? [], [testimonials, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getRecords = () =>
-        testimonials.map((testimonial, index) => [
-            pagination.currentPage * pagination.pageSize + index + 1,
-            testimonial.name,
-            testimonial.order,
-            DateUtils.dateTimeSecondToDate(testimonial.createdAt ?? ""),
-            DateUtils.dateTimeSecondToDate(testimonial.updatedAt ?? ""),
-            Action(testimonial.id ?? 0)
-        ]
-        );
-
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Position", key: "position", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Created At", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Updated At", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -93,23 +80,30 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Position", key: "position", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Created At", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Updated At", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Testimonials" 
-            description="Recommendations and reviews" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Testimonial" 
+        <ListingShell
+            title="Testimonials"
+            description="Recommendations and reviews"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Testimonial"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.TESTIMONIALS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     )
 }

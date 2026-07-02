@@ -713,4 +713,4 @@ const TableV2: React.FC<TableProps> = ({
     );
 };
 
-export default TableV2;
+export default React.memo(TableV2);

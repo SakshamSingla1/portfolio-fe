@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FiEdit, FiEye, FiMail, FiMessageSquare, FiMessageCircle, FiInbox } from "react-icons/fi";
 import type { ColumnType } from "../../organisms/Table/TableV1";
@@ -43,7 +43,7 @@ const TemplateListTableTemplate: React.FC<Props> = ({
     const colors = useColors();
     const { isDark } = useTheme();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         navigate(makeRoute(ADMIN_ROUTES.TEMPLATES_EDIT, {
             query: {
                 page: searchParams.get("page") || "",
@@ -52,9 +52,9 @@ const TemplateListTableTemplate: React.FC<Props> = ({
             },
             params: { id },
         }));
-    };
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         navigate(makeRoute(ADMIN_ROUTES.TEMPLATES_VIEW, {
             query: {
                 page: searchParams.get("page") || "",
@@ -63,7 +63,7 @@ const TemplateListTableTemplate: React.FC<Props> = ({
             },
             params: { id },
         }));
-    };
+    }, [navigate, searchParams]);
 
     const ChannelBadges = (isEmail: number, isSms: number, isWhatsapp: number) => (
         <div className="flex flex-wrap gap-1">
@@ -116,12 +116,12 @@ const TemplateListTableTemplate: React.FC<Props> = ({
         </div>
     );
 
-    const visibleTemplates = templates.filter((t) => {
+    const visibleTemplates = useMemo(() => templates.filter((t) => {
         if (channelFilter === "email")    return t.isEmail    === 1;
         if (channelFilter === "sms")      return t.isSms      === 1;
         if (channelFilter === "whatsapp") return t.isWhatsapp === 1;
         return true;
-    });
+    }), [templates, channelFilter]);
 
     const SkeletonRow = () => (
         <tr>
@@ -139,7 +139,7 @@ const TemplateListTableTemplate: React.FC<Props> = ({
         </tr>
     );
 
-    const getRecords = () => {
+    const records = useMemo(() => {
         if (loading) return [];
         return visibleTemplates.map((t: INotificationTemplate, index) => [
             pagination.currentPage * pagination.pageSize + index + 1,
@@ -150,19 +150,9 @@ const TemplateListTableTemplate: React.FC<Props> = ({
             DateUtils.dateTimeSecondToDate(t.updatedAt ?? ""),
             ActionCell(t.id),
         ]);
-    };
+    }, [loading, visibleTemplates, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.",        key: "id",        type: "number" as ColumnType, props: {} },
-        { label: "Template",      key: "template",  type: "text"   as ColumnType, props: {} },
-        { label: "Subject",       key: "subject",   type: "text"   as ColumnType, props: {} },
-        { label: "Channels",      key: "channels",  type: "custom" as ColumnType, props: {} },
-        { label: "Created",       key: "createdAt", type: "date"   as ColumnType, props: {} },
-        { label: "Last Modified", key: "updatedAt", type: "date"   as ColumnType, props: {} },
-        { label: "Action",        key: "action",    type: "custom" as ColumnType, props: {} },
-    ];
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         pagination: {
             total: pagination.totalRecords,
@@ -172,10 +162,18 @@ const TemplateListTableTemplate: React.FC<Props> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange,
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.",        key: "id",        type: "number" as ColumnType, props: {} },
+            { label: "Template",      key: "template",  type: "text"   as ColumnType, props: {} },
+            { label: "Subject",       key: "subject",   type: "text"   as ColumnType, props: {} },
+            { label: "Channels",      key: "channels",  type: "custom" as ColumnType, props: {} },
+            { label: "Created",       key: "createdAt", type: "date"   as ColumnType, props: {} },
+            { label: "Last Modified", key: "updatedAt", type: "date"   as ColumnType, props: {} },
+            { label: "Action",        key: "action",    type: "custom" as ColumnType, props: {} },
+        ],
         hover: true,
         striped: true,
-    });
+    }), [pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     const channelButtons: { key: ChannelFilter; label: string; icon: React.ReactNode }[] = [
         { key: "all",       label: "All",       icon: null },
@@ -270,7 +268,7 @@ const TemplateListTableTemplate: React.FC<Props> = ({
                     </div>
                 </div>
             ) : (
-                <TableV1 schema={getSchema()} records={getRecords()} />
+                <TableV1 schema={schema} records={records} />
             )}
         </ListingShell>
     );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { HTTP_STATUS, StatusOptions, type IPagination } from "../../../utils/types";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -38,7 +38,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
 
     const isMobile = useIsMobile();
 
-    const handleActivateResume = async (id?: number | null) => {
+    const handleActivateResume = useCallback(async (id?: number | null) => {
         if (!id) return;
         try {
             const response = await resumeService.activateResume({ resumeId: id });
@@ -49,17 +49,17 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
         } catch (error) {
             console.error(error);
         }
-    }
+    }, [resumeService, showSnackbar]);
 
-    const handleView = (url: string, status: string) => {
+    const handleView = useCallback((url: string, status: string) => {
         if (status === 'DELETED') {
             showSnackbar('error', 'Cannot view deleted resume');
             return;
         }
         window.open(url, '_blank');
-    }
+    }, [showSnackbar]);
 
-    const handleDeleteResume = async (id?: number | null) => {
+    const handleDeleteResume = useCallback(async (id?: number | null) => {
         if (!id) return;
         try {
             const response = await resumeService.deleteResume(id);
@@ -70,51 +70,37 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
         } catch (error) {
             console.error(error);
         }
-    }
+    }, [resumeService, showSnackbar]);
 
-    const Action = (resume: DocumentUploadResponse) => {
-        return (
-            <div className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`}>
-                <ActionButtons onView={() => handleView(resume.fileUrl, resume.status)} />
-                {resume.status === 'INACTIVE' && (
-                    <button
-                        onClick={() => handleActivateResume(resume.id)}
-                        className="w-6 h-6"
-                        title="Activate"
-                    >
-                        <CgUnblock />
-                    </button>
-                )}
-                {resume.status !== 'DELETED' && (
-                    <button
-                        onClick={() => handleDeleteResume(resume.id)}
-                        className="w-6 h-6"
-                        title="Delete"
-                    >
-                        <MdDelete />
-                    </button>
-                )}
-            </div>
-        );
-    };
-
-    const getRecords = () => resumes?.map((resume: DocumentUploadResponse, index) => [
+    const records = useMemo(() => resumes?.map((resume: DocumentUploadResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         resume.fileName,
         StatusOptions.find((status) => status.value === resume.status)?.label,
         DateUtils.dateTimeSecondToDate(resume.updatedAt ?? ""),
-        Action(resume)
-    ])
+        <div key={resume.id} className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`}>
+            <ActionButtons onView={() => handleView(resume.fileUrl, resume.status)} />
+            {resume.status === 'INACTIVE' && (
+                <button
+                    onClick={() => handleActivateResume(resume.id)}
+                    className="w-6 h-6"
+                    title="Activate"
+                >
+                    <CgUnblock />
+                </button>
+            )}
+            {resume.status !== 'DELETED' && (
+                <button
+                    onClick={() => handleDeleteResume(resume.id)}
+                    className="w-6 h-6"
+                    title="Delete"
+                >
+                    <MdDelete />
+                </button>
+            )}
+        </div>
+    ]) ?? [], [resumes, pagination.currentPage, pagination.pageSize, isMobile, handleView, handleActivateResume, handleDeleteResume]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "File Name", key: "fileName", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
-        { label: "Uploaded At", key: "uploadedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -125,10 +111,16 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "File Name", key: "fileName", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
+            { label: "Uploaded At", key: "uploadedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
         <ListingShell
@@ -140,7 +132,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     )
 }

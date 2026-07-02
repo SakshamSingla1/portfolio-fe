@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -19,10 +19,10 @@ interface IEducationsTableTemplateProps {
     onSearchChange?: (val: string) => void;
 }
 
-const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({ 
-    educations, 
-    pagination, 
-    handlePaginationChange, 
+const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
+    educations,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange
@@ -31,7 +31,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -43,9 +43,9 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -57,29 +57,18 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;;
-
-    const getRecords = () => educations?.map((education: Education, index) => [
+    const records = useMemo(() => educations?.map((education: Education, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         education.institution,
         DEGREE_OPTIONS.find(opt => opt.value === education.degree)?.label ?? "",
         education.startYear ?? "",
         education.endYear ?? "",
-        Action(education.id ?? 0)
-    ])
+        <ActionButtons key={education.id} onEdit={() => handleEdit(education.id ?? 0)} onView={() => handleView(education.id ?? 0)} />
+    ]) ?? [], [educations, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Institution", key: "institution", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Degree", key: "degree", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Start Year", key: "startYear", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "End Year", key: "endYear", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -90,23 +79,30 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "Institution", key: "institution", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Degree", key: "degree", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Start Year", key: "startYear", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "End Year", key: "endYear", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Education" 
-            description="Academic background and degrees" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Education" 
+        <ListingShell
+            title="Education"
+            description="Academic background and degrees"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Education"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.EDUCATION_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     );
 }

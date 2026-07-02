@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -20,10 +20,10 @@ interface IAchievementsTableTemplateProps {
     onSearchChange?: (val: string) => void;
 }
 
-const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({ 
-    achievements, 
-    pagination, 
-    handlePaginationChange, 
+const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
+    achievements,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange
@@ -33,7 +33,7 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
 
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -45,9 +45,9 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -59,31 +59,18 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const records = useMemo(() => achievements.map((achievement, index) => [
+        pagination.currentPage * pagination.pageSize + index + 1,
+        `${achievement.title} - ${achievement.order}`,
+        achievement.issuer,
+        DateUtils.dateTimeSecondToDate(achievement.createdAt ?? ""),
+        DateUtils.dateTimeSecondToDate(achievement.updatedAt ?? ""),
+        <ActionButtons key={achievement.id} onEdit={() => handleEdit(achievement.id ?? 0)} onView={() => handleView(achievement.id ?? 0)} />
+    ]) ?? [], [achievements, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getRecords = () =>
-        achievements.map((achievement, index) => [
-            pagination.currentPage * pagination.pageSize + index + 1,
-            `${achievement.title} - ${achievement.order}`,
-            achievement.issuer,
-            DateUtils.dateTimeSecondToDate(achievement.createdAt ?? ""),
-            DateUtils.dateTimeSecondToDate(achievement.updatedAt ?? ""),
-            Action(achievement.id ?? 0)
-        ]
-        );
-
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Issuer", key: "issuer", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Created At", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Updated At", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -94,23 +81,30 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Issuer", key: "issuer", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Created At", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Updated At", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Achievements" 
-            description="Awards and milestones" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Achievement" 
+        <ListingShell
+            title="Achievements"
+            description="Awards and milestones"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Achievement"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.ACHIEVEMENTS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     );
 }

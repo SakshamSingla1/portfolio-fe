@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -20,10 +20,10 @@ interface ProjectsTableTemplateProps {
     onSearchChange?: (val: string) => void;
 }
 
-const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({ 
-    projects, 
-    pagination, 
-    handlePaginationChange, 
+const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
+    projects,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange
@@ -32,33 +32,23 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.PROJECTS_EDIT, { query, params: { id: String(id) } }));
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query, params: { id: String(id) } }));
-    }
-
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
-
-    const getRecords = () => projects?.map((project: ProjectResponse, index) => [
-        pagination.currentPage * pagination.pageSize + index + 1,
-        project.projectName,
-        getTechImages(project.skills),
-        project.workStatus === WorkStatusType.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate || ""),
-        Action(project.id ?? 0)
-    ])
+    }, [navigate, searchParams]);
 
     const getTechImages = (skills: SkillDropdown[]) => {
         const visibleSkills = skills.slice(0, 3);
@@ -75,15 +65,15 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
         );
     };
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: 'low' as const, hideOnMobile: true },
-        { label: "Project Name", key: "projectName", type: "text" as ColumnType, props: { className: '' }, priority: 'high' as const },
-        { label: "Technologies", key: "technologies", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-        { label: "Duration", key: "duration", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-    ]
+    const records = useMemo(() => projects?.map((project: ProjectResponse, index) => [
+        pagination.currentPage * pagination.pageSize + index + 1,
+        project.projectName,
+        getTechImages(project.skills),
+        project.workStatus === WorkStatusType.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate || ""),
+        <ActionButtons key={project.id} onEdit={() => handleEdit(project.id ?? 0)} onView={() => handleView(project.id ?? 0)} />
+    ]) ?? [], [projects, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView]);
 
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -94,23 +84,29 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: 'low' as const, hideOnMobile: true },
+            { label: "Project Name", key: "projectName", type: "text" as ColumnType, props: { className: '' }, priority: 'high' as const },
+            { label: "Technologies", key: "technologies", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+            { label: "Duration", key: "duration", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+            { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Projects" 
-            description="Portfolio projects and case studies" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Project" 
+        <ListingShell
+            title="Projects"
+            description="Portfolio projects and case studies"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Project"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.PROJECTS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     );
 }

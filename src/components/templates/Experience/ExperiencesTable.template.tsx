@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -20,10 +20,10 @@ interface ExperienceTableTemplateProps {
     onSearchChange?: (val: string) => void;
 }
 
-const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({ 
-    experiences, 
-    pagination, 
-    handlePaginationChange, 
+const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
+    experiences,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange
@@ -32,45 +32,34 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_EDIT, { query, params: { id: String(id) } }));
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
             search: searchParams.get("search") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.EXPERIENCE_VIEW, { query, params: { id: String(id) } }));
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
-
-    const getRecords = () => experiences?.map((experience: ExperienceResponse, index) => [
+    const records = useMemo(() => experiences?.map((experience: ExperienceResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         experience.companyName,
         experience.jobTitle,
         experience.location,
         experience.employmentStatus === EmploymentStatus.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(experience.startDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(experience.endDate || ""),
-        Action(experience.id ?? 0)
-    ])
+        <ActionButtons key={experience.id} onEdit={() => handleEdit(experience.id ?? 0)} onView={() => handleView(experience.id ?? 0)} />
+    ]) ?? [], [experiences, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: 'low' as const, hideOnMobile: true },
-        { label: "Company Name", key: "companyName", type: "text" as ColumnType, props: { className: '' }, priority: 'high' as const },
-        { label: "Job Title", key: "jobTitle", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-        { label: "Location", key: "location", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-        { label: "Duration", key: "duration", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: 'medium' as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -81,23 +70,30 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: 'low' as const, hideOnMobile: true },
+            { label: "Company Name", key: "companyName", type: "text" as ColumnType, props: { className: '' }, priority: 'high' as const },
+            { label: "Job Title", key: "jobTitle", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+            { label: "Location", key: "location", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+            { label: "Duration", key: "duration", type: "text" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+            { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: 'medium' as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Experience" 
-            description="Work history and roles" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Experience" 
+        <ListingShell
+            title="Experience"
+            description="Work history and roles"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Experience"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.EXPERIENCE_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     );
 }

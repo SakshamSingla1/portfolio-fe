@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -32,7 +32,7 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -44,9 +44,9 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -58,37 +58,24 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
+    const records = useMemo(() => certifications.map((certification, index) => {
+        const issue = certification.issueDate ?? "";
+        const expiry = certification.expiryDate ?? "Present";
+        const duration = issue || expiry ? `${issue} - ${expiry}` : "";
+        return [
+            pagination.currentPage * pagination.pageSize + index + 1,
+            `${certification.title} - ${certification.order}`,
+            certification.issuer,
+            duration,
+            DateUtils.dateTimeSecondToDate(certification.createdAt ?? ""),
+            DateUtils.dateTimeSecondToDate(certification.updatedAt ?? ""),
+            <ActionButtons key={certification.id} onEdit={() => handleEdit(certification.id ?? 0)} onView={() => handleView(certification.id ?? 0)} />
+        ];
+    }) ?? [], [certifications, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getRecords = () =>
-        certifications.map((certification, index) => {
-            const issue = certification.issueDate ?? "";
-            const expiry = certification.expiryDate ?? "Present";
-            const duration = issue || expiry ? `${issue} - ${expiry}` : "";
-            return [
-                pagination.currentPage * pagination.pageSize + index + 1,
-                `${certification.title} - ${certification.order}`,
-                certification.issuer,
-                duration,
-                DateUtils.dateTimeSecondToDate(certification.createdAt ?? ""),
-                DateUtils.dateTimeSecondToDate(certification.updatedAt ?? ""),
-                Action(certification.id ?? 0)
-            ];
-        });
-
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Issuer", key: "issuer", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Duration", key: "duration", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Created At", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Updated At", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -99,10 +86,18 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Issuer", key: "issuer", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Duration", key: "duration", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Created At", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Updated At", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Actions", key: "actions", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
         <ListingShell
@@ -115,7 +110,7 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     )
 }

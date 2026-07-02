@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { StatusOptions, type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -35,7 +35,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -47,9 +47,9 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -61,29 +61,18 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
                 query: query
             })
         );
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
-
-    const getRecords = () => navlinks?.map((navlink: NavlinkResponse, index) => [
+    const records = useMemo(() => navlinks?.map((navlink: NavlinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         `${enumToNormalKey(navlink.name)} (${navlink.index})`,
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
         StatusOptions.find((status) => status.value === navlink.status)?.label,
-        Action(navlink.id ?? 0)
-    ])
+        <ActionButtons key={navlink.id} onEdit={() => handleEdit(navlink.id ?? 0)} onView={() => handleView(navlink.id ?? 0)} />
+    ]) ?? [], [navlinks, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -94,10 +83,17 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Created Date", key: "createdAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Last Modified", key: "updatedAt", type: "date" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
+            { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
         <ListingShell
@@ -111,7 +107,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     )
 }

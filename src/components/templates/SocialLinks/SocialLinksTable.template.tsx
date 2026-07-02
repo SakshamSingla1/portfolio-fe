@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -22,10 +22,10 @@ interface SocialLinksTableTemplateProps {
     filterContent?: React.ReactNode;
 }
 
-const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({ 
-    socialLinks, 
-    pagination, 
-    handlePaginationChange, 
+const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
+    socialLinks,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
@@ -36,7 +36,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
 
     const isMobile = useIsMobile();
 
-    const handleEdit = (id: number) => {
+    const handleEdit = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -44,9 +44,9 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
             status: searchParams.get("status") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_EDIT, { query, params: { id: String(id) } }));
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id: number) => {
+    const handleView = useCallback((id: number) => {
         const query = {
             page: searchParams.get("page") || "",
             size: searchParams.get("size") || "",
@@ -54,29 +54,18 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
             status: searchParams.get("status") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS_VIEW, { query, params: { id: String(id) } }));
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (id: number) => <ActionButtons onEdit={() => handleEdit(id)} onView={() => handleView(id)} />;
-
-    const getRecords = () => socialLinks?.map((sl: SocialLinkResponse, index) => [
+    const records = useMemo(() => socialLinks?.map((sl: SocialLinkResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         enumToNormalKey(sl.platform),
         sl.status,
         DateUtils.dateTimeSecondToDate(sl.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(sl.updatedAt ?? ""),
-        Action(sl.id ?? 0)
-    ]);
+        <ActionButtons key={sl.id} onEdit={() => handleEdit(sl.id ?? 0)} onView={() => handleView(sl.id ?? 0)} />
+    ]) ?? [], [socialLinks, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "serial", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Platform", key: "platform", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
-        { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Action", key: "id", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
-    ];
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -87,24 +76,31 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "serial", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "Platform", key: "platform", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Status", key: "status", component: ({ value }: { value: string }) => <ResourceStatus status={value} />, type: "custom" as ColumnType, props: {}, priority: "medium" as const },
+            { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Updated At", key: "updatedAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Action", key: "id", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Social Links" 
-            description="Online profiles and presence" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Social Link" 
+        <ListingShell
+            title="Social Links"
+            description="Online profiles and presence"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Social Link"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.SOCIAL_LINKS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     )
 }

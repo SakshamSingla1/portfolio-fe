@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import { createUseStyles } from "react-jss";
 import {
@@ -40,6 +40,16 @@ const useStyles = createUseStyles({
     zIndex: 0,
   },
 
+  '@keyframes glowPulse1': {
+    '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
+    '50%': { opacity: 0.8, transform: 'scale(1.08)' },
+  },
+
+  '@keyframes glowPulse2': {
+    '0%, 100%': { opacity: 0.6, transform: 'scale(1.05)' },
+    '50%': { opacity: 0.35, transform: 'scale(1)' },
+  },
+
   glow1: (c: any) => ({
     position: "absolute",
     top: "-5%",
@@ -49,6 +59,8 @@ const useStyles = createUseStyles({
     background: `radial-gradient(circle, ${c.primary500}10 0%, transparent 70%)`,
     filter: "blur(80px)",
     borderRadius: "50%",
+    willChange: "opacity, transform",
+    animation: "$glowPulse1 10s ease-in-out infinite",
   }),
 
   glow2: (c: any) => ({
@@ -60,6 +72,8 @@ const useStyles = createUseStyles({
     background: `radial-gradient(circle, ${c.accent500}10 0%, transparent 70%)`,
     filter: "blur(80px)",
     borderRadius: "50%",
+    willChange: "opacity, transform",
+    animation: "$glowPulse2 12s ease-in-out infinite",
   }),
 
   sidebarWrapper: (c: any) => ({
@@ -278,22 +292,24 @@ const DashboardLayout: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const colors = useColors();
-  const classes = useStyles({ ...colors, isMobile, isSidebarOpen });
+  const jssTheme = useMemo(() => ({ ...colors, isMobile, isSidebarOpen }), [colors, isMobile, isSidebarOpen]);
+  const classes = useStyles(jssTheme);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthenticatedUser();
   const { isDark, setColorMode } = useTheme();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const breadcrumbs = useMemo(() => getBreadcrumbsFromUrl(location.pathname), [location.pathname]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     navigate("/login");
-  };
+  }, [logout, navigate]);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setColorMode(isDark ? "light" : "dark");
-  };
+  }, [isDark, setColorMode]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -311,37 +327,22 @@ const DashboardLayout: React.FC = () => {
   }, [location.pathname, isMobile]);
 
   useEffect(() => {
+    if (!isDropdownOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (isDropdownOpen && !(e.target as HTMLElement).closest(`.${classes.userDropdownTrigger}`)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [isDropdownOpen, classes.userDropdownTrigger]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
 
   return (
     <div className={classes.layoutWrapper}>
       {/* Ambient background effects */}
       <div className={classes.ambientGlow}>
-        <motion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 0.8, 0.5],
-            rotate: [0, 45, 0]
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className={classes.glow1}
-        />
-        <motion.div
-          animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: [0.6, 0.4, 0.6],
-            rotate: [0, -30, 0]
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className={classes.glow2}
-        />
+        <div className={classes.glow1} />
+        <div className={classes.glow2} />
       </div>
 
       <AnimatePresence>
@@ -431,7 +432,7 @@ const DashboardLayout: React.FC = () => {
               </button>
             </div>
 
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative" }} ref={dropdownRef}>
               <div
                 className={classes.userDropdownTrigger}
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}

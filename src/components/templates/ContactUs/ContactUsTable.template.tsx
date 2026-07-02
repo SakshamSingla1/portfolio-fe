@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -20,11 +20,11 @@ interface ContactUsTableTemplateProps {
     onSearchChange?: (val: string) => void;
 }
 
-const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({ 
-    contactUs, 
-    pagination, 
-    handlePaginationChange, 
-    handleRowsPerPageChange, 
+const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({
+    contactUs,
+    pagination,
+    handlePaginationChange,
+    handleRowsPerPageChange,
     handleMarkRead,
     searchValue,
     onSearchChange
@@ -33,40 +33,28 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({
     const isMobile = useIsMobile();
     const [selectedMessage, setSelectedMessage] = useState<ContactUs | null>(null);
 
-    const handleView = async (message: ContactUs) => {
+    const handleView = useCallback(async (message: ContactUs) => {
         setSelectedMessage(message);
-    }
+    }, []);
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setSelectedMessage(null);
         if (selectedMessage?.status === 'UNREAD') {
             handleMarkRead(selectedMessage.id ?? 0);
         }
-    }
+    }, [selectedMessage, handleMarkRead]);
 
-    const Action = (message: ContactUs) => <ActionButtons onView={() => handleView(message)} />;
-
-    const getRecords = () => contactUs?.map((contactUs: ContactUs, index) => [
+    const records = useMemo(() => contactUs?.map((contactUsItem: ContactUs, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
-        contactUs.name,
-        contactUs.email,
-        contactUs.phone,
-        <ResourceStatus status={contactUs.status} />,
-        DateUtils.formatDateTimeToDateMonthYear(contactUs.createdAt),
-        Action(contactUs)
-    ])
+        contactUsItem.name,
+        contactUsItem.email,
+        contactUsItem.phone,
+        <ResourceStatus key={`status-${contactUsItem.id}`} status={contactUsItem.status} />,
+        DateUtils.formatDateTimeToDateMonthYear(contactUsItem.createdAt),
+        <ActionButtons key={contactUsItem.id} onView={() => handleView(contactUsItem)} />
+    ]) ?? [], [contactUs, pagination.currentPage, pagination.pageSize, handleView]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
-        { label: "Email", key: "email", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
-        { label: "Phone", key: "phone", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
-        { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
-        { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
-        { label: "Actions", key: "actions", type: "action" as ColumnType, props: { className: '' }, priority: "low" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -77,24 +65,32 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
+            { label: "Email", key: "email", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
+            { label: "Phone", key: "phone", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
+            { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const },
+            { label: "Created At", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const },
+            { label: "Actions", key: "actions", type: "action" as ColumnType, props: { className: '' }, priority: "low" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Messages" 
-            description="Visitor inquiries and contact" 
-            count={pagination.totalRecords} 
+        <ListingShell
+            title="Messages"
+            description="Visitor inquiries and contact"
+            count={pagination.totalRecords}
             isAddButtonVisible={false}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
             <>
                 <TableV1
-                    schema={getSchema()}
-                    records={getRecords()}
+                    schema={schema}
+                    records={records}
                 />
                 {selectedMessage && (
                     <MessageDetailModal message={selectedMessage} onClose={handleClose} />

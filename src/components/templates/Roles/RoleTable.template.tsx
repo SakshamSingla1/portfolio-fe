@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -21,10 +21,10 @@ interface RoleTableTemplateProps {
     filterContent?: React.ReactNode;
 }
 
-const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({ 
-    users, 
-    pagination, 
-    handlePaginationChange, 
+const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
+    users,
+    pagination,
+    handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
@@ -34,7 +34,7 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
 
-    const handleEdit = (id?: number | null) => {
+    const handleEdit = useCallback((id?: number | null) => {
         if (!id) return;
         const query = {
             page: searchParams.get("page") || "",
@@ -42,9 +42,9 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
             search: searchParams.get("search") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.ROLE_EDIT, { query, params: { id: String(id) } }));
-    }
+    }, [navigate, searchParams]);
 
-    const handleView = (id?: number | null) => {
+    const handleView = useCallback((id?: number | null) => {
         if (!id) return;
         const query = {
             page: searchParams.get("page") || "",
@@ -52,29 +52,18 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
             search: searchParams.get("search") || "",
         }
         navigate(makeRoute(ADMIN_ROUTES.ROLE_VIEW, { query, params: { id: String(id) } }));
-    }
+    }, [navigate, searchParams]);
 
-    const Action = (role: RoleListResponseDTO) => <ActionButtons onEdit={() => handleEdit(role.id)} onView={() => handleView(role.id)} />;
-
-    const getRecords = () => users?.map((role: RoleListResponseDTO, index) => [
+    const records = useMemo(() => users?.map((role: RoleListResponseDTO, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         role.name,
         role.description || '-',
-        <ResourceStatus status={role.status} />,
+        <ResourceStatus key={`status-${role.id}`} status={role.status} />,
         new Date(role.createdAt).toLocaleDateString(),
-        Action(role)
-    ])
+        <ActionButtons key={role.id} onEdit={() => handleEdit(role.id)} onView={() => handleView(role.id)} />
+    ]) ?? [], [users, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 
-    const getTableColumns = () => [
-        { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
-        { label: "Role Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
-        { label: "Description", key: "description", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
-        { label: "Created Date", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const, hideOnMobile: true },
-        { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
-    ]
-
-    const getSchema = () => ({
+    const schema = useMemo(() => ({
         id: 1,
         mobileView: isMobile ? "cards" as const : "responsive" as const,
         pagination: {
@@ -85,24 +74,31 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
             handleChangePage: handlePaginationChange,
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
-        columns: getTableColumns(),
+        columns: [
+            { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
+            { label: "Role Name", key: "name", type: "text" as ColumnType, props: { className: '' }, priority: "high" as const },
+            { label: "Description", key: "description", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Created Date", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const, hideOnMobile: true },
+            { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+        ],
         hover: true,
         striped: true
-    });
+    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell 
-            title="Roles" 
-            description="User roles and permissions" 
-            count={pagination.totalRecords} 
-            isAddButtonVisible={true} 
-            addButtonLabel="Add Role" 
+        <ListingShell
+            title="Roles"
+            description="User roles and permissions"
+            count={pagination.totalRecords}
+            isAddButtonVisible={true}
+            addButtonLabel="Add Role"
             addButtonOnClick={() => navigate(ADMIN_ROUTES.ROLE_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={getSchema()} records={getRecords()} />
+            <TableV1 schema={schema} records={records} />
         </ListingShell>
     )
 }
