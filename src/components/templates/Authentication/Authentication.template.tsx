@@ -2,7 +2,6 @@ import React, { useEffect, type ReactNode, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import OnboardingSection from "./OnboardingSection.template";
 import { AUTH_STATE, useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import { motion } from "framer-motion";
 
 interface AuthenticationTemplateProps {
@@ -17,7 +16,6 @@ const AuthenticationTemplate: React.FC<AuthenticationTemplateProps> = ({
   setAuthState,
 }) => {
   const colors = useColors();
-  const { isDark } = useTheme();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
@@ -46,10 +44,7 @@ const AuthenticationTemplate: React.FC<AuthenticationTemplateProps> = ({
 
   const showOnboarding = isDesktopView || isOnboardingVisible;
 
-  // Background is always dark — isDark just shifts the tone
-  const pageBg = isDark
-    ? `radial-gradient(ellipse at 30% 20%, #0a0f1e 0%, #010410 60%)`
-    : `radial-gradient(ellipse at 30% 20%, #1e293b 0%, #020617 60%)`;
+  const pageBg = `radial-gradient(ellipse at 30% 20%, #1e293b 0%, #020617 60%)`;
 
   return (
     <>
@@ -64,7 +59,7 @@ const AuthenticationTemplate: React.FC<AuthenticationTemplateProps> = ({
         }}
       >
         <div
-          style={{ position: "absolute", inset: 0, backgroundImage: NOISE_SVG, opacity: isDark ? 0.06 : 0.04 }}
+          style={{ position: "absolute", inset: 0, backgroundImage: NOISE_SVG, opacity: 0.04 }}
         />
         <motion.div
           style={{

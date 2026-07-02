@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object().shape({
@@ -51,7 +50,6 @@ interface EducationFormProps {
 const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, education }) => {
     const navigate = useNavigate();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const onClose = () => navigate(ADMIN_ROUTES.EDUCATION);
 
@@ -85,9 +83,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
         },
     });
 
-    const cardShadow = isDark
-        ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
-        : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
+    const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
     return (
         <FormShell

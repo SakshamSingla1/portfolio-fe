@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import Button from "../../atoms/Button/Button";
 import { FiPlus, FiSearch, FiFilter, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import TextField from "../../atoms/TextField/TextField";
@@ -89,13 +88,10 @@ const ListingShell: React.FC<ListingShellProps> = ({
   stats
 }) => {
   const colors = useColors();
-  const { isDark } = useTheme();
   const isMobile = useIsMobile();
   const [showFilters, setShowFilters] = useState(false);
 
-  const cardShadow = isDark
-    ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
-    : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
+  const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
   const accent = accentColor ?? colors.primary600;
 
@@ -134,7 +130,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
                 <span
                   className="text-[11px] font-bold px-2.5 py-0.5 rounded-full tabular-nums"
                   style={{
-                    background: isDark ? colors.neutral100 : colors.neutral100,
+                    background: colors.neutral100,
                     color: colors.neutral500,
                     border: `1.5px solid ${colors.neutral300}`,
                   }}

@@ -8,16 +8,12 @@ import TwoFactorTab from "./TwoFactorTab";
 import SeoTab from "./SeoTab";
 import GitHubTab from "./GitHubTab";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 
 const SettingsTemplate: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("password");
   const colors = useColors();
-  const { isDark } = useTheme();
 
-  const cardShadow = isDark
-    ? "0 2px 8px rgba(0,0,0,0.4)"
-    : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
+  const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
   const tabs: ITabsSchema[] = [
     {

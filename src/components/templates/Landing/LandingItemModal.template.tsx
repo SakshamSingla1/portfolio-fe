@@ -9,7 +9,6 @@ import {
 import Button from '../../atoms/Button/Button';
 import TextField from '../../atoms/TextField/TextField';
 import { useColors } from '../../../utils/types';
-import { useTheme } from '../../../contexts/ThemeContext';
 
 // ── TagsInput ────────────────────────────────────────────────────────────────
 
@@ -115,7 +114,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
     onClose,
 }) => {
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const typeMap: Record<string, { icon: React.ReactNode; accent: string; label: string; sub: string }> = {
         feature:     { icon: <LuZap size={15} />,          accent: colors.primary500,   label: 'Feature',       sub: 'A capability highlight shown on the landing page' },
@@ -186,9 +184,7 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                     background: colors.neutral0,
                     border: `1.5px solid ${colors.neutral300}`,
                     borderRadius: '16px',
-                    boxShadow: isDark
-                        ? `0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)`
-                        : `0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)`,
+                    boxShadow: `0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)`,
                     overflow: 'hidden',
                 }
             }}

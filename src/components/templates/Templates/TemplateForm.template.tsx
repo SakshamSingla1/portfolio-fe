@@ -7,7 +7,6 @@ import {
     FiCopy, FiCheck, FiZap,
 } from "react-icons/fi";
 import { HTTP_STATUS, SORT_ENUM, useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { makeRoute } from "../../../utils/helper";
 import { useTemplateService } from "../../../services/useTemplateService";
@@ -51,7 +50,6 @@ interface PreviewModalProps {
 
 const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab, formik, variables }) => {
     const colors = useColors();
-    const { isDark } = useTheme();
     const [varValues, setVarValues] = useState<Record<string, string>>({});
     const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -109,15 +107,15 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                         transition={{ duration: 0.22, ease: "easeOut" }}
                         className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl overflow-hidden"
                         style={{
-                            background: isDark ? colors.neutral900 : colors.neutral0,
-                            border: `1.5px solid ${isDark ? colors.neutral700 : colors.neutral200}`,
+                            background: colors.neutral0,
+                            border: `1.5px solid ${colors.neutral200}`,
                             boxShadow: `0 24px 64px -12px ${colors.neutral900}40`,
                         }}
                     >
                         {/* Header */}
                         <div
                             className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0"
-                            style={{ borderColor: isDark ? colors.neutral700 : colors.neutral200 }}
+                            style={{ borderColor: colors.neutral200 }}
                         >
                             <div className="flex items-center gap-2">
                                 <FiEye size={18} style={{ color: colors.primary500 }} />
@@ -127,7 +125,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                 <span
                                     className="text-xs px-2 py-0.5 rounded-full capitalize font-medium"
                                     style={{
-                                        background: isDark ? colors.primary900 : colors.primary50,
+                                        background: colors.primary50,
                                         color: colors.primary600,
                                     }}
                                 >
@@ -149,7 +147,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                             {detectedVars.length > 0 && (
                                 <div
                                     className="lg:w-64 flex-shrink-0 p-4 overflow-y-auto border-b lg:border-b-0 lg:border-r"
-                                    style={{ borderColor: isDark ? colors.neutral700 : colors.neutral200 }}
+                                    style={{ borderColor: colors.neutral200 }}
                                 >
                                     <p
                                         className="text-xs font-semibold uppercase tracking-wider mb-3"
@@ -175,8 +173,8 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                                     placeholder={`Sample ${v}`}
                                                     className="w-full text-sm px-3 py-1.5 rounded-lg outline-none"
                                                     style={{
-                                                        background: isDark ? colors.neutral800 : colors.neutral50,
-                                                        border: `1px solid ${isDark ? colors.neutral600 : colors.neutral200}`,
+                                                        background: colors.neutral50,
+                                                        border: `1px solid ${colors.neutral200}`,
                                                         color: colors.neutral900,
                                                     }}
                                                 />
@@ -191,7 +189,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                 {activeTab === "email" && previewSubject && (
                                     <div
                                         className="flex items-start justify-between gap-4 px-5 py-3 border-b flex-shrink-0"
-                                        style={{ borderColor: isDark ? colors.neutral700 : colors.neutral200 }}
+                                        style={{ borderColor: colors.neutral200 }}
                                     >
                                         <div className="flex-1 min-w-0">
                                             <p className="text-xs font-medium mb-0.5" style={{ color: colors.neutral400 }}>
@@ -207,7 +205,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                             className="flex-shrink-0 flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors"
                                             style={{
                                                 color: copiedField === "subject" ? colors.success600 : colors.neutral400,
-                                                background: isDark ? colors.neutral800 : colors.neutral50,
+                                                background: colors.neutral50,
                                             }}
                                         >
                                             {copiedField === "subject" ? <FiCheck size={12} /> : <FiCopy size={12} />}
@@ -228,7 +226,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                             className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors"
                                             style={{
                                                 color: copiedField === "body" ? colors.success600 : colors.neutral400,
-                                                background: isDark ? colors.neutral800 : colors.neutral50,
+                                                background: colors.neutral50,
                                             }}
                                         >
                                             {copiedField === "body" ? <FiCheck size={12} /> : <FiCopy size={12} />}
@@ -238,8 +236,8 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                     <div
                                         className="rounded-xl p-4 prose prose-sm max-w-none"
                                         style={{
-                                            background: isDark ? colors.neutral800 : colors.neutral50,
-                                            border: `1px solid ${isDark ? colors.neutral700 : colors.neutral200}`,
+                                            background: colors.neutral50,
+                                            border: `1px solid ${colors.neutral200}`,
                                             color: colors.neutral900,
                                             minHeight: 120,
                                         }}
@@ -261,7 +259,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
     const [searchParams] = useSearchParams();
     const templateService = useTemplateService();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const [variables, setVariables] = useState<ITemplateVariable[]>([]);
     const [loadingVars, setLoadingVars] = useState(false);
@@ -395,8 +392,8 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                             className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg font-medium transition-colors"
                             style={{
                                 color: colors.primary600,
-                                background: isDark ? colors.primary900 : colors.primary50,
-                                border: `1px solid ${isDark ? colors.primary700 : colors.primary200}`,
+                                background: colors.primary50,
+                                border: `1px solid ${colors.primary200}`,
                             }}
                         >
                             <FiEye size={14} />
@@ -410,14 +407,14 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                 <div
                     className="rounded-xl border overflow-hidden"
                     style={{
-                        borderColor: isDark ? colors.neutral700 : colors.neutral200,
-                        background: isDark ? colors.neutral800 : colors.neutral50,
+                        borderColor: colors.neutral200,
+                        background: colors.neutral50,
                     }}
                 >
                     {/* Panel header */}
                     <div
                         className="flex items-center justify-between px-4 py-3 border-b"
-                        style={{ borderColor: isDark ? colors.neutral700 : colors.neutral200 }}
+                        style={{ borderColor: colors.neutral200 }}
                     >
                         <div className="flex items-center gap-2">
                             <FiZap size={14} style={{ color: colors.primary500 }} />
@@ -428,7 +425,7 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                                 <span
                                     className="text-xs px-1.5 py-0.5 rounded-full font-medium"
                                     style={{
-                                        background: isDark ? colors.neutral700 : colors.neutral200,
+                                        background: colors.neutral200,
                                         color: colors.neutral500,
                                     }}
                                 >
@@ -457,8 +454,8 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                                     placeholder="Filter variables…"
                                     className="w-full text-sm pl-8 pr-3 py-2 rounded-lg outline-none"
                                     style={{
-                                        background: isDark ? colors.neutral900 : colors.neutral0,
-                                        border: `1px solid ${isDark ? colors.neutral600 : colors.neutral300}`,
+                                        background: colors.neutral0,
+                                        border: `1px solid ${colors.neutral300}`,
                                         color: colors.neutral900,
                                     }}
                                 />
@@ -473,7 +470,7 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                                         className="h-6 rounded-full animate-pulse"
                                         style={{
                                             width: `${60 + (i % 3) * 20}px`,
-                                            background: isDark ? colors.neutral700 : colors.neutral200,
+                                            background: colors.neutral200,
                                         }}
                                     />
                                 ))}
@@ -494,18 +491,18 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                                         title={`Insert {{${v.variableName}}} at cursor`}
                                         className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono transition-all cursor-pointer select-none active:scale-95"
                                         style={{
-                                            background: isDark ? colors.neutral900 : colors.neutral0,
-                                            border: `1px solid ${isDark ? colors.neutral600 : colors.neutral300}`,
-                                            color: isDark ? colors.primary300 : colors.primary700,
+                                            background: colors.neutral0,
+                                            border: `1px solid ${colors.neutral300}`,
+                                            color: colors.primary700,
                                             boxShadow: `0 1px 2px ${colors.neutral900}08`,
                                         }}
                                         onMouseEnter={(e) => {
                                             (e.currentTarget as HTMLButtonElement).style.borderColor = colors.primary400;
-                                            (e.currentTarget as HTMLButtonElement).style.background = isDark ? colors.primary900 : colors.primary50;
+                                            (e.currentTarget as HTMLButtonElement).style.background = colors.primary50;
                                         }}
                                         onMouseLeave={(e) => {
-                                            (e.currentTarget as HTMLButtonElement).style.borderColor = isDark ? colors.neutral600 : colors.neutral300;
-                                            (e.currentTarget as HTMLButtonElement).style.background = isDark ? colors.neutral900 : colors.neutral0;
+                                            (e.currentTarget as HTMLButtonElement).style.borderColor = colors.neutral300;
+                                            (e.currentTarget as HTMLButtonElement).style.background = colors.neutral0;
                                         }}
                                     >
                                         {`{{${v.variableName}}}`}

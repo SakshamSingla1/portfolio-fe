@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FiArrowLeft } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 
 interface FormShellProps {
@@ -23,12 +22,9 @@ const FormShell: React.FC<FormShellProps> = ({
   children,
 }) => {
   const colors = useColors();
-  const { isDark } = useTheme();
   const isMobile = useIsMobile();
 
-  const cardShadow = isDark
-    ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
-    : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
+  const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
   const accent = accentColor ?? colors.primary600;
 
