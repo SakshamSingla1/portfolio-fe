@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { LuLogIn } from 'react-icons/lu';
-import { C, CUBIC } from '../constants';
+import { C, CUBIC } from '../../../utils/constant';
 
 interface NavbarProps {
   onGetStarted: () => void;

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { LuActivity, LuGitBranch, LuTrendingUp, LuUsers } from 'react-icons/lu';
-import { C, fadeUp } from '../constants';
+import { C, fadeUp } from '../../../utils/constant';
 
 const METRICS = [
   { icon: LuActivity, label: 'Uptime', val: '99.9%', color: C.green },

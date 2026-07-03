@@ -118,7 +118,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
                                 className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all hover:opacity-90 active:scale-[0.97]"
                                 style={{ backgroundColor: colors.primary500, color: colors.neutral0, whiteSpace: 'nowrap' }}
                             >
-                                <FiPlus size={12} color={colors.neutral0}/>
+                                <FiPlus size={12} color={colors.neutral0} />
                                 Add
                             </button>
                         </InputAdornment>
@@ -283,8 +283,8 @@ const FieldWithCount: React.FC<{ children: React.ReactNode; value: string; max: 
 );
 
 // ── Completion helpers ─────────────────────────────────────────────────────────
-const HERO_TOTAL   = 7;
-const CTA_TOTAL    = 5;
+const HERO_TOTAL = 7;
+const CTA_TOTAL = 5;
 const BANNER_TOTAL = 1;
 
 const heroFilled = (c: LandingConfig) =>
@@ -309,7 +309,7 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
     const colors = useColors();
     const fileService = useFileService();
 
-    const [bannerValue, setBannerValue]     = useState<ImageValue | null>(null);
+    const [bannerValue, setBannerValue] = useState<ImageValue | null>(null);
     const [bannerAssetId, setBannerAssetId] = useState<string | number | null>(null);
 
     useEffect(() => {
@@ -343,12 +343,12 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
         }
     };
 
-    const hFilled     = heroFilled(config);
-    const cFilled     = ctaFilled(config);
-    const bFilled     = bannerValue ? 1 : 0;
+    const hFilled = heroFilled(config);
+    const cFilled = ctaFilled(config);
+    const bFilled = bannerValue ? 1 : 0;
     const totalFilled = hFilled + cFilled + bFilled;
     const totalFields = HERO_TOTAL + CTA_TOTAL + BANNER_TOTAL;
-    const overallPct  = Math.round((totalFilled / totalFields) * 100);
+    const overallPct = Math.round((totalFilled / totalFields) * 100);
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {

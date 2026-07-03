@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { C, fadeUp } from '../constants';
-import { SectionLabel, SectionTitle } from '../SectionPrimitives';
+import { C, fadeUp } from '../../../utils/constant';
+import { SectionLabel, SectionTitle } from './SectionPrimitives';
 
 const TECH_STACK = [
   { cat: 'Backend', color: C.teal, items: ['Spring Boot 3', 'Java 21', 'MongoDB', 'JWT Auth', 'Cloudinary SDK', 'REST APIs'] },

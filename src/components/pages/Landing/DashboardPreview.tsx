@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { C, fadeUp } from '../constants';
-import { SectionLabel, SectionTitle } from '../SectionPrimitives';
-import DashboardMockup from '../DashboardMockup';
+import { C, fadeUp } from '../../../utils/constant';
+import { SectionLabel, SectionTitle } from './SectionPrimitives';
+import DashboardMockup from './DashboardMockup';
 
 interface DashboardPreviewProps {
   bannerUrl?: string | null;

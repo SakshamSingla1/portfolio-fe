@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { LuMonitor, LuCode, LuBriefcase, LuAward, LuStar, LuCircleCheck, LuGraduationCap, LuGlobe } from 'react-icons/lu';
-import { C, fadeUp } from '../constants';
-import { SectionLabel, SectionTitle } from '../SectionPrimitives';
+import { C, fadeUp } from '../../../utils/constant';
+import { SectionLabel, SectionTitle } from './SectionPrimitives';
 
 interface ProfileSnapshotProps {
   profileMaster: any;

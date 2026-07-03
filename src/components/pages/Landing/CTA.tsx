@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { LuLogIn, LuCircleCheck } from 'react-icons/lu';
-import { C } from '../constants';
+import { C } from '../../../utils/constant';
 
 interface CTAProps {
   onGetStarted: () => void;

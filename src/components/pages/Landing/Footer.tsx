@@ -1,5 +1,5 @@
 import { LuServer, LuCode, LuImage, LuDatabase } from 'react-icons/lu';
-import { C } from '../constants';
+import { C } from '../../../utils/constant';
 
 const Footer = () => (
   <footer style={{ borderTop: `1px solid ${C.border}`, padding: '28px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>

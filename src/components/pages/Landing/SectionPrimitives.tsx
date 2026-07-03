@@ -1,5 +1,5 @@
 import React from 'react';
-import { C } from './constants';
+import { C } from '../../../utils/constant';
 
 export const SectionLabel = ({ children }: { children: React.ReactNode }) => (
   <div style={{

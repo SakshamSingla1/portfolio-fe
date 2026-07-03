@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { C } from './constants';
+import { C } from '../../../utils/constant';
 
 const LINES = [
   { prompt: '$', cmd: 'git clone portfolio-be && cd portfolio-be', delay: 0 },

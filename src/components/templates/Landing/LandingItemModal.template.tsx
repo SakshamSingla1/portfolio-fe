@@ -116,11 +116,11 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
     const colors = useColors();
 
     const typeMap: Record<string, { icon: React.ReactNode; accent: string; label: string; sub: string }> = {
-        feature:     { icon: <LuZap size={15} />,          accent: colors.primary500,   label: 'Feature',       sub: 'A capability highlight shown on the landing page' },
-        faq:         { icon: <LuMessageSquare size={15} />, accent: colors.accent500,    label: 'FAQ',           sub: 'A frequently asked question and its answer' },
-        step:        { icon: <LuLayers size={15} />,        accent: colors.secondary500, label: 'Step',          sub: 'A step in the how-to-use section' },
-        audience:    { icon: <LuGlobe size={15} />,         accent: colors.warning500,   label: 'Audience Card', sub: 'A target audience segment card' },
-        testimonial: { icon: <LuStar size={15} />,          accent: colors.success500,   label: 'Testimonial',   sub: 'A customer or client testimonial' },
+        feature: { icon: <LuZap size={15} />, accent: colors.primary500, label: 'Feature', sub: 'A capability highlight shown on the landing page' },
+        faq: { icon: <LuMessageSquare size={15} />, accent: colors.accent500, label: 'FAQ', sub: 'A frequently asked question and its answer' },
+        step: { icon: <LuLayers size={15} />, accent: colors.secondary500, label: 'Step', sub: 'A step in the how-to-use section' },
+        audience: { icon: <LuGlobe size={15} />, accent: colors.warning500, label: 'Audience Card', sub: 'A target audience segment card' },
+        testimonial: { icon: <LuStar size={15} />, accent: colors.success500, label: 'Testimonial', sub: 'A customer or client testimonial' },
     };
 
     const meta = typeMap[type] ?? { icon: null, accent: colors.primary500, label: type, sub: '' };

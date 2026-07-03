@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { LuTerminal, LuServer, LuGlobe } from 'react-icons/lu';
-import { C, fadeUp } from '../constants';
-import { SectionLabel, SectionTitle } from '../SectionPrimitives';
+import { C, fadeUp } from '../../../utils/constant';
+import { SectionLabel, SectionTitle } from './SectionPrimitives';
 
 const ARCHITECTURE_STEPS = [
   {

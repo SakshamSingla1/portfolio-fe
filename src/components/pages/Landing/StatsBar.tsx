@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { LuLayers, LuDatabase, LuPalette, LuZap } from 'react-icons/lu';
-import { C, fadeUp } from '../constants';
+import { C, fadeUp } from '../../../utils/constant';
 
 const STATS = [
   { value: '3', label: 'Applications', sub: 'Admin · API · Portfolio', icon: LuLayers, color: C.teal },

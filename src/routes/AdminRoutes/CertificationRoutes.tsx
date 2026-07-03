@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import ListingCertificationPage from "../../components/pages/Certification/ListingCertification.page";
 import AddCertificationPage from "../../components/pages/Certification/AddCertification.page";
-import UpdateCertificationPage from "../../components/pages/Certification/UpdateCertification.page";
+import UpdateCertificationPage from "../../components/pages/Certification/EditCertification.page";
 import ViewCertificationPage from "../../components/pages/Certification/ViewCertification.page";
 import PermissionGuard from "../PermissionGuard";
 

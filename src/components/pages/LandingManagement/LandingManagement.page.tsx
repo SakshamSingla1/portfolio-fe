@@ -30,11 +30,11 @@ const emptyConfig = (): LandingConfig => ({
     heroPrimaryCtaText: '', heroSecondaryCtaText: '', heroTrustBadges: [],
     ctaBadgeText: '', ctaHeadline: '', ctaDescription: '', ctaButtonText: '', ctaTrustPoints: [],
 });
-const emptyFeature     = (): LandingFeature      => ({ iconName: '', colorKey: '', title: '', description: '', sortOrder: 0, isActive: true });
-const emptyFaq         = (): LandingFaq          => ({ question: '', answer: '', sortOrder: 0, isActive: true });
-const emptyStep        = (): LandingStep         => ({ stepNumber: '', iconName: '', colorKey: '', title: '', bullets: [], sortOrder: 0, isActive: true });
-const emptyAudience    = (): LandingAudienceCard => ({ iconName: '', colorKey: '', title: '', description: '', sortOrder: 0, isActive: true });
-const emptyTestimonial = (): LandingTestimonial  => ({ authorName: '', authorRole: '', authorCompany: '', avatarUrl: '', content: '', linkedinUrl: '', sortOrder: 0, isActive: true });
+const emptyFeature = (): LandingFeature => ({ iconName: '', colorKey: '', title: '', description: '', sortOrder: 0, isActive: true });
+const emptyFaq = (): LandingFaq => ({ question: '', answer: '', sortOrder: 0, isActive: true });
+const emptyStep = (): LandingStep => ({ stepNumber: '', iconName: '', colorKey: '', title: '', bullets: [], sortOrder: 0, isActive: true });
+const emptyAudience = (): LandingAudienceCard => ({ iconName: '', colorKey: '', title: '', description: '', sortOrder: 0, isActive: true });
+const emptyTestimonial = (): LandingTestimonial => ({ authorName: '', authorRole: '', authorCompany: '', avatarUrl: '', content: '', linkedinUrl: '', sortOrder: 0, isActive: true });
 
 // ── Component ───────────────────────────────────────────────────────────────────
 
@@ -45,21 +45,21 @@ const LandingManagement = () => {
     const [activeTab, setActiveTab] = useState('config');
     const [loading, setLoading] = useState(false);
 
-    const [config, setConfig]         = useState<LandingConfig>(emptyConfig());
+    const [config, setConfig] = useState<LandingConfig>(emptyConfig());
     const [configSaving, setConfigSaving] = useState(false);
 
-    const [features, setFeatures]         = useState<LandingFeature[]>([]);
-    const [faqs, setFaqs]                 = useState<LandingFaq[]>([]);
-    const [steps, setSteps]               = useState<LandingStep[]>([]);
-    const [audience, setAudience]         = useState<LandingAudienceCard[]>([]);
+    const [features, setFeatures] = useState<LandingFeature[]>([]);
+    const [faqs, setFaqs] = useState<LandingFaq[]>([]);
+    const [steps, setSteps] = useState<LandingStep[]>([]);
+    const [audience, setAudience] = useState<LandingAudienceCard[]>([]);
     const [testimonials, setTestimonials] = useState<LandingTestimonial[]>([]);
 
-    const [modal, setModal]     = useState<{ open: boolean; type: string; data: any }>({ open: false, type: '', data: null });
+    const [modal, setModal] = useState<{ open: boolean; type: string; data: any }>({ open: false, type: '', data: null });
     const [formData, setFormData] = useState<any>({});
-    const [saving, setSaving]   = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: number } | null>(null);
-    const [deleting, setDeleting]         = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     // ── Data loading ──────────────────────────────────────────────────────────
 
@@ -77,10 +77,10 @@ const LandingManagement = () => {
             const raw = cfgRes.data.data;
             setConfig({ ...emptyConfig(), ...raw, heroTrustBadges: raw.heroTrustBadges ?? [], ctaTrustPoints: raw.ctaTrustPoints ?? [] });
         }
-        if (ftRes?.status === HTTP_STATUS.OK)   setFeatures(ftRes.data?.data ?? []);
-        if (faqRes?.status === HTTP_STATUS.OK)  setFaqs(faqRes.data?.data ?? []);
-        if (stRes?.status === HTTP_STATUS.OK)   setSteps(stRes.data?.data ?? []);
-        if (audRes?.status === HTTP_STATUS.OK)  setAudience(audRes.data?.data ?? []);
+        if (ftRes?.status === HTTP_STATUS.OK) setFeatures(ftRes.data?.data ?? []);
+        if (faqRes?.status === HTTP_STATUS.OK) setFaqs(faqRes.data?.data ?? []);
+        if (stRes?.status === HTTP_STATUS.OK) setSteps(stRes.data?.data ?? []);
+        if (audRes?.status === HTTP_STATUS.OK) setAudience(audRes.data?.data ?? []);
         if (testRes?.status === HTTP_STATUS.OK) setTestimonials(testRes.data?.data ?? []);
         setLoading(false);
     }, []);
@@ -119,11 +119,11 @@ const LandingManagement = () => {
         const { type, data } = modal;
         const isEdit = !!data?.id;
         let res: any;
-        if (type === 'feature')          res = isEdit ? await service.updateFeature(data.id, formData)     : await service.createFeature(formData);
-        else if (type === 'faq')         res = isEdit ? await service.updateFaq(data.id, formData)          : await service.createFaq(formData);
-        else if (type === 'step')        res = isEdit ? await service.updateStep(data.id, formData)         : await service.createStep(formData);
-        else if (type === 'audience')    res = isEdit ? await service.updateAudienceCard(data.id, formData) : await service.createAudienceCard(formData);
-        else if (type === 'testimonial') res = isEdit ? await service.updateTestimonial(data.id, formData)  : await service.createTestimonial(formData);
+        if (type === 'feature') res = isEdit ? await service.updateFeature(data.id, formData) : await service.createFeature(formData);
+        else if (type === 'faq') res = isEdit ? await service.updateFaq(data.id, formData) : await service.createFaq(formData);
+        else if (type === 'step') res = isEdit ? await service.updateStep(data.id, formData) : await service.createStep(formData);
+        else if (type === 'audience') res = isEdit ? await service.updateAudienceCard(data.id, formData) : await service.createAudienceCard(formData);
+        else if (type === 'testimonial') res = isEdit ? await service.updateTestimonial(data.id, formData) : await service.createTestimonial(formData);
 
         if (res?.status === HTTP_STATUS.OK || res?.status === 201) {
             showSnackbar('success', isEdit ? 'Updated successfully' : 'Created successfully');
@@ -144,10 +144,10 @@ const LandingManagement = () => {
         setDeleting(true);
         const { type, id } = deleteTarget;
         let res: any;
-        if (type === 'feature')          res = await service.deleteFeature(id);
-        else if (type === 'faq')         res = await service.deleteFaq(id);
-        else if (type === 'step')        res = await service.deleteStep(id);
-        else if (type === 'audience')    res = await service.deleteAudienceCard(id);
+        if (type === 'feature') res = await service.deleteFeature(id);
+        else if (type === 'faq') res = await service.deleteFaq(id);
+        else if (type === 'step') res = await service.deleteStep(id);
+        else if (type === 'audience') res = await service.deleteAudienceCard(id);
         else if (type === 'testimonial') res = await service.deleteTestimonial(id);
 
         if (res?.status === HTTP_STATUS.OK || res?.status === 204) {

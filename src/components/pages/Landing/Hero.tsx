@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { LuLogIn, LuCircleCheck, LuArrowRight } from 'react-icons/lu';
-import { C, CUBIC } from '../constants';
-import AnimatedTerminal from '../AnimatedTerminal';
+import { C, CUBIC } from '../../../utils/constant';
+import AnimatedTerminal from './AnimatedTerminal';
 
 interface HeroProps {
   onGetStarted: () => void;

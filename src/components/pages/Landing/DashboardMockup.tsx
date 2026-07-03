@@ -1,4 +1,4 @@
-import { C } from './constants';
+import { C } from '../../../utils/constant';
 
 const DashboardMockup = () => {
   const rows = [

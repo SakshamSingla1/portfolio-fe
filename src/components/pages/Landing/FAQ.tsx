@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LuChevronDown } from 'react-icons/lu';
-import { C, CUBIC, fadeUp } from '../constants';
-import { SectionLabel, SectionTitle } from '../SectionPrimitives';
+import { C, CUBIC, fadeUp } from '../../../utils/constant';
+import { SectionLabel, SectionTitle } from './SectionPrimitives';
 
 const FAQS = [
   {
