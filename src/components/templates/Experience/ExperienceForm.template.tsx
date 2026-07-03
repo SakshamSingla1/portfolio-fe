@@ -152,8 +152,8 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
             subtitle={mode === MODE.ADD ? "Add your professional experience to your portfolio" : mode === MODE.EDIT ? "Update your experience information" : "View experience details"}
             onBack={() => navigate(-1)}
         >
-            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+            <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Basic Information
@@ -202,7 +202,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         />
                     </div>
                 </div>
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                         Technologies Used
@@ -247,7 +247,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         )}
                     </div>
                 </div>
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />
                         Employment Timeline
@@ -291,7 +291,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         </div>
                     </div>
                 </div>
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <div className="mt-1">
                         <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />

@@ -83,7 +83,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      style={{ padding: isMobile ? "8px 8px 16px" : "16px 16px 24px", position: "relative", overflow: "hidden" }}
+      style={{ padding: isMobile ? "8px 4px 16px" : "16px 16px 24px", position: "relative", overflow: "hidden" }}
     >
       {/* Ambient blobs */}
       <div
@@ -124,7 +124,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
         <div style={{ height: 3, background: `linear-gradient(90deg, ${accent} 0%, ${accent}28 100%)` }} />
 
         {/* Hero row */}
-        <div className={`flex items-center justify-between gap-4 ${isMobile ? "px-4 py-3.5" : "px-5 py-4"}`}>
+        <div className={`flex items-center justify-between gap-4 ${isMobile ? "px-3 py-3.5" : "px-5 py-4"}`}>
           <div className="flex items-center gap-4 min-w-0 flex-1">
             {icon && (
               <div
@@ -204,7 +204,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
         {/* Stat chips */}
         {stats && stats.length > 0 && (
           <div
-            className={`flex flex-wrap gap-2 ${isMobile ? "px-4 pb-3" : "px-5 pb-4"}`}
+            className={`flex flex-wrap gap-2 ${isMobile ? "px-3 pb-3" : "px-5 pb-4"}`}
             style={{ borderTop: `1px solid ${colors.neutral100}`, paddingTop: 12 }}
           >
             {stats.map((stat, idx) => (
@@ -223,7 +223,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
         {/* Filters / Search */}
         {(onSearchChange || filterContent) && (
           <div
-            className={`${isMobile ? "px-4 pb-3" : "px-5 pb-4"}`}
+            className={`${isMobile ? "px-3 pb-3" : "px-5 pb-4"}`}
             style={{ borderTop: `1px solid ${colors.neutral100}`, paddingTop: 14 }}
           >
             {isMobile ? (

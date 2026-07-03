@@ -8,10 +8,12 @@ import TwoFactorTab from "./TwoFactorTab";
 import SeoTab from "./SeoTab";
 import GitHubTab from "./GitHubTab";
 import { useColors } from "../../../utils/types";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 const SettingsTemplate: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("password");
   const colors = useColors();
+  const isMobile = useIsMobile();
 
   const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
@@ -53,7 +55,7 @@ const SettingsTemplate: React.FC = () => {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      style={{ padding: "16px 16px 24px" }}
+      style={{ padding: isMobile ? "8px 4px 16px" : "16px 16px 24px" }}
     >
       {/* Page header card */}
       <div
@@ -65,7 +67,7 @@ const SettingsTemplate: React.FC = () => {
         }}
       >
         <div style={{ height: 3, background: `linear-gradient(90deg, ${colors.primary600} 0%, ${colors.primary400}28 100%)` }} />
-        <div className="px-5 py-4 flex items-center gap-3">
+        <div className={`${isMobile ? "px-3 py-3" : "px-5 py-4"} flex items-center gap-3`}>
           <div
             className="flex items-center justify-center rounded-xl"
             style={{ width: 38, height: 38, background: `${colors.primary500}12`, color: colors.primary600 }}
@@ -96,7 +98,7 @@ const SettingsTemplate: React.FC = () => {
         }}
       >
         <div
-          className="flex items-center gap-2 px-5 py-3"
+          className={`flex items-center gap-2 ${isMobile ? "px-3" : "px-5"} py-3`}
           style={{ borderBottom: `1px solid ${colors.neutral100}` }}
         >
           <div
@@ -110,7 +112,7 @@ const SettingsTemplate: React.FC = () => {
             Security Settings
           </span>
         </div>
-        <div className="p-5">
+        <div className={isMobile ? "px-2 py-4" : "p-5"}>
           <Tabs
             schema={tabs}
             value={activeTab}

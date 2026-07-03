@@ -130,7 +130,7 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
           backgroundColor: isDark ? `${colors.neutral0}05` : `${colors.neutral0}99`,
           backdropFilter: "blur(20px) saturate(180%)",
           border: `1px solid ${isActive ? primaryColor : isDark ? `${colors.neutral200}10` : `${colors.neutral200}`}`,
-          padding: isMobile ? "16px" : "20px 24px",
+          padding: isMobile ? "12px 10px" : "20px 24px",
         }}
       >
         {/* shimmer overlay */}
@@ -139,8 +139,8 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
         </div>
 
         {/* ── Header ── */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between mb-5 gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <motion.div
               className="h-10 w-10 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner shrink-0"
               style={{ background: `linear-gradient(135deg, ${primaryColor}30, ${accentColor}20)`, border: `1px solid ${primaryColor}30` }}

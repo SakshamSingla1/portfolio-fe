@@ -73,10 +73,10 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
       breadcrumb="Navlinks"
       onBack={() => navigate(-1)}
     >
-      <div className="p-4 sm:p-6">
+      <div className="px-3 py-4 sm:p-6">
         <div className="space-y-6 sm:space-y-8">
           <div
-            className="p-4 sm:p-6 rounded-xl shadow-sm border"
+            className="px-3 py-4 sm:p-6 rounded-xl shadow-sm border"
             style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral300 }}
           >
             <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
@@ -140,7 +140,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
           </div>
 
           <div
-            className="p-4 sm:p-6 rounded-xl shadow-sm border"
+            className="px-3 py-4 sm:p-6 rounded-xl shadow-sm border"
             style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral300 }}
           >
             <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>

@@ -126,7 +126,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     };
 
     return (
-        <div className="relative w-full mx-auto px-4 sm:px-6">
+        <div className="relative w-full mx-auto px-2 sm:px-4 lg:px-6">
             <AnimatePresence>
                 {isPreviewActive && (
                     <motion.div
@@ -167,7 +167,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 addButtonLabel="Add Theme"
                 addButtonOnClick={() => navigate(ADMIN_ROUTES.COLOR_THEME_ADD)}
             >
-                <div className="p-4 sm:p-6">
+                <div className="px-2 py-3 sm:p-6">
                     {colorThemes.length > 0 && (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-12">

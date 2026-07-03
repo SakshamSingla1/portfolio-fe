@@ -105,8 +105,8 @@ const CertificationFormTemplate = ({
             subtitle={mode === MODE.ADD ? "Add a professional certification" : mode === MODE.EDIT ? "Update certification information" : "View certification information"}
             onBack={() => navigate(-1)}
         >
-            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+            <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Basic Information
@@ -140,7 +140,7 @@ const CertificationFormTemplate = ({
                     </div>
                 </div>
 
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />
                         Certification Timeline
@@ -167,7 +167,7 @@ const CertificationFormTemplate = ({
                         />
                     </div>
                 </div>
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                         Credential Details
@@ -210,7 +210,7 @@ const CertificationFormTemplate = ({
                         />
                     </div>
                 </div>
-                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                         Certification Status

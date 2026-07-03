@@ -33,7 +33,7 @@ const FormShell: React.FC<FormShellProps> = ({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      style={{ padding: isMobile ? "8px 8px 16px" : "16px 16px 24px" }}
+      style={{ padding: isMobile ? "8px 4px 16px" : "16px 16px 24px" }}
     >
       {/* ── Page header card ────────────────────────── */}
       <div
@@ -52,7 +52,7 @@ const FormShell: React.FC<FormShellProps> = ({
           }}
         />
 
-        <div className={isMobile ? "px-4 py-3" : "px-5 py-4"}>
+        <div className={isMobile ? "px-3 py-3" : "px-5 py-4"}>
           {/* Breadcrumb / back navigation */}
           {(breadcrumb || onBack) && (
             <button

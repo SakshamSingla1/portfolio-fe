@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 import { motion } from "framer-motion";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -25,6 +26,7 @@ const ChangeEmailTab: React.FC = () => {
     const authService = useAuthService();
     const { showSnackbar } = useSnackbar();
     const colors = useColors();
+    const isMobile = useIsMobile();
 
     const [otpOpen, setOtpOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -83,7 +85,7 @@ const ChangeEmailTab: React.FC = () => {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                style={{ padding: "24px", width: "100%" }}
+                style={{ padding: isMobile ? "16px 12px" : "24px", width: "100%" }}
             >
                 <div style={{ marginBottom: "32px", display: "flex", alignItems: "center", gap: "12px" }}>
                     <div className="flex items-center justify-center p-2 rounded-xl"

@@ -92,7 +92,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
             breadcrumb="Education"
             onBack={onClose}
         >
-            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+            <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div
                     className="p-4 sm:p-5"
                     style={{
