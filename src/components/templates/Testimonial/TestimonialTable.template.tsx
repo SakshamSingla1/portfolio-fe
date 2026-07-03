@@ -10,6 +10,7 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { Testimonial } from "../../../services/useTestimonialService";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaComments } from "react-icons/fa";
 
 interface ITestimonialTableTemplateProps {
     testimonials: Testimonial[];
@@ -95,6 +96,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
     return (
         <ListingShell
             title="Testimonials"
+            icon={<FaComments />}
             description="Recommendations and reviews"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

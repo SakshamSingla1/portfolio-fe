@@ -10,6 +10,7 @@ import {
     FiChevronRight,
 } from "react-icons/fi";
 import { TbPalette } from "react-icons/tb";
+import { FaPalette } from "react-icons/fa";
 import { useColors } from "../../../utils/types";
 import { motion, AnimatePresence } from "framer-motion";
 import GlassCard from "../../atoms/GlassCard/GlassCard";
@@ -159,6 +160,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
 
             <ListingShell
                 title="Color Themes"
+                icon={<FaPalette />}
                 description="Custom portfolio style presets"
                 count={pagination.totalRecords}
                 isAddButtonVisible={true}

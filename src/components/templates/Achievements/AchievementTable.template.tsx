@@ -10,6 +10,7 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { Achievement } from "../../../services/useAchievementService";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaTrophy } from "react-icons/fa";
 
 interface IAchievementsTableTemplateProps {
     achievements: Achievement[];
@@ -96,6 +97,7 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
     return (
         <ListingShell
             title="Achievements"
+            icon={<FaTrophy />}
             description="Awards and milestones"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

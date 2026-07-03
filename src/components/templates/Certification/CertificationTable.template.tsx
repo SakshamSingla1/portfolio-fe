@@ -10,6 +10,7 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { Certification } from "../../../services/useCertificationService";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaCertificate } from "react-icons/fa";
 
 interface ICertificationsTableTemplateProps {
     certifications: Certification[];
@@ -102,6 +103,7 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
     return (
         <ListingShell
             title="Certifications"
+            icon={<FaCertificate />}
             description="Professional certifications"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

@@ -10,6 +10,7 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { convertToCamelCase } from "../../../utils/helper";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaCode } from "react-icons/fa";
 
 interface SkillTableTemplateProps {
     skills: SkillResponse[];
@@ -96,6 +97,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({
     return (
         <ListingShell
             title="Skills"
+            icon={<FaCode />}
             description="Technical skills and expertise"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

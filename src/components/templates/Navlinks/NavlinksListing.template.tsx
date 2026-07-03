@@ -11,6 +11,7 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 import { enumToNormalKey } from "../../../utils/helper";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaLink } from "react-icons/fa";
 
 interface INavlinkListTableTemplateProps {
     navlinks: NavlinkResponse[];
@@ -98,6 +99,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
     return (
         <ListingShell
             title="Navigation Links"
+            icon={<FaLink />}
             description="Portfolio navigation menu"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

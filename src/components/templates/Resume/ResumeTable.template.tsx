@@ -12,6 +12,7 @@ import { useResumeService } from "../../../services/useResumeService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaFileAlt } from "react-icons/fa";
 
 interface ResumeTableTemplateProps {
     resumes: DocumentUploadResponse[];
@@ -125,6 +126,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
     return (
         <ListingShell
             title="Resumes"
+            icon={<FaFileAlt />}
             description="Manage your resume files"
             count={pagination.totalRecords}
             isAddButtonVisible={false}

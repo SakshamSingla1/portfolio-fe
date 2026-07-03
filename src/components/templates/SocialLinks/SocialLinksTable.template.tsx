@@ -11,6 +11,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaShareAlt } from "react-icons/fa";
 
 interface SocialLinksTableTemplateProps {
     socialLinks: SocialLinkResponse[];
@@ -91,6 +92,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
     return (
         <ListingShell
             title="Social Links"
+            icon={<FaShareAlt />}
             description="Online profiles and presence"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

@@ -10,6 +10,7 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaShieldAlt } from "react-icons/fa";
 
 interface RoleTableTemplateProps {
     users: RoleListResponseDTO[];
@@ -89,6 +90,7 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
     return (
         <ListingShell
             title="Roles"
+            icon={<FaShieldAlt />}
             description="User roles and permissions"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

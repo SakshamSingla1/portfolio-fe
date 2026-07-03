@@ -10,6 +10,7 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { SkillDropdown } from "../../../services/useSkillService";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaProjectDiagram } from "react-icons/fa";
 
 interface ProjectsTableTemplateProps {
     projects: ProjectResponse[];
@@ -98,6 +99,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
     return (
         <ListingShell
             title="Projects"
+            icon={<FaProjectDiagram />}
             description="Portfolio projects and case studies"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

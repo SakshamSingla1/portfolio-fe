@@ -13,6 +13,7 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useProfileService } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaUsers } from "react-icons/fa";
 
 interface UserTableTemplateProps {
     users: UserResponse[];
@@ -123,6 +124,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     return (
         <ListingShell
             title="Users"
+            icon={<FaUsers />}
             description="Platform user accounts"
             count={pagination.totalRecords}
             isAddButtonVisible={false}

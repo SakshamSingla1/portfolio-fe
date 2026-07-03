@@ -395,7 +395,6 @@ const Tips = ({ colors }: { colors: any }) => (
   <div className="mt-6 space-y-8">
     {tips.map((section, si) => {
       const colorKey = `${section.color}500` as any;
-      const bgKey = `${section.color}50` as any;
       return (
         <motion.div key={section.category} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: si * 0.08 }}>
           <div className="flex items-center gap-2 mb-4">
@@ -738,15 +737,14 @@ export default function HelpPage() {
             { label: "FAQs",          value: `${faqs.length}`, color: "warning" },
           ].map((chip) => {
             const c5 = `${chip.color}500` as any;
-            const c50 = `${chip.color}50` as any;
             return (
               <div
                 key={chip.label}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border"
                 style={{
-                  backgroundColor: `${colors[c5]}10`,
-                  borderColor: `${colors[c5]}25`,
-                  color: colors[c5],
+                  backgroundColor: `${(colors as any)[c5]}10`,
+                  borderColor: `${(colors as any)[c5]}25`,
+                  color: (colors as any)[c5],
                 }}
               >
                 <span className="text-base font-black">{chip.value}</span>

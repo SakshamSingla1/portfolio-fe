@@ -12,6 +12,7 @@ import ListingShell from "../Shared/ListingShell.template";
 import type { ListingStat } from "../Shared/ListingShell.template";
 import type { INotificationTemplate } from "../../../services/useTemplateService";
 import type { ChannelFilter } from "../../pages/Templates/TemplatesListing.page";
+import { FaBell } from "react-icons/fa";
 
 interface Props {
     templates: INotificationTemplate[];
@@ -211,6 +212,7 @@ const TemplateListTableTemplate: React.FC<Props> = ({
     return (
         <ListingShell
             title="Notification Templates"
+            icon={<FaBell />}
             description="Email, SMS, and WhatsApp message templates"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

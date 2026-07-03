@@ -9,6 +9,7 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaEnvelope } from "react-icons/fa";
 
 interface ContactUsTableTemplateProps {
     contactUs: ContactUs[];
@@ -81,6 +82,7 @@ const ContactUsTableTemplate: React.FC<ContactUsTableTemplateProps> = ({
     return (
         <ListingShell
             title="Messages"
+            icon={<FaEnvelope />}
             description="Visitor inquiries and contact"
             count={pagination.totalRecords}
             isAddButtonVisible={false}

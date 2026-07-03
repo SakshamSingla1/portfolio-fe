@@ -19,6 +19,7 @@ interface ListingShellProps {
   description?: string;
   count?: number | null;
   accentColor?: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
   addButtonLabel?: string;
   addButtonOnClick?: () => void;
@@ -30,44 +31,26 @@ interface ListingShellProps {
   stats?: ListingStat[];
 }
 
-const StatCard: React.FC<{
+const StatChip: React.FC<{
   label: string;
   value: number;
   icon?: React.ReactNode;
-  isMobile: boolean;
   accentColor: string;
-}> = ({ label, value, icon, isMobile, accentColor }) => {
+  colors: ReturnType<typeof useColors>;
+}> = ({ label, value, icon, accentColor, colors }) => {
   const animatedValue = useCountUp(value);
-  const colors = useColors();
-
   return (
     <div
-      className="rounded-xl border flex flex-col items-center justify-center text-center p-4 transition-all duration-300 hover:shadow-sm"
+      className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border"
       style={{
-        background: colors.neutral50,
-        borderColor: colors.neutral300,
+        backgroundColor: `${accentColor}10`,
+        borderColor: `${accentColor}25`,
+        color: accentColor,
       }}
     >
-      {icon && (
-        <div className="mb-1.5 text-lg" style={{ color: accentColor }}>
-          {icon}
-        </div>
-      )}
-      <span
-        className="text-[10px] font-bold uppercase tracking-wider mb-1"
-        style={{ color: colors.neutral400 }}
-      >
-        {label}
-      </span>
-      <span
-        className="font-extrabold"
-        style={{
-          fontSize: isMobile ? "20px" : "24px",
-          color: colors.neutral900,
-        }}
-      >
-        {animatedValue}
-      </span>
+      {icon && <span style={{ fontSize: 11 }}>{icon}</span>}
+      <span className="font-black text-sm tabular-nums">{animatedValue}</span>
+      <span style={{ color: colors.neutral500 }}>{label}</span>
     </div>
   );
 };
@@ -77,6 +60,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
   description,
   count,
   accentColor,
+  icon,
   children,
   addButtonLabel,
   addButtonOnClick,
@@ -85,14 +69,13 @@ const ListingShell: React.FC<ListingShellProps> = ({
   searchValue,
   onSearchChange,
   filterContent,
-  stats
+  stats,
 }) => {
   const colors = useColors();
   const isMobile = useIsMobile();
   const [showFilters, setShowFilters] = useState(false);
 
   const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
-
   const accent = accentColor ?? colors.primary600;
 
   return (
@@ -100,85 +83,144 @@ const ListingShell: React.FC<ListingShellProps> = ({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      style={{ padding: isMobile ? "8px 8px 16px" : "16px 16px 24px" }}
+      style={{ padding: isMobile ? "8px 8px 16px" : "16px 16px 24px", position: "relative", overflow: "hidden" }}
     >
+      {/* Ambient blobs */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          top: "-20%", right: "-8%",
+          width: "45vw", height: "45vw",
+          background: `radial-gradient(circle, ${accent}, transparent)`,
+          filter: "blur(120px)",
+          opacity: 0.05,
+          zIndex: 0,
+        }}
+      />
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          bottom: "-10%", left: "-5%",
+          width: "30vw", height: "30vw",
+          background: `radial-gradient(circle, ${colors.secondary500 ?? colors.neutral400}, transparent)`,
+          filter: "blur(100px)",
+          opacity: 0.04,
+          zIndex: 0,
+        }}
+      />
+
+      {/* Header card */}
       <div
         className="rounded-2xl overflow-hidden mb-4"
         style={{
           background: colors.neutral0,
           border: `1.5px solid ${colors.neutral300}`,
           boxShadow: cardShadow,
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        <div
-          style={{
-            height: 3,
-            background: `linear-gradient(90deg, ${accent} 0%, ${accent}28 100%)`,
-          }}
-        />
+        {/* Accent gradient line */}
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${accent} 0%, ${accent}28 100%)` }} />
 
-        <div className={`flex items-center justify-between ${isMobile ? "px-4 py-3" : "px-5 py-4"}`}>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1
-                className="font-black tracking-tight"
-                style={{ fontSize: isMobile ? 17 : 20, color: colors.neutral900, letterSpacing: "-0.025em" }}
+        {/* Hero row */}
+        <div className={`flex items-center justify-between gap-4 ${isMobile ? "px-4 py-3.5" : "px-5 py-4"}`}>
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+            {icon && (
+              <div
+                className="flex items-center justify-center shrink-0 rounded-2xl"
+                style={{
+                  width: isMobile ? 44 : 52,
+                  height: isMobile ? 44 : 52,
+                  backgroundColor: `${accent}12`,
+                  border: `1.5px solid ${accent}25`,
+                  color: accent,
+                  fontSize: isMobile ? 18 : 22,
+                }}
               >
-                {title}
-              </h1>
-              {count !== null && Number(count) > 0 && (
-                <span
-                  className="text-[11px] font-bold px-2.5 py-0.5 rounded-full tabular-nums"
+                {icon}
+              </div>
+            )}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1
+                  className="font-black tracking-tight m-0"
                   style={{
-                    background: colors.neutral100,
-                    color: colors.neutral500,
-                    border: `1.5px solid ${colors.neutral300}`,
+                    fontSize: isMobile ? 18 : 24,
+                    color: colors.neutral900,
+                    letterSpacing: "-0.025em",
                   }}
                 >
-                  {count}
-                </span>
+                  {title}
+                </h1>
+                {count !== null && count !== undefined && Number(count) > 0 && (
+                  <span
+                    className="text-xs font-bold px-2.5 py-0.5 rounded-full tabular-nums"
+                    style={{
+                      background: `${accent}12`,
+                      color: accent,
+                      border: `1.5px solid ${accent}25`,
+                    }}
+                  >
+                    {count}
+                  </span>
+                )}
+              </div>
+              {description && (
+                <p className="text-xs mt-0.5 m-0" style={{ color: colors.neutral400 }}>
+                  {description}
+                </p>
               )}
             </div>
-            {description && (
-              <p className="text-xs mt-0.5" style={{ color: colors.neutral400 }}>
-                {description}
-              </p>
-            )}
           </div>
+
           {isAddButtonVisible && (
-            <div>
+            <div className="shrink-0">
               <Button
                 label={isMobile ? <FiPlus size={18} /> : addButtonLabel}
                 variant="primaryContained"
                 startIcon={isMobile ? undefined : <FiPlus />}
                 onClick={addButtonOnClick}
                 size={isMobile ? "small" : "medium"}
-                style={isMobile ? { minWidth: 36, width: 36, height: 36, borderRadius: "50%", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" } : {}}
+                style={
+                  isMobile
+                    ? {
+                        minWidth: 36,
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        padding: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }
+                    : {}
+                }
               />
             </div>
           )}
         </div>
 
-        {/* Stats Area */}
+        {/* Stat chips */}
         {stats && stats.length > 0 && (
           <div
-            className={`grid gap-4 ${isMobile ? "grid-cols-2 px-4 pb-3" : `grid-cols-${Math.min(stats.length, 4)} px-5 pb-4`}`}
-            style={{ borderTop: `1px solid ${colors.neutral100}`, paddingTop: 16 }}
+            className={`flex flex-wrap gap-2 ${isMobile ? "px-4 pb-3" : "px-5 pb-4"}`}
+            style={{ borderTop: `1px solid ${colors.neutral100}`, paddingTop: 12 }}
           >
             {stats.map((stat, idx) => (
-              <StatCard
+              <StatChip
                 key={idx}
                 label={stat.label}
                 value={stat.value}
                 icon={stat.icon}
-                isMobile={isMobile}
                 accentColor={accent}
+                colors={colors}
               />
             ))}
           </div>
         )}
 
-        {/* Filters/Search Area */}
+        {/* Filters / Search */}
         {(onSearchChange || filterContent) && (
           <div
             className={`${isMobile ? "px-4 pb-3" : "px-5 pb-4"}`}
@@ -205,7 +247,6 @@ const ListingShell: React.FC<ListingShellProps> = ({
                     {showFilters ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
                   </span>
                 </button>
-
                 {showFilters && (
                   <div className="space-y-3 pt-1">
                     {onSearchChange && (
@@ -252,12 +293,16 @@ const ListingShell: React.FC<ListingShellProps> = ({
           </div>
         )}
       </div>
+
+      {/* Content card */}
       <div
         className="rounded-2xl overflow-hidden"
         style={{
           background: colors.neutral0,
           border: `1.5px solid ${colors.neutral300}`,
           boxShadow: cardShadow,
+          position: "relative",
+          zIndex: 1,
         }}
       >
         {children}

@@ -10,6 +10,7 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaBookOpen } from "react-icons/fa";
 
 interface ExperienceTableTemplateProps {
     experiences: ExperienceResponse[];
@@ -85,6 +86,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
     return (
         <ListingShell
             title="Experience"
+            icon={<FaBookOpen />}
             description="Work history and roles"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

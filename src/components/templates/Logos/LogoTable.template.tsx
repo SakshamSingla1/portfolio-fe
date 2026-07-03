@@ -9,6 +9,7 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { type Logo } from '../../../services/useLogoService';
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaImage } from "react-icons/fa";
 
 interface LogoTableTemplateProps {
     logos: Logo[];
@@ -84,6 +85,7 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({
     return (
         <ListingShell
             title="Logos"
+            icon={<FaImage />}
             description="Technology logos and icons"
             count={pagination.totalRecords}
             isAddButtonVisible={true}

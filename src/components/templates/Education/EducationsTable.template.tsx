@@ -9,6 +9,7 @@ import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import { ADMIN_ROUTES, DEGREE_OPTIONS } from "../../../utils/constant";
 import type { Education } from "../../../services/useEducationService";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { FaGraduationCap } from "react-icons/fa";
 
 interface IEducationsTableTemplateProps {
     educations: Education[];
@@ -94,6 +95,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
     return (
         <ListingShell
             title="Education"
+            icon={<FaGraduationCap />}
             description="Academic background and degrees"
             count={pagination.totalRecords}
             isAddButtonVisible={true}
