@@ -38,6 +38,15 @@ const AdminBadge = ({ colors }: any) => (
   </span>
 );
 
+const SuperAdminBadge = ({ colors }: any) => (
+  <span
+    className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1"
+    style={{ backgroundColor: `${colors.error500}15`, color: colors.error600, border: `1px solid ${colors.error500}30` }}
+  >
+    <FaLock style={{ fontSize: 7 }} /> Super Admin
+  </span>
+);
+
 const SectionLabel = ({ text, colors }: { text: string; colors: any }) => (
   <p className="text-[10px] font-black uppercase tracking-[0.14em] mb-4 ml-1" style={{ color: colors.neutral400 }}>
     {text}
@@ -109,37 +118,37 @@ const allModules = [
     group: "Portfolio Content",
     icon: FiBook,
     items: [
-      { title: "Profile", desc: "Your identity, headline, bio, contact info, and avatar.", icon: FaUser, url: "/profile", admin: false },
-      { title: "Skills", desc: "Tech stack catalogue with proficiency levels and categories.", icon: FaCode, url: "/skills", admin: false },
-      { title: "Experience", desc: "Professional timeline with roles, companies, and tech used.", icon: FaBookOpen, url: "/experience", admin: false },
-      { title: "Education", desc: "Academic history — degrees, institutions, grades.", icon: FaGraduationCap, url: "/education", admin: false },
-      { title: "Projects", desc: "Showcase with screenshots, live demos, and source links.", icon: FaProjectDiagram, url: "/projects", admin: false },
-      { title: "Certifications", desc: "Professional certifications with issuer and verification links.", icon: FaCertificate, url: "/certifications", admin: false },
-      { title: "Achievements", desc: "Awards, recognitions, and notable milestones.", icon: FaTrophy, url: "/achievements", admin: false },
-      { title: "Testimonials", desc: "Client and colleague testimonials with ratings.", icon: FaComments, url: "/testimonials", admin: false },
+      { title: "Profile", desc: "Your identity, headline, bio, contact info, and avatar.", icon: FaUser, url: "/profile", admin: false, superAdmin: false },
+      { title: "Skills", desc: "Tech stack catalogue with proficiency levels and categories.", icon: FaCode, url: "/skills", admin: false, superAdmin: false },
+      { title: "Experience", desc: "Professional timeline with roles, companies, and tech used.", icon: FaBookOpen, url: "/experience", admin: false, superAdmin: false },
+      { title: "Education", desc: "Academic history — degrees, institutions, grades.", icon: FaGraduationCap, url: "/education", admin: false, superAdmin: false },
+      { title: "Projects", desc: "Showcase with screenshots, live demos, and source links.", icon: FaProjectDiagram, url: "/projects", admin: false, superAdmin: false },
+      { title: "Certifications", desc: "Professional certifications with issuer and verification links.", icon: FaCertificate, url: "/certifications", admin: false, superAdmin: false },
+      { title: "Achievements", desc: "Awards, recognitions, and notable milestones.", icon: FaTrophy, url: "/achievements", admin: false, superAdmin: false },
+      { title: "Testimonials", desc: "Client and colleague testimonials with ratings.", icon: FaComments, url: "/testimonials", admin: false, superAdmin: false },
     ],
   },
   {
     group: "Media & Branding",
     icon: FaMagic,
     items: [
-      { title: "Logos", desc: "Reusable tech and company logo assets used across modules.", icon: FaImage, url: "/logos", admin: false },
-      { title: "Resumes", desc: "Manage downloadable resume files for visitors.", icon: FaFileAlt, url: "/resumes", admin: false },
-      { title: "Color Themes", desc: "Preset and custom palettes to style your portfolio.", icon: FaPalette, url: "/themes", admin: false },
-      { title: "Social Links", desc: "External profile links shown on your public portfolio.", icon: FaShareAlt, url: "/social-links", admin: false },
-      { title: "Landing Page", desc: "Configure the features, FAQs, steps, and audience cards on your public landing page.", icon: FaGlobe, url: "/landing-management", admin: false },
+      { title: "Logos", desc: "Reusable tech and company logo assets used across modules.", icon: FaImage, url: "/logos", admin: false, superAdmin: true },
+      { title: "Resumes", desc: "Manage downloadable resume files for visitors.", icon: FaFileAlt, url: "/resumes", admin: false, superAdmin: false },
+      { title: "Color Themes", desc: "Preset and custom palettes to style your portfolio.", icon: FaPalette, url: "/themes", admin: false, superAdmin: false },
+      { title: "Social Links", desc: "External profile links shown on your public portfolio.", icon: FaShareAlt, url: "/social-links", admin: false, superAdmin: false },
+      { title: "Landing Page", desc: "Configure the features, FAQs, steps, and audience cards on your public landing page.", icon: FaGlobe, url: "/landing-management", admin: false, superAdmin: true },
     ],
   },
   {
     group: "Administration",
     icon: FiSettings,
     items: [
-      { title: "Messages", desc: "Inbox for contact form submissions from portfolio visitors.", icon: FaComments, url: "/messages", admin: false },
-      { title: "Nav Links", desc: "Control sidebar navigation order, icons, and visibility.", icon: FaLink, url: "/navlinks", admin: true },
-      { title: "Email Templates", desc: "Build notification templates with dynamic variable substitution.", icon: FaBell, url: "/notifications", admin: true },
-      { title: "Users", desc: "Manage platform user accounts and account status.", icon: FaUsers, url: "/users", admin: true },
-      { title: "Roles & Permissions", desc: "Define roles with granular per-module access control.", icon: FaShieldAlt, url: "/roles-permissions", admin: true },
-      { title: "Settings", desc: "Security settings — password, email, 2FA, SEO, GitHub.", icon: FaCog, url: "/settings", admin: false },
+      { title: "Messages", desc: "Inbox for contact form submissions from portfolio visitors.", icon: FaComments, url: "/messages", admin: false, superAdmin: false },
+      { title: "Nav Links", desc: "Control sidebar navigation order, icons, and visibility.", icon: FaLink, url: "/navlinks", admin: true, superAdmin: true },
+      { title: "Email Templates", desc: "Build notification templates with dynamic variable substitution.", icon: FaBell, url: "/notifications", admin: true, superAdmin: true },
+      { title: "Users", desc: "Manage platform user accounts and account status.", icon: FaUsers, url: "/users", admin: true, superAdmin: false },
+      { title: "Roles & Permissions", desc: "Define roles with granular per-module access control.", icon: FaShieldAlt, url: "/roles-permissions", admin: true, superAdmin: true },
+      { title: "Settings", desc: "Security settings — password, email, 2FA, SEO, GitHub.", icon: FaCog, url: "/settings", admin: false, superAdmin: false },
     ],
   },
 ];
@@ -322,15 +331,18 @@ const QuickStart = ({ colors }: { colors: any }) => (
 
 // ── Tab: All Modules ───────────────────────────────────────────────────────────
 
-const AllModules = ({ colors, isAdmin }: { colors: any; isAdmin: boolean }) => (
+const AllModules = ({ colors, isAdmin, isSuperAdmin }: { colors: any; isAdmin: boolean; isSuperAdmin: boolean }) => (
   <div className="mt-6 space-y-8">
-    {allModules.map((group, gi) => (
-      <motion.div key={group.group} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: gi * 0.06 }}>
-        <SectionLabel text={group.group} colors={colors} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {group.items
-            .filter((item) => !item.admin || isAdmin)
-            .map((item, ii) => (
+    {allModules.map((group, gi) => {
+      const visibleItems = group.items.filter((item) =>
+        item.superAdmin ? isSuperAdmin : (!item.admin || isAdmin)
+      );
+      if (visibleItems.length === 0) return null;
+      return (
+        <motion.div key={group.group} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: gi * 0.06 }}>
+          <SectionLabel text={group.group} colors={colors} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {visibleItems.map((item, ii) => (
               <motion.div key={item.title} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: gi * 0.06 + ii * 0.04 }}>
                 <Link
                   to={item.url}
@@ -354,7 +366,11 @@ const AllModules = ({ colors, isAdmin }: { colors: any; isAdmin: boolean }) => (
                     >
                       <item.icon style={{ fontSize: 15, color: colors.primary600 }} />
                     </div>
-                    {item.admin && <AdminBadge colors={colors} />}
+                    {item.superAdmin
+                      ? <SuperAdminBadge colors={colors} />
+                      : item.admin
+                        ? <AdminBadge colors={colors} />
+                        : null}
                   </div>
                   <div>
                     <p className="font-bold text-sm m-0" style={{ color: colors.neutral800 }}>{item.title}</p>
@@ -363,9 +379,30 @@ const AllModules = ({ colors, isAdmin }: { colors: any; isAdmin: boolean }) => (
                 </Link>
               </motion.div>
             ))}
+          </div>
+        </motion.div>
+      );
+    })}
+
+    {!isSuperAdmin && (
+      <Card
+        colors={colors}
+        style={{ borderColor: `${colors.error500}30`, backgroundColor: `${colors.error500}05` }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${colors.error500}15` }}>
+            <FaLock style={{ fontSize: 14, color: colors.error500 }} />
+          </div>
+          <div>
+            <p className="font-bold text-sm m-0" style={{ color: colors.neutral800 }}>Super Admin modules are hidden</p>
+            <p className="text-xs mt-0.5 leading-relaxed" style={{ color: colors.neutral500 }}>
+              Logos, Landing Page, Nav Links, Email Templates, and Roles & Permissions require a Super Admin account.
+              Contact your Super Admin to request elevated access.
+            </p>
+          </div>
         </div>
-      </motion.div>
-    ))}
+      </Card>
+    )}
 
     {!isAdmin && (
       <Card
@@ -379,7 +416,7 @@ const AllModules = ({ colors, isAdmin }: { colors: any; isAdmin: boolean }) => (
           <div>
             <p className="font-bold text-sm m-0" style={{ color: colors.neutral800 }}>Admin-only modules are hidden</p>
             <p className="text-xs mt-0.5 leading-relaxed" style={{ color: colors.neutral500 }}>
-              Nav Links, Email Templates, Users, and Roles & Permissions are only visible to admin-role accounts.
+              Users and other admin modules are only visible to Admin or Super Admin accounts.
               Contact your administrator to request elevated access.
             </p>
           </div>
@@ -680,17 +717,18 @@ export default function HelpPage() {
   const colors = useColors();
   const { user } = useAuthenticatedUser();
   const [activeTab, setActiveTab] = useState("start");
-  const isAdmin = user?.roleName !== "USER";
+  const isSuperAdmin = user?.roleName === "SUPER_ADMIN";
+  const isAdmin = user?.roleName === "ADMIN" || isSuperAdmin;
 
   const schema = useMemo<ITabsSchema[]>(
     () => [
       { label: "Quick Start",    value: "start",  icon: <FaRocket />,     component: <QuickStart colors={colors} /> },
-      { label: "All Modules",    value: "modules", icon: <FiLayout />,    component: <AllModules colors={colors} isAdmin={isAdmin} /> },
+      { label: "All Modules",    value: "modules", icon: <FiLayout />,    component: <AllModules colors={colors} isAdmin={isAdmin} isSuperAdmin={isSuperAdmin} /> },
       { label: "Tips",           value: "tips",   icon: <FaLightbulb />,  component: <Tips colors={colors} /> },
       { label: "Deployment",     value: "deploy", icon: <FaCloudUploadAlt />, component: <Deployment colors={colors} /> },
       { label: "FAQ",            value: "faq",    icon: <FiHelpCircle />, component: <FAQ colors={colors} /> },
     ],
-    [colors, isAdmin]
+    [colors, isAdmin, isSuperAdmin]
   );
 
   return (
