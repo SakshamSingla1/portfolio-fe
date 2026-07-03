@@ -10,7 +10,6 @@ import { type Skill, SkillLevelType } from "../../../services/useSkillService";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object().shape({
@@ -33,7 +32,6 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     const logoService = useLogoService();
     const navigate = useNavigate();
     const colors = useColors();
-    const { isDark } = useTheme();
 
     const [logos, setLogos] = useState<Logo[]>([]);
     const [selectedLogo, setSelectedLogo] = useState<Logo | null>(null);
@@ -99,9 +97,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         }
     }, [formik.values.logoId, logos]);
 
-    const cardShadow = isDark
-        ? "0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)"
-        : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
+    const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
     return (
         <FormShell
@@ -124,7 +120,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                         className="text-lg font-semibold mb-4 flex items-center"
                         style={{ color: colors.neutral900 }}
                     >
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }}></div>
                         Select Skill Logo
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -194,7 +190,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
                         className="text-lg font-semibold mb-4 flex items-center"
                         style={{ color: colors.neutral900 }}
                     >
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }}></div>
                         Classification
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

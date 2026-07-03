@@ -108,7 +108,7 @@ const CertificationFormTemplate = ({
             <div className="p-6 space-y-8">
                 <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Basic Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -142,7 +142,7 @@ const CertificationFormTemplate = ({
 
                 <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
-                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />
                         Certification Timeline
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -169,7 +169,7 @@ const CertificationFormTemplate = ({
                 </div>
                 <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                         Credential Details
                     </h3>
                     <div className="flex flex-col gap-6">
@@ -212,7 +212,7 @@ const CertificationFormTemplate = ({
                 </div>
                 <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold mb-4 flex items-center" style={sectionTitleStyle}>
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3" />
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                         Certification Status
                     </h3>
                     <CustomRadioGroup

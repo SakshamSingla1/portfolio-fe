@@ -80,7 +80,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
             style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral300 }}
           >
             <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
-              <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#f97316' }} />
+              <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
               Navlink Details
             </h3>
 
@@ -144,7 +144,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
             style={{ backgroundColor: colors.neutral0, borderColor: colors.neutral300 }}
           >
             <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
-              <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#22c55e' }} />
+              <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
               Navlink Status
             </h3>
 

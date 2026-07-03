@@ -7,7 +7,7 @@ import Button from "../../atoms/Button/Button";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { titleModification } from "../../../utils/helper";
 import { type Testimonial, type TestimonialRequest } from "../../../services/useTestimonialService";
-import { Status, StatusOptions } from "../../../utils/types";
+import { Status, StatusOptions, useColors } from "../../../utils/types";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import { useTestimonialService } from "../../../services/useTestimonialService";
 import { HTTP_STATUS } from "../../../utils/types";
@@ -15,6 +15,7 @@ import type { ImageUploadResponse } from "../../../services/useProfileService";
 import CustomRadioGroup from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { isRichTextEmpty } from "../../../utils/helper";
+import FormShell from "../Shared/FormShell.template";
 
 const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -45,6 +46,7 @@ const TestimonialFormTemplate = ({
 }: TestimonialFormProps) => {
 
     const navigate = useNavigate();
+    const colors = useColors();
     const testimonialService = useTestimonialService();
 
     const onClose = () => navigate(ADMIN_ROUTES.TESTIMONIALS);
@@ -95,23 +97,23 @@ const TestimonialFormTemplate = ({
         }
     };
 
-
+    const cardStyle: React.CSSProperties = {
+        background: colors.neutral0,
+        border: `1.5px solid ${colors.neutral300}`,
+    };
+    const sectionTitleStyle: React.CSSProperties = { color: colors.neutral800 };
 
     return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? "Add Testimonial" : mode === MODE.EDIT ? "Edit Testimonial" : "Testimonial Details"}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.ADD ? "Add a professional testimonial" : mode === MODE.EDIT ? "Update testimonial information" : "View testimonial information"}
-                </p>
-            </div>
-
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+        <FormShell
+            title={mode === MODE.ADD ? "Add Testimonial" : mode === MODE.EDIT ? "Edit Testimonial" : "Testimonial Details"}
+            subtitle={mode === MODE.ADD ? "Add a professional testimonial from a client or colleague" : mode === MODE.EDIT ? "Update testimonial information" : "View testimonial details"}
+            breadcrumb="Testimonials"
+            onBack={onClose}
+        >
+            <div className="p-6 space-y-8">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Testimonial Details
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -119,18 +121,12 @@ const TestimonialFormTemplate = ({
                             label="Name"
                             placeholder="Enter Name"
                             value={formik.values.name}
-                            onChange={e =>
-                                formik.setFieldValue(
-                                    "name",
-                                    titleModification(e.target.value)
-                                )
-                            }
+                            onChange={e => formik.setFieldValue("name", titleModification(e.target.value))}
                             required={true}
                             error={formik.touched.name && Boolean(formik.errors.name)}
                             helperText={String(formik.touched.name && formik.errors.name)}
                             disabled={mode === MODE.VIEW}
                         />
-
                         <TextField
                             label="Role"
                             placeholder="Enter Role"
@@ -140,7 +136,6 @@ const TestimonialFormTemplate = ({
                             helperText={String(formik.touched.role && formik.errors.role)}
                             disabled={mode === MODE.VIEW}
                         />
-
                         <TextField
                             label="Company"
                             placeholder="Enter Company"
@@ -150,13 +145,11 @@ const TestimonialFormTemplate = ({
                             helperText={String(formik.touched.company && formik.errors.company)}
                             disabled={mode === MODE.VIEW}
                         />
-
                     </div>
                 </div>
-
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />
                         Profile Details
                     </h3>
                     <div className="flex flex-col gap-6">
@@ -171,14 +164,7 @@ const TestimonialFormTemplate = ({
                         />
                         <ImageUpload
                             label="Image"
-                            value={
-                                formik.values.imageId
-                                    ? { 
-                                        url: formik.values.imageUrl,
-                                        publicId: formik.values.imageId,
-                                    }
-                                    : null
-                            }
+                            value={formik.values.imageId ? { url: formik.values.imageUrl, publicId: formik.values.imageId } : null}
                             onChange={(value) => {
                                 formik.setFieldValue("imageUrl", value?.url || "");
                                 formik.setFieldValue("imageId", value?.publicId || "");
@@ -187,19 +173,15 @@ const TestimonialFormTemplate = ({
                             disabled={mode === MODE.VIEW || isUploading}
                             maxSize={5}
                             aspectRatio="wide"
-                            helperText={
-                                isUploading
-                                    ? "Uploading..."
-                                    : "Image · Max 5MB"
-                            }
+                            helperText={isUploading ? "Uploading..." : "Image · Max 5MB"}
                             required={true}
                             error={formik.touched.imageUrl && Boolean(formik.errors.imageUrl)}
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold flex items-center mb-4">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                         Message and Order
                     </h3>
                     <div className="flex flex-col gap-6">
@@ -223,9 +205,9 @@ const TestimonialFormTemplate = ({
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3" />
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                         Testimonial Status
                     </h3>
                     <CustomRadioGroup
@@ -238,11 +220,7 @@ const TestimonialFormTemplate = ({
                     />
                 </div>
                 <div className="flex justify-between gap-3">
-                    <Button
-                        label="Cancel"
-                        variant="tertiaryContained"
-                        onClick={onClose}
-                    />
+                    <Button label="Cancel" variant="tertiaryContained" onClick={onClose} />
                     {mode !== MODE.VIEW && (
                         <Button
                             label={mode === MODE.ADD ? "Add" : "Update"}
@@ -253,7 +231,7 @@ const TestimonialFormTemplate = ({
                     )}
                 </div>
             </div>
-        </div>
+        </FormShell>
     );
 };
 

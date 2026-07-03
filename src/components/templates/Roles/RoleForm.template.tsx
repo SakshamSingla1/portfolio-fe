@@ -379,10 +379,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                                                                 return (
                                                                     <label
                                                                         key={permission.id}
-                                                                        className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all duration-200 ${isSelected
-                                                                            ? 'border-blue-500 bg-blue-50'
-                                                                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                                                            }`}
+                                                                        className="flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all duration-200"
                                                                         style={{
                                                                             borderColor: isSelected ? colors.primary500 : colors.neutral200,
                                                                             backgroundColor: isSelected ? colors.primary50 : colors.neutral50

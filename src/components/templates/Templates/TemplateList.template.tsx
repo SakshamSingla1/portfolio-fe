@@ -193,11 +193,9 @@ const TemplateListTableTemplate: React.FC<Props> = ({
                         onClick={() => setChannelFilter(key)}
                         className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium transition-all"
                         style={{
-                            background: active
-                                ? isDark ? colors.primary800 : colors.primary100
-                                : isDark ? colors.neutral800 : colors.neutral100,
+                            background: active ? colors.primary100 : colors.neutral100,
                             color: active ? colors.primary700 : colors.neutral500,
-                            border: `1px solid ${active ? colors.primary300 : isDark ? colors.neutral700 : colors.neutral300}`,
+                            border: `1px solid ${active ? colors.primary300 : colors.neutral300}`,
                         }}
                     >
                         {icon}

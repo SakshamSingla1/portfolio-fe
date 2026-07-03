@@ -6,11 +6,12 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
-import { Status } from '../../../utils/types';
+import { Status, useColors } from '../../../utils/types';
 import { makeRoute } from '../../../utils/helper';
 import { type SocialLink, type SocialLinkResponse } from '../../../services/useSocialLinkService';
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 import { SocialLinkPlatformOptions } from '../../../utils/constant';
+import FormShell from '../Shared/FormShell.template';
 
 interface SocialLinksFormTemplateProps {
     onSubmit: (values: SocialLink) => void;
@@ -31,6 +32,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
     socialLink,
 }) => {
     const navigate = useNavigate();
+    const colors = useColors();
 
     const formik = useFormik<SocialLink>({
         initialValues: {
@@ -44,21 +46,20 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
         onSubmit,
     });
 
+    const cardStyle: React.CSSProperties = { background: colors.neutral0, border: `1.5px solid ${colors.neutral300}` };
+    const sectionTitleStyle: React.CSSProperties = { color: colors.neutral800 };
 
     return (
-        <div className="mb-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {mode === MODE.ADD ? 'Add Social Link' : mode === MODE.EDIT ? 'Edit Social Link' : 'Social Link Details'}
-                </h2>
-                <p className="text-gray-600">
-                    {mode === MODE.VIEW ? 'View social link details' : 'Configure social link settings'}
-                </p>
-            </div>
-            <div className="space-y-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+        <FormShell
+            title={mode === MODE.ADD ? 'Add Social Link' : mode === MODE.EDIT ? 'Edit Social Link' : 'Social Link Details'}
+            subtitle={mode === MODE.VIEW ? 'View social link details' : 'Configure your public profile connection'}
+            breadcrumb="Social Links"
+            onBack={() => navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS, {}))}
+        >
+            <div className="p-6 space-y-8">
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Social Link Details
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -68,16 +69,14 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             options={SocialLinkPlatformOptions}
                             value={SocialLinkPlatformOptions.find(option => option.value === formik.values.platform) || null}
                             onSearch={() => { }}
-                            onChange={value => {
-                                formik.setFieldValue("platform", value?.value ?? null);
-                            }}
+                            onChange={value => { formik.setFieldValue("platform", value?.value ?? null); }}
                             required
                             error={formik.touched.platform && Boolean(formik.errors.platform)}
                             helperText={formik.touched.platform && formik.errors.platform ? String(formik.errors.platform) : ""}
                             isDisabled={mode !== MODE.ADD}
                         />
                         <TextField
-                            label="Url"
+                            label="URL"
                             placeholder="https://example.com"
                             fullWidth
                             {...formik.getFieldProps('url')}
@@ -87,8 +86,8 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                             helperText={formik.touched.url && formik.errors.url ? String(formik.errors.url) : ""}
                         />
                         <TextField
-                            label="Index"
-                            placeholder="Order"
+                            label="Display Order"
+                            placeholder="e.g. 1, 2, 3"
                             type="text"
                             fullWidth
                             {...formik.getFieldProps('order')}
@@ -99,31 +98,22 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                         />
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                    <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                         Social Link Status
                     </h3>
                     <CustomRadioGroup
                         name="status"
                         label=""
-                        options={Object.values(Status).map((status) => ({
-                            value: status,
-                            label: status,
-                        }))}
+                        options={Object.values(Status).map((status) => ({ value: status, label: status }))}
                         value={formik.values.status || ''}
                         onChange={formik.handleChange}
                         disabled={mode === MODE.VIEW}
                     />
                 </div>
-                <div className="flex justify-between gap-3 pt-4">
-                    <Button
-                        label="Cancel"
-                        variant="tertiaryContained"
-                        onClick={() =>
-                            navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS, {}))
-                        }
-                    />
+                <div className="flex justify-between gap-3">
+                    <Button label="Cancel" variant="tertiaryContained" onClick={() => navigate(makeRoute(ADMIN_ROUTES.SOCIAL_LINKS, {}))} />
                     {mode !== MODE.VIEW && (
                         <Button
                             label={mode === MODE.ADD ? 'Add' : 'Update'}
@@ -134,7 +124,7 @@ const SocialLinksFormTemplate: React.FC<SocialLinksFormTemplateProps> = ({
                     )}
                 </div>
             </div>
-        </div>
+        </FormShell>
     );
 };
 

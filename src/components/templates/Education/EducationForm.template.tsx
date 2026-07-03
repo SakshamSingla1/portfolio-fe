@@ -106,7 +106,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         className="text-lg font-semibold mb-4 flex items-center"
                         style={{ color: colors.neutral900 }}
                     >
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Basic Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,7 +152,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         className="text-lg font-semibold mb-4 flex items-center"
                         style={{ color: colors.neutral900 }}
                     >
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                         Details
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -231,7 +231,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                         className="text-lg font-semibold mb-4 flex items-center"
                         style={{ color: colors.neutral900 }}
                     >
-                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />
                         Timeline
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -279,7 +279,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             className="text-lg font-semibold mb-4 flex items-center"
                             style={{ color: colors.neutral900 }}
                         >
-                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                            <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                             Description
                         </h3>
                         <RichTextEditor

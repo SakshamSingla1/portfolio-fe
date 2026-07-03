@@ -215,7 +215,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             <div className="p-6 space-y-8">
                 <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+                        <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Basic Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -418,7 +418,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                         />
 
                                         {isPrimary && !!image && (
-                                            <div className="absolute top-11 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/90 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest shadow-lg z-10 border border-white/20">
+                                            <div className="absolute top-11 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest shadow-lg z-10 border border-white/20" style={{ backgroundColor: colors.primary600 }}>
                                                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                                                 Cover Image
                                             </div>
