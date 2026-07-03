@@ -1,10 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import ListingContactUsPage from "../../components/pages/ContactUs/ListingContactUs.page";
 
+import PermissionGuard from "../PermissionGuard";
+
 const ContactUsRoutes = () => {
     return (
         <Routes>
-            <Route index element={<ListingContactUsPage />} />
+            <Route index element={<PermissionGuard required="VIEW"><ListingContactUsPage /></PermissionGuard>} />
         </Routes>
     );
 };

@@ -3,14 +3,15 @@ import ListingRolesPage from "../../components/pages/RolePermissions/ListingRole
 import AddRolePage from "../../components/pages/RolePermissions/AddRole.page";
 import EditRolePage from "../../components/pages/RolePermissions/EditRole.page";
 import ViewRolePage from "../../components/pages/RolePermissions/ViewRole.page";
+import PermissionGuard from "../PermissionGuard";
 
 const RoleRoutes = () => {
     return (
         <Routes>
-            <Route index element={<ListingRolesPage />} />
-            <Route path="/add" element={<AddRolePage />} />
-            <Route path="/:id/edit" element={<EditRolePage />} />
-            <Route path="/:id" element={<ViewRolePage />} />
+            <Route index element={<PermissionGuard required="VIEW"><ListingRolesPage /></PermissionGuard>} />
+            <Route path="/add" element={<PermissionGuard required="ADD"><AddRolePage /></PermissionGuard>} />
+            <Route path="/:id/edit" element={<PermissionGuard required="EDIT"><EditRolePage /></PermissionGuard>} />
+            <Route path="/:id" element={<PermissionGuard required="VIEW"><ViewRolePage /></PermissionGuard>} />
         </Routes>
     );
 };

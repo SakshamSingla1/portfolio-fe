@@ -7,6 +7,7 @@ import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from "@mui/material";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
+import { usePermissionHelper } from "../../../hooks/usePermissionHelper";
 
 export interface ListingStat {
   label: string;
@@ -73,6 +74,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
 }) => {
   const colors = useColors();
   const isMobile = useIsMobile();
+  const { canAdd } = usePermissionHelper();
   const [showFilters, setShowFilters] = useState(false);
 
   const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
@@ -174,7 +176,7 @@ const ListingShell: React.FC<ListingShellProps> = ({
             </div>
           </div>
 
-          {isAddButtonVisible && (
+          {isAddButtonVisible && canAdd && (
             <div className="shrink-0">
               <Button
                 label={isMobile ? <FiPlus size={18} /> : addButtonLabel}

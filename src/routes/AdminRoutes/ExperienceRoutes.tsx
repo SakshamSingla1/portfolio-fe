@@ -3,14 +3,15 @@ import ListingExperiencePage from "../../components/pages/Experience/ListingExpe
 import AddExperiencePage from "../../components/pages/Experience/AddExperience.page";
 import EditExperiencePage from "../../components/pages/Experience/EditExperience.page";
 import ViewExperiencePage from "../../components/pages/Experience/ViewExperience.page";
+import PermissionGuard from "../PermissionGuard";
 
 const ExperienceRoutes = () => {
     return (
         <Routes>
-            <Route index element={<ListingExperiencePage />} />
-            <Route path="add" element={<AddExperiencePage />} />
-            <Route path=":id/edit" element={<EditExperiencePage />} />
-            <Route path=":id" element={<ViewExperiencePage />} />
+            <Route index element={<PermissionGuard required="VIEW"><ListingExperiencePage /></PermissionGuard>} />
+            <Route path="add" element={<PermissionGuard required="ADD"><AddExperiencePage /></PermissionGuard>} />
+            <Route path=":id/edit" element={<PermissionGuard required="EDIT"><EditExperiencePage /></PermissionGuard>} />
+            <Route path=":id" element={<PermissionGuard required="VIEW"><ViewExperiencePage /></PermissionGuard>} />
         </Routes>
     );
 };

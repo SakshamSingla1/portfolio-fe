@@ -3,14 +3,15 @@ import ListingTestimonialPage from "../../components/pages/Testimonial/ListingTe
 import AddTestimonialPage from "../../components/pages/Testimonial/AddTestimonial.page";
 import UpdateTestimonialPage from "../../components/pages/Testimonial/UpdateTestimonial.page";
 import ViewTestimonialPage from "../../components/pages/Testimonial/ViewTestimonial.page";
+import PermissionGuard from "../PermissionGuard";
 
 const TestimonialRoutes = () => {
     return (
         <Routes>
-            <Route index element={<ListingTestimonialPage />} />
-            <Route path="add" element={<AddTestimonialPage />} />
-            <Route path=":id/edit" element={<UpdateTestimonialPage />} />
-            <Route path=":id" element={<ViewTestimonialPage />} />
+            <Route index element={<PermissionGuard required="VIEW"><ListingTestimonialPage /></PermissionGuard>} />
+            <Route path="add" element={<PermissionGuard required="ADD"><AddTestimonialPage /></PermissionGuard>} />
+            <Route path=":id/edit" element={<PermissionGuard required="EDIT"><UpdateTestimonialPage /></PermissionGuard>} />
+            <Route path=":id" element={<PermissionGuard required="VIEW"><ViewTestimonialPage /></PermissionGuard>} />
         </Routes>
     );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
+import { usePermissionHelper } from "../../../hooks/usePermissionHelper";
 
 interface ActionButtonsProps {
   onEdit?: () => void;
@@ -10,6 +11,7 @@ interface ActionButtonsProps {
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({ onEdit, onView, onDelete }) => {
   const colors = useColors();
+  const { canEdit, canView, canDelete } = usePermissionHelper();
 
   const btnBase: React.CSSProperties = {
     width: 30,
@@ -27,7 +29,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onEdit, onView, onDelete 
 
   return (
     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-      {onEdit && (
+      {onEdit && canEdit && (
         <button
           onClick={(e) => { e.stopPropagation(); onEdit(); }}
           title="Edit"
@@ -50,7 +52,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onEdit, onView, onDelete 
           <FiEdit2 size={13} />
         </button>
       )}
-      {onView && (
+      {onView && canView && (
         <button
           onClick={(e) => { e.stopPropagation(); onView(); }}
           title="View details"
@@ -73,7 +75,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onEdit, onView, onDelete 
           <FiEye size={13} />
         </button>
       )}
-      {onDelete && (
+      {onDelete && canDelete && (
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
           title="Delete"
