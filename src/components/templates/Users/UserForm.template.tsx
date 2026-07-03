@@ -95,8 +95,8 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
             breadcrumb="Users"
             onBack={onClose}
         >
-            <div className="p-6 space-y-8">
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         User Information
@@ -107,7 +107,7 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
                         <TextField label="Email Address" {...formik.getFieldProps("email")} disabled={true} fullWidth />
                     </div>
                 </div>
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                         Role & Permissions
@@ -129,7 +129,7 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
                         </div>
                     </div>
                 </div>
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                         Account Status

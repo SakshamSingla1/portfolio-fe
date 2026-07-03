@@ -167,10 +167,10 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 addButtonLabel="Add Theme"
                 addButtonOnClick={() => navigate(ADMIN_ROUTES.COLOR_THEME_ADD)}
             >
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                     {colorThemes.length > 0 && (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-12">
                                 {colorThemes.map((theme, i) => (
                                     <motion.div
                                         key={theme.id || theme.themeName}

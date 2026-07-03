@@ -217,9 +217,9 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
             breadcrumb="Roles"
             onBack={() => navigate(-1)}
         >
-            <div className="p-6">
-                <div className="space-y-8">
-                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
+            <div className="p-4 sm:p-6">
+                <div className="space-y-6 sm:space-y-8">
+                    <div className="p-4 sm:p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                             Role Details
@@ -249,7 +249,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                         </div>
                     </div>
 
-                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
+                    <div className="p-4 sm:p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
                             Role Status
@@ -268,7 +268,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                         />
                     </div>
 
-                    <div className="p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
+                    <div className="p-4 sm:p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: colors.neutral900 }}>
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                             Permissions

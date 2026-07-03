@@ -85,7 +85,7 @@ const HintText = ({ text, colors }: { text: string; colors: ReturnType<typeof us
 );
 
 const TwoCol = ({ children }: { children: React.ReactNode }) => (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {children}
     </div>
 );

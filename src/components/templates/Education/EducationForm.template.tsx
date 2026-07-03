@@ -92,11 +92,11 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
             breadcrumb="Education"
             onBack={onClose}
         >
-            <div className="space-y-8" style={{ padding: "24px" }}>
+            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div
+                    className="p-4 sm:p-5"
                     style={{
                         background: colors.neutral50,
-                        padding: "20px",
                         borderRadius: "12px",
                         border: "1px solid " + colors.neutral200,
                         boxShadow: cardShadow,
@@ -140,9 +140,9 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     </div>
                 </div>
                 <div
+                    className="p-4 sm:p-5"
                     style={{
                         background: colors.neutral50,
-                        padding: "20px",
                         borderRadius: "12px",
                         border: "1px solid " + colors.neutral200,
                         boxShadow: cardShadow,
@@ -219,9 +219,9 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     </div>
                 </div>
                 <div
+                    className="p-4 sm:p-5"
                     style={{
                         background: colors.neutral50,
-                        padding: "20px",
                         borderRadius: "12px",
                         border: "1px solid " + colors.neutral200,
                         boxShadow: cardShadow,
@@ -266,9 +266,9 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                     </div>
                 </div>
                 <div
+                    className="p-4 sm:p-5"
                     style={{
                         background: colors.neutral50,
-                        padding: "20px",
                         borderRadius: "12px",
                         border: "1px solid " + colors.neutral200,
                         boxShadow: cardShadow,

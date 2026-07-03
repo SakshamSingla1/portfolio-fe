@@ -134,7 +134,7 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {items.map(({ label, value, detail, color }) => (
         <motion.div
           key={label}

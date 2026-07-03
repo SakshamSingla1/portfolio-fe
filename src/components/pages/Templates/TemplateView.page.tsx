@@ -403,7 +403,7 @@ const TemplateViewPage: React.FC = () => {
                         {/* Email extra fields */}
                         {activeTab === "email" && (template.emailTo || template.emailCc || template.emailBcc || template.emailReplyTo) && (
                             <div
-                                className="grid grid-cols-2 gap-3 pt-4 border-t"
+                                className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t"
                                 style={{ borderColor: isDark ? colors.neutral700 : colors.neutral100 }}
                             >
                                 {[

@@ -212,8 +212,8 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             subtitle={mode === MODE.ADD ? "Showcase your work and contributions" : mode === MODE.EDIT ? "Update project details" : "View project information"}
             onBack={() => navigate(-1)}
         >
-            <div className="p-6 space-y-8">
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
                         Basic Information
@@ -245,7 +245,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     </div>
                 </div>
 
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
                         Technologies Used
@@ -296,7 +296,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     </div>
                 </div>
 
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
                         Timeline
@@ -337,7 +337,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     </div>
                 </div>
 
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-red-500 rounded-full mr-3" />
                         GitHub Repositories
@@ -382,7 +382,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             </p>
                         )}
                 </div>
-                <div className="p-6 rounded-xl shadow-sm gap-3" style={cardStyle}>
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm gap-3" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-orange-500 rounded-xl mr-3" />
                         Project Images
@@ -458,7 +458,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     )}
                 </div>
 
-                <div className="p-6 rounded-xl shadow-sm" style={cardStyle}>
+                <div className="p-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 bg-pink-500 rounded-full mr-3" />
                         Project Description

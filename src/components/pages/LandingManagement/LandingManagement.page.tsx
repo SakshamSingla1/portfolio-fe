@@ -260,7 +260,7 @@ const LandingManagement = () => {
             title="Landing Page Management"
             subtitle="Manage hero content, features, FAQs, steps, audience cards, and testimonials"
         >
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
                 <Tabs schema={tabSchema} value={activeTab} setValue={setActiveTab} fullWidth />
             </div>
 
