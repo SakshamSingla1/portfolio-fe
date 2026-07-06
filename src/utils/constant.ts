@@ -91,6 +91,7 @@ export const ADMIN_ROUTES = {
     LOGO_VIEW: "/logos/:id",
 
     USER: "/users",
+    USER_ADD: "/users/add",
     USER_EDIT: "/users/:id/edit",
     USER_VIEW: "/users/:id",
 

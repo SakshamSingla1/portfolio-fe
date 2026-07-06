@@ -39,6 +39,17 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
     logo: false,
   });
 
+  const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreviewUrl);
+      }
+    };
+  }, [logoPreviewUrl]);
+
   const onClose = () => navigate(ADMIN_ROUTES.LOGO);
 
   const devicon = (slug: string, variant = "original") => {
@@ -53,9 +64,33 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
+      let url = values.url;
+
+      if (pendingLogoFile) {
+        setIsUploading((prev) => ({ ...prev, logo: true }));
+        try {
+          const response = await profileService.uploadLogo(pendingLogoFile);
+          if (response.status === HTTP_STATUS.OK) {
+            const asset = response.data.data;
+            url = asset.path;
+          } else {
+            setSubmitting(false);
+            return;
+          }
+        } catch {
+          setSubmitting(false);
+          return;
+        } finally {
+          setIsUploading((prev) => ({ ...prev, logo: false }));
+        }
+      }
+
       setSubmitting(true);
       if (mode !== MODE.VIEW) {
-        await onSubmit(values);
+        await onSubmit({
+          name: values.name,
+          url,
+        });
       } else {
         onClose();
       }
@@ -64,18 +99,20 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
   });
 
   const uploadLogo = async (file: File): Promise<ImageUploadResponse> => {
-    setIsUploading((prev) => ({ ...prev, logo: true }));
-    try {
-      const response = await profileService.uploadLogo(file);
-      if (response.status === HTTP_STATUS.OK) {
-        const asset = response.data.data;
-        formik.setFieldValue("url", asset.path);
-        return { url: asset.path, publicId: asset.id };
-      }
-      throw new Error("Upload failed");
-    } finally {
-      setIsUploading((prev) => ({ ...prev, logo: false }));
+    const previewUrl = URL.createObjectURL(file);
+    setPendingLogoFile(file);
+    setLogoPreviewUrl(previewUrl);
+    formik.setFieldValue("url", previewUrl);
+    return { url: previewUrl, publicId: "" };
+  };
+
+  const handleLogoClear = () => {
+    if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(logoPreviewUrl);
     }
+    setPendingLogoFile(null);
+    setLogoPreviewUrl(null);
+    formik.setFieldValue("url", "");
   };
 
   useEffect(() => {
@@ -173,7 +210,11 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
               <ImageUpload
                 label=""
                 value={formik.values.url ? { url: formik.values.url } : null}
-                onChange={(value) => formik.setFieldValue("url", value?.url || "")}
+                onChange={(value) => {
+                  if (!value) {
+                    handleLogoClear();
+                  }
+                }}
                 onUpload={uploadLogo}
                 disabled={mode === MODE.VIEW || isUploading.logo}
                 maxSize={5}

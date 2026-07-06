@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
@@ -28,8 +28,7 @@ const validationSchema = Yup.object({
     ),
     issuer: Yup.string().required("Issuer is required"),
     achievedAt: Yup.date().required("Achieved at is required"),
-    proofUrl: Yup.string().url("Invalid URL").required("Proof URL is required"),
-    proofPublicId: Yup.string().required("Proof public ID is required"),
+    hasImage: Yup.boolean().oneOf([true], "Proof image is required"),
     order: Yup.string().required("Order is required"),
     status: Yup.string().required("Status is required"),
 });
@@ -38,6 +37,10 @@ interface AchievementFormProps {
     onSubmit: (values: AchievementRequest) => Promise<void>;
     mode: string;
     achievement?: Achievement | null;
+}
+
+interface AchievementFormValues extends AchievementRequest {
+    hasImage: boolean;
 }
 
 const AchievementFormTemplate = ({
@@ -52,9 +55,18 @@ const AchievementFormTemplate = ({
 
     const onClose = () => navigate(ADMIN_ROUTES.ACHIEVEMENTS);
 
-    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [pendingProofFile, setPendingProofFile] = useState<File | null>(null);
+    const [proofPreviewUrl, setProofPreviewUrl] = useState<string | null>(null);
 
-    const formik = useFormik<AchievementRequest>({
+    useEffect(() => {
+        return () => {
+            if (proofPreviewUrl && proofPreviewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(proofPreviewUrl);
+            }
+        };
+    }, [proofPreviewUrl]);
+
+    const formik = useFormik<AchievementFormValues>({
         initialValues: {
             title: achievement?.title || "",
             description: achievement?.description || "",
@@ -64,13 +76,40 @@ const AchievementFormTemplate = ({
             proofPublicId: achievement?.proofPublicId || "",
             order: achievement?.order || "",
             status: achievement?.status || Status.ACTIVE,
+            hasImage: !!achievement?.proofUrl,
         },
         enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
+            let proofUrl = values.proofUrl;
+            let proofPublicId = values.proofPublicId;
+
+            if (pendingProofFile) {
+                try {
+                    const response = await achievementService.uploadImage(pendingProofFile);
+                    if (response.status === HTTP_STATUS.OK) {
+                        const asset = response.data.data;
+                        proofUrl = asset.path;
+                        proofPublicId = asset.publicId;
+                    } else {
+                        setSubmitting(false);
+                        return;
+                    }
+                } catch {
+                    setSubmitting(false);
+                    return;
+                }
+            }
+
             const payload = {
-                ...values,
+                title: values.title,
                 description: isRichTextEmpty(values.description) ? "" : values.description,
+                issuer: values.issuer,
+                achievedAt: values.achievedAt,
+                proofUrl,
+                proofPublicId,
+                order: values.order,
+                status: values.status,
             };
             setSubmitting(true);
             if (mode !== MODE.VIEW) await onSubmit(payload);
@@ -79,22 +118,28 @@ const AchievementFormTemplate = ({
         },
     });
 
-    const uploadProof = async (file: File): Promise<ImageUploadResponse> => {
-        setIsUploading(true);
-        try {
-            const response = await achievementService.uploadImage(file);
-            if (response.status === HTTP_STATUS.OK) {
-                const asset = response.data.data;
-                formik.setFieldValue("proofUrl", asset.path);
-                formik.setFieldValue("proofPublicId", asset.id);
-                return { url: asset.path, publicId: asset.id };
-            }
-            throw new Error();
-        } catch {
-            throw new Error();
-        } finally {
-            setIsUploading(false);
+    const handleProofSelect = (file: File) => {
+        const previewUrl = URL.createObjectURL(file);
+        setPendingProofFile(file);
+        setProofPreviewUrl(previewUrl);
+        formik.setFieldValue("hasImage", true);
+        return previewUrl;
+    };
+
+    const handleProofClear = () => {
+        if (proofPreviewUrl && proofPreviewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(proofPreviewUrl);
         }
+        setPendingProofFile(null);
+        setProofPreviewUrl(null);
+        formik.setFieldValue("proofUrl", "");
+        formik.setFieldValue("proofPublicId", "");
+        formik.setFieldValue("hasImage", false);
+    };
+
+    const uploadProof = async (file: File): Promise<ImageUploadResponse> => {
+        const url = handleProofSelect(file);
+        return { url, publicId: "" };
     };
 
     const cardStyle: React.CSSProperties = {
@@ -192,7 +237,9 @@ const AchievementFormTemplate = ({
                         <ImageUpload
                             label="Proof"
                             value={
-                                formik.values.proofPublicId
+                                proofPreviewUrl
+                                    ? { url: proofPreviewUrl, publicId: "" }
+                                    : formik.values.proofPublicId
                                     ? {
                                         url: formik.values.proofUrl,
                                         publicId: formik.values.proofPublicId,
@@ -200,19 +247,16 @@ const AchievementFormTemplate = ({
                                     : null
                             }
                             onChange={(value) => {
-                                formik.setFieldValue("proofUrl", value?.url || "");
-                                formik.setFieldValue("proofPublicId", value?.publicId || "");
+                                if (!value) {
+                                    handleProofClear();
+                                }
                             }}
                             onUpload={uploadProof}
-                            disabled={mode === MODE.VIEW || isUploading}
+                            disabled={mode === MODE.VIEW}
                             maxSize={5}
                             aspectRatio="wide"
-                            helperText={
-                                isUploading
-                                    ? "Uploading..."
-                                    : "Proof · Max 5MB"
-                            }
-                            error={Boolean(formik.touched.proofUrl && formik.errors.proofUrl)}
+                            helperText={formik.submitCount > 0 && formik.errors.hasImage ? String(formik.errors.hasImage) : "Proof · Max 5MB"}
+                            error={formik.submitCount > 0 && Boolean(formik.errors.hasImage)}
                             required
                         />
                         <TextField

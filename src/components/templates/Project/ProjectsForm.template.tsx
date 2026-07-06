@@ -12,7 +12,7 @@ import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { isRichTextEmpty, titleModification } from "../../../utils/helper";
-import { HTTP_STATUS, type ImageValue } from "../../../utils/types";
+import { HTTP_STATUS } from "../../../utils/types";
 import { type Project, type ProjectResponse, WorkStatusOptions, WorkStatusType, useProjectService, } from "../../../services/useProjectService";
 import { useSkillService, type SkillDropdown, } from "../../../services/useSkillService";
 import { FiTrash2 } from "react-icons/fi";
@@ -37,10 +37,7 @@ const validationSchema = Yup.object({
         })
         .nullable(),
     workStatus: Yup.string().required("Work status is required"),
-    projectImages: Yup.array().of(Yup.object({
-        url: Yup.string().required("Image URL is required"),
-        publicId: Yup.string().required("Public ID is required"),
-    })).min(1, "At least one image is required"),
+    hasImages: Yup.boolean().oneOf([true], "At least one image is required"),
     githubRepositories: Yup.array().of(Yup.string().url("Invalid URL")).min(1, "At least one repository is required"),
 });
 
@@ -48,6 +45,10 @@ interface ProjectFormProps {
     onSubmit: (values: Project) => Promise<void>;
     mode: string;
     projects?: ProjectResponse | null;
+}
+
+interface ProjectFormValues extends Project {
+    hasImages: boolean;
 }
 
 const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => {
@@ -59,14 +60,25 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     const [skills, setSkills] = useState<SkillDropdown[]>([]);
     const [selectedSkillObjects, setSelectedSkillObjects] = useState<SkillDropdown[]>(projects?.skills || []);
-    const [isUploading, setIsUploading] = useState<boolean>(false);
     const [isLoadingSkills, setIsLoadingSkills] = useState(false);
+    const [pendingImageFiles, setPendingImageFiles] = useState<(File | null)[]>([]);
+    const [imagePreviewUrls, setImagePreviewUrls] = useState<(string | null)[]>([]);
     const skillServiceRef = useRef(skillService);
     skillServiceRef.current = skillService;
 
     const onClose = () => navigate(ADMIN_ROUTES.PROJECTS);
 
-    const formik = useFormik<Project>({
+    useEffect(() => {
+        return () => {
+            imagePreviewUrls.forEach(url => {
+                if (url && url.startsWith('blob:')) {
+                    URL.revokeObjectURL(url);
+                }
+            });
+        };
+    }, [imagePreviewUrls]);
+
+    const formik = useFormik<ProjectFormValues>({
         initialValues: {
             projectName: projects?.projectName || "",
             projectDescription: projects?.projectDescription || "",
@@ -77,13 +89,47 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             workStatus: projects?.workStatus || WorkStatusType.CURRENT,
             projectImages: projects?.projectImages || [],
             skillIds: projects?.skills?.map(s => s.id).filter((id): id is number => id !== null && id !== undefined) || [],
+            hasImages: (projects?.projectImages?.length ?? 0) > 0,
         },
         enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
+            let projectImages = [...values.projectImages];
+
+            if (pendingImageFiles.some(f => f !== null)) {
+                const uploadPromises = pendingImageFiles.map(async (file, index) => {
+                    if (file) {
+                        try {
+                            const response = await projectService.uploadProjectImage(file);
+                            if (response.status === HTTP_STATUS.OK) {
+                                const asset = response.data.data;
+                                return { index, image: { url: asset.path, publicId: asset.publicId } };
+                            }
+                        } catch {
+                            return null;
+                        }
+                    }
+                    return null;
+                });
+
+                const uploadResults = await Promise.all(uploadPromises);
+                uploadResults.forEach(result => {
+                    if (result) {
+                        projectImages[result.index] = result.image;
+                    }
+                });
+            }
+
             const payload = {
-                ...values,
+                projectName: values.projectName,
                 projectDescription: isRichTextEmpty(values.projectDescription) ? "" : values.projectDescription,
+                githubRepositories: values.githubRepositories,
+                projectLink: values.projectLink,
+                projectStartDate: values.projectStartDate,
+                projectEndDate: values.projectEndDate,
+                workStatus: values.workStatus,
+                projectImages,
+                skillIds: values.skillIds,
             };
             setSubmitting(true);
             if (mode !== MODE.VIEW) await onSubmit(payload);
@@ -114,36 +160,20 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
     }, [projects?.skills]);
 
     const uploadProjectImage = async (file: File, index?: number) => {
-        setIsUploading(true);
-        try {
-            const response = await projectService.uploadProjectImage(file);
-            if (response.status === HTTP_STATUS.OK) {
-                const asset = response.data.data;
-                addProjectImage({ url: asset.path, publicId: asset.id }, index);
-                return { url: asset.path, publicId: asset.id };
-            }
-            throw new Error("Upload failed");
-        } catch {
-            throw new Error("Upload failed");
-        } finally {
-            setIsUploading(false);
-        }
+        const targetIndex = index ?? formik.values.projectImages.length;
+        const newPendingFiles = [...pendingImageFiles];
+        const newPreviewUrls = [...imagePreviewUrls];
+        
+        newPendingFiles[targetIndex] = file;
+        newPreviewUrls[targetIndex] = URL.createObjectURL(file);
+        
+        setPendingImageFiles(newPendingFiles);
+        setImagePreviewUrls(newPreviewUrls);
+        formik.setFieldValue("hasImages", true);
+        
+        return { url: newPreviewUrls[targetIndex] || "", publicId: "" };
     };
 
-    const addProjectImage = (image: ImageValue | ImageValue[] | null, index?: number) => {
-        if (!image) return;
-        const imagesToAdd = Array.isArray(image) ? image : [image];
-        if (typeof index === "number") {
-            const updated = [...formik.values.projectImages];
-            updated[index] = imagesToAdd[0];
-            formik.setFieldValue("projectImages", updated);
-        } else {
-            formik.setFieldValue("projectImages", [
-                ...formik.values.projectImages,
-                ...imagesToAdd,
-            ]);
-        }
-    };
 
     const skillOptions = useMemo(
         () =>
@@ -172,6 +202,22 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         const newImages = [...formik.values.projectImages];
         newImages.splice(index, 1);
         formik.setFieldValue("projectImages", newImages);
+        
+        const newPendingFiles = [...pendingImageFiles];
+        const newPreviewUrls = [...imagePreviewUrls];
+        
+        if (newPreviewUrls[index] && newPreviewUrls[index]?.startsWith('blob:')) {
+            URL.revokeObjectURL(newPreviewUrls[index]!);
+        }
+        newPendingFiles.splice(index, 1);
+        newPreviewUrls.splice(index, 1);
+        
+        setPendingImageFiles(newPendingFiles);
+        setImagePreviewUrls(newPreviewUrls);
+        
+        if (newImages.length === 0) {
+            formik.setFieldValue("hasImages", false);
+        }
     };
 
     const addGithubRepo = () => {
@@ -390,6 +436,9 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
                         {(formik.values.projectImages.length > 0 ? formik.values.projectImages : [null]).map((image, index) => {
                             const isPrimary = index === 0;
+                            const displayValue = imagePreviewUrls[index] 
+                                ? { url: imagePreviewUrls[index]!, publicId: "" }
+                                : image;
                             return (
                                 <div key={index} className="relative group/img-container w-[260px]">
                                     <div
@@ -398,26 +447,22 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                                     >
                                         <ImageUpload
                                             label={isPrimary ? "Primary Project Cover" : `Additional Asset ${index + 1}`}
-                                            value={image}
+                                            value={displayValue}
                                             onChange={(val) => {
                                                 if (val === null) {
-                                                    const updated = [...formik.values.projectImages];
-                                                    updated[index] = null as any;
-                                                    formik.setFieldValue("projectImages", updated);
-                                                } else {
-                                                    addProjectImage(val, index);
+                                                    removeProjectImage(index);
                                                 }
                                             }}
                                             onUpload={(file) => uploadProjectImage(file, index)}
-                                            disabled={mode === MODE.VIEW || isUploading}
+                                            disabled={mode === MODE.VIEW || formik.isSubmitting}
                                             maxSize={5}
                                             aspectRatio="wide"
                                             helperText={isPrimary ? "Main visual for this project" : "Gallery asset · Max 5MB"}
                                             required={true}
-                                            error={formik.touched.projectImages && Boolean(formik.errors.projectImages)}
+                                            error={formik.submitCount > 0 && Boolean(formik.errors.hasImages)}
                                         />
 
-                                        {isPrimary && !!image && (
+                                        {isPrimary && !!displayValue && (
                                             <div className="absolute top-11 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest shadow-lg z-10 border border-white/20" style={{ backgroundColor: colors.primary600 }}>
                                                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                                                 Cover Image
@@ -444,16 +489,18 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                             <Button
                                 label="Add Another Image"
                                 variant="primaryContained"
-                                onClick={() =>
-                                    formik.setFieldValue("projectImages", [...formik.values.projectImages, null])
-                                }
-                                disabled={isUploading}
+                                onClick={() => {
+                                    formik.setFieldValue("projectImages", [...formik.values.projectImages, null]);
+                                    setPendingImageFiles([...pendingImageFiles, null]);
+                                    setImagePreviewUrls([...imagePreviewUrls, null]);
+                                }}
+                                disabled={formik.isSubmitting}
                             />
                         </div>
                     )}
-                    {typeof formik.errors.projectImages === "string" && formik.touched.projectImages && (
+                    {formik.submitCount > 0 && formik.errors.hasImages && (
                         <p className="mb-3 text-xs" style={{ color: colors.error600 }}>
-                            {formik.errors.projectImages}
+                            {String(formik.errors.hasImages)}
                         </p>
                     )}
                 </div>

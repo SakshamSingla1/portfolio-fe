@@ -9,9 +9,9 @@ const RoleRoutes = () => {
     return (
         <Routes>
             <Route index element={<PermissionGuard required="VIEW"><ListingRolesPage /></PermissionGuard>} />
-            <Route path="/add" element={<PermissionGuard required="ADD"><AddRolePage /></PermissionGuard>} />
-            <Route path="/:id/edit" element={<PermissionGuard required="EDIT"><EditRolePage /></PermissionGuard>} />
-            <Route path="/:id" element={<PermissionGuard required="VIEW"><ViewRolePage /></PermissionGuard>} />
+            <Route path="add" element={<PermissionGuard required="ADD"><AddRolePage /></PermissionGuard>} />
+            <Route path=":id/edit" element={<PermissionGuard required="EDIT"><EditRolePage /></PermissionGuard>} />
+            <Route path=":id" element={<PermissionGuard required="VIEW"><ViewRolePage /></PermissionGuard>} />
         </Routes>
     );
 };

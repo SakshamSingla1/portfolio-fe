@@ -11,10 +11,10 @@ export const PROFILE_URLS = {
     GET_BY_ID: "/profile",
     GET_ALL: "/profile",
 
-    // Uploads
-    UPLOAD_PROFILE_IMAGE: "/profile/:id/upload/profile-image",
-    UPLOAD_LOGO: "/profile/:id/upload/logo",
-    UPLOAD_ABOUT_ME_IMAGE: "/profile/:id/upload/about-me-image",
+    // Uploads (kept for reference — upload functions use useFileService directly)
+    UPLOAD_PROFILE_IMAGE: "/profile/upload/profile-image",
+    UPLOAD_PROFILE_LOGO: "/profile/upload/logo",
+    UPLOAD_ABOUT_ME_IMAGE: "/profile/upload/about-image",
 
     // Admin
     ADMIN_GET_ALL_USERS: "/profile/users",
@@ -130,10 +130,10 @@ export const useProfileService = () => {
         fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: true, sortOrder: 0 });
 
     const uploadLogo = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "LOGO", { isPrimary: true, sortOrder: 0 });
+        fileService.upload(file, user?.id ?? "", "PROFILE_LOGO", { isPrimary: true, sortOrder: 0 });
 
     const uploadAboutMeImage = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: false, sortOrder: 1 });
+        fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: false, sortOrder: 1, metaData: "ABOUT_ME_IMAGE" });
 
     // =========================
     // ADMIN APIs
@@ -176,6 +176,14 @@ export const useProfileService = () => {
         );
     };
 
+    const deleteUser = (id: number | null) => {
+        return request(
+            API_METHOD.DELETE,
+            replaceUrlParams(PROFILE_URLS.ADMIN_DELETE_USER, { id }),
+            user
+        );
+    };
+
     return {
         get,
         update,
@@ -186,6 +194,7 @@ export const useProfileService = () => {
         getUserById,
         updateUserStatus,
         updateUserRole,
-        toggleUserVerification
+        toggleUserVerification,
+        deleteUser
     };
 };

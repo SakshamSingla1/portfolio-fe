@@ -21,7 +21,7 @@ interface SocialLinksFormTemplateProps {
 
 const validationSchema = Yup.object({
     platform: Yup.string().required('Platform is required'),
-    url: Yup.string().required('URL is required'),
+    url: Yup.string().url('Must be a valid URL').required('URL is required'),
     order: Yup.string().required('Order is required'),
     status: Yup.string().required('Status is required'),
 });

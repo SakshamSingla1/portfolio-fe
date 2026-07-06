@@ -18,6 +18,7 @@ export interface Certification {
     expiryDate: string;
     credentialId: string;
     credentialUrl: string;
+    credentialPublicId?: string | null;
     status: string;
     order: string;
     createdAt: string;
@@ -31,6 +32,7 @@ export interface CertificationRequest {
     expiryDate: string;
     credentialId: string;
     credentialUrl: string;
+    credentialPublicId: string;
     status: string;
     order: string;
 }

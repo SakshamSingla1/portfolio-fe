@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
@@ -25,8 +25,7 @@ const validationSchema = Yup.object({
     expiryDate: Yup.date()
         .min(Yup.ref("issueDate"), "Expiry date must be after issue date")
         .nullable(),
-    credentialId: Yup.string().required("Credential ID is required"),
-    credentialUrl: Yup.string().url("Invalid URL").required("Credential URL is required"),
+    hasCredentialImage: Yup.boolean().oneOf([true], "Credential image is required"),
     order: Yup.string().required("Order is required"),
     status: Yup.string().required("Status is required"),
 });
@@ -35,6 +34,10 @@ interface CertificationFormProps {
     onSubmit: (values: CertificationRequest) => Promise<void>;
     mode: string;
     certification?: Certification | null;
+}
+
+interface CertificationFormValues extends CertificationRequest {
+    hasCredentialImage: boolean;
 }
 
 const CertificationFormTemplate = ({
@@ -49,9 +52,18 @@ const CertificationFormTemplate = ({
 
     const onClose = () => navigate(ADMIN_ROUTES.CERTIFICATIONS);
 
-    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [pendingCredentialFile, setPendingCredentialFile] = useState<File | null>(null);
+    const [credentialPreviewUrl, setCredentialPreviewUrl] = useState<string | null>(null);
 
-    const formik = useFormik<CertificationRequest>({
+    useEffect(() => {
+        return () => {
+            if (credentialPreviewUrl && credentialPreviewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(credentialPreviewUrl);
+            }
+        };
+    }, [credentialPreviewUrl]);
+
+    const formik = useFormik<CertificationFormValues>({
         initialValues: {
             title: certification?.title || "",
             issuer: certification?.issuer || "",
@@ -59,35 +71,74 @@ const CertificationFormTemplate = ({
             expiryDate: certification?.expiryDate || "",
             credentialId: certification?.credentialId || "",
             credentialUrl: certification?.credentialUrl || "",
+            credentialPublicId: certification?.credentialPublicId || "",
             order: certification?.order || "",
             status: certification?.status || Status.ACTIVE,
+            hasCredentialImage: !!certification?.credentialUrl,
         },
         enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
+            let credentialUrl = values.credentialUrl;
+            let credentialPublicId = values.credentialPublicId;
+
+            if (pendingCredentialFile) {
+                try {
+                    const response = await certificationService.uploadCredential(pendingCredentialFile);
+                    if (response.status === HTTP_STATUS.OK) {
+                        const asset = response.data.data;
+                        credentialUrl = asset.path;
+                        credentialPublicId = asset.publicId;
+                    } else {
+                        setSubmitting(false);
+                        return;
+                    }
+                } catch {
+                    setSubmitting(false);
+                    return;
+                }
+            }
+
+            const payload = {
+                title: values.title,
+                issuer: values.issuer,
+                issueDate: values.issueDate,
+                expiryDate: values.expiryDate,
+                credentialId: values.credentialId,
+                credentialUrl,
+                credentialPublicId,
+                order: values.order,
+                status: values.status,
+            };
             setSubmitting(true);
-            if (mode !== MODE.VIEW) await onSubmit(values);
+            if (mode !== MODE.VIEW) await onSubmit(payload);
             onClose();
             setSubmitting(false);
         },
     });
 
-    const uploadCredential = async (file: File): Promise<ImageUploadResponse> => {
-        setIsUploading(true);
-        try {
-            const response = await certificationService.uploadCredential(file);
-            if (response.status === HTTP_STATUS.OK) {
-                const asset = response.data.data;
-                formik.setFieldValue("credentialUrl", asset.path);
-                formik.setFieldValue("credentialId", asset.id);
-                return { url: asset.path, publicId: asset.id };
-            }
-            throw new Error();
-        } catch {
-            throw new Error();
-        } finally {
-            setIsUploading(false);
+    const handleCredentialSelect = (file: File) => {
+        const previewUrl = URL.createObjectURL(file);
+        setPendingCredentialFile(file);
+        setCredentialPreviewUrl(previewUrl);
+        formik.setFieldValue("hasCredentialImage", true);
+        return previewUrl;
+    };
+
+    const handleCredentialClear = () => {
+        if (credentialPreviewUrl && credentialPreviewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(credentialPreviewUrl);
         }
+        setPendingCredentialFile(null);
+        setCredentialPreviewUrl(null);
+        formik.setFieldValue("credentialUrl", "");
+        formik.setFieldValue("credentialPublicId", "");
+        formik.setFieldValue("hasCredentialImage", false);
+    };
+
+    const uploadCredential = async (file: File): Promise<ImageUploadResponse> => {
+        const url = handleCredentialSelect(file);
+        return { url, publicId: "" };
     };
 
     const cardStyle: React.CSSProperties = {
@@ -176,28 +227,32 @@ const CertificationFormTemplate = ({
                         <ImageUpload
                             label="Credential"
                             value={
-                                formik.values.credentialId
-                                    ? {
-                                        url: formik.values.credentialUrl,
-                                        publicId: formik.values.credentialId,
-                                    }
+                                credentialPreviewUrl
+                                    ? { url: credentialPreviewUrl, publicId: "" }
+                                    : formik.values.credentialPublicId
+                                    ? { url: formik.values.credentialUrl, publicId: formik.values.credentialPublicId }
                                     : null
                             }
                             onChange={(value) => {
-                                formik.setFieldValue("credentialUrl", value?.url || "");
-                                formik.setFieldValue("credentialId", value?.publicId || "");
+                                if (!value) {
+                                    handleCredentialClear();
+                                }
                             }}
                             onUpload={uploadCredential}
-                            disabled={mode === MODE.VIEW || isUploading}
+                            disabled={mode === MODE.VIEW}
                             maxSize={5}
                             aspectRatio="wide"
-                            helperText={
-                                isUploading
-                                    ? "Uploading..."
-                                    : "Credential · Max 5MB"
-                            }
+                            helperText={formik.submitCount > 0 && formik.errors.hasCredentialImage ? String(formik.errors.hasCredentialImage) : "Credential · Max 5MB"}
+                            error={formik.submitCount > 0 && Boolean(formik.errors.hasCredentialImage)}
                             required={true}
-                            error={formik.touched.credentialUrl && Boolean(formik.errors.credentialUrl)}
+                        />
+                        <TextField
+                            label="Credential ID"
+                            placeholder="Enter Credential ID (e.g. GOOG-12345)"
+                            {...formik.getFieldProps("credentialId")}
+                            disabled={mode === MODE.VIEW}
+                            error={formik.touched.credentialId && Boolean(formik.errors.credentialId)}
+                            helperText={Boolean(formik.touched.credentialId && formik.errors.credentialId) ? formik.errors.credentialId : ""}
                         />
                         <TextField
                             label="Order"

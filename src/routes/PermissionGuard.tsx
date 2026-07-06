@@ -25,10 +25,11 @@ const PermissionGuard: FC<PermissionGuardProps> = ({ children, required }) => {
     };
 
     if (!permitted[required]) {
-        const fallback = location.pathname
+        const stripped = location.pathname
             .replace(/\/add$/, "")
             .replace(/\/[^/]+\/edit$/, "");
-        return <Navigate to={fallback || "/admin"} replace />;
+        const fallback = stripped !== location.pathname ? stripped : "/admin";
+        return <Navigate to={fallback} replace />;
     }
 
     return <>{children}</>;

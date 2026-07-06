@@ -170,12 +170,12 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
 
   const handleViewResume = async () => {
     const url = publicResumeService.getViewResumeUrl();
-    window.open(url, "_blank");
+    if (url) window.open(url, "_blank");
   };
 
   const handleDownloadResume = async () => {
     const url = publicResumeService.getDownloadResumeUrl();
-    window.location.href = url;
+    if (url) window.location.href = url;
   };
 
   useEffect(() => {

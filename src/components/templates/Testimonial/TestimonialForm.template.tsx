@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -26,8 +26,7 @@ const validationSchema = Yup.object({
     ),
     role: Yup.string().required("Role is required"),
     company: Yup.string().required("Company is required"),
-    imageId: Yup.string().required("Image ID is required"),
-    imageUrl: Yup.string().url("Invalid URL").required("Image URL is required"),
+    hasImage: Yup.boolean().oneOf([true], "Image is required"),
     linkedInUrl: Yup.string().url("Invalid URL").required("Linked In URL is required"),
     order: Yup.string().required("Order is required"),
     status: Yup.string().required("Status is required"),
@@ -37,6 +36,10 @@ interface TestimonialFormProps {
     onSubmit: (values: TestimonialRequest) => void;
     mode: string;
     testimonial?: Testimonial | null;
+}
+
+interface TestimonialFormValues extends TestimonialRequest {
+    hasImage: boolean;
 }
 
 const TestimonialFormTemplate = ({
@@ -51,26 +54,63 @@ const TestimonialFormTemplate = ({
 
     const onClose = () => navigate(ADMIN_ROUTES.TESTIMONIALS);
 
-    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
-    const formik = useFormik<TestimonialRequest>({
+    useEffect(() => {
+        return () => {
+            if (imagePreviewUrl && imagePreviewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(imagePreviewUrl);
+            }
+        };
+    }, [imagePreviewUrl]);
+
+    const formik = useFormik<TestimonialFormValues>({
         initialValues: {
             name: testimonial?.name || "",
             message: testimonial?.message || "",
             role: testimonial?.role || "",
             company: testimonial?.company || "",
-            imageId: testimonial?.imageId || "",
+            imageId: testimonial?.imageId ?? null,
             imageUrl: testimonial?.imageUrl || "",
             linkedInUrl: testimonial?.linkedInUrl || "",
             order: testimonial?.order || "",
             status: testimonial?.status || Status.ACTIVE,
+            hasImage: !!testimonial?.imageUrl,
         },
         enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
+            let imageUrl = values.imageUrl;
+            let imageId = values.imageId;
+
+            if (pendingImageFile) {
+                try {
+                    const response = await testimonialService.uploadImage(pendingImageFile);
+                    if (response.status === HTTP_STATUS.OK) {
+                        const asset = response.data.data;
+                        imageUrl = asset.path;
+                        imageId = asset.id;
+                    } else {
+                        setSubmitting(false);
+                        return;
+                    }
+                } catch {
+                    setSubmitting(false);
+                    return;
+                }
+            }
+
             const payload = {
-                ...values,
+                name: values.name,
                 message: isRichTextEmpty(values.message) ? "" : values.message,
+                role: values.role,
+                company: values.company,
+                imageId,
+                imageUrl,
+                linkedInUrl: values.linkedInUrl,
+                order: values.order,
+                status: values.status,
             };
             setSubmitting(true);
             if (mode !== MODE.VIEW) await onSubmit(payload);
@@ -79,22 +119,28 @@ const TestimonialFormTemplate = ({
         },
     });
 
-    const uploadImage = async (file: File): Promise<ImageUploadResponse> => {
-        setIsUploading(true);
-        try {
-            const response = await testimonialService.uploadImage(file);
-            if (response.status === HTTP_STATUS.OK) {
-                const asset = response.data.data;
-                formik.setFieldValue("imageUrl", asset.path);
-                formik.setFieldValue("imageId", asset.id);
-                return { url: asset.path, publicId: asset.id };
-            }
-            throw new Error();
-        } catch {
-            throw new Error();
-        } finally {
-            setIsUploading(false);
+    const handleImageSelect = (file: File) => {
+        const previewUrl = URL.createObjectURL(file);
+        setPendingImageFile(file);
+        setImagePreviewUrl(previewUrl);
+        formik.setFieldValue("hasImage", true);
+        return previewUrl;
+    };
+
+    const handleImageClear = () => {
+        if (imagePreviewUrl && imagePreviewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(imagePreviewUrl);
         }
+        setPendingImageFile(null);
+        setImagePreviewUrl(null);
+        formik.setFieldValue("imageUrl", "");
+        formik.setFieldValue("imageId", null);
+        formik.setFieldValue("hasImage", false);
+    };
+
+    const uploadImage = async (file: File): Promise<ImageUploadResponse> => {
+        const url = handleImageSelect(file);
+        return { url, publicId: "" };
     };
 
     const cardStyle: React.CSSProperties = {
@@ -124,7 +170,7 @@ const TestimonialFormTemplate = ({
                             onChange={e => formik.setFieldValue("name", titleModification(e.target.value))}
                             required={true}
                             error={formik.touched.name && Boolean(formik.errors.name)}
-                            helperText={String(formik.touched.name && formik.errors.name)}
+                            helperText={formik.touched.name && formik.errors.name ? String(formik.errors.name) : ""}
                             disabled={mode === MODE.VIEW}
                         />
                         <TextField
@@ -133,7 +179,7 @@ const TestimonialFormTemplate = ({
                             {...formik.getFieldProps("role")}
                             required={true}
                             error={formik.touched.role && Boolean(formik.errors.role)}
-                            helperText={String(formik.touched.role && formik.errors.role)}
+                            helperText={formik.touched.role && formik.errors.role ? String(formik.errors.role) : ""}
                             disabled={mode === MODE.VIEW}
                         />
                         <TextField
@@ -142,7 +188,7 @@ const TestimonialFormTemplate = ({
                             {...formik.getFieldProps("company")}
                             required={true}
                             error={formik.touched.company && Boolean(formik.errors.company)}
-                            helperText={String(formik.touched.company && formik.errors.company)}
+                            helperText={formik.touched.company && formik.errors.company ? String(formik.errors.company) : ""}
                             disabled={mode === MODE.VIEW}
                         />
                     </div>
@@ -159,23 +205,30 @@ const TestimonialFormTemplate = ({
                             {...formik.getFieldProps("linkedInUrl")}
                             required={true}
                             error={formik.touched.linkedInUrl && Boolean(formik.errors.linkedInUrl)}
-                            helperText={String(formik.touched.linkedInUrl && formik.errors.linkedInUrl)}
+                            helperText={formik.touched.linkedInUrl && formik.errors.linkedInUrl ? String(formik.errors.linkedInUrl) : ""}
                             disabled={mode === MODE.VIEW}
                         />
                         <ImageUpload
                             label="Image"
-                            value={formik.values.imageId ? { url: formik.values.imageUrl, publicId: formik.values.imageId } : null}
+                            value={
+                                imagePreviewUrl
+                                    ? { url: imagePreviewUrl, publicId: "" }
+                                    : formik.values.imageId
+                                    ? { url: formik.values.imageUrl, publicId: String(formik.values.imageId) }
+                                    : null
+                            }
                             onChange={(value) => {
-                                formik.setFieldValue("imageUrl", value?.url || "");
-                                formik.setFieldValue("imageId", value?.publicId || "");
+                                if (!value) {
+                                    handleImageClear();
+                                }
                             }}
                             onUpload={uploadImage}
-                            disabled={mode === MODE.VIEW || isUploading}
+                            disabled={mode === MODE.VIEW}
                             maxSize={5}
                             aspectRatio="wide"
-                            helperText={isUploading ? "Uploading..." : "Image · Max 5MB"}
+                            helperText={formik.submitCount > 0 && formik.errors.hasImage ? String(formik.errors.hasImage) : "Image · Max 5MB"}
+                            error={formik.submitCount > 0 && Boolean(formik.errors.hasImage)}
                             required={true}
-                            error={formik.touched.imageUrl && Boolean(formik.errors.imageUrl)}
                         />
                     </div>
                 </div>
@@ -191,7 +244,7 @@ const TestimonialFormTemplate = ({
                             {...formik.getFieldProps("order")}
                             required={true}
                             error={formik.touched.order && Boolean(formik.errors.order)}
-                            helperText={String(formik.touched.order && formik.errors.order)}
+                            helperText={formik.touched.order && formik.errors.order ? String(formik.errors.order) : ""}
                             disabled={mode === MODE.VIEW}
                         />
                         <RichTextEditor
@@ -201,7 +254,7 @@ const TestimonialFormTemplate = ({
                             isEditMode={mode !== MODE.VIEW}
                             required={true}
                             error={formik.touched.message && Boolean(formik.errors.message)}
-                            helperText={String(formik.touched.message && formik.errors.message)}
+                            helperText={formik.touched.message && formik.errors.message ? String(formik.errors.message) : ""}
                         />
                     </div>
                 </div>

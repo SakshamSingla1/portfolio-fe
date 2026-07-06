@@ -48,7 +48,7 @@ const ResumeListPage: React.FC = () => {
             }).catch((error) => {
                 console.error("Error fetching projects:", error);
                 setResumesTo([]);
-                showSnackbar('error', 'Failed to load projects');
+                showSnackbar('error', 'Failed to load resumes');
             })
     }
 
@@ -88,13 +88,14 @@ const ResumeListPage: React.FC = () => {
 
     return (
         <div>
-            <ResumeTable 
-                resumes={resumes} 
-                pagination={pagination} 
-                handlePaginationChange={handlePaginationChange} 
-                handleRowsPerPageChange={handleRowsPerPageChange} 
+            <ResumeTable
+                resumes={resumes}
+                pagination={pagination}
+                handlePaginationChange={handlePaginationChange}
+                handleRowsPerPageChange={handleRowsPerPageChange}
                 searchValue={filters.search}
                 onSearchChange={(val) => handleFiltersChange("search", val)}
+                onRefresh={() => refreshResumes(pagination.currentPage.toString(), pagination.pageSize.toString())}
                 filterContent={
                     <div className="w-full sm:w-72">
                         <AutoCompleteInput

@@ -8,7 +8,8 @@ export const ROLE_URLS = {
     UPDATE: "/roles/:id",
     GET_ROLE_PERMISSIONS: "/roles/:id",
     GET_ALL_ROLES: "/roles",
-    GET_USER_ROLE_PERMISSIONS: "/roles/user/:usedId"
+    GET_USER_ROLE_PERMISSIONS: "/roles/user/:userId",
+    DELETE: "/roles/:id"
 };
 
 export interface ModulePermissionDTO {
@@ -123,10 +124,18 @@ export const useRoleService = () => {
     };
 
     const getRolePermissionsByUserId = (userId: string) => {
-        const url = replaceUrlParams(ROLE_URLS.GET_USER_ROLE_PERMISSIONS, { usedId: userId });
+        const url = replaceUrlParams(ROLE_URLS.GET_USER_ROLE_PERMISSIONS, { userId });
         return request(
             API_METHOD.GET,
             url,
+            user
+        );
+    };
+
+    const deleteRole = (id: number | null) => {
+        return request(
+            API_METHOD.DELETE,
+            replaceUrlParams(ROLE_URLS.DELETE, { id }),
             user
         );
     };
@@ -136,6 +145,7 @@ export const useRoleService = () => {
         updateRole,
         getRolePermissionsByRoleId,
         getAllRolesByCriteria,
-        getRolePermissionsByUserId
+        getRolePermissionsByUserId,
+        deleteRole
     };
 };

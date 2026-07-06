@@ -16,7 +16,7 @@ export interface Testimonial {
     message: string;
     role: string;
     company: string;
-    imageId: string;
+    imageId: number | null;
     imageUrl: string;
     linkedInUrl: string;
     status: string;
@@ -30,7 +30,7 @@ export interface TestimonialRequest {
     message: string;
     role: string;
     company: string;
-    imageId: string;
+    imageId: number | null;
     imageUrl: string;
     linkedInUrl: string;
     status: string;

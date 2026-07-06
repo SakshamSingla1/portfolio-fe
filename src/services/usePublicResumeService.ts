@@ -9,17 +9,21 @@ export const PUBLIC_RESUME_URLS = {
 export const usePublicResumeService = () => {
   const { user } = useAuthenticatedUser();
 
-  const getViewResumeUrl = () =>
-    `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
+  const getViewResumeUrl = () => {
+    if (!user?.userName) return null;
+    return `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
       PUBLIC_RESUME_URLS.VIEW_RESUME,
-      { username: user?.userName }
+      { username: user.userName }
     )}`;
+  };
 
-  const getDownloadResumeUrl = () =>
-    `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
+  const getDownloadResumeUrl = () => {
+    if (!user?.userName) return null;
+    return `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
       PUBLIC_RESUME_URLS.DOWNLOAD_RESUME,
-      { username: user?.userName }
+      { username: user.userName }
     )}`;
+  };
 
   return {
     getViewResumeUrl,

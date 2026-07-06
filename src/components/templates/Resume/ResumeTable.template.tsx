@@ -22,6 +22,7 @@ interface ResumeTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     filterContent?: React.ReactNode;
+    onRefresh?: () => void;
 }
 
 const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
@@ -31,7 +32,8 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    filterContent
+    filterContent,
+    onRefresh
 }) => {
     const { showSnackbar } = useSnackbar();
 
@@ -45,12 +47,12 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
             const response = await resumeService.activateResume({ resumeId: id });
             if (response.status === HTTP_STATUS.OK) {
                 showSnackbar('success', 'Resume activated successfully');
-                window.location.reload();
+                onRefresh?.();
             }
         } catch (error) {
             console.error(error);
         }
-    }, [resumeService, showSnackbar]);
+    }, [resumeService, showSnackbar, onRefresh]);
 
     const handleView = useCallback((url: string, status: string) => {
         if (status === 'DELETED') {
@@ -66,12 +68,12 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
             const response = await resumeService.deleteResume(id);
             if (response.status === HTTP_STATUS.OK) {
                 showSnackbar('success', 'Resume deleted successfully');
-                window.location.reload();
+                onRefresh?.();
             }
         } catch (error) {
             console.error(error);
         }
-    }, [resumeService, showSnackbar]);
+    }, [resumeService, showSnackbar, onRefresh]);
 
     const records = useMemo(() => resumes?.map((resume: DocumentUploadResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,

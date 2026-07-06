@@ -15,7 +15,8 @@ const URLS = {
 };
 
 export interface IFileAsset {
-    id: string | number | null;
+    id: number | null;
+    publicId: string | null;
     location: string | null;
     path: string;
     resourceId: string | null;
