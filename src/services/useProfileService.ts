@@ -66,6 +66,9 @@ export interface ProfileRequest {
     aboutMeImagePublicId?: string;
     logoUrl?: string;
     logoPublicId?: string;
+    availableForWork?: boolean;
+    availabilityNote?: string;
+    availableFrom?: string;
 }
 
 export interface UserResponse {

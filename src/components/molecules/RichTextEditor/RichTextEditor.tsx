@@ -1,117 +1,147 @@
-import React, { useState } from "react";
-import { createUseStyles } from "react-jss";
-import TextField from "../../atoms/TextField/TextField";
+import React, { useMemo, useRef } from "react";
+import JoditEditor from "jodit-react";
+import type { IJodit } from "jodit/esm/types/jodit";
 import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 interface RichTextEditorProps {
-  label?: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  error?: boolean;
-  helperText?: string;
-  required?: boolean;
-  isEditMode?: boolean;
+    label?: string;
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+    error?: boolean;
+    helperText?: string;
+    required?: boolean;
+    isEditMode?: boolean;
 }
 
-const useStyles = createUseStyles({
-  textarea: {
-    "& textarea": {
-      maxHeight: 140,   // ~6 lines
-      overflowY: "auto",
-      resize: "none",
-    },
-  },
-
-  preview: (colors: any) => ({
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 12,
-    border: `1.5px solid ${colors.neutral300}`,
-    background: colors.neutral50,
-    color: colors.neutral900,
-    lineHeight: 1.6,
-    boxShadow: `inset 0 2px 4px 0 ${colors.neutral900}05`,
-
-    "& p": {
-      marginBottom: 12,
-    },
-
-    "& strong": {
-      fontWeight: 600,
-    },
-  }),
-
-  toggle: (colors: any) => ({
-    fontSize: 13,
-    fontWeight: 600,
-    cursor: "pointer",
-    color: colors.primary600,
-    marginTop: 10,
-    width: "fit-content",
-    padding: "6px 14px",
-    borderRadius: "20px",
-    background: colors.primary50,
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-
-    "&:hover": {
-      background: colors.primary100,
-      transform: "translateY(-1px)",
-      boxShadow: `0 4px 12px -4px ${colors.primary500}30`
-    },
-    "&:active": {
-      transform: "scale(0.96)"
-    }
-  }),
-});
+const TOOLBAR_BUTTONS = [
+    "bold", "italic", "underline", "strikethrough", "|",
+    "eraser", "|",
+    "ul", "ol", "|",
+    "paragraph", "fontsize", "|",
+    "indent", "outdent", "|",
+    "align", "lineHeight", "|",
+    "link", "hr", "|",
+    "undo", "redo", "|",
+    "fullsize",
+].join(",");
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
-  label,
-  value,
-  onChange,
-  placeholder,
-  error,
-  helperText,
-  required,
-  isEditMode,
+    label,
+    value,
+    onChange,
+    placeholder,
+    error,
+    helperText,
+    required,
+    isEditMode = true,
 }) => {
-  const colors = useColors();
-  const classes = useStyles(colors);
+    const colors = useColors();
+    const { isDark } = useTheme();
+    const editorRef = useRef<IJodit | null>(null);
 
-  const [showPreview, setShowPreview] = useState(false);
+    const config = useMemo(() => ({
+        readonly: false,
+        theme: isDark ? "dark" : "default",
+        height: 320,
+        minHeight: 180,
+        placeholder: placeholder || "Write content here…",
+        toolbar: true,
+        statusbar: false,
+        allowResizeX: false,
+        allowResizeY: true,
+        language: "en",
+        buttons: TOOLBAR_BUTTONS,
+        removeButtons: [
+            "video", "table", "source", "symbol", "print", "about",
+            "image", "file", "speechRecognize", "classSpan", "draw.io",
+            "dots", "cut", "copy", "paste", "copyformat", "selectall",
+        ],
+        style: {
+            fontFamily: "inherit",
+            fontSize: "14px",
+            lineHeight: "1.7",
+            color: isDark ? "#e5e7eb" : "#1f2937",
+            background: isDark ? "#1f2937" : "#ffffff",
+        },
+        toolbarAdaptive: false,
+        toolbarSticky: false,
+        showXPathInStatusbar: false,
+        showCharsCounter: false,
+        showWordsCounter: false,
+        spellcheck: true,
+    }), [isDark, placeholder]);
 
-  return (
-    <div style={{ width: "100%" }}>
-      <div className={classes.textarea}>
-        <TextField
-          label={label}
-          required={required}
-          multiline
-          minRows={6}
-          placeholder={placeholder || "Write HTML content here..."}
-          value={value}
-          error={error}
-          helperText={helperText}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={!isEditMode}
-        />
-      </div>
+    const labelEl = label && (
+        <label
+            style={{
+                display: "block",
+                marginBottom: 6,
+                fontSize: 12,
+                fontWeight: 600,
+                color: colors.neutral600,
+                letterSpacing: "0.02em",
+            }}
+        >
+            {label}
+            {required && <span style={{ color: colors.error500, marginLeft: 2 }}>*</span>}
+        </label>
+    );
 
-      <div
-        className={classes.toggle}
-        onClick={() => setShowPreview(!showPreview)}
-      >
-        {showPreview ? "Hide Preview" : "Show Preview"}
-      </div>
+    if (!isEditMode) {
+        return (
+            <div style={{ width: "100%" }}>
+                {labelEl}
+                <div
+                    style={{
+                        padding: "10px 14px",
+                        borderRadius: 8,
+                        border: `1.5px solid ${colors.neutral200}`,
+                        background: colors.neutral50,
+                        color: colors.neutral800,
+                        lineHeight: 1.7,
+                        minHeight: 60,
+                        fontSize: 14,
+                    }}
+                    dangerouslySetInnerHTML={{ __html: value || `<span style="color:${colors.neutral400}">—</span>` }}
+                />
+            </div>
+        );
+    }
 
-      {showPreview && (
-        <div
-          className={classes.preview}
-          dangerouslySetInnerHTML={{ __html: value || "" }}
-        />
-      )}
-    </div>
-  );
+    return (
+        <div style={{ width: "100%" }}>
+            {labelEl}
+            <div
+                style={{
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    border: `1.5px solid ${error ? colors.error500 : colors.neutral300}`,
+                    transition: "border-color 0.15s",
+                    boxShadow: error ? `0 0 0 3px ${colors.error500}18` : undefined,
+                }}
+            >
+                <JoditEditor
+                    ref={editorRef}
+                    value={value}
+                    config={config}
+                    onChange={onChange}
+                />
+            </div>
+            {helperText && (
+                <p
+                    style={{
+                        marginTop: 4,
+                        fontSize: 12,
+                        color: error ? colors.error500 : colors.neutral400,
+                    }}
+                >
+                    {helperText}
+                </p>
+            )}
+        </div>
+    );
 };
 
 export default RichTextEditor;

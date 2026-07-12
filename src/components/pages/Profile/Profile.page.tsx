@@ -43,6 +43,9 @@ const EMPTY_PROFILE: ProfileRequest = {
   aboutMeImagePublicId: "",
   logoUrl: "",
   logoPublicId: "",
+  availableForWork: false,
+  availabilityNote: "",
+  availableFrom: "",
 };
 
 const ProfilePage: React.FC = () => {
