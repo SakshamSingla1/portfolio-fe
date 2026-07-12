@@ -111,6 +111,11 @@ export const ADMIN_ROUTES = {
     LANGUAGES_ADD: "/languages/add",
     LANGUAGES_EDIT: "/languages/:id/edit",
     LANGUAGES_VIEW: "/languages/:id",
+
+    SERVICES: "/services",
+    SERVICES_ADD: "/services/add",
+    SERVICES_EDIT: "/services/:id/edit",
+    SERVICES_VIEW: "/services/:id",
 }
 
 export const MODE = {
