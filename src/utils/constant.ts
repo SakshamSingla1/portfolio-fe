@@ -106,6 +106,11 @@ export const ADMIN_ROUTES = {
     BLOGS_ADD: "/blogs/add",
     BLOGS_EDIT: "/blogs/:id/edit",
     BLOGS_VIEW: "/blogs/:id",
+
+    LANGUAGES: "/languages",
+    LANGUAGES_ADD: "/languages/add",
+    LANGUAGES_EDIT: "/languages/:id/edit",
+    LANGUAGES_VIEW: "/languages/:id",
 }
 
 export const MODE = {
@@ -448,6 +453,13 @@ export type Option = {
     value: string;
     label: string;
 }
+
+export const LANGUAGE_PROFICIENCY_OPTIONS: Option[] = [
+    { value: "NATIVE", label: "Native" },
+    { value: "FLUENT", label: "Fluent" },
+    { value: "INTERMEDIATE", label: "Intermediate" },
+    { value: "BASIC", label: "Basic" },
+];
 
 export const SKILL_LEVEL_OPTIONS: Option[] = [
     { value: 'Beginner', label: 'Beginner' },

@@ -30,6 +30,7 @@ const LandingPage = lazy(() => import('../components/pages/Landing/Landing.page'
 const LandingRoutes = lazy(() => import('./AdminRoutes/LandingRoutes'));
 const AnalyticsRoutes = lazy(() => import('./AdminRoutes/AnalyticsRoutes'));
 const BlogRoutes = lazy(() => import('./AdminRoutes/BlogRoutes'));
+const LanguageRoutes = lazy(() => import('./AdminRoutes/LanguageRoutes'));
 
 export const AdminRouter: React.FC = () => {
   const { showSnackbar } = useSnackbar();
@@ -98,6 +99,7 @@ export const AdminRouter: React.FC = () => {
           <Route path="landing-management/*" element={<div><LandingRoutes /></div>} />
           <Route path="analytics/*" element={<div><AnalyticsRoutes /></div>} />
           <Route path="blogs/*" element={<div><BlogRoutes /></div>} />
+          <Route path="languages/*" element={<div><LanguageRoutes /></div>} />
         </Route>
         {/* Renders without admin chrome — full-screen landing preview */}
         <Route path="" element={<LandingPage />} />
