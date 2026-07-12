@@ -101,6 +101,11 @@ export const ADMIN_ROUTES = {
     ROLE_ADD: "/roles-permissions/add",
     ROLE_EDIT: "/roles-permissions/:id/edit",
     ROLE_VIEW: "/roles-permissions/:id",
+
+    BLOGS: "/blogs",
+    BLOGS_ADD: "/blogs/add",
+    BLOGS_EDIT: "/blogs/:id/edit",
+    BLOGS_VIEW: "/blogs/:id",
 }
 
 export const MODE = {
