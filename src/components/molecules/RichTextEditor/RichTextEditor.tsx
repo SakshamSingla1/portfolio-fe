@@ -73,26 +73,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         spellcheck: true,
     }), [isDark, placeholder]);
 
-    const viewConfig = useMemo(() => ({
-        readonly: true,
-        toolbar: false,
-        statusbar: false,
-        allowResizeX: false,
-        allowResizeY: false,
-        showXPathInStatusbar: false,
-        showCharsCounter: false,
-        showWordsCounter: false,
-        height: "auto",
-        minHeight: 40,
-        style: {
-            fontFamily: "inherit",
-            fontSize: "14px",
-            lineHeight: "1.7",
-            color: isDark ? "#e5e7eb" : "#1f2937",
-            background: "transparent",
-        },
-    }), [isDark]);
-
     const labelEl = label && (
         <label
             style={{
