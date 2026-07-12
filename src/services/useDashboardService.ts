@@ -46,6 +46,7 @@ export interface IViewStats {
     deviceBreakdown: Record<string, number>;
     browserBreakdown: Record<string, number>;
     locationBreakdown: Record<string, number>;
+    referrerBreakdown: Record<string, number>;
     recentViews: IPortfolioView[];
 }
 

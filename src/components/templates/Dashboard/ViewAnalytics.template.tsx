@@ -23,6 +23,7 @@ const EMPTY_VIEW_STATS: IViewStats = {
   deviceBreakdown: {},
   browserBreakdown: {},
   locationBreakdown: {},
+  referrerBreakdown: {},
   recentViews: [],
 };
 
@@ -381,7 +382,7 @@ const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ br
 
 
 const SOURCE_COLORS: Record<string, string> = {
-  direct:    "#94a3b8",
+  Direct:    "#94a3b8",
   google:    "#4285f4",
   linkedin:  "#0a66c2",
   github:    "#24292e",
@@ -394,7 +395,7 @@ const SOURCE_COLORS: Record<string, string> = {
 };
 
 const getSourceColor = (src: string): string => {
-  if (src === "Direct") return SOURCE_COLORS.direct;
+  if (src === "Direct") return SOURCE_COLORS.Direct;
   const lower = src.toLowerCase();
   for (const [key, color] of Object.entries(SOURCE_COLORS)) {
     if (lower.includes(key)) return color;
@@ -402,17 +403,11 @@ const getSourceColor = (src: string): string => {
   return "#8b5cf6";
 };
 
-const TrafficSources: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
+const ReferrerBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
   const colors = useColors();
-  if (!views?.length) return null;
+  const sorted = Object.entries(breakdown).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  if (!sorted.length) return null;
 
-  const counts: Record<string, number> = {};
-  views.forEach((v) => {
-    const src = v.referrer && v.referrer !== "Direct" ? v.referrer : "Direct";
-    counts[src] = (counts[src] || 0) + 1;
-  });
-
-  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
 
   return (
@@ -738,6 +733,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     deviceBreakdown = {},
     browserBreakdown = {},
     locationBreakdown = {},
+    referrerBreakdown = {},
     recentViews = [],
   } = viewStats;
 
@@ -779,8 +775,9 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     </div>
   );
 
-  const hasBrowserData = Object.keys(browserBreakdown).length > 0;
-  const hasLocationData = Object.keys(locationBreakdown).length > 0;
+  const hasBrowserData   = Object.keys(browserBreakdown).length > 0;
+  const hasLocationData  = Object.keys(locationBreakdown).length > 0;
+  const hasReferrerData  = Object.keys(referrerBreakdown).length > 0;
 
   return (
     <motion.div
@@ -922,16 +919,20 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
         </div>
 
         {}
-        {recentViews.length > 0 && (
+        {(hasReferrerData || recentViews.length > 0) && (
           <div className={`mt-4 grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
-            <div style={panelStyle}>
-              {panelLabel("Traffic Sources", <FiLink size={10} style={{ color: colors.neutral400 }} />)}
-              <TrafficSources views={recentViews} />
-            </div>
-            <div style={panelStyle}>
-              {panelLabel("Peak Hours", <FiClock size={10} style={{ color: colors.neutral400 }} />)}
-              <PeakHours views={recentViews} />
-            </div>
+            {hasReferrerData && (
+              <div style={panelStyle}>
+                {panelLabel("Traffic Sources", <FiLink size={10} style={{ color: colors.neutral400 }} />)}
+                <ReferrerBreakdown breakdown={referrerBreakdown} />
+              </div>
+            )}
+            {recentViews.length > 0 && (
+              <div style={panelStyle}>
+                {panelLabel("Peak Hours", <FiClock size={10} style={{ color: colors.neutral400 }} />)}
+                <PeakHours views={recentViews} />
+              </div>
+            )}
           </div>
         )}
 
