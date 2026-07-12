@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { InputAdornment } from "@mui/material";
+import { InputAdornment, Switch } from "@mui/material";
 import type { FormikProps } from "formik";
-import { FiUser, FiMail, FiMapPin, FiPhone, FiBriefcase, FiImage, FiInfo } from "react-icons/fi";
+import { FiUser, FiMail, FiMapPin, FiPhone, FiBriefcase, FiImage, FiInfo, FiCheckCircle, FiCalendar } from "react-icons/fi";
 import TextFieldV2 from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
@@ -61,6 +61,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
   onEditClick,
 }) => {
   const { showSnackbar } = useSnackbar();
+  const colors = useColors();
 
   const profileService = useProfileService();
   const resumeService = useResumeService();
@@ -390,6 +391,69 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               helperText={Boolean(formik.errors.aboutMe && formik.touched.aboutMe) ? formik.errors.aboutMe : ""}
             />
           </div>
+        </div>
+      </SectionCard>
+      <SectionCard
+        title="Availability"
+        subtitle="Let recruiters know you're open to opportunities"
+        icon={FiCheckCircle}
+      >
+        <div className="flex flex-col gap-5">
+          <div
+            className="flex items-center justify-between px-4 py-3 rounded-xl"
+            style={{ background: formik.values.availableForWork ? `${colors.success500}10` : `${colors.neutral100}`, border: `1.5px solid ${formik.values.availableForWork ? colors.success500 : colors.neutral200}`, transition: "all 0.2s" }}
+          >
+            <div>
+              <p className="text-sm font-semibold" style={{ color: colors.neutral800 }}>Open to work</p>
+              <p className="text-xs mt-0.5" style={{ color: colors.neutral500 }}>Show an "Available" badge on your public profile</p>
+            </div>
+            <Switch
+              checked={formik.values.availableForWork ?? false}
+              onChange={(e) => formik.setFieldValue("availableForWork", e.target.checked)}
+              disabled={!isEditMode}
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": { color: colors.success500 },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: colors.success500 },
+              }}
+            />
+          </div>
+          {formik.values.availableForWork && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <TextFieldV2
+                  label="Availability Note"
+                  name="availabilityNote"
+                  value={formik.values.availabilityNote ?? ""}
+                  onChange={formik.handleChange}
+                  disabled={!isEditMode}
+                  placeholder="e.g. Open to full-time remote roles"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FiInfo />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
+              <TextFieldV2
+                label="Available From"
+                name="availableFrom"
+                type="date"
+                value={formik.values.availableFrom ?? ""}
+                onChange={formik.handleChange}
+                disabled={!isEditMode}
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FiCalendar />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
+          )}
         </div>
       </SectionCard>
       <SectionCard
