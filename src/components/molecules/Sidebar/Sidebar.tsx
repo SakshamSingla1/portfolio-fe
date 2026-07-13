@@ -4,7 +4,7 @@ import {
   FiHome, FiBriefcase, FiLogOut
 } from "react-icons/fi";
 import { LuGraduationCap, LuFolderKanban, LuAward, LuShieldCheck } from "react-icons/lu";
-import { TbCode, TbUser, TbMessageChatbot, TbBell, TbSettings, TbLink, TbShare, TbLayoutDashboard, TbUsers, TbHelp, TbIcons, TbBrowser, TbChartBar, TbArticle, TbLanguage, TbBriefcase } from "react-icons/tb";
+import { TbCode, TbUser, TbMessageChatbot, TbBell, TbSettings, TbLink, TbShare, TbLayoutDashboard, TbUsers, TbHelp, TbIcons, TbBrowser, TbChartBar, TbArticle, TbLanguage, TbBriefcase, TbBrandGithub } from "react-icons/tb";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { CgFileDocument } from "react-icons/cg";
 import { createUseStyles } from "react-jss";
@@ -43,6 +43,7 @@ const getIconForItem = (itemName: string) => {
     BLOGS: <TbArticle />,
     LANGUAGES: <TbLanguage />,
     SERVICES: <TbBriefcase />,
+    GITHUB_INTEGRATION: <TbBrandGithub />,
   };
   return iconMap[itemName] || <FiHome />;
 };
@@ -194,11 +195,13 @@ const Sidebar: React.FC<{
     const sortedGroups: Record<string, any[]> = {};
     const navGroupSequence = {
       OVERVIEW: 1,
-      CONTENT: 2,
-      EXTRAS: 3,
-      LINKS: 4,
-      ADMINISTRATION: 5,
-      SYSTEM: 6
+      PORTFOLIO: 2,
+      BRANDING: 3,
+      LANDING: 4,
+      COMMUNICATION: 5,
+      CONFIGURATION: 6,
+      ADMINISTRATION: 7,
+      SUPPORT: 8,
     };
 
     Object.keys(navGroupSequence).forEach((key) => {
