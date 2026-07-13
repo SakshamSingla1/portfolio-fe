@@ -116,6 +116,13 @@ export const ADMIN_ROUTES = {
     SERVICES_ADD: "/services/add",
     SERVICES_EDIT: "/services/:id/edit",
     SERVICES_VIEW: "/services/:id",
+
+    PUBLICATIONS: "/publications",
+    PUBLICATIONS_ADD: "/publications/add",
+    PUBLICATIONS_EDIT: "/publications/:id/edit",
+    PUBLICATIONS_VIEW: "/publications/:id",
+
+    TESTIMONIAL_REQUESTS: "/testimonial-requests",
 }
 
 export const MODE = {

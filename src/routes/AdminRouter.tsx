@@ -33,6 +33,8 @@ const BlogRoutes = lazy(() => import('./AdminRoutes/BlogRoutes'));
 const LanguageRoutes = lazy(() => import('./AdminRoutes/LanguageRoutes'));
 const ServiceRoutes = lazy(() => import('./AdminRoutes/ServiceRoutes'));
 const GithubIntegrationRoutes = lazy(() => import('./AdminRoutes/GithubIntegrationRoutes'));
+const TestimonialRequestRoutes = lazy(() => import('./AdminRoutes/TestimonialRequestRoutes'));
+const PublicationRoutes = lazy(() => import('./AdminRoutes/PublicationRoutes'));
 
 export const AdminRouter: React.FC = () => {
   const { showSnackbar } = useSnackbar();
@@ -104,6 +106,8 @@ export const AdminRouter: React.FC = () => {
           <Route path="languages/*" element={<div><LanguageRoutes /></div>} />
           <Route path="services/*" element={<div><ServiceRoutes /></div>} />
           <Route path="github-integration/*" element={<div><GithubIntegrationRoutes /></div>} />
+          <Route path="testimonial-requests/*" element={<div><TestimonialRequestRoutes /></div>} />
+          <Route path="publications/*" element={<div><PublicationRoutes /></div>} />
         </Route>
         {/* Renders without admin chrome — full-screen landing preview */}
         <Route path="" element={<LandingPage />} />
