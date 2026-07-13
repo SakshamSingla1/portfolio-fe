@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiDownload, FiGlobe, FiMail } from "react-icons/fi";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useProfileService, type ProfileRequest } from "../../../services/useProfileService";
@@ -11,6 +11,8 @@ import { useSnackbar } from "../../../contexts/SnackbarContext";
 import ProfileFormTemplate from "../../templates/Profile/ProfileForm.template";
 import Button from "../../atoms/Button/Button";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+
+const API_BASE = import.meta.env.VITE_API_V1_URL as string;
 
 const validationSchema = Yup.object({
   userName: Yup.string().required("User name is required"),
@@ -58,6 +60,9 @@ const ProfilePage: React.FC = () => {
   const queryClient = useQueryClient();
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isDiscoverable, setIsDiscoverable] = useState<boolean>(true);
+  const [digestEnabled, setDigestEnabled] = useState<boolean>(true);
+  const [settingsSaving, setSettingsSaving] = useState<boolean>(false);
 
   const { data: profileData, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -91,6 +96,38 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     setIsEditMode(searchParams.get("mode") === MODE.EDIT);
   }, [searchParams]);
+
+  useEffect(() => {
+    if (profileData) {
+      setIsDiscoverable((profileData as any).isDiscoverable ?? true);
+      setDigestEnabled((profileData as any).digestEmailEnabled ?? true);
+    }
+  }, [profileData]);
+
+  const handleSettingToggle = async (field: "isDiscoverable" | "digestEmailEnabled", value: boolean) => {
+    setSettingsSaving(true);
+    try {
+      await profileService.updateSettings({ [field]: value });
+      if (field === "isDiscoverable") setIsDiscoverable(value);
+      else setDigestEnabled(value);
+      showSnackbar("success", "Setting updated");
+    } catch {
+      showSnackbar("error", "Failed to update setting");
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const downloadQrCode = () => {
+    const userName = profileData?.userName;
+    if (!userName) return;
+    const a = document.createElement("a");
+    a.href = `${API_BASE}/public/qr/${userName}`;
+    a.download = `portfolio-qr-${userName}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
     <div className="relative">
@@ -131,6 +168,101 @@ const ProfilePage: React.FC = () => {
             onEditClick={() => navigate(ADMIN_ROUTES.PROFILE)}
           />
         )}
+
+        {/* Growth settings card */}
+        <div
+          className="mx-auto mt-6 rounded-2xl p-6"
+          style={{
+            maxWidth: 720,
+            background: colors.neutral0,
+            border: `1px solid ${colors.neutral200}`,
+          }}
+        >
+          <h2 className="font-bold text-base mb-1" style={{ color: colors.neutral800 }}>
+            Portfolio Settings
+          </h2>
+          <p className="text-sm mb-5" style={{ color: colors.neutral500 }}>
+            Control discoverability, notifications, and your QR code.
+          </p>
+
+          {/* Discoverable toggle */}
+          <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
+            <div className="flex items-center gap-3">
+              <FiGlobe style={{ color: colors.primary500 }} />
+              <div>
+                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Show on Explore</p>
+                <p className="text-xs" style={{ color: colors.neutral500 }}>Let others discover your portfolio on the public explore page</p>
+              </div>
+            </div>
+            <button
+              disabled={settingsSaving}
+              onClick={() => handleSettingToggle("isDiscoverable", !isDiscoverable)}
+              style={{
+                width: 44, height: 24, borderRadius: 12,
+                background: isDiscoverable ? colors.primary500 : colors.neutral300,
+                border: "none", cursor: "pointer", position: "relative",
+                transition: "background 0.2s", flexShrink: 0,
+              }}
+            >
+              <span style={{
+                position: "absolute", top: 3,
+                left: isDiscoverable ? 22 : 3,
+                width: 18, height: 18, borderRadius: "50%",
+                background: "#fff", transition: "left 0.2s",
+              }} />
+            </button>
+          </div>
+
+          {/* Digest toggle */}
+          <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
+            <div className="flex items-center gap-3">
+              <FiMail style={{ color: colors.primary500 }} />
+              <div>
+                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Weekly Email Digest</p>
+                <p className="text-xs" style={{ color: colors.neutral500 }}>Receive a summary of views, referrers, and messages every Monday</p>
+              </div>
+            </div>
+            <button
+              disabled={settingsSaving}
+              onClick={() => handleSettingToggle("digestEmailEnabled", !digestEnabled)}
+              style={{
+                width: 44, height: 24, borderRadius: 12,
+                background: digestEnabled ? colors.primary500 : colors.neutral300,
+                border: "none", cursor: "pointer", position: "relative",
+                transition: "background 0.2s", flexShrink: 0,
+              }}
+            >
+              <span style={{
+                position: "absolute", top: 3,
+                left: digestEnabled ? 22 : 3,
+                width: 18, height: 18, borderRadius: "50%",
+                background: "#fff", transition: "left 0.2s",
+              }} />
+            </button>
+          </div>
+
+          {/* QR download */}
+          <div className="flex items-center justify-between pt-3">
+            <div className="flex items-center gap-3">
+              <FiDownload style={{ color: colors.primary500 }} />
+              <div>
+                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Portfolio QR Code</p>
+                <p className="text-xs" style={{ color: colors.neutral500 }}>Download a QR code linking to your public portfolio</p>
+              </div>
+            </div>
+            <button
+              onClick={downloadQrCode}
+              style={{
+                padding: "6px 16px", borderRadius: 10,
+                background: colors.primary50, border: `1px solid ${colors.primary200}`,
+                color: colors.primary600, fontSize: 13, fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Download PNG
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

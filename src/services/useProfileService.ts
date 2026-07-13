@@ -10,6 +10,7 @@ import useFileService from "./useFileService";
 export const PROFILE_URLS = {
     GET_BY_ID: "/profile",
     GET_ALL: "/profile",
+    PATCH_SETTINGS: "/profile/settings",
 
     // Uploads (kept for reference — upload functions use useFileService directly)
     UPLOAD_PROFILE_IMAGE: "/profile/upload/profile-image",
@@ -98,6 +99,11 @@ export interface RoleUpdateRequest {
     roleId: number | null;
 }
 
+export interface ProfileSettingsRequest {
+    isDiscoverable?: boolean;
+    digestEmailEnabled?: boolean;
+}
+
 export interface GetProfilesParams {
     page: number;
     size: number;
@@ -124,6 +130,10 @@ export const useProfileService = () => {
 
     const update = (profile: ProfileRequest) => {
         return request(API_METHOD.PUT, PROFILE_URLS.GET_BY_ID, user, profile);
+    };
+
+    const updateSettings = (settings: ProfileSettingsRequest) => {
+        return request(API_METHOD.PATCH, PROFILE_URLS.PATCH_SETTINGS, user, settings);
     };
 
     // =========================
@@ -190,6 +200,7 @@ export const useProfileService = () => {
     return {
         get,
         update,
+        updateSettings,
         uploadProfileImage,
         uploadLogo,
         uploadAboutMeImage,
