@@ -113,8 +113,11 @@ const TestimonialFormTemplate = ({
                 status: values.status,
             };
             setSubmitting(true);
-            if (mode !== MODE.VIEW) await onSubmit(payload);
-            onClose();
+            if (mode !== MODE.VIEW) {
+                await onSubmit(payload);
+            } else {
+                onClose();
+            }
             setSubmitting(false);
         },
     });
