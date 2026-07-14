@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
-import { FiEdit, FiDownload, FiGlobe, FiMail } from "react-icons/fi";
+import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail } from "react-icons/fi";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useProfileService, type ProfileRequest } from "../../../services/useProfileService";
@@ -63,6 +63,7 @@ const ProfilePage: React.FC = () => {
   const [isDiscoverable, setIsDiscoverable] = useState<boolean>(true);
   const [digestEnabled, setDigestEnabled] = useState<boolean>(true);
   const [settingsSaving, setSettingsSaving] = useState<boolean>(false);
+  const [embedCopied, setEmbedCopied] = useState<boolean>(false);
 
   const { data: profileData, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -127,6 +128,29 @@ const ProfilePage: React.FC = () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  const downloadPortfolioPdf = () => {
+    const userName = profileData?.userName;
+    if (!userName) return;
+    const a = document.createElement("a");
+    a.href = `${API_BASE}/public/portfolio-export/${userName}`;
+    a.download = `portfolio-${userName}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const embedSnippet = profileData?.userName
+    ? `<iframe src="${API_BASE.replace('/api/v1/public', '')}/embed/${profileData.userName}" width="420" height="460" frameborder="0" style="border:none;border-radius:12px;overflow:hidden;" title="${(profileData as any).fullName ?? 'Portfolio'} — Portfolio Card"></iframe>`
+    : "";
+
+  const copyEmbedSnippet = () => {
+    if (!embedSnippet) return;
+    navigator.clipboard.writeText(embedSnippet).then(() => {
+      setEmbedCopied(true);
+      setTimeout(() => setEmbedCopied(false), 2000);
+    });
   };
 
   return (
@@ -261,6 +285,91 @@ const ProfilePage: React.FC = () => {
             >
               Download PNG
             </button>
+          </div>
+        </div>
+
+        {/* PDF Export card */}
+        <div
+          className="mx-auto mt-6 rounded-2xl p-6"
+          style={{
+            maxWidth: 720,
+            background: colors.neutral0,
+            border: `1px solid ${colors.neutral200}`,
+          }}
+        >
+          <h2 className="font-bold text-base mb-1" style={{ color: colors.neutral800 }}>
+            Export Portfolio
+          </h2>
+          <p className="text-sm mb-5" style={{ color: colors.neutral500 }}>
+            Download a complete PDF of your portfolio — ideal for email submissions and HR systems.
+          </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FiFile style={{ color: colors.primary500 }} />
+              <div>
+                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Full Portfolio PDF</p>
+                <p className="text-xs" style={{ color: colors.neutral500 }}>All sections — experience, skills, projects, publications and more</p>
+              </div>
+            </div>
+            <button
+              onClick={downloadPortfolioPdf}
+              style={{
+                padding: "6px 16px", borderRadius: 10,
+                background: colors.primary50, border: `1px solid ${colors.primary200}`,
+                color: colors.primary600, fontSize: 13, fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Download PDF
+            </button>
+          </div>
+        </div>
+
+        {/* Embed Widget card */}
+        <div
+          className="mx-auto mt-6 rounded-2xl p-6"
+          style={{
+            maxWidth: 720,
+            background: colors.neutral0,
+            border: `1px solid ${colors.neutral200}`,
+          }}
+        >
+          <h2 className="font-bold text-base mb-1" style={{ color: colors.neutral800 }}>
+            Embed Widget
+          </h2>
+          <p className="text-sm mb-5" style={{ color: colors.neutral500 }}>
+            Share a live card of your portfolio anywhere — GitHub README, personal website, or Notion page.
+          </p>
+          <div className="rounded-xl p-3 mb-4 font-mono text-xs break-all" style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}`, color: colors.neutral700 }}>
+            {embedSnippet}
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={copyEmbedSnippet}
+              style={{
+                padding: "6px 16px", borderRadius: 10,
+                background: colors.primary50, border: `1px solid ${colors.primary200}`,
+                color: colors.primary600, fontSize: 13, fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              {embedCopied ? "Copied!" : "Copy Snippet"}
+            </button>
+            {profileData?.userName && (
+              <a
+                href={`${API_BASE.replace('/api/v1/public', '')}/embed/${profileData.userName}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  padding: "6px 16px", borderRadius: 10,
+                  background: "transparent", border: `1px solid ${colors.neutral300}`,
+                  color: colors.neutral600, fontSize: 13, fontWeight: 500,
+                  cursor: "pointer", textDecoration: "none",
+                }}
+              >
+                Preview
+              </a>
+            )}
           </div>
         </div>
       </div>
