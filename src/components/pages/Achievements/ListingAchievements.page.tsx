@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import AchievementListTableTemplate from '../../templates/Achievements/AchievementTable.template';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { useAchievementService, type Achievement, type AchievementFilterParams } from '../../../services/useAchievementService';
+import { useAchievementService } from '../../../services/useAchievementService';
 
 const AchievementListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const achievementService = useAchievementService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,33 +20,28 @@ const AchievementListPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [achievements, setAchievementsTo] = useState<Achievement[]>([]);
 
-    const refreshAchievements = async (page: string, size: string) => {
-        const params: AchievementFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['achievements', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => achievementService.getAll({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await achievementService.getAll(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setAchievementsTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching achievements:", error);
-                setAchievementsTo([]);
-                showSnackbar('error', 'Failed to load achievements');
-            })
-    }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const achievements = pageData?.content ?? [];
+    const totalRecords = pageData?.totalElements ?? 0;
+    const totalPages = pageData?.totalPages ?? 0;
+
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords,
+        totalPages,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -70,10 +64,6 @@ const AchievementListPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshAchievements(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -83,11 +73,11 @@ const AchievementListPage: React.FC = () => {
     }, [filters.search, pagination]);
 
     return (
-        <AchievementListTableTemplate 
-            achievements={achievements} 
-            pagination={pagination} 
-            handlePaginationChange={handlePaginationChange} 
-            handleRowsPerPageChange={handleRowsPerPageChange} 
+        <AchievementListTableTemplate
+            achievements={achievements}
+            pagination={paginationWithTotal}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
         />

@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, SORT_ENUM, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { SORT_ENUM, type IPagination, StatusOptions } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import { useSocialLinkService, type SocialLinkFilterParams, type SocialLinkResponse } from '../../../services/useSocialLinkService';
+import { useSocialLinkService } from '../../../services/useSocialLinkService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
 import SocialLinksTable from '../../templates/SocialLinks/SocialLinksTable.template';
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
-import { StatusOptions } from '../../../utils/types';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const ListingSocialLinksPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const socialLinkService = useSocialLinkService();
-    const { showSnackbar } = useSnackbar();
     const isMobile = useIsMobile();
 
     const initialFiltersValues: any = {
@@ -26,34 +24,26 @@ const ListingSocialLinksPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [socialLinks, setSocialLinksTo] = useState<SocialLinkResponse[]>([]);
 
-    const refreshSocialLinks = async (page: string, size: string) => {
-        const params: SocialLinkFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['socialLinks', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
+        queryFn: () => socialLinkService.getAll({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: SORT_ENUM.DESC,
             sortBy: "createdAt",
-            search: filters?.search,
-            status: filters?.status,
-        };
-        await socialLinkService.getAll(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setSocialLinksTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching projects:", error);
-                setSocialLinksTo([]);
-                showSnackbar('error', 'Failed to load projects');
-            })
-    }
+            search: filters.search,
+            status: filters.status,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const socialLinks = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -76,10 +66,6 @@ const ListingSocialLinksPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshSocialLinks(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -92,7 +78,7 @@ const ListingSocialLinksPage: React.FC = () => {
     return (
         <SocialLinksTable
             socialLinks={socialLinks}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}

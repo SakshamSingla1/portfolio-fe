@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import CertificationListTableTemplate from '../../templates/Certification/CertificationTable.template';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { useCertificationService, type Certification, type CertificationFilterParams } from '../../../services/useCertificationService';
+import { useCertificationService } from '../../../services/useCertificationService';
 
 const CertificationListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const certificationService = useCertificationService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,33 +20,28 @@ const CertificationListPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [certifications, setCertificationsTo] = useState<Certification[]>([]);
 
-    const refreshCertifications = async (page: string, size: string) => {
-        const params: CertificationFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['certifications', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => certificationService.getAll({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await certificationService.getAll(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setCertificationsTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching certifications:", error);
-                setCertificationsTo([]);
-                showSnackbar('error', 'Failed to load certifications');
-            })
-    }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const certifications = pageData?.content ?? [];
+    const totalRecords = pageData?.totalElements ?? 0;
+    const totalPages = pageData?.totalPages ?? 0;
+
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords,
+        totalPages,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -70,10 +64,6 @@ const CertificationListPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshCertifications(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -83,11 +73,11 @@ const CertificationListPage: React.FC = () => {
     }, [filters.search, pagination]);
 
     return (
-        <CertificationListTableTemplate 
-            certifications={certifications} 
-            pagination={pagination} 
-            handlePaginationChange={handlePaginationChange} 
-            handleRowsPerPageChange={handleRowsPerPageChange} 
+        <CertificationListTableTemplate
+            certifications={certifications}
+            pagination={paginationWithTotal}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
         />

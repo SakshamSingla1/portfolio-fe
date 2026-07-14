@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query';
 import { HTTP_STATUS, type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import SkillTableTemplate from '../../templates/Skill/SkillsTable.template';
-import { useSkillService, type SkillResponse, type SkillFilterParams, type SkillStats } from '../../../services/useSkillService';
+import { useSkillService, type SkillResponse, type SkillStats } from '../../../services/useSkillService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-
 const ListingSkillsPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const skillService = useSkillService();
-    const { showSnackbar } = useSnackbar();
 
     const [skillStats, setSkillStats] = useState<SkillStats | null>(null);
 
@@ -24,7 +22,6 @@ const ListingSkillsPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
         totalRecords: 0,
     });
-    const [skills, setSkills] = useState<SkillResponse[]>([]);
 
     const handleFiltersChange = (key: string, value: any) => {
         setFiltersTo((prevFilters: any) => ({
@@ -44,29 +41,22 @@ const ListingSkillsPage: React.FC = () => {
         }
     };
 
-    const refreshSkills = async (page: string, size: string) => {
-        try {
-            const params: SkillFilterParams = {
-                page: page,
-                size: size,
-                search: filters?.search,
-            };
-            const response = await skillService.getByProfile(params);
-            if (response?.status === HTTP_STATUS.OK) {
-                const { totalElements, totalPages } = response?.data?.data;
-                setPagination((prev) => ({
-                    ...prev,
-                    totalPages: totalPages,
-                    totalRecords: totalElements
-                }));
-                setSkills(response?.data?.data?.content);
-            }
-        } catch (error) {
-            console.error("Error fetching skills:", error);
-            setSkills([]);
-            showSnackbar('error', 'Failed to load skills');
-        }
-    }
+    const { data: pageResponse } = useQuery({
+        queryKey: ['skills', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => skillService.getByProfile({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const skills: SkillResponse[] = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handlePaginationChange = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPagination((prevPagination) => ({
@@ -82,10 +72,6 @@ const ListingSkillsPage: React.FC = () => {
             pageSize: newRowsPerPage
         }));
     };
-
-    useEffect(() => {
-        refreshSkills(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         loadSkillStats();
@@ -104,7 +90,7 @@ const ListingSkillsPage: React.FC = () => {
         <div className="grid gap-y-4">
             <SkillTableTemplate
                 skills={skills}
-                pagination={pagination}
+                pagination={paginationWithTotal}
                 handlePaginationChange={handlePaginationChange}
                 handleRowsPerPageChange={handleRowsPerPageChange}
                 searchValue={filters.search}

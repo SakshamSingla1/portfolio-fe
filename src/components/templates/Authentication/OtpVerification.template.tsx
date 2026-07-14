@@ -55,7 +55,6 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
                         email: user.email, phone: user.phone, roleId: user.roleId,
                         roleName: user.roleName, status: user.status,
                         emailVerified: user.emailVerified, phoneVerified: user.phoneVerified,
-                        token: user.token,
                     });
                     setDefaultTheme(user.defaultTheme);
                     setRolePermissions(user.rolePermissions);

@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, SORT_ENUM } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination, SORT_ENUM } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import EducationTable from '../../templates/Education/EducationsTable.template';
-import { useEducationService, type Education, type EducationFilterParams } from '../../../services/useEducationService';
+import { useEducationService } from '../../../services/useEducationService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
 
 const ListingEducationPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const educationService = useEducationService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,33 +20,28 @@ const ListingEducationPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [educations, setEducationsTo] = useState<Education[]>([]);
 
-    const refreshServices = async (page: string, size: string) => {
-        const params: EducationFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['educations', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => educationService.getAllByProfile({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: SORT_ENUM.DESC,
             sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await educationService.getAllByProfile(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setEducationsTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching educations:", error);
-                setEducationsTo([]);
-                showSnackbar('error', 'Failed to load educations');
-            })
-    }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const educations = pageData?.content ?? [];
+    const totalRecords = pageData?.totalElements ?? 0;
+    const totalPages = pageData?.totalPages ?? 0;
+
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords,
+        totalPages,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -70,10 +64,6 @@ const ListingEducationPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshServices(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -85,7 +75,7 @@ const ListingEducationPage: React.FC = () => {
     return (
         <EducationTable
             educations={educations}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}

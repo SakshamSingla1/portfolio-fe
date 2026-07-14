@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import { useProjectService, type ProjectResponse, type ProjectFilterParams } from '../../../services/useProjectService';
+import { useProjectService } from '../../../services/useProjectService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
 import ProjectsTable from '../../templates/Project/ProjectsTable.template';
 
 const ListingProjectsPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const projectService = useProjectService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,33 +20,25 @@ const ListingProjectsPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [projects, setProjectsTo] = useState<ProjectResponse[]>([]);
 
-    const refreshProjects = async (page: string, size: string) => {
-        const params: ProjectFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['projects', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => projectService.getByProfile({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await projectService.getByProfile(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setProjectsTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching projects:", error);
-                setProjectsTo([]);
-                showSnackbar('error', 'Failed to load projects');
-            })
-    }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const projects = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -70,10 +61,6 @@ const ListingProjectsPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshProjects(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -85,7 +72,7 @@ const ListingProjectsPage: React.FC = () => {
     return (
         <ProjectsTable
             projects={projects}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}

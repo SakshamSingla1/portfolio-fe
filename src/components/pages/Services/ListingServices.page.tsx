@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { HTTP_STATUS, type IPagination } from "../../../utils/types";
 import { initialPaginationValues } from "../../../utils/constant";
-import { useServiceService, type ServiceOffering, type ServiceFilterParams } from "../../../services/useServiceService";
+import { useServiceService, type ServiceOffering } from "../../../services/useServiceService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import ServiceTableTemplate from "../../templates/Services/ServiceTable.template";
 
@@ -17,26 +18,24 @@ const ListingServicesPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [services, setServices] = useState<ServiceOffering[]>([]);
 
-    const fetchServices = async () => {
-        const params: ServiceFilterParams = {
+    const { data: pageResponse, refetch } = useQuery({
+        queryKey: ['services', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => serviceService.getAll({
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             sortDir: "ASC",
             sortBy: "sortOrder",
             search: filters.search || undefined,
-        };
-        try {
-            const res = await serviceService.getAll(params);
-            if (res?.status === HTTP_STATUS.OK) {
-                const { totalElements, totalPages } = res.data.data;
-                setPagination((p) => ({ ...p, totalPages, totalRecords: totalElements }));
-                setServices(res.data.data.content);
-            }
-        } catch {
-            showSnackbar("error", "Failed to load services");
-        }
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const services: ServiceOffering[] = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
     };
 
     const handleDelete = async (id: number) => {
@@ -44,7 +43,7 @@ const ListingServicesPage: React.FC = () => {
             const res = await serviceService.remove(id);
             if (res?.status === HTTP_STATUS.OK) {
                 showSnackbar("success", "Service deleted");
-                fetchServices();
+                refetch();
             } else {
                 showSnackbar("error", res?.data?.message);
             }
@@ -53,8 +52,6 @@ const ListingServicesPage: React.FC = () => {
         }
     };
 
-    useEffect(() => { fetchServices(); }, [filters, pagination.currentPage, pagination.pageSize]);
-
     useEffect(() => {
         setSearchParams({ page: pagination.currentPage.toString(), size: pagination.pageSize.toString(), search: filters.search });
     }, [filters.search, pagination.currentPage, pagination.pageSize]);
@@ -62,7 +59,7 @@ const ListingServicesPage: React.FC = () => {
     return (
         <ServiceTableTemplate
             services={services}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={(_, newPage) => setPagination((p) => ({ ...p, currentPage: newPage }))}
             handleRowsPerPageChange={(e) => setPagination((p) => ({ ...p, pageSize: parseInt(e.target.value, 10) }))}
             searchValue={filters.search}

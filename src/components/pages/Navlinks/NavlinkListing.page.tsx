@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, SORT_ENUM, StatusOptions } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination, SORT_ENUM, StatusOptions } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import NavlinkListTableTemplate from '../../templates/Navlinks/NavlinksListing.template';
-import { useNavlinkService, type NavlinkResponse, type NavlinkFilterRequest } from '../../../services/useNavlinkService';
+import { useNavlinkService } from '../../../services/useNavlinkService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const NavlinkListingPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navlinkService = useNavlinkService();
-    const { showSnackbar } = useSnackbar();
     const isMobile = useIsMobile();
 
     const initialFiltersValues: any = {
@@ -25,33 +24,26 @@ const NavlinkListingPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [navlinks, setNavlinksTo] = useState<NavlinkResponse[]>([]);
 
-    const refreshNavlinks = async (page: string, size: string) => {
-        try {
-            const params: NavlinkFilterRequest = {
-                page,
-                size,
-                sortDir: SORT_ENUM.ASC,
-                sortBy: "index",
-                search: filters?.search,
-                status: filters?.status
-            };
-            const res1 = await navlinkService.getAllNavlinks(params);
-            if (res1?.status === HTTP_STATUS.OK) {
-                const { totalElements, totalPages } = res1?.data?.data;
-                setPagination(prev => ({
-                    ...prev,
-                    totalPages,
-                    totalRecords: totalElements
-                }));
-                setNavlinksTo(res1?.data?.data?.content);
-            }
-        } catch (error) {
-            setNavlinksTo([]);
-            showSnackbar('error', 'Failed to fetch navlinks');
-        }
-    }
+    const { data: pageResponse } = useQuery({
+        queryKey: ['navlinks', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
+        queryFn: () => navlinkService.getAllNavlinks({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
+            sortDir: SORT_ENUM.ASC,
+            sortBy: "index",
+            search: filters.search,
+            status: filters.status,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const navlinks = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -74,10 +66,6 @@ const NavlinkListingPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshNavlinks(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -88,11 +76,11 @@ const NavlinkListingPage: React.FC = () => {
     }, [filters.search, filters.status, pagination]);
 
     return (
-        <NavlinkListTableTemplate 
-            navlinks={navlinks} 
-            pagination={pagination} 
-            handlePaginationChange={handlePaginationChange} 
-            handleRowsPerPageChange={handleRowsPerPageChange} 
+        <NavlinkListTableTemplate
+            navlinks={navlinks}
+            pagination={paginationWithTotal}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             filterContent={

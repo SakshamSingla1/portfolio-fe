@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useColors } from '../../../utils/types';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useColors, HTTP_STATUS } from '../../../utils/types';
 import { useSnackbar } from '../../../hooks/useSnackBar';
 import { useTestimonialLinkService, type TestimonialLink, type CreateTestimonialLinkRequest } from '../../../services/useTestimonialLinkService';
-import { HTTP_STATUS } from '../../../utils/types';
 
 const ListingTestimonialLinksPage: React.FC = () => {
     const colors = useColors();
     const { showSnackbar } = useSnackbar();
     const service = useTestimonialLinkService();
 
-    const [links, setLinks] = useState<TestimonialLink[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [generating, setGenerating] = useState(false);
     const [newLinkUrl, setNewLinkUrl] = useState<string | null>(null);
@@ -20,20 +19,12 @@ const ListingTestimonialLinksPage: React.FC = () => {
         expiryDays: 30,
     });
 
-    const loadLinks = async () => {
-        try {
-            const res = await service.getLinks();
-            if (res?.status === HTTP_STATUS.OK) {
-                setLinks(res.data?.data ?? []);
-            }
-        } catch {
-            showSnackbar('error', 'Failed to load testimonial links');
-        }
-    };
+    const { data: pageResponse, refetch } = useQuery({
+        queryKey: ['testimonialLinks'],
+        queryFn: () => service.getLinks(),
+    });
 
-    useEffect(() => {
-        loadLinks();
-    }, []);
+    const links: TestimonialLink[] = pageResponse?.data?.data ?? [];
 
     const handleGenerate = async () => {
         setGenerating(true);
@@ -42,7 +33,7 @@ const ListingTestimonialLinksPage: React.FC = () => {
             if (res?.status === HTTP_STATUS.OK || res?.status === 201) {
                 const created: TestimonialLink = res.data?.data;
                 setNewLinkUrl(created.shareUrl);
-                setLinks(prev => [created, ...prev]);
+                refetch();
                 showSnackbar('success', 'Testimonial request link generated');
             }
         } catch {
@@ -56,7 +47,7 @@ const ListingTestimonialLinksPage: React.FC = () => {
         if (!window.confirm('Revoke this link? It will no longer be accessible.')) return;
         try {
             await service.revokeLink(id);
-            setLinks(prev => prev.filter(l => l.id !== id));
+            refetch();
             showSnackbar('success', 'Link revoked');
         } catch {
             showSnackbar('error', 'Failed to revoke link');

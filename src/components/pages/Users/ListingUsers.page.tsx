@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, Status } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination, Status } from '../../../utils/types';
 import { initialPaginationValues, ROLES } from '../../../utils/constant';
-import { useProfileService, type UserResponse, type GetProfilesParams } from '../../../services/useProfileService';
+import { useProfileService } from '../../../services/useProfileService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
 import UserTableTemplate from '../../templates/Users/UsersTable.template';
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 import { useIsMobile } from '../../../hooks/useIsMobile';
@@ -11,7 +11,6 @@ import { useIsMobile } from '../../../hooks/useIsMobile';
 const ListingUsersPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const profileService = useProfileService();
-    const { showSnackbar } = useSnackbar();
     const isMobile = useIsMobile();
 
     const roleOptions = [
@@ -38,33 +37,25 @@ const ListingUsersPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [users, setUsersTo] = useState<UserResponse[]>([]);
 
-    const refreshUsers = async (page: number, size: number) => {
-        const params: GetProfilesParams = {
-            page: page,
-            size: size,
-            status: filters?.status,
-            roleId: filters?.roleId,
-            search: filters?.search,
-        };
-        await profileService.getAllUsers(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setUsersTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching users:", error);
-                setUsersTo([]);
-                showSnackbar('error', 'Failed to load users');
-            })
-    }
+    const { data: pageResponse, refetch } = useQuery({
+        queryKey: ['users', pagination.currentPage, pagination.pageSize, filters.search, filters.roleId, filters.status],
+        queryFn: () => profileService.getAllUsers({
+            page: pagination.currentPage,
+            size: pagination.pageSize,
+            search: filters.search,
+            roleId: filters.roleId,
+            status: filters.status,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const users = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -87,10 +78,6 @@ const ListingUsersPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshUsers(pagination.currentPage, pagination.pageSize);
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -104,12 +91,12 @@ const ListingUsersPage: React.FC = () => {
     return (
         <UserTableTemplate
             users={users}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
-            onRefresh={() => refreshUsers(pagination.currentPage, pagination.pageSize)}
+            onRefresh={refetch}
             filterContent={
                 <>
                     <div className="w-full sm:w-72">

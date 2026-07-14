@@ -1,10 +1,21 @@
 import { lazy, Suspense, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthenticatedUserContext } from "./contexts/AuthenticatedUserContext";
 import AdminRouter from "./routes/AdminRouter";
 import Authentication from "./components/pages/Authentication/Authentication.page";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ThemeInjector from "./components/atoms/ThemeInjector/ThemeInjector";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30_000, // 30s
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const Landing = lazy(() => import("./components/pages/Landing/Landing.page"));
 
@@ -16,6 +27,7 @@ function App() {
   });
 
   return (
+    <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <SnackbarProvider>
         <AuthenticatedUserContext.Consumer>
@@ -38,6 +50,7 @@ function App() {
         </AuthenticatedUserContext.Consumer>
       </SnackbarProvider>
     </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

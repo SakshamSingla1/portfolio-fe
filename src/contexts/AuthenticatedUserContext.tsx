@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import { type ColorTheme } from "../services/useColorThemeService";
 import type { RolePermissionResponseDTO } from "../services/useRoleService";
 import { AuthDialogProvider } from "./AuthDialogContext";
@@ -18,7 +19,7 @@ export interface AuthenticatedUserType {
     status: string;
     emailVerified: string;
     phoneVerified: string;
-    token: string;
+    token?: string; // deprecated — JWT now stored in httpOnly cookie
     isTwoFactorEnabled?: boolean;
 }
 
@@ -77,8 +78,13 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
     });
 
     useEffect(() => {
-        if (user) localStorage.setItem("user", JSON.stringify(user));
-        else localStorage.removeItem("user");
+        if (user) {
+            // Strip token before persisting — JWT lives in httpOnly cookie, not localStorage
+            const { token: _discard, ...userWithoutToken } = user;
+            localStorage.setItem("user", JSON.stringify(userWithoutToken));
+        } else {
+            localStorage.removeItem("user");
+        }
     }, [user]);
 
     useEffect(() => {
@@ -91,7 +97,12 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
         else localStorage.removeItem("rolePermissions");
     }, [rolePermissions]);
 
-    const logout = useCallback(() => {
+    const logout = useCallback(async () => {
+        try {
+            await axios.post(`${import.meta.env.VITE_API_V1_URL}/admin/auth/logout`, {}, { withCredentials: true });
+        } catch {
+            // ignore — proceed with local logout regardless
+        }
         setAuthenticatedUser(null);
         setDefaultTheme(null);
         setRolePermissions(null);

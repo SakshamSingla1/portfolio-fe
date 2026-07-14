@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import { HTTP_STATUS, type IPagination } from "../../../utils/types";
+import { type IPagination } from "../../../utils/types";
 import { initialPaginationValues } from "../../../utils/constant";
-import { useLanguageService, type Language, type LanguageFilterParams } from "../../../services/useLanguageService";
-import { useSnackbar } from "../../../hooks/useSnackBar";
+import { useLanguageService } from "../../../services/useLanguageService";
 import LanguageTableTemplate from "../../templates/Languages/LanguageTable.template";
 
 const ListingLanguagesPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const languageService = useLanguageService();
-    const { showSnackbar } = useSnackbar();
 
     const [filters, setFilters] = useState({ search: searchParams.get("search") || "" });
     const [pagination, setPagination] = useState<IPagination>({
@@ -17,26 +16,24 @@ const ListingLanguagesPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [languages, setLanguages] = useState<Language[]>([]);
 
-    const fetchLanguages = async (page: string, size: string) => {
-        const params: LanguageFilterParams = {
-            page,
-            size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['languages', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => languageService.getAll({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "ASC",
             sortBy: "sortOrder",
-            search: filters.search || undefined,
-        };
-        try {
-            const res = await languageService.getAll(params);
-            if (res?.status === HTTP_STATUS.OK) {
-                const { totalElements, totalPages } = res.data.data;
-                setPagination((p) => ({ ...p, totalPages, totalRecords: totalElements }));
-                setLanguages(res.data.data.content);
-            }
-        } catch {
-            showSnackbar("error", "Failed to load languages");
-        }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const languages = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
     };
 
     const handlePaginationChange = (_: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -46,10 +43,6 @@ const ListingLanguagesPage: React.FC = () => {
     const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPagination((p) => ({ ...p, pageSize: parseInt(e.target.value, 10) }));
     };
-
-    useEffect(() => {
-        fetchLanguages(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         setSearchParams({
@@ -62,7 +55,7 @@ const ListingLanguagesPage: React.FC = () => {
     return (
         <LanguageTableTemplate
             languages={languages}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}

@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import TestimonialListTableTemplate from '../../templates/Testimonial/TestimonialTable.template';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { useTestimonialService, type Testimonial, type TestimonialFilterParams } from '../../../services/useTestimonialService';
+import { useTestimonialService } from '../../../services/useTestimonialService';
 
 const TestimonialListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const testimonialService = useTestimonialService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,33 +20,25 @@ const TestimonialListPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [testimonials, setTestimonialsTo] = useState<Testimonial[]>([]);
 
-    const refreshTestimonials = async (page: string, size: string) => {
-        const params: TestimonialFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['testimonials', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => testimonialService.getAll({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await testimonialService.getAll(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setTestimonialsTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching testimonials:", error);
-                setTestimonialsTo([]);
-                showSnackbar('error', 'Failed to load testimonials');
-            })
-    }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const testimonials = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -70,10 +61,6 @@ const TestimonialListPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshTestimonials(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -83,11 +70,11 @@ const TestimonialListPage: React.FC = () => {
     }, [filters.search, pagination]);
 
     return (
-        <TestimonialListTableTemplate 
-            testimonials={testimonials} 
-            pagination={pagination} 
-            handlePaginationChange={handlePaginationChange} 
-            handleRowsPerPageChange={handleRowsPerPageChange} 
+        <TestimonialListTableTemplate
+            testimonials={testimonials}
+            pagination={paginationWithTotal}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
         />

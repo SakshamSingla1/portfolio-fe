@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { HTTP_STATUS, SORT_ENUM, type IPagination } from "../../../utils/types";
 import { initialPaginationValues } from "../../../utils/constant";
 import { useSearchParams } from "react-router-dom";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import {
     useBlogPostService,
-    type BlogPostSummary,
-    type BlogPostFilterParams,
     BlogStatusOptions,
 } from "../../../services/useBlogPostService";
 import BlogPostTableTemplate from "../../templates/Blogs/BlogPostTable.template";
@@ -30,38 +29,33 @@ const ListingBlogsPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [posts, setPosts] = useState<BlogPostSummary[]>([]);
 
     const statusFilterOptions = [
         { label: "All Statuses", value: "" },
         ...BlogStatusOptions,
     ];
 
-    const refreshPosts = async (page: string, size: string) => {
-        const params: BlogPostFilterParams = {
-            page: Number(page),
-            size: Number(size),
+    const { data: pageResponse, refetch } = useQuery({
+        queryKey: ['blogPosts', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
+        queryFn: () => blogPostService.getAll({
+            page: pagination.currentPage,
+            size: pagination.pageSize,
             sortDir: SORT_ENUM.DESC,
             sortBy: "createdAt",
             search: filters.search || undefined,
             status: filters.status || undefined,
-        };
-        await blogPostService.getAll(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination((prev) => ({
-                        ...prev,
-                        totalPages,
-                        totalRecords: totalElements,
-                    }));
-                    setPosts(res?.data?.data?.content ?? []);
-                }
-            })
-            .catch(() => {
-                setPosts([]);
-                showSnackbar("error", "Failed to load blog posts");
-            });
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const posts = pageData?.content ?? [];
+    const totalRecords = pageData?.totalElements ?? 0;
+    const totalPages = pageData?.totalPages ?? 0;
+
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords,
+        totalPages,
     };
 
     const handleFiltersChange = (name: string, value: any) => {
@@ -89,7 +83,7 @@ const ListingBlogsPage: React.FC = () => {
             const res = await blogPostService.remove(id);
             if (res?.status === HTTP_STATUS.OK) {
                 showSnackbar("success", res?.data?.message || "Blog post deleted");
-                refreshPosts(pagination.currentPage.toString(), pagination.pageSize.toString());
+                refetch();
             } else {
                 showSnackbar("error", res?.data?.message || "Failed to delete blog post");
             }
@@ -97,10 +91,6 @@ const ListingBlogsPage: React.FC = () => {
             showSnackbar("error", "Failed to delete blog post");
         }
     };
-
-    useEffect(() => {
-        refreshPosts(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
 
     useEffect(() => {
         const params: Record<string, string> = {
@@ -115,7 +105,7 @@ const ListingBlogsPage: React.FC = () => {
     return (
         <BlogPostTableTemplate
             posts={posts}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}

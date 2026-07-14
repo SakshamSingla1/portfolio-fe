@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, StatusOptions, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { StatusOptions, type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import { useResumeService , type DocumentUploadResponse , type ResumeSearchParams} from '../../../services/useResumeService';
+import { useResumeService, type DocumentUploadResponse } from '../../../services/useResumeService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
 import ResumeTable from '../../templates/Resume/ResumeTable.template';
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 
 const ResumeListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const resumeService = useResumeService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -23,34 +22,26 @@ const ResumeListPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [resumes, setResumesTo] = useState<DocumentUploadResponse[]>([]);
 
-    const refreshResumes = async (page: string, size: string) => {
-        const params: ResumeSearchParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse, refetch } = useQuery({
+        queryKey: ['resumes', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
+        queryFn: () => resumeService.getByProfile({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "updatedAt",
-            search: filters?.search,
-            status: filters?.status,
-        };
-        await resumeService.getByProfile(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setResumesTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching projects:", error);
-                setResumesTo([]);
-                showSnackbar('error', 'Failed to load resumes');
-            })
-    }
+            search: filters.search,
+            status: filters.status,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const resumes: DocumentUploadResponse[] = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -73,10 +64,6 @@ const ResumeListPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshResumes(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -90,12 +77,12 @@ const ResumeListPage: React.FC = () => {
         <div>
             <ResumeTable
                 resumes={resumes}
-                pagination={pagination}
+                pagination={paginationWithTotal}
                 handlePaginationChange={handlePaginationChange}
                 handleRowsPerPageChange={handleRowsPerPageChange}
                 searchValue={filters.search}
                 onSearchChange={(val) => handleFiltersChange("search", val)}
-                onRefresh={() => refreshResumes(pagination.currentPage.toString(), pagination.pageSize.toString())}
+                onRefresh={() => refetch()}
                 filterContent={
                     <div className="w-full sm:w-72">
                         <AutoCompleteInput
@@ -120,4 +107,3 @@ const ResumeListPage: React.FC = () => {
 }
 
 export default ResumeListPage;
-

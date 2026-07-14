@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import PublicationListTableTemplate from '../../templates/Publication/PublicationTable.template';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { usePublicationService, type Publication, type PublicationFilterParams } from '../../../services/usePublicationService';
+import { usePublicationService } from '../../../services/usePublicationService';
 
 const ListingPublicationPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const publicationService = usePublicationService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,33 +20,25 @@ const ListingPublicationPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [publications, setPublicationsTo] = useState<Publication[]>([]);
 
-    const refreshPublications = async (page: string, size: string) => {
-        const params: PublicationFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['publications', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => publicationService.getAll({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await publicationService.getAll(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setPublicationsTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching publications:", error);
-                setPublicationsTo([]);
-                showSnackbar('error', 'Failed to load publications');
-            })
-    }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const publications = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -70,10 +61,6 @@ const ListingPublicationPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshPublications(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -85,7 +72,7 @@ const ListingPublicationPage: React.FC = () => {
     return (
         <PublicationListTableTemplate
             publications={publications}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}

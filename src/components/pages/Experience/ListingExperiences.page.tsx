@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import ExperienceListTableTemplate from '../../templates/Experience/ExperiencesTable.template';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
-import { useExperienceService, type ExperienceResponse, type ExperienceFilterParams } from '../../../services/useExperienceService';
+import { useExperienceService } from '../../../services/useExperienceService';
 
 const ExperienceListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const experienceService = useExperienceService();
-    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,33 +20,25 @@ const ExperienceListPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [experiences, setExperiencesTo] = useState<ExperienceResponse[]>([]);
 
-    const refreshExperiences = async (page: string, size: string) => {
-        const params: ExperienceFilterParams = {
-            page: page,
-            size: size,
+    const { data: pageResponse } = useQuery({
+        queryKey: ['experiences', pagination.currentPage, pagination.pageSize, filters.search],
+        queryFn: () => experienceService.getAllByProfile({
+            page: pagination.currentPage.toString(),
+            size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
-            search: filters?.search,
-        };
-        await experienceService.getAllByProfile(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setExperiencesTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching experiences:", error);
-                setExperiencesTo([]);
-                showSnackbar('error', 'Failed to load experiences');
-            })
-    }
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const experiences = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -70,10 +61,6 @@ const ExperienceListPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshExperiences(pagination.currentPage.toString(), pagination.pageSize.toString());
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -85,7 +72,7 @@ const ExperienceListPage: React.FC = () => {
     return (
         <ExperienceListTableTemplate
             experiences={experiences}
-            pagination={pagination}
+            pagination={paginationWithTotal}
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}

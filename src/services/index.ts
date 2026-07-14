@@ -3,29 +3,47 @@ import { type AuthenticatedUserType } from '../contexts/AuthenticatedUserContext
 
 const API_BASE_URL = import.meta.env.VITE_API_V1_URL;
 
+axios.defaults.withCredentials = true;
+
+let isRefreshing = false;
+let refreshSubscribers: Array<() => void> = [];
+
+const onRefreshed = () => refreshSubscribers.forEach(cb => cb());
+
 axios.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("user");
-      localStorage.removeItem("defaultTheme");
-      localStorage.removeItem("rolePermissions");
-      localStorage.removeItem("reLoginTimestamp");
-      window.location.href = '/login';
+  async (error: AxiosError) => {
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshSubscribers.push(() => resolve(axios(originalRequest)));
+        });
+      }
+      originalRequest._retry = true;
+      isRefreshing = true;
+      try {
+        await axios.post(`${API_BASE_URL}/admin/auth/refresh`, {}, { withCredentials: true });
+        onRefreshed();
+        refreshSubscribers = [];
+        isRefreshing = false;
+        return axios(originalRequest);
+      } catch {
+        isRefreshing = false;
+        refreshSubscribers = [];
+        localStorage.removeItem("user");
+        localStorage.removeItem("defaultTheme");
+        localStorage.removeItem("rolePermissions");
+        localStorage.removeItem("reLoginTimestamp");
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
 );
 
-const setAuthHeader = (userContext: AuthenticatedUserType | null): void => {
-  
-    if (userContext?.token) {
-    axios.defaults.headers.common['Authorization'] = userContext.token;
-  } else {
-    delete axios.defaults.headers.common['Authorization'];
-  }
-
-};
+// Token now sent via httpOnly cookie — no manual header needed
+const setAuthHeader = (_userContext: AuthenticatedUserType | null): void => {};
 
 export const request = async (
   method: AxiosRequestConfig['method'],

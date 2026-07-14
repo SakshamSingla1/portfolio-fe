@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { HTTP_STATUS, type IPagination, Status } from '../../../utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { type IPagination, Status } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import { useRoleService, type RoleListResponseDTO, type GetAllRolesParams } from '../../../services/useRoleService';
+import { useRoleService, type RoleListResponseDTO } from '../../../services/useRoleService';
 import { useSearchParams } from 'react-router-dom';
-import { useSnackbar } from '../../../hooks/useSnackBar';
 import RoleTableTemplate from '../../templates/Roles/RoleTable.template';
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 import { useIsMobile } from '../../../hooks/useIsMobile';
@@ -11,7 +11,6 @@ import { useIsMobile } from '../../../hooks/useIsMobile';
 const ListingRolesPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const roleService = useRoleService();
-    const { showSnackbar } = useSnackbar();
     const isMobile = useIsMobile();
 
     const statusOptions = [
@@ -31,32 +30,24 @@ const ListingRolesPage: React.FC = () => {
         currentPage: Number(searchParams.get("page")) || 0,
         pageSize: Number(searchParams.get("size")) || 10,
     });
-    const [roles, setRolesTo] = useState<RoleListResponseDTO[]>([]);
 
-    const refreshRoles = async (page: number, size: number) => {
-        const params: GetAllRolesParams = {
-            page: page,
-            size: size,
-            status: filters?.status,
-            search: filters?.search,
-        };
-        await roleService.getAllRolesByCriteria(params)
-            .then((res) => {
-                if (res?.status === HTTP_STATUS.OK) {
-                    const { totalElements, totalPages } = res?.data?.data;
-                    setPagination({
-                        ...pagination,
-                        totalPages: totalPages,
-                        totalRecords: totalElements
-                    });
-                    setRolesTo(res?.data?.data?.content);
-                }
-            }).catch((error) => {
-                console.error("Error fetching roles:", error);
-                setRolesTo([]);
-                showSnackbar('error', 'Failed to load roles');
-            })
-    }
+    const { data: pageResponse } = useQuery({
+        queryKey: ['roles', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
+        queryFn: () => roleService.getAllRolesByCriteria({
+            page: pagination.currentPage,
+            size: pagination.pageSize,
+            status: filters.status,
+            search: filters.search,
+        }),
+    });
+
+    const pageData = pageResponse?.data?.data;
+    const roles: RoleListResponseDTO[] = pageData?.content ?? [];
+    const paginationWithTotal: IPagination = {
+        ...pagination,
+        totalRecords: pageData?.totalElements ?? 0,
+        totalPages: pageData?.totalPages ?? 0,
+    };
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
@@ -79,10 +70,6 @@ const ListingRolesPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refreshRoles(pagination.currentPage, pagination.pageSize);
-    }, [filters, pagination.currentPage, pagination.pageSize]);
-
-    useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
@@ -93,11 +80,11 @@ const ListingRolesPage: React.FC = () => {
     }, [filters.search, filters.status, pagination]);
 
     return (
-        <RoleTableTemplate 
-            users={roles} 
-            pagination={pagination} 
-            handlePaginationChange={handlePaginationChange} 
-            handleRowsPerPageChange={handleRowsPerPageChange} 
+        <RoleTableTemplate
+            users={roles}
+            pagination={paginationWithTotal}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             filterContent={
