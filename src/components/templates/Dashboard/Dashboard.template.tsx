@@ -31,7 +31,8 @@ const EMPTY_VIEW_STATS: IViewStats = {
   deviceBreakdown: {},
   recentViews: [],
   browserBreakdown: {},
-  locationBreakdown: {}
+  locationBreakdown: {},
+  referrerBreakdown: {}
 };
 
 const getGreeting = (): string => {
