@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { AuthenticatedUserContext } from "../contexts/AuthenticatedUserContext";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "./useSnackBar";
 
 const isSessionExpired = (): boolean | null => {
     const lastReLoginTimestamp = localStorage.getItem("reLoginTimestamp");
@@ -12,6 +13,7 @@ const isSessionExpired = (): boolean | null => {
 export const useAuthenticatedUser = () => {
     const context = React.useContext(AuthenticatedUserContext);
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
     if (!context) {
         throw new Error("useAuthenticatedUser must be used within a AuthenticatedUserProvider");
     }
@@ -33,10 +35,10 @@ export const useAuthenticatedUser = () => {
             localStorage.removeItem("rolePermissions");
             localStorage.removeItem("reLoginTimestamp");
 
-            alert("Session expired. Please log in again.");
+            showSnackbar("warning", "Session expired. Please log in again.");
             navigate("/");
-        } 
-    }, [navigate, context]);
+        }
+    }, [navigate, context, showSnackbar]);
 
     return context;
 };

@@ -3,6 +3,20 @@ import { type AuthenticatedUserType } from '../contexts/AuthenticatedUserContext
 
 const API_BASE_URL = import.meta.env.VITE_API_V1_URL;
 
+axios.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("user");
+      localStorage.removeItem("defaultTheme");
+      localStorage.removeItem("rolePermissions");
+      localStorage.removeItem("reLoginTimestamp");
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 const setAuthHeader = (userContext: AuthenticatedUserType | null): void => {
   
     if (userContext?.token) {

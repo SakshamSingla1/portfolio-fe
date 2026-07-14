@@ -1,11 +1,13 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "./useAuthenticatedUser";
+import { useSnackbar } from "./useSnackBar";
 import type { ModulePermissionDTO } from "../services/useRoleService";
 
 const useRouteValidate = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
 
   const {
     user,
@@ -41,7 +43,7 @@ const useRouteValidate = () => {
     );
 
     if (!isValid) {
-      alert("401 Unauthorized: You do not have permission to view this page.");
+      showSnackbar("error", "401 Unauthorized: You do not have permission to view this page.");
 
       localStorage.clear();
       sessionStorage.clear();
@@ -57,6 +59,7 @@ const useRouteValidate = () => {
     user,
     allowedRoutes,
     navigate,
+    showSnackbar,
     setAuthenticatedUser,
     setRolePermissions,
     setDefaultTheme
