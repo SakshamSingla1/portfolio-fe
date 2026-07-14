@@ -27,7 +27,6 @@ const NavlinkEditPage: React.FC = () => {
                 showSnackbar('success', 'Navlink updated successfully');
             }
         } catch (error) {
-            console.log(error);
             showSnackbar('error', 'Failed to update navlink');
         }
     };
@@ -38,8 +37,7 @@ const NavlinkEditPage: React.FC = () => {
             if (response?.status === HTTP_STATUS.OK) {
                 setNavlink(response.data.data);
             }
-        } catch (error) {
-            console.log(error);
+        } catch {
         }
     };
 

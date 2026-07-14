@@ -19,8 +19,7 @@ const NavlinkViewPage: React.FC = () => {
             if (response?.status === HTTP_STATUS.OK) {
                 setNavlink(response.data.data);
             }
-        } catch (error) {
-            console.log(error);
+        } catch {
         }
     };
 

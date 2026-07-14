@@ -23,6 +23,7 @@ interface UserTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     filterContent?: React.ReactNode;
+    onRefresh?: () => void;
 }
 
 const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
@@ -32,7 +33,8 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    filterContent
+    filterContent,
+    onRefresh,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -66,13 +68,13 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             const response = await toggleUserVerification(userId);
             if (response?.status === 200) {
                 showSnackbar('success', 'User verification status updated successfully');
-                window.location.reload();
+                onRefresh?.();
             }
         } catch (error) {
             showSnackbar('error', 'Failed to update user verification status');
             console.error('Error verifying user:', error);
         }
-    }, [toggleUserVerification, showSnackbar]);
+    }, [toggleUserVerification, showSnackbar, onRefresh]);
 
     const records = useMemo(() => users?.map((user: UserResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,

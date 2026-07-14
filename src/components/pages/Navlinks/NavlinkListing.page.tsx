@@ -48,7 +48,6 @@ const NavlinkListingPage: React.FC = () => {
                 setNavlinksTo(res1?.data?.data?.content);
             }
         } catch (error) {
-            console.log(error);
             setNavlinksTo([]);
             showSnackbar('error', 'Failed to fetch navlinks');
         }

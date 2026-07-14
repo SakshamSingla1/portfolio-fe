@@ -20,7 +20,6 @@ const NavlinkAddPage: React.FC = () => {
                 showSnackbar('success', 'Navlink created successfully');
             }
         } catch (error) {
-            console.log(error);
             showSnackbar('error', 'Failed to create navlink');
         }
     };

@@ -102,13 +102,14 @@ const ListingUsersPage: React.FC = () => {
     }, [filters.search, filters.roleId, filters.status, pagination]);
 
     return (
-        <UserTableTemplate 
-            users={users} 
-            pagination={pagination} 
-            handlePaginationChange={handlePaginationChange} 
-            handleRowsPerPageChange={handleRowsPerPageChange} 
+        <UserTableTemplate
+            users={users}
+            pagination={pagination}
+            handlePaginationChange={handlePaginationChange}
+            handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
+            onRefresh={() => refreshUsers(pagination.currentPage, pagination.pageSize)}
             filterContent={
                 <>
                     <div className="w-full sm:w-72">

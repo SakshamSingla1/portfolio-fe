@@ -21,7 +21,6 @@ const ColorThemeCreatePage: React.FC = () => {
             }
         } catch (error) {
             showSnackbar('error', 'Failed to create color theme');
-            console.log(error);
         }
     }
 
