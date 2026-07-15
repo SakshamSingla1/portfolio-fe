@@ -44,10 +44,6 @@ export const Status = {
     DELETED: "DELETED",
 }
 
-export const VerificationStatusOptions = [
-    { value: VerificationStatus.PENDING, label: "Pending" },
-    { value: VerificationStatus.VERIFIED, label: "Verified" },
-]
 
 export const StatusOptions = [
     { value: Status.ACTIVE, label: "Active" },

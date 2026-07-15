@@ -2,9 +2,8 @@ import { useRef, useCallback } from 'react';
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
-import { REGEX } from "./constant";
 import { createSearchParams, generatePath } from "react-router-dom";
-import type { IOption, MakeRouteParams } from "./types";
+import type { MakeRouteParams } from "./types";
 import type { ColorTheme } from "../services/useColorThemeService";
 
 export const capitalizeFirstLetter = (input: string) => {
@@ -16,43 +15,6 @@ export const convertToCamelCase = (input: string) => {
   return input?.split(" ")?.map(el => capitalizeFirstLetter(el))?.join(" ");
 };
 
-export const validatePhoneNumber = (phoneNumber: string) => {
-  return REGEX.PHONE_NUMBER.test(phoneNumber);
-};
-
-export const snakeCaseToTitleCase = (str: string) => {
-  return str.replace(/_/g, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
-};
-
-export const timeToLocale = (
-  timeInSeconds: number,
-  maximumUnitOfTime: 'year' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second'
-) => {
-  const timeUnits = [
-    { unit: 'year', value: 31536000 },
-    { unit: 'month', value: 2592000 },
-    { unit: 'week', value: 604800 },
-    { unit: 'day', value: 86400 },
-    { unit: 'hour', value: 3600 },
-    { unit: 'minute', value: 60 },
-    { unit: 'second', value: 1 },
-  ];
-
-  let result = '';
-  const availableTimeUnits = timeUnits.slice(
-    timeUnits.findIndex((timeUnit) => timeUnit.unit === maximumUnitOfTime)
-  );
-
-  for (const timeUnit of availableTimeUnits) {
-    const unitCount = Math.floor(timeInSeconds / timeUnit.value);
-    timeInSeconds %= timeUnit.value;
-    if (unitCount > 0) {
-      result += `${result ? ',' : ''}${unitCount} ${timeUnit.unit}${unitCount > 1 ? 's' : ''}`;
-    }
-  }
-
-  return result;
-};
 
 export const replaceUrlParams = (url: string, params: Record<string, any>) => {
   let result = url;
@@ -75,27 +37,6 @@ export const useDebounce = <T extends any[]>(
   }, [delay]);
 };
 
-const saveToSessionStorage = (newObject: any) => {
-  sessionStorage.setItem('history', JSON.stringify(newObject));
-};
-
-export const getListFromSessionStorage = (key: string) => {
-  const list = sessionStorage.getItem(key);
-  return list ? JSON.parse(list) : [];
-};
-
-export const addToQueue = (newObject: any) => {
-  const list = getListFromSessionStorage('history');
-  if (list.length > 0 && JSON.stringify(list[list.length - 1]) === JSON.stringify(newObject)) {
-    return;
-  }
-
-  list.push(newObject);
-  if (list.length > 10) {
-    list.shift();
-  }
-  saveToSessionStorage(list);
-};
 
 export const DateUtils = {
   formatDateTimeToDate: (dateTime: string): string => {
@@ -149,17 +90,6 @@ export const getInitials = (str: string): string => {
     .join('');
 };
 
-export const createFileFromUrl = (url: string): File => {
-  if (!url) return new File([], '-', { type: 'image/jpeg' });
-  const fullPath = url?.split('.com/')[1]?.split('?')[0] ?? '';
-  const pathParts = fullPath.split('/');
-  const filename = pathParts[pathParts.length - 1] || 'file';
-  return new File([new Blob([url])], filename, { type: 'image/jpeg' });
-};
-
-export const OptionToValue = (options: IOption[], value: string): string | number | React.ReactNode | undefined => {
-  return options.find((option: IOption) => option.value === value)?.label;
-};
 
 export const titleModification = (title: string) => {
   return title.charAt(0).toUpperCase() + title.slice(1);
@@ -223,11 +153,6 @@ export const enumToNormalKey = (enumKey: string): string => {
     .join(' ');
 };
 
-export const sanitizeHtml = (html: string): string => {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = html;
-  return tempDiv.textContent || tempDiv.innerText || '';
-};
 
 export const isRichTextEmpty = (value?: string) => {
     if (!value) return true;
