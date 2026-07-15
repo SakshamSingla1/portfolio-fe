@@ -17,7 +17,6 @@ const ViewUserPage: React.FC = () => {
             const response = await profileService.getUserById(id ? Number(id) : null);
             setUserTo(response.data.data);
         } catch (error) {
-            console.error("Error loading user:", error);
         }
     }
 

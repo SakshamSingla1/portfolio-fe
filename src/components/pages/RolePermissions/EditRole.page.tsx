@@ -21,7 +21,6 @@ const EditRolePage: React.FC = () => {
                 navigate(makeRoute(ADMIN_ROUTES.ROLE, {}));
             }
         } catch (error) {
-            console.error('Error updating role:', error);
         }
     };
 
@@ -32,7 +31,6 @@ const EditRolePage: React.FC = () => {
                 setRoleDetails(response.data.data);
             }
         } catch (error) {
-            console.error('Error loading role details:', error);
         }
     }
 

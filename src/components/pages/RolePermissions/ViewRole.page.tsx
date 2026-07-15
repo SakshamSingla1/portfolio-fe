@@ -19,7 +19,6 @@ const ViewRolePage: React.FC = () => {
                 setRoleDetails(response.data.data);
             }
         } catch (error) {
-            console.error('Error loading role details:', error);
         }
     }
 

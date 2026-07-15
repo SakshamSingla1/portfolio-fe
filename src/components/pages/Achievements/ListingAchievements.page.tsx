@@ -21,7 +21,7 @@ const AchievementListPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['achievements', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => achievementService.getAll({
             page: pagination.currentPage.toString(),

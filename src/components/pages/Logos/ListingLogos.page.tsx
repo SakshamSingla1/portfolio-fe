@@ -21,7 +21,7 @@ const ListingLogosPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['logos', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => logoService.getAll({
             page: pagination.currentPage.toString(),

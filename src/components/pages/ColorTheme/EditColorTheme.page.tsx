@@ -27,7 +27,6 @@ const ColorThemeEditPage: React.FC = () => {
             }
         } catch (error) {
             showSnackbar('error', 'Failed to update color theme');
-            console.error('Error updating color theme:', error);
         }
     }
 

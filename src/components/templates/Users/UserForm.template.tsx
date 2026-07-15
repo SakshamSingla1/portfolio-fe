@@ -76,7 +76,6 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
 
                 onClose();
             } catch (error) {
-                console.error("Update failed:", error);
                 showSnackbar('error', 'Failed to update user. Please try again.');
             } finally {
                 setIsSubmitting(false);

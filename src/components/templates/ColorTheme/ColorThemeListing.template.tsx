@@ -120,7 +120,6 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 await deleteColorTheme(id);
                 if (onRefresh) onRefresh();
             } catch (error) {
-                console.error("Delete failed:", error);
             }
         }
     };

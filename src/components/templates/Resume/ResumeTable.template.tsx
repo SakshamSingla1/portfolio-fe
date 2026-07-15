@@ -50,7 +50,6 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
                 onRefresh?.();
             }
         } catch (error) {
-            console.error(error);
         }
     }, [resumeService, showSnackbar, onRefresh]);
 
@@ -71,7 +70,6 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
                 onRefresh?.();
             }
         } catch (error) {
-            console.error(error);
         }
     }, [resumeService, showSnackbar, onRefresh]);
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import DOMPurify from 'dompurify';
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -121,7 +122,7 @@ const HighlightedBody: React.FC<{
                 padding: "16px 20px",
                 maxHeight: 420,
             }}
-            dangerouslySetInnerHTML={{ __html: rendered || "<em style='color: gray'>No body content</em>" }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rendered ?? '') || "<em style='color: gray'>No body content</em>" }}
         />
     );
 };

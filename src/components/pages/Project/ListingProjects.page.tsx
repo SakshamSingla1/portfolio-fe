@@ -21,7 +21,7 @@ const ListingProjectsPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['projects', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => projectService.getByProfile({
             page: pagination.currentPage.toString(),

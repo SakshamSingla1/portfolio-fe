@@ -72,7 +72,6 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             }
         } catch (error) {
             showSnackbar('error', 'Failed to update user verification status');
-            console.error('Error verifying user:', error);
         }
     }, [toggleUserVerification, showSnackbar, onRefresh]);
 

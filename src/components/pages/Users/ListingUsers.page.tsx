@@ -38,7 +38,7 @@ const ListingUsersPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, refetch } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading, refetch } = useQuery({
         queryKey: ['users', pagination.currentPage, pagination.pageSize, filters.search, filters.roleId, filters.status],
         queryFn: () => profileService.getAllUsers({
             page: pagination.currentPage,

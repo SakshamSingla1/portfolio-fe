@@ -75,7 +75,6 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                 setNavlinks(response.data.data.content);
             }
         } catch (error) {
-            console.error('Error loading navlinks:', error);
         }
     };
 
@@ -86,7 +85,6 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                 setPermissions(response.data.data);
             }
         } catch (error) {
-            console.error('Error loading permissions:', error);
         }
     }
 

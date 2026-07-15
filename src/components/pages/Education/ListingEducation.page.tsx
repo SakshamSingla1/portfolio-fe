@@ -21,7 +21,7 @@ const ListingEducationPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['educations', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => educationService.getAllByProfile({
             page: pagination.currentPage.toString(),

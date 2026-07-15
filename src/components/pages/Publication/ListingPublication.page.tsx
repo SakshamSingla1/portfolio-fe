@@ -21,7 +21,7 @@ const ListingPublicationPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['publications', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => publicationService.getAll({
             page: pagination.currentPage.toString(),

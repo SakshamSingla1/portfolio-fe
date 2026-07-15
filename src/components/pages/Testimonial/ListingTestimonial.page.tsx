@@ -21,7 +21,7 @@ const TestimonialListPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['testimonials', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => testimonialService.getAll({
             page: pagination.currentPage.toString(),

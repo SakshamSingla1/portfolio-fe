@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import DOMPurify from 'dompurify';
 import type { FormikProps } from "formik";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -241,7 +242,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                             color: colors.neutral900,
                                             minHeight: 120,
                                         }}
-                                        dangerouslySetInnerHTML={{ __html: previewBody || "<em style='color: gray'>No body content</em>" }}
+                                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(previewBody ?? '') || "<em style='color: gray'>No body content</em>" }}
                                     />
                                 </div>
                             </div>
@@ -282,7 +283,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
             selection.insertHTML(`{{${varName}}}`);
             editor.events.fire("change");
         } catch (err) {
-            console.error("Failed to insert variable:", err);
         }
     };
 

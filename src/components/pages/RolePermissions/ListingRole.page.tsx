@@ -31,7 +31,7 @@ const ListingRolesPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['roles', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => roleService.getAllRolesByCriteria({
             page: pagination.currentPage,

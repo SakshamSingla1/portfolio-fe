@@ -35,7 +35,7 @@ const ListingBlogsPage: React.FC = () => {
         ...BlogStatusOptions,
     ];
 
-    const { data: pageResponse, refetch } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading, refetch } = useQuery({
         queryKey: ['blogPosts', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => blogPostService.getAll({
             page: pagination.currentPage,

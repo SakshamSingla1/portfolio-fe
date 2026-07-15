@@ -16,7 +16,7 @@ const ColorThemeListingPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, refetch } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading, refetch } = useQuery({
         queryKey: ['colorThemes', pagination.currentPage, pagination.pageSize],
         queryFn: () => colorThemeService.getColorTheme({
             page: pagination.currentPage.toString(),

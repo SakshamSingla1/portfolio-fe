@@ -17,7 +17,7 @@ const ListingLanguagesPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['languages', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => languageService.getAll({
             page: pagination.currentPage.toString(),

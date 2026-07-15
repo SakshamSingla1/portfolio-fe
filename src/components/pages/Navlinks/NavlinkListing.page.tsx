@@ -25,7 +25,7 @@ const NavlinkListingPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading } = useQuery({
         queryKey: ['navlinks', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => navlinkService.getAllNavlinks({
             page: pagination.currentPage.toString(),

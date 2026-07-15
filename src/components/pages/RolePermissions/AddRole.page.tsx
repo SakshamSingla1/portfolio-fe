@@ -19,7 +19,6 @@ const AddRolePage : React.FC = () => {
             navigate(makeRoute(ADMIN_ROUTES.ROLE, {}));
         }
        } catch (error) {
-        console.error('Error creating role:', error);
        }
     }
     return (

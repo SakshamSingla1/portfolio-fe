@@ -19,7 +19,7 @@ const ListingServicesPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, refetch } = useQuery({
+    const { data: pageResponse, isLoading: _isLoading, refetch } = useQuery({
         queryKey: ['services', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => serviceService.getAll({
             page: pagination.currentPage.toString(),

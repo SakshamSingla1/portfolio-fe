@@ -57,7 +57,6 @@ const PasswordTab: React.FC = () => {
           resetForm();
         }
       } catch (error) {
-        console.error("Error changing password:", error);
       } finally {
         setSubmitting(false);
       }

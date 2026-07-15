@@ -37,7 +37,6 @@ const ListingSkillsPage: React.FC = () => {
                 setSkillStats(response?.data?.data);
             }
         } catch (error) {
-            console.error("Error loading skill stats:", error);
         }
     };
 
