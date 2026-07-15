@@ -6,9 +6,12 @@ const API_BASE_URL = import.meta.env.VITE_API_V1_URL;
 axios.defaults.withCredentials = true;
 
 let isRefreshing = false;
-let refreshSubscribers: Array<() => void> = [];
+let refreshSubscribers: Array<(ok: boolean) => void> = [];
 
-const onRefreshed = () => refreshSubscribers.forEach(cb => cb());
+const notifySubscribers = (ok: boolean) => {
+  refreshSubscribers.forEach(cb => cb(ok));
+  refreshSubscribers = [];
+};
 
 axios.interceptors.response.use(
   (response) => response,
@@ -16,26 +19,28 @@ axios.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          refreshSubscribers.push(() => resolve(axios(originalRequest)));
+        return new Promise((resolve, reject) => {
+          refreshSubscribers.push((ok) =>
+            ok ? resolve(axios(originalRequest)) : reject(error)
+          );
         });
       }
       originalRequest._retry = true;
       isRefreshing = true;
       try {
         await axios.post(`${API_BASE_URL}/admin/auth/refresh`, {}, { withCredentials: true });
-        onRefreshed();
-        refreshSubscribers = [];
+        notifySubscribers(true);
         isRefreshing = false;
         return axios(originalRequest);
       } catch {
         isRefreshing = false;
-        refreshSubscribers = [];
+        notifySubscribers(false);
         localStorage.removeItem("user");
         localStorage.removeItem("defaultTheme");
         localStorage.removeItem("rolePermissions");
         localStorage.removeItem("reLoginTimestamp");
-        window.location.href = '/login';
+        // Redirect to root with ?auth=expired so App.tsx skips landing and shows login
+        window.location.href = '/?auth=expired';
       }
     }
     return Promise.reject(error);

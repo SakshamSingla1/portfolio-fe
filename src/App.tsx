@@ -1,5 +1,4 @@
 import { lazy, Suspense, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthenticatedUserContext } from "./contexts/AuthenticatedUserContext";
 import AdminRouter from "./routes/AdminRouter";
 import Authentication from "./components/pages/Authentication/Authentication.page";
@@ -7,27 +6,16 @@ import { SnackbarProvider } from "./contexts/SnackbarContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ThemeInjector from "./components/atoms/ThemeInjector/ThemeInjector";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      staleTime: 30_000, // 30s
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
 const Landing = lazy(() => import("./components/pages/Landing/Landing.page"));
 
 function App() {
-  // Skip landing when URL contains a password-reset token
+  // Skip landing when URL contains a password-reset token or session-expired redirect
   const [showLanding, setShowLanding] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return !params.get("token");
+    return !params.get("token") && !params.get("auth");
   });
 
   return (
-    <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <SnackbarProvider>
         <AuthenticatedUserContext.Consumer>
@@ -35,7 +23,7 @@ function App() {
             <>
               <ThemeInjector />
               <div>
-                {user?.token && user?.email ? (
+                {user?.email ? (
                   <AdminRouter />
                 ) : showLanding ? (
                   <Suspense fallback={null}>
@@ -50,7 +38,6 @@ function App() {
         </AuthenticatedUserContext.Consumer>
       </SnackbarProvider>
     </ThemeProvider>
-    </QueryClientProvider>
   );
 }
 

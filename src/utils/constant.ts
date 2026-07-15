@@ -22,9 +22,9 @@ export const REGEX = {
 
 export const ADMIN_ROUTES = {
     DASHBOARD: '/admin',
-    ANALYTICS: '/admin/analytics',
-    GITHUB_INTEGRATION: '/admin/github-integration',
-    HELP: '/admin/help',
+    ANALYTICS: '/analytics',
+    GITHUB_INTEGRATION: '/github-integration',
+    HELP: '/help',
 
     PROFILE: "/profile",
 

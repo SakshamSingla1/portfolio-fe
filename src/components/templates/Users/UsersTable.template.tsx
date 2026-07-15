@@ -129,7 +129,9 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             icon={<FaUsers />}
             description="Platform user accounts"
             count={pagination.totalRecords}
-            isAddButtonVisible={false}
+            isAddButtonVisible={true}
+            addButtonLabel="Add User"
+            addButtonOnClick={() => navigate(ADMIN_ROUTES.USER_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
             filterContent={filterContent}

@@ -1,4 +1,5 @@
 import React, { useMemo, useRef } from "react";
+import DOMPurify from 'dompurify';
 import JoditEditor from "jodit-react";
 import type { IJodit } from "jodit/esm/types/jodit";
 import { useColors } from "../../../utils/types";
@@ -104,7 +105,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         minHeight: 60,
                         fontSize: 14,
                     }}
-                    dangerouslySetInnerHTML={{ __html: value || `<span style="color:${colors.neutral400}">—</span>` }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value ?? '') || `<span style="color:${colors.neutral400}">—</span>` }}
                 />
             </div>
         );

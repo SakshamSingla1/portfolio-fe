@@ -45,8 +45,10 @@ const useRouteValidate = () => {
     if (!isValid) {
       showSnackbar("error", "401 Unauthorized: You do not have permission to view this page.");
 
-      localStorage.clear();
-      sessionStorage.clear();
+      localStorage.removeItem("user");
+      localStorage.removeItem("defaultTheme");
+      localStorage.removeItem("rolePermissions");
+      localStorage.removeItem("reLoginTimestamp");
 
       setAuthenticatedUser(null);
       setRolePermissions(null);
