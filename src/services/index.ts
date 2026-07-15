@@ -28,7 +28,7 @@ axios.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
       try {
-        await axios.post(`${API_BASE_URL}/admin/auth/refresh`, {}, { withCredentials: true });
+        await axios.post(`${API_BASE_URL}/auth/refresh`, {}, { withCredentials: true });
         notifySubscribers(true);
         isRefreshing = false;
         return axios(originalRequest);
