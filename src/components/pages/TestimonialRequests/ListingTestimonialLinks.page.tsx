@@ -22,6 +22,7 @@ const ListingTestimonialLinksPage: React.FC = () => {
     const { data: pageResponse, refetch } = useQuery({
         queryKey: ['testimonialLinks'],
         queryFn: () => service.getLinks(),
+        refetchOnMount: 'always',
     });
 
     const links: TestimonialLink[] = pageResponse?.data?.data ?? [];

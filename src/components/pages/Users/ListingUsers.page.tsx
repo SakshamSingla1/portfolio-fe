@@ -47,6 +47,7 @@ const ListingUsersPage: React.FC = () => {
             roleId: filters.roleId,
             status: filters.status,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

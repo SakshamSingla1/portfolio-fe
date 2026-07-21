@@ -30,6 +30,7 @@ const ListingProjectsPage: React.FC = () => {
             sortBy: "createdAt",
             search: filters.search,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

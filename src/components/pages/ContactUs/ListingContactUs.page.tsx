@@ -40,6 +40,7 @@ const ContactUsListPage: React.FC = () => {
             return null;
         },
         placeholderData: (prev) => prev,
+        refetchOnMount: 'always',
     });
 
     const contactUs: ContactUs[] = queryResult?.content ?? [];

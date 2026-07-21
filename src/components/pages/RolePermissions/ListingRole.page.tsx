@@ -39,6 +39,7 @@ const ListingRolesPage: React.FC = () => {
             status: filters.status,
             search: filters.search,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

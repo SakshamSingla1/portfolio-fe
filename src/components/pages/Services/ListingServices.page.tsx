@@ -28,6 +28,7 @@ const ListingServicesPage: React.FC = () => {
             sortBy: "sortOrder",
             search: filters.search || undefined,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

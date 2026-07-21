@@ -26,6 +26,7 @@ const ListingLanguagesPage: React.FC = () => {
             sortBy: "sortOrder",
             search: filters.search,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

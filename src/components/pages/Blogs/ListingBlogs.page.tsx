@@ -45,6 +45,7 @@ const ListingBlogsPage: React.FC = () => {
             search: filters.search || undefined,
             status: filters.status || undefined,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

@@ -24,6 +24,7 @@ const ColorThemeListingPage: React.FC = () => {
             sortDir: "desc",
             sortBy: "createdAt",
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

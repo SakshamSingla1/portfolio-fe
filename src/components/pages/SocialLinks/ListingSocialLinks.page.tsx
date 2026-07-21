@@ -35,6 +35,7 @@ const ListingSocialLinksPage: React.FC = () => {
             search: filters.search,
             status: filters.status,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;

@@ -47,6 +47,7 @@ const ListingSkillsPage: React.FC = () => {
             size: pagination.pageSize.toString(),
             search: filters.search,
         }),
+        refetchOnMount: 'always',
     });
 
     const pageData = pageResponse?.data?.data;
