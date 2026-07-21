@@ -99,7 +99,7 @@ export const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderType> 
 
     const logout = useCallback(async () => {
         try {
-            await axios.post(`${import.meta.env.VITE_API_V1_URL}/admin/auth/logout`, {}, { withCredentials: true });
+            await axios.post(`${import.meta.env.VITE_API_V1_URL}/auth/logout`, {}, { withCredentials: true });
         } catch {
             // ignore — proceed with local logout regardless
         }
