@@ -79,7 +79,7 @@ export const AdminRouter: React.FC = () => {
     <Suspense fallback={null}>
       <Routes>
         <Route path="/*" element={<DashboardLayout />} >
-          <Route index element={<Navigate to="profile" replace />} />
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="profile/*" element={<div><ProfileRoutes /></div>} />
           <Route path="experience/*" element={<div><ExperienceRoutes /></div>} />
           <Route path="education/*" element={<div><EducationRoutes /></div>} />
@@ -108,6 +108,7 @@ export const AdminRouter: React.FC = () => {
           <Route path="github-integration/*" element={<div><GithubIntegrationRoutes /></div>} />
           <Route path="testimonial-requests/*" element={<div><TestimonialRequestRoutes /></div>} />
           <Route path="publications/*" element={<div><PublicationRoutes /></div>} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
         {/* Renders without admin chrome — full-screen landing preview */}
         <Route path="" element={<LandingPage />} />
