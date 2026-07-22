@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import Sidebar from "../components/molecules/Sidebar/Sidebar";
 import { createUseStyles } from "react-jss";
 import {
-  FiBell, FiSun, FiMoon,
+  FiSun, FiMoon,
   FiLogOut, FiSettings, FiUser, FiSearch, FiLayout, FiMenu
 } from "react-icons/fi";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
@@ -11,6 +11,8 @@ import { useColors } from "../utils/types";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { useTheme } from "../contexts/ThemeContext";
 import { getBreadcrumbsFromUrl } from "../utils/helper";
+import NotificationBell from "../components/molecules/NotificationBell/NotificationBell";
+import SearchPanel from "../components/molecules/SearchPanel/SearchPanel";
 
 const useStyles = createUseStyles({
   layoutWrapper: (c: any) => ({
@@ -176,21 +178,6 @@ const useStyles = createUseStyles({
     },
   }),
 
-  notificationBadge: {
-    position: "relative",
-  },
-
-  notificationDot: (c: any) => ({
-    position: "absolute",
-    top: c.isMobile ? 1 : 8,
-    right: c.isMobile ? 3 : 8,
-    width: c.isMobile ? 7 : 8,
-    height: c.isMobile ? 7 : 8,
-    borderRadius: "50%",
-    background: c.primary500,
-    border: `2px solid ${c.neutral0}`,
-  }),
-
   userDropdownTrigger: (c: any) => ({
     display: "flex",
     alignItems: "center",
@@ -290,6 +277,7 @@ const DashboardLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const colors = useColors();
   const jssTheme = useMemo(() => ({ ...colors, isMobile, isSidebarOpen }), [colors, isMobile, isSidebarOpen]);
@@ -403,7 +391,7 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           <div className={classes.headerRight}>
-            <button className={classes.iconButton} title="Global Search">
+            <button className={classes.iconButton} onClick={() => setIsSearchOpen(true)} title="Global Search">
               <FiSearch size={20} />
             </button>
 
@@ -421,16 +409,7 @@ const DashboardLayout: React.FC = () => {
               </AnimatePresence>
             </button>
 
-            <div className={classes.notificationBadge}>
-              <button className={classes.iconButton} title="Notifications">
-                <FiBell size={20} />
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className={classes.notificationDot}
-                />
-              </button>
-            </div>
+            <NotificationBell />
 
             <div style={{ position: "relative" }} ref={dropdownRef}>
               <div
@@ -509,6 +488,10 @@ const DashboardLayout: React.FC = () => {
           </AnimatePresence>
         </main>
       </div>
+
+      <AnimatePresence>
+        {isSearchOpen && <SearchPanel onClose={() => setIsSearchOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
 };
