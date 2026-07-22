@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FiSearch, FiX } from "react-icons/fi";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useColors } from "../../../utils/types";
-import { useDebounce } from "../../../utils/helper";
 import useSearchService, { type SearchResult } from "../../../services/useSearchService";
+import AutoCompleteInput, { type AutoCompleteOption } from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 
 interface SearchPanelProps {
     onClose: () => void;
@@ -22,33 +23,25 @@ const MODULE_LABELS: Record<string, string> = {
     blogPost: "Blog Posts",
 };
 
+const resultKey = (r: SearchResult) => `${r.module}-${r.id}`;
+
 const SearchPanel: React.FC<SearchPanelProps> = ({ onClose }) => {
     const colors = useColors();
     const navigate = useNavigate();
     const searchService = useSearchService();
 
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState<SearchResult[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [searched, setSearched] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
-    const runSearch = useDebounce(async (q: string) => {
-        if (!q.trim()) {
-            setResults([]);
-            setSearched(false);
-            setLoading(false);
-            return;
-        }
-        setLoading(true);
-        const res = await searchService.search(q.trim());
-        setResults(res?.data?.data ?? []);
-        setLoading(false);
-        setSearched(true);
-    }, 300);
-
-    useEffect(() => {
-        runSearch(query);
-    }, [query]);
+    const { data: results = [], isFetching } = useQuery({
+        queryKey: ["content-search", searchTerm],
+        queryFn: async () => {
+            const res = await searchService.search(searchTerm.trim());
+            return (res?.data?.data ?? []) as SearchResult[];
+        },
+        enabled: searchTerm.trim().length > 0,
+        placeholderData: keepPreviousData,
+        staleTime: 60_000,
+    });
 
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
@@ -58,18 +51,41 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose }) => {
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
 
-    const grouped = useMemo(() => {
-        const map: Record<string, SearchResult[]> = {};
-        results.forEach((r) => {
-            if (!map[r.module]) map[r.module] = [];
-            map[r.module].push(r);
-        });
-        return map;
-    }, [results]);
+    const options: AutoCompleteOption[] = useMemo(
+        () =>
+            results.map((r) => ({
+                value: resultKey(r),
+                title: r.title,
+                icon: (
+                    <span
+                        className="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full shrink-0"
+                        style={{ background: colors.primary50, color: colors.primary600 }}
+                    >
+                        {MODULE_LABELS[r.module] ?? r.module}
+                    </span>
+                ),
+                label: (
+                    <div className="flex flex-col overflow-hidden">
+                        <span className="text-sm font-semibold truncate" style={{ color: colors.neutral800 }}>
+                            {r.title}
+                        </span>
+                        {r.snippet && (
+                            <span className="text-xs truncate" style={{ color: colors.neutral500 }}>
+                                {r.snippet}
+                            </span>
+                        )}
+                    </div>
+                ),
+            })),
+        [results, colors]
+    );
 
-    const handleResultClick = (r: SearchResult) => {
+    const handleSelect = (option: AutoCompleteOption | null) => {
+        if (!option) return;
+        const match = results.find((r) => resultKey(r) === option.value);
+        if (!match) return;
         onClose();
-        navigate(r.path);
+        navigate(match.path);
     };
 
     return (
@@ -78,81 +94,32 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose }) => {
             onClick={onClose}
         >
             <div
-                className="w-full max-w-xl rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden"
-                style={{ backgroundColor: colors.neutral50, maxHeight: "70vh" }}
+                className="w-full max-w-xl rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.25)] flex flex-col overflow-visible p-5"
+                style={{ backgroundColor: colors.neutral50 }}
                 onClick={(e) => e.stopPropagation()}
             >
-                <div
-                    className="flex items-center gap-3 px-5 py-4 border-b"
-                    style={{ borderColor: colors.neutral300 }}
-                >
-                    <FiSearch size={18} style={{ color: colors.neutral500 }} />
-                    <input
-                        autoFocus
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search skills, projects, experience, blog posts…"
-                        className="flex-1 bg-transparent outline-none text-sm"
-                        style={{ color: colors.neutral800 }}
-                    />
+                <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                        <AutoCompleteInput
+                            options={options}
+                            onSearch={setSearchTerm}
+                            onChange={handleSelect}
+                            loading={isFetching}
+                            placeHolder="Search skills, projects, experience, blog posts…"
+                            noOptionsText={
+                                searchTerm.trim()
+                                    ? `No results for "${searchTerm.trim()}"`
+                                    : "Start typing to search across your portfolio content"
+                            }
+                        />
+                    </div>
                     <button
                         onClick={onClose}
-                        className="p-1.5 rounded-lg transition-all"
+                        className="p-2.5 rounded-xl transition-all"
                         style={{ color: colors.neutral600, backgroundColor: colors.neutral100 }}
                     >
-                        <FiX size={16} />
+                        <FiX size={18} />
                     </button>
-                </div>
-
-                <div className="overflow-y-auto flex-1 px-2 py-2">
-                    {loading && (
-                        <div className="text-center text-sm py-8" style={{ color: colors.neutral400 }}>
-                            Searching…
-                        </div>
-                    )}
-
-                    {!loading && searched && results.length === 0 && (
-                        <div className="text-center text-sm py-8" style={{ color: colors.neutral400 }}>
-                            No results for "{query}"
-                        </div>
-                    )}
-
-                    {!loading && !searched && (
-                        <div className="text-center text-sm py-8" style={{ color: colors.neutral400 }}>
-                            Start typing to search across your portfolio content
-                        </div>
-                    )}
-
-                    {!loading && Object.entries(grouped).map(([module, items]) => (
-                        <div key={module} className="mb-2">
-                            <div
-                                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide"
-                                style={{ color: colors.neutral500 }}
-                            >
-                                {MODULE_LABELS[module] ?? module}
-                            </div>
-                            {items.map((r) => (
-                                <button
-                                    key={`${module}-${r.id}`}
-                                    onClick={() => handleResultClick(r)}
-                                    className="w-full text-left px-3 py-2.5 rounded-xl transition-all"
-                                    style={{ color: colors.neutral800 }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.neutral100)}
-                                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                                >
-                                    <div className="text-sm font-semibold">{r.title}</div>
-                                    {r.snippet && (
-                                        <div
-                                            className="text-xs mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
-                                            style={{ color: colors.neutral500 }}
-                                        >
-                                            {r.snippet}
-                                        </div>
-                                    )}
-                                </button>
-                            ))}
-                        </div>
-                    ))}
                 </div>
             </div>
         </div>

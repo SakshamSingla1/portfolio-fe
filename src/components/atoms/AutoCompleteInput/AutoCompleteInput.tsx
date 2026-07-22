@@ -32,6 +32,7 @@ interface AutoCompleteInputProps {
     className?: string;
     loading?: boolean;
     required?: boolean;
+    noOptionsText?: React.ReactNode;
 }
 
 const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
@@ -49,6 +50,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     className = "",
     required = false,
     loading = false,
+    noOptionsText,
 }) => {
     const colors = useColors();
     const [open, setOpen] = useState(false);
@@ -118,6 +120,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                 onChange={handleChange}
                 onInputChange={handleInputChange}
                 onBlur={onBlur}
+                noOptionsText={noOptionsText}
                 slotProps={{
                     paper: {
                         sx: {
