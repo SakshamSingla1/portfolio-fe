@@ -6,8 +6,28 @@
     <link rel="apple-touch-icon" href="/pb-logo-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14B8A0" />
+
     <title>Portfolios Builder — Your portfolio, fully managed.</title>
     <meta name="description" content="A three-app platform — admin dashboard, REST API, and public portfolio — to manage your entire professional story without touching code. Self-hosted, JWT-secured, Cloudinary CDN." />
+
+    <!-- This app serves the public marketing/landing page at the root (unauthenticated)
+         state and the admin dashboard only after login — crawlers never authenticate, so
+         they only ever see the marketing page here and it should be indexed like any
+         other marketing site. -->
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.portfoliosbuilder.com/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Portfolios Builder" />
+    <meta property="og:title" content="Portfolios Builder — Your portfolio, fully managed." />
+    <meta property="og:description" content="A three-app platform — admin dashboard, REST API, and public portfolio — to manage your entire professional story without touching code. Self-hosted, JWT-secured, Cloudinary CDN." />
+    <meta property="og:url" content="https://www.portfoliosbuilder.com/" />
+    <meta property="og:image" content="https://www.portfoliosbuilder.com/pb-logo.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Portfolios Builder — Your portfolio, fully managed." />
+    <meta name="twitter:description" content="Manage your entire professional portfolio without touching code." />
+    <meta name="twitter:image" content="https://www.portfoliosbuilder.com/pb-logo.png" />
   </head>
   <body>
     <div id="root"></div>
