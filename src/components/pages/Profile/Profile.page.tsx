@@ -13,6 +13,7 @@ import Button from "../../atoms/Button/Button";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 
 const API_BASE = import.meta.env.VITE_API_V1_URL as string;
+const API_ORIGIN = API_BASE.replace(/\/api\/v1.*$/, "");
 
 const validationSchema = Yup.object({
   userName: Yup.string().required("User name is required"),
@@ -142,7 +143,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const embedSnippet = profileData?.userName
-    ? `<iframe src="${API_BASE.replace('/api/v1/public', '')}/embed/${profileData.userName}" width="420" height="460" frameborder="0" style="border:none;border-radius:12px;overflow:hidden;" title="${(profileData as any).fullName ?? 'Portfolio'} — Portfolio Card"></iframe>`
+    ? `<iframe src="${API_ORIGIN}/embed/${profileData.userName}" width="420" height="460" frameborder="0" style="border:none;border-radius:12px;overflow:hidden;" title="${(profileData as any).fullName ?? 'Portfolio'} — Portfolio Card"></iframe>`
     : "";
 
   const copyEmbedSnippet = () => {
@@ -363,7 +364,7 @@ const ProfilePage: React.FC = () => {
             </button>
             {profileData?.userName && (
               <a
-                href={`${API_BASE.replace('/api/v1/public', '')}/embed/${profileData.userName}`}
+                href={`${API_ORIGIN}/embed/${profileData.userName}`}
                 target="_blank"
                 rel="noreferrer"
                 style={{
