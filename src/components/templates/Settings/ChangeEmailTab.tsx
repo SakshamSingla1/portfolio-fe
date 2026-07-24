@@ -96,7 +96,7 @@ const ChangeEmailTab: React.FC = () => {
                     >
                         <FiMail size={20} />
                     </div>
-                    <h3 style={{
+                    <h2 style={{
                         fontSize: "22px",
                         fontWeight: 700,
                         color: colors.neutral900,
@@ -104,7 +104,7 @@ const ChangeEmailTab: React.FC = () => {
                     }}
                     >
                         Change Email
-                    </h3>
+                    </h2>
 
                     <p
                         style={{

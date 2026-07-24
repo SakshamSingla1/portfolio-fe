@@ -16,18 +16,23 @@ const TextField: React.FC<Props> = ({
   required,
   InputProps,
   className,
+  id,
   ...props
 }) => {
+  const generatedId = React.useId();
+  const inputId = id ?? generatedId;
+
   return (
     <div className="flex flex-col gap-1.5 w-full">
       {label && (
-        <label className="text-gray-700 text-sm font-semibold ml-2 select-none tracking-tight">
+        <label htmlFor={inputId} className="text-gray-700 text-sm font-semibold ml-2 select-none tracking-tight">
           {label} {required && <span className="text-red-500 font-bold">*</span>}
         </label>
       )}
 
       <MuiTextField
         {...props}
+        id={inputId}
         label=""
         error={error}
         helperText={null}

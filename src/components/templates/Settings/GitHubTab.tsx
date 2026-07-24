@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import CircularProgress from "@mui/material/CircularProgress";
 import { FiGithub, FiCheck, FiAlertCircle, FiExternalLink } from "react-icons/fi";
 import { useColors, HTTP_STATUS } from "../../../utils/types";
 import { useSocialLinkService, type SocialLinkResponse } from "../../../services/useSocialLinkService";
@@ -87,7 +88,14 @@ const GitHubTab: React.FC = () => {
         }
     };
 
-    if (loading) return null;
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center gap-3" style={{ padding: "64px 24px", color: colors.neutral500 }}>
+                <CircularProgress size={20} color="inherit" />
+                <span className="text-sm">Loading GitHub settings…</span>
+            </div>
+        );
+    }
 
     return (
         <motion.div
@@ -104,9 +112,9 @@ const GitHubTab: React.FC = () => {
                 >
                     <FiGithub size={20} />
                 </div>
-                <h3 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>
+                <h2 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>
                     GitHub
-                </h3>
+                </h2>
             </div>
             <p className="text-sm mb-6" style={{ color: colors.neutral500 }}>
                 Your GitHub profile URL powers the GitHub stats section on your public portfolio.

@@ -31,9 +31,9 @@ const SectionCard = ({ title, subtitle, icon: Icon, actions, children, }: {
             <Icon className="w-8 h-8" style={{ color: colors.primary600 }} />
           </div>
           <div>
-            <h3 className="text-base sm:text-lg font-semibold" style={{ color: colors.neutral900 }}>
+            <h2 className="text-base sm:text-lg font-semibold" style={{ color: colors.neutral900 }}>
               {title}
-            </h3>
+            </h2>
             {subtitle && (
               <p className="text-xs sm:text-sm mt-0.5" style={{ color: colors.neutral500 }}>
                 {subtitle}
@@ -411,6 +411,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               checked={formik.values.availableForWork ?? false}
               onChange={(e) => formik.setFieldValue("availableForWork", e.target.checked)}
               disabled={!isEditMode}
+              slotProps={{ input: { "aria-label": "Open to work" } as React.InputHTMLAttributes<HTMLInputElement> }}
               sx={{
                 "& .MuiSwitch-switchBase.Mui-checked": { color: colors.success500 },
                 "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: colors.success500 },

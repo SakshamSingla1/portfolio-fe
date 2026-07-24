@@ -221,6 +221,9 @@ const ProfilePage: React.FC = () => {
             <button
               disabled={settingsSaving}
               onClick={() => handleSettingToggle("isDiscoverable", !isDiscoverable)}
+              role="switch"
+              aria-checked={isDiscoverable}
+              aria-label="Show on Explore"
               style={{
                 width: 44, height: 24, borderRadius: 12,
                 background: isDiscoverable ? colors.primary500 : colors.neutral300,
@@ -249,6 +252,9 @@ const ProfilePage: React.FC = () => {
             <button
               disabled={settingsSaving}
               onClick={() => handleSettingToggle("digestEmailEnabled", !digestEnabled)}
+              role="switch"
+              aria-checked={digestEnabled}
+              aria-label="Weekly Email Digest"
               style={{
                 width: 44, height: 24, borderRadius: 12,
                 background: digestEnabled ? colors.primary500 : colors.neutral300,

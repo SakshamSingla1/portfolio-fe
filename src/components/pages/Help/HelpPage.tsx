@@ -264,6 +264,7 @@ const QuickStart = ({ colors }: { colors: any }) => (
         <div className="space-y-3">
           {quickStartSteps.map((s, i) => {
             const colorKey = `${s.color}500` as any;
+            const textKey = `${s.color}700` as any;
             const bgKey = `${s.color}50` as any;
             return (
               <motion.div
@@ -293,7 +294,7 @@ const QuickStart = ({ colors }: { colors: any }) => (
                     className="h-12 w-12 rounded-[12px] border flex flex-col items-center justify-center shrink-0"
                     style={{ backgroundColor: colors.neutral0, borderColor: `${colors.neutral200}60` }}
                   >
-                    <span className="text-[7px] uppercase tracking-widest font-black" style={{ color: colors.neutral400 }}>step</span>
+                    <span className="text-[7px] uppercase tracking-widest font-black" style={{ color: colors.neutral600 }}>step</span>
                     <span className="font-black text-base leading-none" style={{ color: colors.primary600 }}>{s.num}</span>
                   </div>
                   {/* Icon */}
@@ -309,7 +310,7 @@ const QuickStart = ({ colors }: { colors: any }) => (
                     <p className="text-xs mt-1 leading-relaxed" style={{ color: colors.neutral500 }}>{s.desc}</p>
                     <div
                       className="inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-lg text-[10px] font-semibold"
-                      style={{ backgroundColor: `${colors[bgKey]}80`, color: colors[colorKey] }}
+                      style={{ backgroundColor: `${colors[bgKey]}80`, color: colors[textKey] }}
                     >
                       <FaLightbulb style={{ fontSize: 8 }} />
                       {s.tip}
@@ -758,7 +759,7 @@ export default function HelpPage() {
           </div>
           <div>
             <h1 className="text-3xl sm:text-4xl font-black m-0 tracking-tight" style={{ color: colors.neutral900 }}>
-              Help <span style={{ color: colors.primary500 }}>Center</span>
+              Help <span style={{ color: colors.primary700 }}>Center</span>
             </h1>
             <p className="text-base mt-1 font-medium" style={{ color: colors.neutral500 }}>
               Everything you need to build, customise, and publish your portfolio.
@@ -775,6 +776,7 @@ export default function HelpPage() {
             { label: "FAQs",          value: `${faqs.length}`, color: "warning" },
           ].map((chip) => {
             const c5 = `${chip.color}500` as any;
+            const c7 = `${chip.color}700` as any;
             return (
               <div
                 key={chip.label}
@@ -782,11 +784,11 @@ export default function HelpPage() {
                 style={{
                   backgroundColor: `${(colors as any)[c5]}10`,
                   borderColor: `${(colors as any)[c5]}25`,
-                  color: (colors as any)[c5],
+                  color: (colors as any)[c7],
                 }}
               >
                 <span className="text-base font-black">{chip.value}</span>
-                <span style={{ color: colors.neutral500 }}>{chip.label}</span>
+                <span style={{ color: colors.neutral600 }}>{chip.label}</span>
               </div>
             );
           })}

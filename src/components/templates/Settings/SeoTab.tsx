@@ -81,7 +81,7 @@ const SeoTab: React.FC = () => {
                     style={{ background: colors.primary100, color: colors.primary600 }}>
                     <FiSearch size={20} />
                 </div>
-                <h3 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>SEO Settings</h3>
+                <h2 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>SEO Settings</h2>
             </div>
             <p className="text-sm mb-6" style={{ color: colors.neutral500 }}>
                 Control how each page appears in search engines and social previews.

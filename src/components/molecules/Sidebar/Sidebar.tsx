@@ -97,7 +97,7 @@ const useStyles = createUseStyles({
     padding: "16px 12px 8px",
     fontSize: 10,
     fontWeight: 700,
-    color: c.neutral400,
+    color: c.neutral600,
     textTransform: "uppercase",
     letterSpacing: "1.2px",
     display: c.collapsed ? "none" : "block",
@@ -260,13 +260,13 @@ const Sidebar: React.FC<{
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <h2 style={{
+                <div style={{
                   fontWeight: 800,
                   fontSize: 15,
                   color: colors.neutral800,
                   margin: 0,
                   letterSpacing: "-0.5px"
-                }}>Portfolios Builder</h2>
+                }}>Portfolios Builder</div>
                 <p style={{
                   fontSize: 10,
                   color: colors.neutral500,

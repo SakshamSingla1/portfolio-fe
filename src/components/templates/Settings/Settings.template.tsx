@@ -81,7 +81,7 @@ const SettingsTemplate: React.FC = () => {
             >
               Account Settings
             </h1>
-            <p className="text-xs mt-0.5" style={{ color: colors.neutral400 }}>
+            <p className="text-xs mt-0.5" style={{ color: colors.neutral600 }}>
               Manage your security preferences and account configuration
             </p>
           </div>

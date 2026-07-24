@@ -52,12 +52,12 @@ const StyledButton = styled(MuiButton, {
 
   ...( {
     primaryContained: {
-      backgroundColor: colors.primary400,
+      backgroundColor: colors.primary700,
       color: colors.neutral0,
       border: `1px solid transparent`,
       boxShadow: `0 4px 12px -2px ${colors.primary500}40`,
-      "&:hover": { 
-        backgroundColor: colors.primary500,
+      "&:hover": {
+        backgroundColor: colors.primary800,
         boxShadow: `0 6px 16px -2px ${colors.primary500}60`,
         transform: "translateY(-1px)",
       },

@@ -181,9 +181,9 @@ const TwoFactorTab: React.FC = () => {
                 >
                     <FiShield size={20} />
                 </div>
-                <h3 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>
+                <h2 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>
                     Two-Factor Authentication
-                </h3>
+                </h2>
             </div>
             <p className="text-sm mb-6" style={{ color: colors.neutral500 }}>
                 Protect your account with a TOTP authenticator app.
@@ -284,6 +284,7 @@ const TwoFactorTab: React.FC = () => {
                                 <button
                                     onClick={copySecret}
                                     title={copied ? "Copied!" : "Copy key"}
+                                    aria-label={copied ? "Copied" : "Copy key"}
                                     style={{ color: copied ? colors.primary500 : colors.neutral400, background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}
                                 >
                                     {copied ? <FiCheck size={14} /> : <FiCopy size={14} />}

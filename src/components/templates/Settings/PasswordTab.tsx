@@ -94,6 +94,7 @@ const PasswordTab: React.FC = () => {
             <button
               type="button"
               onClick={() => toggleVisibility(name)}
+              aria-label={showPassword[name] ? "Hide password" : "Show password"}
               style={{
                 background: "transparent",
                 border: "none",
@@ -137,9 +138,9 @@ const PasswordTab: React.FC = () => {
           >
             <FiKey size={20} />
           </div>
-          <h3 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>
+          <h2 className="text-lg font-semibold" style={{ color: colors.neutral900 }}>
             Change Password
-          </h3>
+          </h2>
         </div>
         <p className="text-sm" style={{ color: colors.neutral500 }}>
           Update your account password securely.
