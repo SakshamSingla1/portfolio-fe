@@ -15,7 +15,7 @@ import { useResumeService, type DocumentUploadResponse, type ResumeSearchParams 
 import { usePublicResumeService } from "../../../services/usePublicResumeService";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 
-const SectionCard = ({ title, subtitle, icon: Icon, actions, children, }: {
+export const SectionCard = ({ title, subtitle, icon: Icon, actions, children, }: {
   title: string;
   subtitle?: string;
   icon: React.ElementType;
@@ -46,6 +46,46 @@ const SectionCard = ({ title, subtitle, icon: Icon, actions, children, }: {
       <div>{children}</div>
     </section>
   );
+};
+
+const ReadOnlyField = ({ label, value, icon: Icon, }: {
+  label: string;
+  value?: string | null;
+  icon: React.ElementType;
+}) => {
+  const colors = useColors();
+  const hasValue = Boolean(value && value.trim());
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <label className="text-sm font-semibold ml-2 select-none tracking-tight" style={{ color: colors.neutral700 }}>
+        {label}
+      </label>
+      <div
+        className="flex items-center gap-2.5 w-full"
+        style={{
+          borderRadius: 16,
+          border: `1.5px solid ${colors.neutral200}`,
+          background: colors.neutral50,
+          padding: "16px 16px",
+        }}
+      >
+        <Icon style={{ color: colors.neutral400, flexShrink: 0 }} />
+        <span
+          className="text-base truncate"
+          style={{ color: hasValue ? colors.neutral900 : colors.neutral400, fontStyle: hasValue ? "normal" : "italic" }}
+        >
+          {hasValue ? value : "Not provided"}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+const formatReadableDate = (value?: string | null): string | null => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 };
 
 interface ProfileFormProps {
@@ -215,7 +255,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               helperText={
                 isUploading.profile
                   ? "Uploading..."
-                  : "JPG / PNG · Max 5MB"
+                  : isEditMode
+                    ? "JPG / PNG · Max 5MB"
+                    : undefined
               }
               error={Boolean(formik.errors.profileImageUrl && formik.touched.profileImageUrl)}
               required={isEditMode}
@@ -241,7 +283,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               helperText={
                 isUploading.aboutMeImage
                   ? "Uploading..."
-                  : "JPG / PNG · Max 5MB"
+                  : isEditMode
+                    ? "JPG / PNG · Max 5MB"
+                    : undefined
               }
               error={Boolean(formik.errors.aboutMeImageUrl && formik.touched.aboutMeImageUrl)}
               required={isEditMode}
@@ -267,7 +311,9 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               helperText={
                 isUploading.logo
                   ? "Uploading..."
-                  : "Brand logo · Max 5MB"
+                  : isEditMode
+                    ? "Brand logo · Max 5MB"
+                    : undefined
               }
               error={Boolean(formik.errors.logoUrl && formik.touched.logoUrl)}
               required={isEditMode}
@@ -279,98 +325,110 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
           subtitle="Basic contact details"
           icon={FiUser}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
+          {isEditMode ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <TextFieldV2
+                  label="Full Name"
+                  name="fullName"
+                  value={formik.values.fullName}
+                  onChange={formik.handleChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FiUser />
+                      </InputAdornment>
+                    ),
+                  }}
+                  error={Boolean(formik.errors.fullName && formik.touched.fullName)}
+                  helperText={Boolean(formik.errors.fullName && formik.touched.fullName) ? formik.errors.fullName : ""}
+                  required
+                />
+              </div>
+              <div className="md:col-span-2">
+                <TextFieldV2
+                  label="Email"
+                  name="email"
+                  value={formik.values.email}
+                  disabled
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FiMail />
+                      </InputAdornment>
+                    ),
+                  }}
+                  required
+                  error={Boolean(formik.errors.email && formik.touched.email)}
+                  helperText={Boolean(formik.errors.email && formik.touched.email) ? formik.errors.email : ""}
+                />
+              </div>
               <TextFieldV2
-                label="Full Name"
-                name="fullName"
-                value={formik.values.fullName}
+                label="Professional Title"
+                name="title"
+                value={formik.values.title}
                 onChange={formik.handleChange}
-                disabled={!isEditMode}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FiUser />
+                      <FiBriefcase />
                     </InputAdornment>
                   ),
                 }}
-                error={Boolean(formik.errors.fullName && formik.touched.fullName)}
-                helperText={Boolean(formik.errors.fullName && formik.touched.fullName) ? formik.errors.fullName : ""}
-                required={isEditMode}
+                error={Boolean(formik.errors.title && formik.touched.title)}
+                helperText={Boolean(formik.errors.title && formik.touched.title) ? formik.errors.title : ""}
+                required
               />
-            </div>
-            <div className="md:col-span-2">
               <TextFieldV2
-                label="Email"
-                name="email"
-                value={formik.values.email}
-                disabled
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <FiMail />
-                    </InputAdornment>
-                  ),
-                }}
-                required={isEditMode}
-                error={Boolean(formik.errors.email && formik.touched.email)}
-                helperText={Boolean(formik.errors.email && formik.touched.email) ? formik.errors.email : ""}
-              />
-            </div>
-            <TextFieldV2
-              label="Professional Title"
-              name="title"
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              disabled={!isEditMode}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FiBriefcase />
-                  </InputAdornment>
-                ),
-              }}
-              error={Boolean(formik.errors.title && formik.touched.title)}
-              helperText={Boolean(formik.errors.title && formik.touched.title) ? formik.errors.title : ""}
-              required={isEditMode}
-            />
-            <TextFieldV2
-              label="Phone"
-              name="phone"
-              value={formik.values.phone}
-              onChange={formik.handleChange}
-              disabled={!isEditMode}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FiPhone />
-                  </InputAdornment>
-                ),
-              }}
-              error={Boolean(formik.errors.phone && formik.touched.phone)}
-              helperText={Boolean(formik.errors.phone && formik.touched.phone) ? formik.errors.phone : ""}
-              required={isEditMode}
-            />
-            <div className="md:col-span-2">
-              <TextFieldV2
-                label="Location"
-                name="location"
-                value={formik.values.location}
+                label="Phone"
+                name="phone"
+                value={formik.values.phone}
                 onChange={formik.handleChange}
-                disabled={!isEditMode}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FiMapPin />
+                      <FiPhone />
                     </InputAdornment>
                   ),
                 }}
-                error={Boolean(formik.errors.location && formik.touched.location)}
-                helperText={Boolean(formik.errors.location && formik.touched.location) ? formik.errors.location : ""}
-                required={isEditMode}
+                error={Boolean(formik.errors.phone && formik.touched.phone)}
+                helperText={Boolean(formik.errors.phone && formik.touched.phone) ? formik.errors.phone : ""}
+                required
               />
+              <div className="md:col-span-2">
+                <TextFieldV2
+                  label="Location"
+                  name="location"
+                  value={formik.values.location}
+                  onChange={formik.handleChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FiMapPin />
+                      </InputAdornment>
+                    ),
+                  }}
+                  error={Boolean(formik.errors.location && formik.touched.location)}
+                  helperText={Boolean(formik.errors.location && formik.touched.location) ? formik.errors.location : ""}
+                  required
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <ReadOnlyField label="Full Name" value={formik.values.fullName} icon={FiUser} />
+              </div>
+              <div className="md:col-span-2">
+                <ReadOnlyField label="Email" value={formik.values.email} icon={FiMail} />
+              </div>
+              <ReadOnlyField label="Professional Title" value={formik.values.title} icon={FiBriefcase} />
+              <ReadOnlyField label="Phone" value={formik.values.phone} icon={FiPhone} />
+              <div className="md:col-span-2">
+                <ReadOnlyField label="Location" value={formik.values.location} icon={FiMapPin} />
+              </div>
+            </div>
+          )}
         </SectionCard>
       </div>
       <SectionCard
@@ -419,41 +477,48 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
             />
           </div>
           {formik.values.availableForWork && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
+            isEditMode ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <TextFieldV2
+                    label="Availability Note"
+                    name="availabilityNote"
+                    value={formik.values.availabilityNote ?? ""}
+                    onChange={formik.handleChange}
+                    placeholder="e.g. Open to full-time remote roles"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <FiInfo />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </div>
                 <TextFieldV2
-                  label="Availability Note"
-                  name="availabilityNote"
-                  value={formik.values.availabilityNote ?? ""}
+                  label="Available From"
+                  name="availableFrom"
+                  type="date"
+                  value={formik.values.availableFrom ?? ""}
                   onChange={formik.handleChange}
-                  disabled={!isEditMode}
-                  placeholder="e.g. Open to full-time remote roles"
+                  InputLabelProps={{ shrink: true }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <FiInfo />
+                        <FiCalendar />
                       </InputAdornment>
                     ),
                   }}
                 />
               </div>
-              <TextFieldV2
-                label="Available From"
-                name="availableFrom"
-                type="date"
-                value={formik.values.availableFrom ?? ""}
-                onChange={formik.handleChange}
-                disabled={!isEditMode}
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <FiCalendar />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <ReadOnlyField label="Availability Note" value={formik.values.availabilityNote} icon={FiInfo} />
+                </div>
+                <ReadOnlyField label="Available From" value={formatReadableDate(formik.values.availableFrom)} icon={FiCalendar} />
+              </div>
+            )
           )}
         </div>
       </SectionCard>
@@ -463,7 +528,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
         icon={IoMdCloudUpload}
       >
         <DocumentUpload
-          label="Upload Resume"
+          label={isEditMode ? "Upload Resume" : "Resume"}
           accept=".pdf,.doc,.docx"
           disabled={!isEditMode || isUploading.resume}
           value={

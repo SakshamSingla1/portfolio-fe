@@ -3,12 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
-import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail } from "react-icons/fi";
+import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail, FiMapPin, FiSettings, FiCode } from "react-icons/fi";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useProfileService, type ProfileRequest } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
-import ProfileFormTemplate from "../../templates/Profile/ProfileForm.template";
+import ProfileFormTemplate, { SectionCard } from "../../templates/Profile/ProfileForm.template";
 import Button from "../../atoms/Button/Button";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 
@@ -187,198 +187,219 @@ const ProfilePage: React.FC = () => {
             Loading profile...
           </div>
         ) : (
-          <ProfileFormTemplate
-            formik={formik}
-            isEditMode={isEditMode}
-            onEditClick={() => navigate(ADMIN_ROUTES.PROFILE)}
-          />
+          <>
+            {!isEditMode && profileData && (
+              <div
+                className="rounded-2xl p-6 mb-6 flex items-center gap-5 flex-wrap sm:flex-nowrap"
+                style={{ background: colors.neutral0, border: `1px solid ${colors.neutral200}`, boxShadow: `0 1px 4px rgba(0,0,0,0.04)` }}
+              >
+                {profileData.profileImageUrl ? (
+                  <img
+                    src={profileData.profileImageUrl}
+                    alt={profileData.fullName}
+                    className="rounded-full object-cover shrink-0"
+                    style={{ width: 84, height: 84, border: `1px solid ${colors.neutral200}` }}
+                  />
+                ) : (
+                  <div
+                    className="rounded-full flex items-center justify-center font-bold shrink-0"
+                    style={{ width: 84, height: 84, background: colors.primary500, color: colors.neutral0, fontSize: 28 }}
+                  >
+                    {(profileData.fullName || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-lg font-bold truncate" style={{ color: colors.neutral900 }}>{profileData.fullName}</h2>
+                    {profileData.availableForWork && (
+                      <span
+                        className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"
+                        style={{ background: `${colors.success500}15`, color: colors.success700 }}
+                      >
+                        ● Open to Work
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm mt-0.5" style={{ color: colors.neutral600 }}>{profileData.title}</p>
+                  {profileData.location && (
+                    <div className="flex items-center gap-1.5 mt-1.5 text-xs" style={{ color: colors.neutral500 }}>
+                      <FiMapPin size={13} />
+                      <span>{profileData.location}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <ProfileFormTemplate
+              formik={formik}
+              isEditMode={isEditMode}
+              onEditClick={() => navigate(ADMIN_ROUTES.PROFILE)}
+            />
+          </>
         )}
 
-        {/* Growth settings card */}
-        <div
-          className="mx-auto mt-6 rounded-2xl p-6"
-          style={{
-            maxWidth: 720,
-            background: colors.neutral0,
-            border: `1px solid ${colors.neutral200}`,
-          }}
-        >
-          <h2 className="font-bold text-base mb-1" style={{ color: colors.neutral800 }}>
-            Portfolio Settings
-          </h2>
-          <p className="text-sm mb-5" style={{ color: colors.neutral500 }}>
-            Control discoverability, notifications, and your QR code.
-          </p>
+        {!isEditMode && !isLoading && (
+          <div className="mt-6 space-y-6">
+            <SectionCard
+              title="Portfolio Settings"
+              subtitle="Control discoverability, notifications, and your QR code."
+              icon={FiSettings}
+            >
+              <div className="flex flex-col">
+                {/* Discoverable toggle */}
+                <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
+                  <div className="flex items-center gap-3">
+                    <FiGlobe style={{ color: colors.primary500 }} />
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Show on Explore</p>
+                      <p className="text-xs" style={{ color: colors.neutral500 }}>Let others discover your portfolio on the public explore page</p>
+                    </div>
+                  </div>
+                  <button
+                    disabled={settingsSaving}
+                    onClick={() => handleSettingToggle("isDiscoverable", !isDiscoverable)}
+                    role="switch"
+                    aria-checked={isDiscoverable}
+                    aria-label="Show on Explore"
+                    style={{
+                      width: 44, height: 24, borderRadius: 12,
+                      background: isDiscoverable ? colors.primary500 : colors.neutral300,
+                      border: "none", cursor: "pointer", position: "relative",
+                      transition: "background 0.2s", flexShrink: 0,
+                    }}
+                  >
+                    <span style={{
+                      position: "absolute", top: 3,
+                      left: isDiscoverable ? 22 : 3,
+                      width: 18, height: 18, borderRadius: "50%",
+                      background: "#fff", transition: "left 0.2s",
+                    }} />
+                  </button>
+                </div>
 
-          {/* Discoverable toggle */}
-          <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
-            <div className="flex items-center gap-3">
-              <FiGlobe style={{ color: colors.primary500 }} />
-              <div>
-                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Show on Explore</p>
-                <p className="text-xs" style={{ color: colors.neutral500 }}>Let others discover your portfolio on the public explore page</p>
+                {/* Digest toggle */}
+                <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
+                  <div className="flex items-center gap-3">
+                    <FiMail style={{ color: colors.primary500 }} />
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Weekly Email Digest</p>
+                      <p className="text-xs" style={{ color: colors.neutral500 }}>Receive a summary of views, referrers, and messages every Monday</p>
+                    </div>
+                  </div>
+                  <button
+                    disabled={settingsSaving}
+                    onClick={() => handleSettingToggle("digestEmailEnabled", !digestEnabled)}
+                    role="switch"
+                    aria-checked={digestEnabled}
+                    aria-label="Weekly Email Digest"
+                    style={{
+                      width: 44, height: 24, borderRadius: 12,
+                      background: digestEnabled ? colors.primary500 : colors.neutral300,
+                      border: "none", cursor: "pointer", position: "relative",
+                      transition: "background 0.2s", flexShrink: 0,
+                    }}
+                  >
+                    <span style={{
+                      position: "absolute", top: 3,
+                      left: digestEnabled ? 22 : 3,
+                      width: 18, height: 18, borderRadius: "50%",
+                      background: "#fff", transition: "left 0.2s",
+                    }} />
+                  </button>
+                </div>
+
+                {/* QR download */}
+                <div className="flex items-center justify-between pt-3">
+                  <div className="flex items-center gap-3">
+                    <FiDownload style={{ color: colors.primary500 }} />
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Portfolio QR Code</p>
+                      <p className="text-xs" style={{ color: colors.neutral500 }}>Download a QR code linking to your public portfolio</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={downloadQrCode}
+                    style={{
+                      padding: "6px 16px", borderRadius: 10,
+                      background: colors.primary50, border: `1px solid ${colors.primary200}`,
+                      color: colors.primary600, fontSize: 13, fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Download PNG
+                  </button>
+                </div>
               </div>
-            </div>
-            <button
-              disabled={settingsSaving}
-              onClick={() => handleSettingToggle("isDiscoverable", !isDiscoverable)}
-              role="switch"
-              aria-checked={isDiscoverable}
-              aria-label="Show on Explore"
-              style={{
-                width: 44, height: 24, borderRadius: 12,
-                background: isDiscoverable ? colors.primary500 : colors.neutral300,
-                border: "none", cursor: "pointer", position: "relative",
-                transition: "background 0.2s", flexShrink: 0,
-              }}
-            >
-              <span style={{
-                position: "absolute", top: 3,
-                left: isDiscoverable ? 22 : 3,
-                width: 18, height: 18, borderRadius: "50%",
-                background: "#fff", transition: "left 0.2s",
-              }} />
-            </button>
-          </div>
+            </SectionCard>
 
-          {/* Digest toggle */}
-          <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
-            <div className="flex items-center gap-3">
-              <FiMail style={{ color: colors.primary500 }} />
-              <div>
-                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Weekly Email Digest</p>
-                <p className="text-xs" style={{ color: colors.neutral500 }}>Receive a summary of views, referrers, and messages every Monday</p>
-              </div>
-            </div>
-            <button
-              disabled={settingsSaving}
-              onClick={() => handleSettingToggle("digestEmailEnabled", !digestEnabled)}
-              role="switch"
-              aria-checked={digestEnabled}
-              aria-label="Weekly Email Digest"
-              style={{
-                width: 44, height: 24, borderRadius: 12,
-                background: digestEnabled ? colors.primary500 : colors.neutral300,
-                border: "none", cursor: "pointer", position: "relative",
-                transition: "background 0.2s", flexShrink: 0,
-              }}
-            >
-              <span style={{
-                position: "absolute", top: 3,
-                left: digestEnabled ? 22 : 3,
-                width: 18, height: 18, borderRadius: "50%",
-                background: "#fff", transition: "left 0.2s",
-              }} />
-            </button>
-          </div>
-
-          {/* QR download */}
-          <div className="flex items-center justify-between pt-3">
-            <div className="flex items-center gap-3">
-              <FiDownload style={{ color: colors.primary500 }} />
-              <div>
-                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Portfolio QR Code</p>
-                <p className="text-xs" style={{ color: colors.neutral500 }}>Download a QR code linking to your public portfolio</p>
-              </div>
-            </div>
-            <button
-              onClick={downloadQrCode}
-              style={{
-                padding: "6px 16px", borderRadius: 10,
-                background: colors.primary50, border: `1px solid ${colors.primary200}`,
-                color: colors.primary600, fontSize: 13, fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Download PNG
-            </button>
-          </div>
-        </div>
-
-        {/* PDF Export card */}
-        <div
-          className="mx-auto mt-6 rounded-2xl p-6"
-          style={{
-            maxWidth: 720,
-            background: colors.neutral0,
-            border: `1px solid ${colors.neutral200}`,
-          }}
-        >
-          <h2 className="font-bold text-base mb-1" style={{ color: colors.neutral800 }}>
-            Export Portfolio
-          </h2>
-          <p className="text-sm mb-5" style={{ color: colors.neutral500 }}>
-            Download a complete PDF of your portfolio — ideal for email submissions and HR systems.
-          </p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <FiFile style={{ color: colors.primary500 }} />
-              <div>
-                <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Full Portfolio PDF</p>
-                <p className="text-xs" style={{ color: colors.neutral500 }}>All sections — experience, skills, projects, publications and more</p>
-              </div>
-            </div>
-            <button
-              onClick={downloadPortfolioPdf}
-              style={{
-                padding: "6px 16px", borderRadius: 10,
-                background: colors.primary50, border: `1px solid ${colors.primary200}`,
-                color: colors.primary600, fontSize: 13, fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Download PDF
-            </button>
-          </div>
-        </div>
-
-        {/* Embed Widget card */}
-        <div
-          className="mx-auto mt-6 rounded-2xl p-6"
-          style={{
-            maxWidth: 720,
-            background: colors.neutral0,
-            border: `1px solid ${colors.neutral200}`,
-          }}
-        >
-          <h2 className="font-bold text-base mb-1" style={{ color: colors.neutral800 }}>
-            Embed Widget
-          </h2>
-          <p className="text-sm mb-5" style={{ color: colors.neutral500 }}>
-            Share a live card of your portfolio anywhere — GitHub README, personal website, or Notion page.
-          </p>
-          <div className="rounded-xl p-3 mb-4 font-mono text-xs break-all" style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}`, color: colors.neutral700 }}>
-            {embedSnippet}
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={copyEmbedSnippet}
-              style={{
-                padding: "6px 16px", borderRadius: 10,
-                background: colors.primary50, border: `1px solid ${colors.primary200}`,
-                color: colors.primary600, fontSize: 13, fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              {embedCopied ? "Copied!" : "Copy Snippet"}
-            </button>
-            {profileData?.userName && (
-              <a
-                href={`${API_ORIGIN}/embed/${profileData.userName}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  padding: "6px 16px", borderRadius: 10,
-                  background: "transparent", border: `1px solid ${colors.neutral300}`,
-                  color: colors.neutral600, fontSize: 13, fontWeight: 500,
-                  cursor: "pointer", textDecoration: "none",
-                }}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8">
+              <SectionCard
+                title="Export Portfolio"
+                subtitle="Download a complete PDF — ideal for email submissions and HR systems."
+                icon={FiFile}
               >
-                Preview
-              </a>
-            )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FiFile style={{ color: colors.primary500 }} />
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Full Portfolio PDF</p>
+                      <p className="text-xs" style={{ color: colors.neutral500 }}>All sections — experience, skills, projects, publications and more</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={downloadPortfolioPdf}
+                    style={{
+                      padding: "6px 16px", borderRadius: 10,
+                      background: colors.primary50, border: `1px solid ${colors.primary200}`,
+                      color: colors.primary600, fontSize: 13, fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Download PDF
+                  </button>
+                </div>
+              </SectionCard>
+
+              <SectionCard
+                title="Embed Widget"
+                subtitle="Share a live card anywhere — GitHub README, personal website, or Notion page."
+                icon={FiCode}
+              >
+                <div className="rounded-xl p-3 mb-4 font-mono text-xs break-all" style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}`, color: colors.neutral700 }}>
+                  {embedSnippet}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={copyEmbedSnippet}
+                    style={{
+                      padding: "6px 16px", borderRadius: 10,
+                      background: colors.primary50, border: `1px solid ${colors.primary200}`,
+                      color: colors.primary600, fontSize: 13, fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {embedCopied ? "Copied!" : "Copy Snippet"}
+                  </button>
+                  {profileData?.userName && (
+                    <a
+                      href={`${API_ORIGIN}/embed/${profileData.userName}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        padding: "6px 16px", borderRadius: 10,
+                        background: "transparent", border: `1px solid ${colors.neutral300}`,
+                        color: colors.neutral600, fontSize: 13, fontWeight: 500,
+                        cursor: "pointer", textDecoration: "none",
+                      }}
+                    >
+                      Preview
+                    </a>
+                  )}
+                </div>
+              </SectionCard>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
