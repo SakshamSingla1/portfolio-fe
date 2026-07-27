@@ -53,7 +53,7 @@ const LogoTableTemplate: React.FC<LogoTableTemplateProps> = ({
     const records = useMemo(() => logos?.map((logo: Logo, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         logo.name,
-        <img key={logo.id} src={logo.url} alt={logo.name} className="w-8 h-8 bg-[#FFFFFF] rounded-sm p-1" title={logo.name} />,
+        <img key={logo.id} src={logo.url} alt={logo.name} className="w-8 h-8 bg-[#FFFFFF] rounded-sm p-1" title={logo.name} loading="lazy" width={32} height={32} />,
         DateUtils.dateTimeSecondToDate(logo.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(logo.updatedAt ?? ""),
         <ActionButtons key={`action-${logo.id}`} onEdit={() => handleEdit(logo.id ?? 0)} onView={() => handleView(logo.id ?? 0)} />

@@ -1,7 +1,11 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, lazy, Suspense } from "react";
 import DOMPurify from 'dompurify';
-import JoditEditor from "jodit-react";
 import type { IJodit } from "jodit/esm/types/jodit";
+
+// jodit-react is a ~1.1MB chunk — load it only when a form page actually
+// renders an editable RichTextEditor, instead of blocking first paint of
+// every page that imports this component (including read-only views).
+const JoditEditor = lazy(() => import("jodit-react"));
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 
@@ -28,7 +32,7 @@ const TOOLBAR_BUTTONS = [
     "fullsize",
 ].join(",");
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({
+const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
     label,
     value,
     onChange,
@@ -123,12 +127,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     boxShadow: error ? `0 0 0 3px ${colors.error500}18` : undefined,
                 }}
             >
-                <JoditEditor
-                    ref={editorRef}
-                    value={value}
-                    config={config}
-                    onChange={onChange}
-                />
+                <Suspense fallback={<div style={{ minHeight: config.height, background: config.style.background }} />}>
+                    <JoditEditor
+                        ref={editorRef}
+                        value={value}
+                        config={config}
+                        onChange={onChange}
+                    />
+                </Suspense>
             </div>
             {helperText && (
                 <p
@@ -143,6 +149,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             )}
         </div>
     );
-};
+});
 
 export default RichTextEditor;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Chip } from '@mui/material';
 import { LuPlus } from 'react-icons/lu';
 import Button from '../../atoms/Button/Button';
@@ -27,7 +27,7 @@ const LandingFeaturesTableTemplate: React.FC<LandingFeaturesTableProps> = ({
         />
     );
 
-    const schema = {
+    const schema = useMemo(() => ({
         id: 3,
         hover: true,
         columns: [
@@ -39,9 +39,9 @@ const LandingFeaturesTableTemplate: React.FC<LandingFeaturesTableProps> = ({
             { label: 'Actions', key: 'actions', type: 'custom' as ColumnType, props: {} },
         ],
         pagination: { limit: 50, isVisible: false, currentPage: 0, total: 0 },
-    };
+    }), []);
 
-    const records = features.map(f => [
+    const records = useMemo(() => features.map(f => [
         f.title,
         <code key={`icon-${f.id}`}>{f.iconName}</code>,
         <Chip key={`color-${f.id}`} size="small" label={f.colorKey} />,
@@ -53,7 +53,7 @@ const LandingFeaturesTableTemplate: React.FC<LandingFeaturesTableProps> = ({
             color={f.isActive ? 'success' : 'default'}
         />,
         Action(f),
-    ]);
+    ]), [features, onEdit, onDelete]);
 
     return (
         <div className="flex flex-col">

@@ -138,6 +138,11 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         },
     });
 
+    const handleDescriptionChange = useCallback(
+        (value: string) => formik.setFieldValue("projectDescription", value),
+        [formik.setFieldValue]
+    );
+
     const loadSkills = useCallback(async (search = "") => {
         setIsLoadingSkills(true);
         try {
@@ -515,7 +520,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                         label="Project Description"
                         placeholder="Enter Details for your project"
                         value={formik.values.projectDescription}
-                        onChange={v => formik.setFieldValue("projectDescription", v)}
+                        onChange={handleDescriptionChange}
                         isEditMode={mode !== MODE.VIEW}
                         error={formik.touched.projectDescription && Boolean(formik.errors.projectDescription)}
                         helperText={Boolean(formik.touched.projectDescription && formik.errors.projectDescription) ? formik.errors.projectDescription : ""}

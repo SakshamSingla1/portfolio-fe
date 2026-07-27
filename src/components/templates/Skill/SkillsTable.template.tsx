@@ -57,7 +57,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({
         pagination.currentPage * pagination.pageSize + index + 1,
         skill.logoName,
         <div key={skill.id} className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
-            <img src={skill.logoUrl} alt={skill.logoName} className='w-10 h-10' />
+            <img src={skill.logoUrl} alt={skill.logoName} className='w-10 h-10' loading="lazy" width={40} height={40} />
         </div>,
         skill.level,
         convertToCamelCase(skill.category),

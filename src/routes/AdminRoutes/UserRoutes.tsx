@@ -1,18 +1,22 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import ListingUserPage from "../../components/pages/Users/ListingUsers.page";
-import AddUserPage from "../../components/pages/Users/AddUser.page";
-import EditUserPage from "../../components/pages/Users/EditUser.page";
-import ViewUserPage from "../../components/pages/Users/ViewUser.page";
 import PermissionGuard from "../PermissionGuard";
+
+const ListingUserPage = lazy(() => import("../../components/pages/Users/ListingUsers.page"));
+const AddUserPage = lazy(() => import("../../components/pages/Users/AddUser.page"));
+const EditUserPage = lazy(() => import("../../components/pages/Users/EditUser.page"));
+const ViewUserPage = lazy(() => import("../../components/pages/Users/ViewUser.page"));
 
 const UserRoutes = () => {
     return (
+        <Suspense fallback={null}>
         <Routes>
             <Route index element={<PermissionGuard required="VIEW"><ListingUserPage /></PermissionGuard>} />
             <Route path="add" element={<PermissionGuard required="ADD"><AddUserPage /></PermissionGuard>} />
             <Route path=":id/edit" element={<PermissionGuard required="EDIT"><EditUserPage /></PermissionGuard>} />
             <Route path=":id" element={<PermissionGuard required="VIEW"><ViewUserPage /></PermissionGuard>} />
         </Routes>
+        </Suspense>
     );
 };
 

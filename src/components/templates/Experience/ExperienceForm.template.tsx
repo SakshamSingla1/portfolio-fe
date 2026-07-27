@@ -100,6 +100,11 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         },
     });
 
+    const handleDescriptionChange = React.useCallback(
+        (value: string) => formik.setFieldValue("description", value),
+        [formik.setFieldValue]
+    );
+
     const loadSkills = React.useCallback(async (searchTerm?: string) => {
         setIsLoadingSkills(true);
         try {
@@ -299,7 +304,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                         </h3>
                         <RichTextEditor
                             value={formik.values.description}
-                            onChange={(value) => formik.setFieldValue("description", value)}
+                            onChange={handleDescriptionChange}
                             isEditMode={mode !== MODE.VIEW}
                         />
                         {formik.errors.description && formik.touched.description && (

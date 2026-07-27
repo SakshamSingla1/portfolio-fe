@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -92,6 +92,11 @@ const ServiceFormTemplate = ({ onSubmit, mode, service }: ServiceFormProps) => {
             setSubmitting(false);
         },
     });
+
+    const handleDescriptionChange = useCallback(
+        (value: string) => formik.setFieldValue("description", value),
+        [formik.setFieldValue]
+    );
 
     const handleBannerSelect = (file: File) => {
         const preview = URL.createObjectURL(file);
@@ -189,7 +194,7 @@ const ServiceFormTemplate = ({ onSubmit, mode, service }: ServiceFormProps) => {
                         label="Description"
                         placeholder="Describe what this service includes..."
                         value={formik.values.description ?? ""}
-                        onChange={(v) => formik.setFieldValue("description", v)}
+                        onChange={handleDescriptionChange}
                         isEditMode={mode !== MODE.VIEW}
                     />
                 </div>

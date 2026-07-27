@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -121,6 +121,11 @@ const TestimonialFormTemplate = ({
             setSubmitting(false);
         },
     });
+
+    const handleMessageChange = useCallback(
+        (value: string) => formik.setFieldValue("message", value),
+        [formik.setFieldValue]
+    );
 
     const handleImageSelect = (file: File) => {
         const previewUrl = URL.createObjectURL(file);
@@ -253,7 +258,7 @@ const TestimonialFormTemplate = ({
                         <RichTextEditor
                             label="Message"
                             value={formik.values.message}
-                            onChange={(value) => formik.setFieldValue("message", value)}
+                            onChange={handleMessageChange}
                             isEditMode={mode !== MODE.VIEW}
                             required={true}
                             error={formik.touched.message && Boolean(formik.errors.message)}

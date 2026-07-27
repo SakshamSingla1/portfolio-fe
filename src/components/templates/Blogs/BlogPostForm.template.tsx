@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -162,6 +162,11 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
             }
         },
     });
+
+    const handleContentChange = useCallback(
+        (value: string) => formik.setFieldValue("content", value),
+        [formik.setFieldValue]
+    );
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const title = e.target.value;
@@ -395,7 +400,7 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                                 label=""
                                 placeholder="Write your blog post content here…"
                                 value={formik.values.content}
-                                onChange={(v) => formik.setFieldValue("content", v)}
+                                onChange={handleContentChange}
                                 isEditMode={!isView}
                                 error={formik.touched.content && Boolean(formik.errors.content)}
                                 helperText={Boolean(formik.touched.content && formik.errors.content) ? formik.errors.content : ""}

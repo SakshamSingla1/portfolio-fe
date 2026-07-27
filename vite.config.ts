@@ -14,6 +14,14 @@ export default defineConfig({
           if (id.includes('react-icons')) return 'vendor-icons';
           if (id.includes('framer-motion')) return 'vendor-motion';
           if (id.includes('@tanstack')) return 'vendor-query';
+          if (id.includes('@mui') || id.includes('@emotion')) return 'vendor-mui';
+          if (id.includes('formik') || id.includes('yup')) return 'vendor-forms';
+          if (id.includes('axios')) return 'vendor-http';
+          if (id.includes('dayjs')) return 'vendor-date';
+          if (id.includes('dompurify')) return 'vendor-dompurify';
+          if (id.includes('i18next')) return 'vendor-i18n';
+          if (id.includes('jss')) return 'vendor-jss';
+          if (id.includes('@dnd-kit')) return 'vendor-dnd';
         },
       },
     },

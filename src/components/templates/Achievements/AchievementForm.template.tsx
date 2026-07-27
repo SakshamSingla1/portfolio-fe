@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
@@ -121,6 +121,11 @@ const AchievementFormTemplate = ({
         },
     });
 
+    const handleDescriptionChange = useCallback(
+        (value: string) => formik.setFieldValue("description", value),
+        [formik.setFieldValue]
+    );
+
     const handleProofSelect = (file: File) => {
         const previewUrl = URL.createObjectURL(file);
         setPendingProofFile(file);
@@ -217,7 +222,7 @@ const AchievementFormTemplate = ({
                             label="Description"
                             placeholder="Enter Description"
                             value={formik.values.description}
-                            onChange={(value) => formik.setFieldValue("description", value)}
+                            onChange={handleDescriptionChange}
                             isEditMode={mode !== MODE.VIEW}
                             error={formik.touched.description && Boolean(formik.errors.description)}
                             helperText={Boolean(formik.touched.description && formik.errors.description) ? formik.errors.description : ""}

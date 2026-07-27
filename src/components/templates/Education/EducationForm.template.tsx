@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import TextField from "../../atoms/TextField/TextField";
 import { DEGREE_OPTIONS, MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { isRichTextEmpty, titleModification } from "../../../utils/helper";
@@ -82,6 +83,11 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
             setSubmitting(false);
         },
     });
+
+    const handleDescriptionChange = useCallback(
+        (value: string) => formik.setFieldValue("description", value),
+        [formik.setFieldValue]
+    );
 
     const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
@@ -286,7 +292,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
                             label="Description"
                             placeholder="Enter Description"
                             value={formik.values.description}
-                            onChange={(value) => formik.setFieldValue("description", value)}
+                            onChange={handleDescriptionChange}
                             isEditMode={mode !== MODE.VIEW}
                             required
                         />

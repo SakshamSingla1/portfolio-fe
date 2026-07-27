@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Chip } from '@mui/material';
 import { LuPlus } from 'react-icons/lu';
 import Button from '../../atoms/Button/Button';
@@ -27,7 +27,7 @@ const LandingAudienceTableTemplate: React.FC<LandingAudienceTableProps> = ({
         />
     );
 
-    const schema = {
+    const schema = useMemo(() => ({
         id: 1,
         hover: true,
         columns: [
@@ -39,9 +39,9 @@ const LandingAudienceTableTemplate: React.FC<LandingAudienceTableProps> = ({
             { label: 'Actions', key: 'actions', type: 'custom' as ColumnType, props: {} },
         ],
         pagination: { limit: 50, isVisible: false, currentPage: 0, total: 0 },
-    };
+    }), []);
 
-    const records = audience.map(a => [
+    const records = useMemo(() => audience.map(a => [
         a.title,
         <code key={`icon-${a.id}`}>{a.iconName}</code>,
         <Chip key={`color-${a.id}`} size="small" label={a.colorKey} />,
@@ -53,7 +53,7 @@ const LandingAudienceTableTemplate: React.FC<LandingAudienceTableProps> = ({
             color={a.isActive ? 'success' : 'default'}
         />,
         Action(a),
-    ]);
+    ]), [audience, onEdit, onDelete]);
 
     return (
         <div className="flex flex-col">

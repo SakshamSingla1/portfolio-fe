@@ -57,7 +57,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
         return (
             <div className={`flex items-center space-x-2 ${isMobile ? 'justify-end' : ''}`}>
                 {visibleSkills.map((skill) => (
-                    <img key={skill.logoName} src={skill.logoUrl} alt={skill.logoName} className="w-10 h-10" />
+                    <img key={skill.logoName} src={skill.logoUrl} alt={skill.logoName} className="w-10 h-10" loading="lazy" width={40} height={40} />
                 ))}
                 {remaining > 0 && (
                     <span className="text-sm font-medium text-gray-500">+{remaining}</span>

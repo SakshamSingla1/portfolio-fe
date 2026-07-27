@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Chip } from '@mui/material';
 import { LuPlus } from 'react-icons/lu';
 import Button from '../../atoms/Button/Button';
@@ -27,7 +27,7 @@ const LandingTestimonialsTableTemplate: React.FC<LandingTestimonialsTableProps> 
         />
     );
 
-    const schema = {
+    const schema = useMemo(() => ({
         id: 5,
         hover: true,
         columns: [
@@ -39,9 +39,9 @@ const LandingTestimonialsTableTemplate: React.FC<LandingTestimonialsTableProps> 
             { label: 'Actions', key: 'actions', type: 'custom' as ColumnType, props: {} },
         ],
         pagination: { limit: 50, isVisible: false, currentPage: 0, total: 0 },
-    };
+    }), []);
 
-    const records = testimonials.map(t => [
+    const records = useMemo(() => testimonials.map(t => [
         t.authorName,
         t.authorRole,
         t.authorCompany,
@@ -53,7 +53,7 @@ const LandingTestimonialsTableTemplate: React.FC<LandingTestimonialsTableProps> 
             color={t.isActive ? 'success' : 'default'}
         />,
         Action(t),
-    ]);
+    ]), [testimonials, onEdit, onDelete]);
 
     return (
         <div className="flex flex-col">

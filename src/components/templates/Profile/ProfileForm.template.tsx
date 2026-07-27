@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { InputAdornment, Switch } from "@mui/material";
 import type { FormikProps } from "formik";
 import { FiUser, FiMail, FiMapPin, FiPhone, FiBriefcase, FiImage, FiInfo, FiCheckCircle, FiCalendar } from "react-icons/fi";
@@ -119,6 +119,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     aboutMeImage: false,
   });
   const [activeResume, setActiveResume] = useState<DocumentUploadResponse | null>(null);
+
+  const handleAboutMeChange = useCallback(
+    (value: string) => formik.setFieldValue("aboutMe", value),
+    [formik.setFieldValue]
+  );
 
   const uploadProfileImage = async (file: File): Promise<ImageUploadResponse> => {
     setIsUploading(prev => ({ ...prev, profile: true }));
@@ -442,7 +447,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
               label="About Me"
               placeholder="Tell about yourself"
               value={formik.values.aboutMe}
-              onChange={(value) => formik.setFieldValue("aboutMe", value)}
+              onChange={handleAboutMeChange}
               isEditMode={isEditMode}
               required={isEditMode}
               error={Boolean(formik.errors.aboutMe && formik.touched.aboutMe)}
