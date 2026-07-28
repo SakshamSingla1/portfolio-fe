@@ -365,6 +365,20 @@ const ProfilePage: React.FC = () => {
                 subtitle="Share a live card anywhere — GitHub README, personal website, or Notion page."
                 icon={FiCode}
               >
+                {profileData?.userName && (
+                  <div
+                    className="rounded-xl mb-4 flex items-center justify-center overflow-hidden"
+                    style={{ background: colors.neutral100, border: `1px solid ${colors.neutral200}`, padding: 16 }}
+                  >
+                    <iframe
+                      src={`${API_ORIGIN}/embed/${profileData.userName}`}
+                      width={420}
+                      height={460}
+                      style={{ border: "none", borderRadius: 12, maxWidth: "100%", background: "#fff" }}
+                      title={`${profileData.fullName ?? "Portfolio"} — Embed preview`}
+                    />
+                  </div>
+                )}
                 <div className="rounded-xl p-3 mb-4 font-mono text-xs break-all" style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}`, color: colors.neutral700 }}>
                   {embedSnippet}
                 </div>
@@ -392,7 +406,7 @@ const ProfilePage: React.FC = () => {
                         cursor: "pointer", textDecoration: "none",
                       }}
                     >
-                      Preview
+                      Open in New Tab
                     </a>
                   )}
                 </div>
