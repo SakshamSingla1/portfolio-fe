@@ -98,6 +98,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
 
                 <div className="space-y-3">
                     <TextField
+                        className="auth-input"
                         fullWidth id="fullName" name="fullName" label="Full Name"
                         value={formik.values.fullName} onChange={formik.handleChange}
                         InputProps={{ startAdornment: <InputAdornment position="start"><FiUser style={iconStyle} /></InputAdornment> }}
@@ -105,6 +106,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
                         helperText={formik.touched.fullName && formik.errors.fullName ? String(formik.errors.fullName) : ""}
                     />
                     <TextField
+                        className="auth-input"
                         fullWidth id="email" name="email" label="Email Address"
                         value={formik.values.email} onChange={formik.handleChange}
                         InputProps={{ startAdornment: <InputAdornment position="start"><FiMail style={iconStyle} /></InputAdornment> }}
@@ -112,6 +114,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
                         helperText={formik.touched.email && formik.errors.email ? String(formik.errors.email) : ""}
                     />
                     <TextField
+                        className="auth-input"
                         fullWidth id="phone" name="phone" label="Phone Number"
                         value={formik.values.phone} onChange={formik.handleChange}
                         InputProps={{ startAdornment: <InputAdornment position="start"><FiPhone style={iconStyle} /></InputAdornment> }}
@@ -120,6 +123,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
                     />
                     <div>
                         <TextField
+                            className="auth-input"
                             fullWidth name="password" type={showPassword.password ? "text" : "password"} label="Password"
                             value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
                             InputProps={{
@@ -138,6 +142,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
                         <PasswordStrengthMeter password={formik.values.password || ""} />
                     </div>
                     <TextField
+                        className="auth-input"
                         fullWidth name="confirmPassword" type={showPassword.confirmPassword ? "text" : "password"} label="Confirm Password"
                         value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
                         InputProps={{

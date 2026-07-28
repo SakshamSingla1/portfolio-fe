@@ -89,6 +89,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
         <div className="space-y-5">
           <div>
             <TextField
+              className="auth-input"
               fullWidth name="newPassword" type={showPassword ? "text" : "password"} label="New Password"
               value={formik.values.newPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
               InputProps={{
@@ -107,6 +108,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
             <PasswordStrengthMeter password={formik.values.newPassword || ""} />
           </div>
           <TextField
+            className="auth-input"
             fullWidth name="confirmPassword" type={showConfirmPassword ? "text" : "password"} label="Confirm Password"
             value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
             InputProps={{

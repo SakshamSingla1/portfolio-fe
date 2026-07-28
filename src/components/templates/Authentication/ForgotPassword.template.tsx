@@ -82,6 +82,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setAuthState }) => {
 
                 <div className="space-y-4">
                     <TextField
+                        className="auth-input"
                         fullWidth name="email" label="Email Address"
                         value={formik.values.email}
                         onChange={formik.handleChange} onBlur={formik.handleBlur}

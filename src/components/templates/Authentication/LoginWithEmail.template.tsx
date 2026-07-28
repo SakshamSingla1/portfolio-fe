@@ -132,6 +132,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendin
 
                 <div className="space-y-4">
                     <TextField
+                        className="auth-input"
                         fullWidth id="email" name="email" label="Email Address"
                         value={formik.values.email}
                         onChange={formik.handleChange} onBlur={formik.handleBlur}
@@ -147,6 +148,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendin
                     />
 
                     <TextField
+                        className="auth-input"
                         fullWidth name="password" label="Password"
                         type={showPassword ? "text" : "password"}
                         value={formik.values.password}

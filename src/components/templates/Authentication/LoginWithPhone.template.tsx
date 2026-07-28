@@ -115,6 +115,7 @@ const LoginWithPhone: React.FC<LoginWithPhoneProps> = ({
 
         <div className="space-y-4">
           <TextField
+            className="auth-input"
             fullWidth name="phone" label="Phone Number"
             value={formik.values.phone}
             onChange={formik.handleChange} onBlur={formik.handleBlur}

@@ -70,6 +70,25 @@
   --color-yellow-700: var(--color-warning-700);
 }
 
+/* Auth screens (login/register/reset) render a fixed dark background regardless
+   of the in-app light/dark toggle, so their inputs need a fixed dark style too
+   rather than following useColors()'s theme-driven neutral-0. */
+.auth-input {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+.auth-input input,
+.auth-input textarea {
+  color: rgba(255, 255, 255, 0.92) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.92) !important;
+}
+.auth-input:hover {
+  border-color: rgba(255, 255, 255, 0.24) !important;
+}
+.auth-input.Mui-focused {
+  border-color: var(--color-primary-400) !important;
+}
+
 @layer base {
     .jodit-add-new-line, .jodit-add-new-line * {
         display: none !important;

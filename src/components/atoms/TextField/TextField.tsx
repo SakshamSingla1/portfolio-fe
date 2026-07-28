@@ -25,8 +25,8 @@ const TextField: React.FC<Props> = ({
   return (
     <div className="flex flex-col gap-1.5 w-full">
       {label && (
-        <label htmlFor={inputId} className="text-gray-700 text-sm font-semibold ml-2 select-none tracking-tight">
-          {label} {required && <span className="text-red-500 font-bold">*</span>}
+        <label htmlFor={inputId} className="text-[var(--color-neutral-700)] text-sm font-semibold ml-2 select-none tracking-tight">
+          {label} {required && <span className="text-[var(--color-error-500)] font-bold">*</span>}
         </label>
       )}
 
@@ -41,9 +41,9 @@ const TextField: React.FC<Props> = ({
           ...InputProps,
           readOnly: InputProps?.readOnly,
           className: twMerge(
-            "w-full text-base border border-gray-300 hover:border-blue-400 hover:shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/60 focus-within:shadow-[0_4px_16px_rgba(59,130,246,0.08)] !rounded-2xl transition-all duration-300 ease-in-out bg-white text-gray-900",
-            error && "border-red-400 bg-red-50/30 focus-within:border-red-500 focus-within:ring-red-100/60 focus-within:shadow-[0_4px_16px_rgba(239,68,68,0.08)]",
-            props.disabled && "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60 hover:shadow-none hover:border-gray-200",
+            "w-full text-base border border-[var(--color-neutral-300)] bg-[var(--color-neutral-0)] text-[var(--color-neutral-900)] hover:border-[var(--color-primary-400)] hover:shadow-sm focus-within:border-[var(--color-primary-500)] focus-within:ring-4 focus-within:ring-[var(--color-primary-100)]/60 focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.08)] !rounded-2xl transition-all duration-300 ease-in-out",
+            error && "border-[var(--color-error-400)] bg-[var(--color-error-50)]/30 focus-within:border-[var(--color-error-500)] focus-within:ring-[var(--color-error-100)]/60",
+            props.disabled && "bg-[var(--color-neutral-50)] border-[var(--color-neutral-200)] cursor-not-allowed opacity-60 hover:shadow-none hover:border-[var(--color-neutral-200)]",
             className
           ),
         }}
@@ -73,7 +73,7 @@ const TextField: React.FC<Props> = ({
       />
 
       {error && helperText && (
-        <span className="text-xs ml-2 text-red-500 font-semibold select-none tracking-tight animate-fade-in">
+        <span className="text-xs ml-2 text-[var(--color-error-500)] font-semibold select-none tracking-tight animate-fade-in">
           {helperText}
         </span>
       )}
