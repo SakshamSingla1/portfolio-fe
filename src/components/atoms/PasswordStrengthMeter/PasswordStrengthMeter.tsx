@@ -1,8 +1,15 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
-const PasswordStrengthMeter = ({ password }: { password: string }) => {
+interface PasswordStrengthMeterProps {
+  password: string;
+  /** Override for screens with a fixed dark background independent of the app's theme toggle */
+  className?: string;
+}
+
+const PasswordStrengthMeter = ({ password, className }: PasswordStrengthMeterProps) => {
   const getPasswordStrength = (pwd: string) => {
-    if (!pwd) return { strength: 0, label: '', color: 'bg-gray-200' };
+    if (!pwd) return { strength: 0, label: '', color: 'bg-[var(--color-neutral-200)]' };
 
     let strength = 0;
     if (pwd.length > 5) strength += 1;
@@ -29,15 +36,15 @@ const PasswordStrengthMeter = ({ password }: { password: string }) => {
   if (!password) return null;
 
   return (
-    <div className="mt-2">
-      <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1">
+    <div className={twMerge("mt-2", className)}>
+      <div className="w-full bg-[var(--color-neutral-200)] rounded-full h-1.5 mb-1 password-strength-track">
         <div
           className={`h-1.5 rounded-full transition-all duration-300 ${color}`}
           style={{ width: `${strength}%` }}
         ></div>
       </div>
-      <p className="text-xs text-gray-500">
-        Password strength: <span className="font-medium text-gray-700">{label}</span>
+      <p className="text-xs text-[var(--color-neutral-500)] password-strength-label">
+        Password strength: <span className="font-medium text-[var(--color-neutral-700)]">{label}</span>
       </p>
     </div>
   );

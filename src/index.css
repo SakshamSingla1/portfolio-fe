@@ -88,6 +88,15 @@
 .auth-input.Mui-focused {
   border-color: var(--color-primary-400) !important;
 }
+.auth-password-strength .password-strength-track {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+.auth-password-strength .password-strength-label {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+.auth-password-strength .password-strength-label span {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
 
 @layer base {
     .jodit-add-new-line, .jodit-add-new-line * {

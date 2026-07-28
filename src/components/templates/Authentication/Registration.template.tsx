@@ -139,7 +139,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
                             error={formik.touched.password && Boolean(formik.errors.password)}
                             helperText={formik.touched.password && formik.errors.password ? String(formik.errors.password) : ""}
                         />
-                        <PasswordStrengthMeter password={formik.values.password || ""} />
+                        <PasswordStrengthMeter password={formik.values.password || ""} className="auth-password-strength" />
                     </div>
                     <TextField
                         className="auth-input"
