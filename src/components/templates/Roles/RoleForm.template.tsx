@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, MODE } from '../../../utils/constant';
 import { enumToNormalKey, makeRoute } from '../../../utils/helper';
 import FormShell from '../Shared/FormShell.template';
+import { useSnackbar } from '../../../hooks/useSnackBar';
 
 interface RoleFormTemplateProps {
     roleDetails?: RolePermissionResponseDTO | null;
@@ -37,6 +38,7 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     const navLinkService = useNavlinkService();
     const permissionService = usePermissionService();
     const colors = useColors();
+    const { showSnackbar } = useSnackbar();
 
     const [navlinks, setNavlinks] = useState<NavlinkResponse[]>([]);
     const [permissions, setPermissions] = useState<PermissionResponseDTO[]>([]);
@@ -74,7 +76,8 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
             if (response.status === HTTP_STATUS.OK) {
                 setNavlinks(response.data.data.content);
             }
-        } catch (error) {
+        } catch {
+            showSnackbar('error', 'Failed to load navlinks');
         }
     };
 
@@ -84,7 +87,8 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
             if (response.status === HTTP_STATUS.OK) {
                 setPermissions(response.data.data);
             }
-        } catch (error) {
+        } catch {
+            showSnackbar('error', 'Failed to load permissions');
         }
     }
 

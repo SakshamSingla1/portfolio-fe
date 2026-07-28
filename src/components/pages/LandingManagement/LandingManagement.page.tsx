@@ -65,25 +65,30 @@ const LandingManagement = () => {
 
     const loadAll = useCallback(async () => {
         setLoading(true);
-        const [cfgRes, ftRes, faqRes, stRes, audRes, testRes] = await Promise.all([
-            service.getConfig(),
-            service.getFeatures(),
-            service.getFaqs(),
-            service.getSteps(),
-            service.getAudienceCards(),
-            service.getTestimonials(),
-        ]);
-        if (cfgRes?.status === HTTP_STATUS.OK && cfgRes.data?.data) {
-            const raw = cfgRes.data.data;
-            setConfig({ ...emptyConfig(), ...raw, heroTrustBadges: raw.heroTrustBadges ?? [], ctaTrustPoints: raw.ctaTrustPoints ?? [] });
+        try {
+            const [cfgRes, ftRes, faqRes, stRes, audRes, testRes] = await Promise.all([
+                service.getConfig(),
+                service.getFeatures(),
+                service.getFaqs(),
+                service.getSteps(),
+                service.getAudienceCards(),
+                service.getTestimonials(),
+            ]);
+            if (cfgRes?.status === HTTP_STATUS.OK && cfgRes.data?.data) {
+                const raw = cfgRes.data.data;
+                setConfig({ ...emptyConfig(), ...raw, heroTrustBadges: raw.heroTrustBadges ?? [], ctaTrustPoints: raw.ctaTrustPoints ?? [] });
+            }
+            if (ftRes?.status === HTTP_STATUS.OK) setFeatures(ftRes.data?.data ?? []);
+            if (faqRes?.status === HTTP_STATUS.OK) setFaqs(faqRes.data?.data ?? []);
+            if (stRes?.status === HTTP_STATUS.OK) setSteps(stRes.data?.data ?? []);
+            if (audRes?.status === HTTP_STATUS.OK) setAudience(audRes.data?.data ?? []);
+            if (testRes?.status === HTTP_STATUS.OK) setTestimonials(testRes.data?.data ?? []);
+        } catch {
+            showSnackbar('error', 'Failed to load landing page content');
+        } finally {
+            setLoading(false);
         }
-        if (ftRes?.status === HTTP_STATUS.OK) setFeatures(ftRes.data?.data ?? []);
-        if (faqRes?.status === HTTP_STATUS.OK) setFaqs(faqRes.data?.data ?? []);
-        if (stRes?.status === HTTP_STATUS.OK) setSteps(stRes.data?.data ?? []);
-        if (audRes?.status === HTTP_STATUS.OK) setAudience(audRes.data?.data ?? []);
-        if (testRes?.status === HTTP_STATUS.OK) setTestimonials(testRes.data?.data ?? []);
-        setLoading(false);
-    }, []);
+    }, [showSnackbar]);
 
     useEffect(() => { loadAll(); }, []);
 

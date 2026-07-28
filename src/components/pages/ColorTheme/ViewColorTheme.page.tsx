@@ -4,12 +4,14 @@ import { HTTP_STATUS } from '../../../utils/types';
 import ColorThemeForm from '../../templates/ColorTheme/ColorThemeForm.template';
 import { MODE } from '../../../utils/constant';
 import { useParams } from 'react-router-dom';
+import { useSnackbar } from '../../../hooks/useSnackBar';
 
 const ColorThemeViewPage: React.FC = () => {
     const colorThemeService = useColorThemeService();
     const params = useParams();
     const themeId = params.id ? Number(params.id) : null;
     const [colorTheme, setColorTheme] = useState<ColorTheme | null>(null);
+    const { showSnackbar } = useSnackbar();
 
     const loadColorThemeData = async () => {
         colorThemeService.getColorThemeById(themeId)
@@ -18,6 +20,7 @@ const ColorThemeViewPage: React.FC = () => {
                     setColorTheme(res.data.data);
                 }
             })
+            .catch(() => showSnackbar('error', 'Failed to load color theme'));
     }
 
 

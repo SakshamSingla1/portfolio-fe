@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
-import { type IPagination } from "../../../utils/types";
+import { type IPagination, useColors } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -16,21 +16,21 @@ interface TypeBadgeProps {
     type: string;
 }
 
-const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-    PAPER:   { bg: "#dbeafe", text: "#1d4ed8" },
-    ARTICLE: { bg: "#dcfce7", text: "#15803d" },
-    TALK:    { bg: "#ede9fe", text: "#7c3aed" },
-    VIDEO:   { bg: "#fee2e2", text: "#dc2626" },
-    PODCAST: { bg: "#ffedd5", text: "#c2410c" },
-};
-
 const TypeBadge: React.FC<TypeBadgeProps> = ({ type }) => {
-    const colors = TYPE_COLORS[type] ?? { bg: "#f1f5f9", text: "#475569" };
+    const themeColors = useColors();
+    const TYPE_TOKENS: Record<string, string> = {
+        PAPER: themeColors.primary600 ?? themeColors.primary500,
+        ARTICLE: themeColors.success700 ?? themeColors.success500,
+        TALK: themeColors.secondary600 ?? themeColors.secondary500,
+        VIDEO: themeColors.error600 ?? themeColors.error500,
+        PODCAST: themeColors.warning700 ?? themeColors.warning500,
+    };
+    const text = TYPE_TOKENS[type] ?? themeColors.neutral600;
     return (
         <span
             style={{
-                background: colors.bg,
-                color: colors.text,
+                background: `${text}18`,
+                color: text,
                 padding: "2px 10px",
                 borderRadius: "12px",
                 fontSize: "12px",

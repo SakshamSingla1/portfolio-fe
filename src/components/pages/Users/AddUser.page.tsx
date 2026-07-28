@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAuthService } from "../../../services/useAuthService";
-import { ADMIN_ROUTES, REGEX } from "../../../utils/constant";
+import { ADMIN_ROUTES, REGEX, ROLES } from "../../../utils/constant";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import TextField from "../../atoms/TextField/TextField";
@@ -51,7 +51,9 @@ const AddUserPage: React.FC = () => {
                     userName: values.userName,
                     email: values.email,
                     password: values.password,
-                    role: "USER",
+                    // No lower-privilege role exists in this system (only ADMIN/SUPER_ADMIN);
+                    // the backend hardcodes new registrations to ADMIN regardless of this field.
+                    role: ROLES.ADMIN,
                     phone: values.phone,
                 });
                 if (response?.status === HTTP_STATUS.OK) {

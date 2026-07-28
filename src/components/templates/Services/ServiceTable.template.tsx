@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
-import { type IPagination } from "../../../utils/types";
+import { type IPagination, useColors } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -33,6 +33,7 @@ const ServiceTableTemplate: React.FC<ServiceTableProps> = ({
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
+    const colors = useColors();
 
     const handleEdit = useCallback((id: number) => {
         const query = {
@@ -63,8 +64,8 @@ const ServiceTableTemplate: React.FC<ServiceTableProps> = ({
         <span
             key={`status-${s.id}`}
             style={{
-                background: s.isActive ? "#d1fae5" : "#fee2e2",
-                color: s.isActive ? "#065f46" : "#991b1b",
+                background: s.isActive ? `${colors.success500}18` : `${colors.error500}18`,
+                color: s.isActive ? (colors.success700 ?? colors.success500) : (colors.error700 ?? colors.error500),
                 padding: "2px 10px",
                 borderRadius: "12px",
                 fontSize: "12px",
@@ -80,7 +81,7 @@ const ServiceTableTemplate: React.FC<ServiceTableProps> = ({
             onView={() => handleView(s.id ?? 0)}
             onDelete={() => onDelete(s.id ?? 0)}
         />,
-    ]), [services, pagination.currentPage, pagination.pageSize, handleEdit, handleView, onDelete]);
+    ]), [services, pagination.currentPage, pagination.pageSize, handleEdit, handleView, onDelete, colors]);
 
     const schema = useMemo(() => ({
         id: 1,

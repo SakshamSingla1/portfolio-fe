@@ -4,9 +4,11 @@ import RoleFormTemplate from "../../templates/Roles/RoleForm.template";
 import { useParams } from "react-router-dom";
 import { MODE } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
+import { useSnackbar } from "../../../hooks/useSnackBar";
 
 const ViewRolePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const { showSnackbar } = useSnackbar();
 
     const roleService = useRoleService();
 
@@ -18,7 +20,8 @@ const ViewRolePage: React.FC = () => {
             if (response.status === HTTP_STATUS.OK) {
                 setRoleDetails(response.data.data);
             }
-        } catch (error) {
+        } catch {
+            showSnackbar("error", "Failed to load role details");
         }
     }
 

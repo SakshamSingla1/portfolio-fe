@@ -5,9 +5,11 @@ import { initialPaginationValues } from '../../../utils/constant';
 import SkillTableTemplate from '../../templates/Skill/SkillsTable.template';
 import { useSkillService, type SkillResponse, type SkillStats } from '../../../services/useSkillService';
 import { useSearchParams } from 'react-router-dom';
+import { useSnackbar } from '../../../hooks/useSnackBar';
 const ListingSkillsPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const skillService = useSkillService();
+    const { showSnackbar } = useSnackbar();
 
     const [skillStats, setSkillStats] = useState<SkillStats | null>(null);
 
@@ -36,7 +38,8 @@ const ListingSkillsPage: React.FC = () => {
             if (response?.status === HTTP_STATUS.OK) {
                 setSkillStats(response?.data?.data);
             }
-        } catch (error) {
+        } catch {
+            showSnackbar("error", "Failed to load skill stats");
         }
     };
 

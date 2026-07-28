@@ -43,7 +43,7 @@ const LoginWithPhone: React.FC<LoginWithPhoneProps> = ({
           setIsRegisterFlow(false);
           setAuthState(AUTH_STATE.OTP_VERIFICATION);
         }
-      } catch (err) {
+      } catch {
         showSnackbar("error", "Failed to send OTP. Please try again.");
       } finally {
         setIsLoading(false);

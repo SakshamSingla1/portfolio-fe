@@ -6,6 +6,7 @@ import { initialPaginationValues } from "../../../utils/constant";
 import { useServiceService, type ServiceOffering } from "../../../services/useServiceService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import ServiceTableTemplate from "../../templates/Services/ServiceTable.template";
+import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
 
 const ListingServicesPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -39,9 +40,14 @@ const ListingServicesPage: React.FC = () => {
         totalPages: pageData?.totalPages ?? 0,
     };
 
-    const handleDelete = async (id: number) => {
+    const [idPendingDelete, setIdPendingDelete] = useState<number | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        if (idPendingDelete == null) return;
+        setDeleting(true);
         try {
-            const res = await serviceService.remove(id);
+            const res = await serviceService.remove(idPendingDelete);
             if (res?.status === HTTP_STATUS.OK) {
                 showSnackbar("success", "Service deleted");
                 refetch();
@@ -50,6 +56,9 @@ const ListingServicesPage: React.FC = () => {
             }
         } catch {
             showSnackbar("error", "Failed to delete service");
+        } finally {
+            setDeleting(false);
+            setIdPendingDelete(null);
         }
     };
 
@@ -58,15 +67,25 @@ const ListingServicesPage: React.FC = () => {
     }, [filters.search, pagination.currentPage, pagination.pageSize]);
 
     return (
-        <ServiceTableTemplate
-            services={services}
-            pagination={paginationWithTotal}
-            handlePaginationChange={(_, newPage) => setPagination((p) => ({ ...p, currentPage: newPage }))}
-            handleRowsPerPageChange={(e) => setPagination((p) => ({ ...p, pageSize: parseInt(e.target.value, 10) }))}
-            searchValue={filters.search}
-            onSearchChange={(val) => { setFilters({ search: val ?? "" }); setPagination((p) => ({ ...p, currentPage: 0 })); }}
-            onDelete={handleDelete}
-        />
+        <>
+            <ServiceTableTemplate
+                services={services}
+                pagination={paginationWithTotal}
+                handlePaginationChange={(_, newPage) => setPagination((p) => ({ ...p, currentPage: newPage }))}
+                handleRowsPerPageChange={(e) => setPagination((p) => ({ ...p, pageSize: parseInt(e.target.value, 10) }))}
+                searchValue={filters.search}
+                onSearchChange={(val) => { setFilters({ search: val ?? "" }); setPagination((p) => ({ ...p, currentPage: 0 })); }}
+                onDelete={(id) => setIdPendingDelete(id)}
+            />
+            <DeleteConfirmation
+                open={idPendingDelete != null}
+                title="Delete this service?"
+                description="This action cannot be undone."
+                onDelete={handleDelete}
+                onCancel={() => setIdPendingDelete(null)}
+                deleteButtonText={deleting ? "Deleting..." : "Delete"}
+            />
+        </>
     );
 };
 

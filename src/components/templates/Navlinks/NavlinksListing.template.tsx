@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
-import { StatusOptions, type IPagination } from "../../../utils/types";
+import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
@@ -69,7 +69,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
         `${enumToNormalKey(navlink.name)} (${navlink.index})`,
         DateUtils.dateTimeSecondToDate(navlink.createdAt ?? ""),
         DateUtils.dateTimeSecondToDate(navlink.updatedAt ?? ""),
-        StatusOptions.find((status) => status.value === navlink.status)?.label,
+        navlink.status,
         <ActionButtons key={navlink.id} onEdit={() => handleEdit(navlink.id ?? 0)} onView={() => handleView(navlink.id ?? 0)} />
     ]) ?? [], [navlinks, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
 

@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
-import { HTTP_STATUS, StatusOptions, type IPagination } from "../../../utils/types";
+import { HTTP_STATUS, type IPagination } from "../../../utils/types";
 import TableV1 from "../../organisms/Table/TableV1";
 import ListingShell from "../Shared/ListingShell.template";
 import { type DocumentUploadResponse } from "../../../services/useResumeService";
@@ -13,6 +13,7 @@ import { useSnackbar } from "../../../hooks/useSnackBar";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { FaFileAlt } from "react-icons/fa";
+import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
 
 interface ResumeTableTemplateProps {
     resumes: DocumentUploadResponse[];
@@ -41,6 +42,9 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
 
     const isMobile = useIsMobile();
 
+    const [idPendingDelete, setIdPendingDelete] = useState<number | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
     const handleActivateResume = useCallback(async (id?: number | null) => {
         if (!id) return;
         try {
@@ -49,7 +53,8 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
                 showSnackbar('success', 'Resume activated successfully');
                 onRefresh?.();
             }
-        } catch (error) {
+        } catch {
+            showSnackbar('error', 'Failed to activate resume');
         }
     }, [resumeService, showSnackbar, onRefresh]);
 
@@ -61,22 +66,27 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
         window.open(url, '_blank');
     }, [showSnackbar]);
 
-    const handleDeleteResume = useCallback(async (id?: number | null) => {
-        if (!id) return;
+    const confirmDeleteResume = useCallback(async () => {
+        if (idPendingDelete == null) return;
+        setDeleting(true);
         try {
-            const response = await resumeService.deleteResume(id);
+            const response = await resumeService.deleteResume(idPendingDelete);
             if (response.status === HTTP_STATUS.OK) {
                 showSnackbar('success', 'Resume deleted successfully');
                 onRefresh?.();
             }
-        } catch (error) {
+        } catch {
+            showSnackbar('error', 'Failed to delete resume');
+        } finally {
+            setDeleting(false);
+            setIdPendingDelete(null);
         }
-    }, [resumeService, showSnackbar, onRefresh]);
+    }, [resumeService, showSnackbar, onRefresh, idPendingDelete]);
 
     const records = useMemo(() => resumes?.map((resume: DocumentUploadResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         resume.fileName,
-        StatusOptions.find((status) => status.value === resume.status)?.label,
+        resume.status,
         DateUtils.dateTimeSecondToDate(resume.updatedAt ?? ""),
         <div key={resume.id} className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`}>
             <ActionButtons onView={() => handleView(resume.fileUrl, resume.status)} />
@@ -91,7 +101,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
             )}
             {resume.status !== 'DELETED' && (
                 <button
-                    onClick={() => handleDeleteResume(resume.id)}
+                    onClick={() => setIdPendingDelete(resume.id ?? null)}
                     className="w-6 h-6"
                     title="Delete"
                 >
@@ -99,7 +109,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
                 </button>
             )}
         </div>
-    ]) ?? [], [resumes, pagination.currentPage, pagination.pageSize, isMobile, handleView, handleActivateResume, handleDeleteResume]);
+    ]) ?? [], [resumes, pagination.currentPage, pagination.pageSize, isMobile, handleView, handleActivateResume]);
 
     const schema = useMemo(() => ({
         id: 1,
@@ -124,18 +134,28 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
     }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange]);
 
     return (
-        <ListingShell
-            title="Resumes"
-            icon={<FaFileAlt />}
-            description="Manage your resume files"
-            count={pagination.totalRecords}
-            isAddButtonVisible={false}
-            searchValue={searchValue}
-            onSearchChange={onSearchChange}
-            filterContent={filterContent}
-        >
-            <TableV1 schema={schema} records={records} />
-        </ListingShell>
+        <>
+            <ListingShell
+                title="Resumes"
+                icon={<FaFileAlt />}
+                description="Manage your resume files"
+                count={pagination.totalRecords}
+                isAddButtonVisible={false}
+                searchValue={searchValue}
+                onSearchChange={onSearchChange}
+                filterContent={filterContent}
+            >
+                <TableV1 schema={schema} records={records} />
+            </ListingShell>
+            <DeleteConfirmation
+                open={idPendingDelete != null}
+                title="Delete this resume?"
+                description="This action cannot be undone."
+                onDelete={confirmDeleteResume}
+                onCancel={() => setIdPendingDelete(null)}
+                deleteButtonText={deleting ? "Deleting..." : "Delete"}
+            />
+        </>
     )
 }
 export default ResumeTableTemplate;

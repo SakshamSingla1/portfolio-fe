@@ -4,10 +4,12 @@ import { HTTP_STATUS } from '../../../utils/types';
 import NavlinkFormTemplate from '../../templates/Navlinks/NavlinkForm.template';
 import { MODE } from '../../../utils/constant';
 import { useParams } from 'react-router-dom';
+import { useSnackbar } from '../../../hooks/useSnackBar';
 
 const NavlinkViewPage: React.FC = () => {
     const params = useParams();
     const id = params.id ? Number(params.id) : null;
+    const { showSnackbar } = useSnackbar();
 
     const navlinkService = useNavlinkService();
 
@@ -20,6 +22,7 @@ const NavlinkViewPage: React.FC = () => {
                 setNavlink(response.data.data);
             }
         } catch {
+            showSnackbar('error', 'Failed to load navlink');
         }
     };
 

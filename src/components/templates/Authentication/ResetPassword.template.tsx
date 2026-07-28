@@ -87,41 +87,41 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ setAuthState }) => {
         </div>
 
         <div className="space-y-5">
-          <TextField
-            fullWidth name="newPassword" type={showPassword ? "text" : "password"} label="New Password"
-            value={formik.values.newPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
-            InputProps={{
-              startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small" style={iconStyle}>
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
-            helperText={formik.touched.newPassword && formik.errors.newPassword ? String(formik.errors.newPassword) : ""}
-          />
           <div>
             <TextField
-              fullWidth name="confirmPassword" type={showConfirmPassword ? "text" : "password"} label="Confirm Password"
-              value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
+              fullWidth name="newPassword" type={showPassword ? "text" : "password"} label="New Password"
+              value={formik.values.newPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
               InputProps={{
                 startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" size="small" style={iconStyle}>
-                      {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small" style={iconStyle}>
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
-              error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-              helperText={formik.touched.confirmPassword && formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""}
+              error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
+              helperText={formik.touched.newPassword && formik.errors.newPassword ? String(formik.errors.newPassword) : ""}
             />
-            <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />
+            <PasswordStrengthMeter password={formik.values.newPassword || ""} />
           </div>
+          <TextField
+            fullWidth name="confirmPassword" type={showConfirmPassword ? "text" : "password"} label="Confirm Password"
+            value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" size="small" style={iconStyle}>
+                    {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+            helperText={formik.touched.confirmPassword && formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""}
+          />
         </div>
 
         <div className="mt-6">

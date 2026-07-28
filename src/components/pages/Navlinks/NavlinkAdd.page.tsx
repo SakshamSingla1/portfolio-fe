@@ -19,7 +19,7 @@ const NavlinkAddPage: React.FC = () => {
                 navigate(makeRoute(ADMIN_ROUTES.NAVLINKS, {}));
                 showSnackbar('success', 'Navlink created successfully');
             }
-        } catch (error) {
+        } catch {
             showSnackbar('error', 'Failed to create navlink');
         }
     };

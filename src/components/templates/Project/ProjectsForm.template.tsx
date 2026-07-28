@@ -94,7 +94,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         enableReinitialize: true,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
-            let projectImages = [...values.projectImages];
+            const projectImages = [...values.projectImages];
 
             if (pendingImageFiles.some(f => f !== null)) {
                 const uploadPromises = pendingImageFiles.map(async (file, index) => {

@@ -19,7 +19,7 @@ const ColorThemeCreatePage: React.FC = () => {
                 showSnackbar('success', 'Color theme created successfully');
                 navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME, {}));
             }
-        } catch (error) {
+        } catch {
             showSnackbar('error', 'Failed to create color theme');
         }
     }

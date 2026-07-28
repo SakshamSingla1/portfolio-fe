@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     type ColorTheme,
     useColorThemeService
@@ -19,6 +19,8 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import ListingShell from "../Shared/ListingShell.template";
+import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
+import { useSnackbar } from "../../../hooks/useSnackBar";
 
 import { TablePagination, IconButton } from "@mui/material";
 import { type IPagination } from "../../../utils/types";
@@ -113,14 +115,25 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     const navigate = useNavigate();
     const { activeThemeName, resetTheme, isPreviewActive, isDark } = useTheme();
     const { deleteColorTheme } = useColorThemeService();
+    const { showSnackbar } = useSnackbar();
 
-    const handleDelete = async (id: number) => {
-        if (window.confirm("Are you sure you want to delete this theme?")) {
-            try {
-                await deleteColorTheme(id);
-                if (onRefresh) onRefresh();
-            } catch (error) {
-            }
+    const [idPendingDelete, setIdPendingDelete] = useState<number | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    const handleDelete = (id: number) => setIdPendingDelete(id);
+
+    const confirmDelete = async () => {
+        if (idPendingDelete == null) return;
+        setDeleting(true);
+        try {
+            await deleteColorTheme(idPendingDelete);
+            showSnackbar("success", "Theme deleted");
+            if (onRefresh) onRefresh();
+        } catch {
+            showSnackbar("error", "Failed to delete theme");
+        } finally {
+            setDeleting(false);
+            setIdPendingDelete(null);
         }
     };
 
@@ -251,6 +264,15 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
             <div
                 className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100]"
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
+            />
+
+            <DeleteConfirmation
+                open={idPendingDelete != null}
+                title="Delete this theme?"
+                description="This action cannot be undone."
+                onDelete={confirmDelete}
+                onCancel={() => setIdPendingDelete(null)}
+                deleteButtonText={deleting ? "Deleting..." : "Delete"}
             />
         </div>
     );

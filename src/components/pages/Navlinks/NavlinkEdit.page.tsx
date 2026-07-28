@@ -26,7 +26,7 @@ const NavlinkEditPage: React.FC = () => {
                 navigate(makeRoute(ADMIN_ROUTES.NAVLINKS, {}));
                 showSnackbar('success', 'Navlink updated successfully');
             }
-        } catch (error) {
+        } catch {
             showSnackbar('error', 'Failed to update navlink');
         }
     };
@@ -38,6 +38,7 @@ const NavlinkEditPage: React.FC = () => {
                 setNavlink(response.data.data);
             }
         } catch {
+            showSnackbar('error', 'Failed to load navlink');
         }
     };
 

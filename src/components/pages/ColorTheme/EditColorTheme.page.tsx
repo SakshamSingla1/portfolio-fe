@@ -25,7 +25,7 @@ const ColorThemeEditPage: React.FC = () => {
                 showSnackbar('success', 'Color theme updated successfully');
                 navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME, {}));
             }
-        } catch (error) {
+        } catch {
             showSnackbar('error', 'Failed to update color theme');
         }
     }
@@ -37,6 +37,7 @@ const ColorThemeEditPage: React.FC = () => {
                     setColorTheme(res.data.data);
                 }
             })
+            .catch(() => showSnackbar('error', 'Failed to load color theme'));
     }
 
     useEffect(() => {

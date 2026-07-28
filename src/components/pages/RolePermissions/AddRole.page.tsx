@@ -5,10 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
+import { useSnackbar } from "../../../hooks/useSnackBar";
 
 const AddRolePage : React.FC = () => {
 
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
 
     const roleService = useRoleService();
 
@@ -18,7 +20,8 @@ const AddRolePage : React.FC = () => {
         if(response.status === HTTP_STATUS.OK) {
             navigate(makeRoute(ADMIN_ROUTES.ROLE, {}));
         }
-       } catch (error) {
+       } catch {
+        showSnackbar("error", "Failed to create role");
        }
     }
     return (

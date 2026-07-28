@@ -282,7 +282,8 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
             if (!isInside) return;
             selection.insertHTML(`{{${varName}}}`);
             editor.events.fire("change");
-        } catch (err) {
+        } catch (_err) {
+            // best-effort editor DOM interaction; failures here aren't user-actionable
         }
     };
 

@@ -118,41 +118,41 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
                         error={formik.touched.phone && !!formik.errors.phone}
                         helperText={formik.touched.phone && formik.errors.phone ? String(formik.errors.phone) : ""}
                     />
-                    <TextField
-                        fullWidth name="password" type={showPassword.password ? "text" : "password"} label="Password"
-                        value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPassword(p => ({ ...p, password: !p.password }))} edge="end" size="small" style={iconStyle}>
-                                        {showPassword.password ? <FiEyeOff /> : <FiEye />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                        error={formik.touched.password && Boolean(formik.errors.password)}
-                        helperText={formik.touched.password && formik.errors.password ? String(formik.errors.password) : ""}
-                    />
                     <div>
                         <TextField
-                            fullWidth name="confirmPassword" type={showPassword.confirmPassword ? "text" : "password"} label="Confirm Password"
-                            value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                            fullWidth name="password" type={showPassword.password ? "text" : "password"} label="Password"
+                            value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
                             InputProps={{
                                 startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton onClick={() => setShowPassword(p => ({ ...p, confirmPassword: !p.confirmPassword }))} edge="end" size="small" style={iconStyle}>
-                                            {showPassword.confirmPassword ? <FiEyeOff /> : <FiEye />}
+                                        <IconButton onClick={() => setShowPassword(p => ({ ...p, password: !p.password }))} edge="end" size="small" style={iconStyle}>
+                                            {showPassword.password ? <FiEyeOff /> : <FiEye />}
                                         </IconButton>
                                     </InputAdornment>
                                 ),
                             }}
-                            error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                            helperText={formik.touched.confirmPassword && formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""}
+                            error={formik.touched.password && Boolean(formik.errors.password)}
+                            helperText={formik.touched.password && formik.errors.password ? String(formik.errors.password) : ""}
                         />
-                        <PasswordStrengthMeter password={formik.values.confirmPassword || ""} />
+                        <PasswordStrengthMeter password={formik.values.password || ""} />
                     </div>
+                    <TextField
+                        fullWidth name="confirmPassword" type={showPassword.confirmPassword ? "text" : "password"} label="Confirm Password"
+                        value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start"><FiLock style={iconStyle} /></InputAdornment>,
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={() => setShowPassword(p => ({ ...p, confirmPassword: !p.confirmPassword }))} edge="end" size="small" style={iconStyle}>
+                                        {showPassword.confirmPassword ? <FiEyeOff /> : <FiEye />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                        error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword ? String(formik.errors.confirmPassword) : ""}
+                    />
                 </div>
 
                 <div className="mt-6">

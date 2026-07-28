@@ -56,7 +56,8 @@ const PasswordTab: React.FC = () => {
           showSnackbar("success", "Password updated successfully");
           resetForm();
         }
-      } catch (error) {
+      } catch {
+        showSnackbar("error", "Failed to update password");
       } finally {
         setSubmitting(false);
       }

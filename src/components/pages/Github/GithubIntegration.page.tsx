@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
-import { useGithubIntegrationService, type GithubRepoItem } from "../../../services/useGithubIntegrationService";
+import { useGithubIntegrationService, type GithubRepoItem, type GithubIntegration } from "../../../services/useGithubIntegrationService";
 import { HTTP_STATUS } from "../../../utils/types";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import {
@@ -136,9 +136,9 @@ const GithubIntegrationPage: React.FC = () => {
 
     const { data: integration, isLoading } = useQuery({
         queryKey: ["github-integration"],
-        queryFn: async () => {
+        queryFn: async (): Promise<GithubIntegration | null> => {
             const res = await service.getIntegration();
-            return res?.status === HTTP_STATUS.OK ? res.data.data as ReturnType<typeof import("../../../services/useGithubIntegrationService")["useGithubIntegrationService"]> extends { getIntegration: () => Promise<any> } ? any : any : null;
+            return res?.status === HTTP_STATUS.OK ? (res.data.data as GithubIntegration) : null;
         },
     });
 
@@ -149,6 +149,7 @@ const GithubIntegrationPage: React.FC = () => {
                 window.location.href = res.data.data.url;
             }
         },
+        onError: () => showSnackbar("error", "Failed to start GitHub connection"),
     });
 
     const syncMutation = useMutation({
@@ -166,6 +167,7 @@ const GithubIntegrationPage: React.FC = () => {
             showSnackbar("success", "GitHub disconnected");
             queryClient.invalidateQueries({ queryKey: ["github-integration"] });
         },
+        onError: () => showSnackbar("error", "Failed to disconnect GitHub"),
     });
 
     const handleToggleVisible = async (id: number, visible: boolean) => {
@@ -173,6 +175,8 @@ const GithubIntegrationPage: React.FC = () => {
         try {
             await service.updateRepo(id, visible);
             queryClient.invalidateQueries({ queryKey: ["github-integration"] });
+        } catch {
+            showSnackbar("error", "Failed to update repo visibility");
         } finally {
             setTogglingId(null);
         }
