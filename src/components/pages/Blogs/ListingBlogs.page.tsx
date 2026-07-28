@@ -35,7 +35,7 @@ const ListingBlogsPage: React.FC = () => {
         ...BlogStatusOptions,
     ];
 
-    const { data: pageResponse, isLoading: _isLoading, refetch } = useQuery({
+    const { data: pageResponse, isLoading, refetch } = useQuery({
         queryKey: ['blogPosts', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => blogPostService.getAll({
             page: pagination.currentPage,
@@ -112,6 +112,7 @@ const ListingBlogsPage: React.FC = () => {
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             onDelete={handleDelete}
+            isLoading={isLoading}
             filterContent={
                 <div className="w-full sm:w-64">
                     <AutoCompleteInput

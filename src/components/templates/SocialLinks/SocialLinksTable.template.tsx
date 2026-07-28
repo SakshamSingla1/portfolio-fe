@@ -21,6 +21,7 @@ interface SocialLinksTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     filterContent?: React.ReactNode;
+    isLoading?: boolean;
 }
 
 const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
@@ -30,7 +31,8 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    filterContent
+    filterContent,
+    isLoading
 }) => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -102,7 +104,7 @@ const SocialLinksTableTemplate: React.FC<SocialLinksTableTemplateProps> = ({
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     )
 }

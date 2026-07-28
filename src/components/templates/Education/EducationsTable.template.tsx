@@ -18,6 +18,7 @@ interface IEducationsTableTemplateProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    isLoading?: boolean;
 }
 
 const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
@@ -26,7 +27,8 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
     handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
-    onSearchChange
+    onSearchChange,
+    isLoading
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -104,7 +106,7 @@ const EducationsTableTemplate: React.FC<IEducationsTableTemplateProps> = ({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     );
 }

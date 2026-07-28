@@ -19,6 +19,7 @@ interface ProjectsTableTemplateProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    isLoading?: boolean;
 }
 
 const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
@@ -27,7 +28,8 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
     handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
-    onSearchChange
+    onSearchChange,
+    isLoading
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -108,7 +110,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     );
 }

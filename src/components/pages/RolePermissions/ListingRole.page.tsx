@@ -31,7 +31,7 @@ const ListingRolesPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, isLoading: _isLoading } = useQuery({
+    const { data: pageResponse, isLoading } = useQuery({
         queryKey: ['roles', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => roleService.getAllRolesByCriteria({
             page: pagination.currentPage,
@@ -88,6 +88,7 @@ const ListingRolesPage: React.FC = () => {
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
+            isLoading={isLoading}
             filterContent={
                 <div className="w-full sm:w-72">
                     <AutoCompleteInput

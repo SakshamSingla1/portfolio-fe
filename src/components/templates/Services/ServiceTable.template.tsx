@@ -19,6 +19,7 @@ interface ServiceTableProps {
     searchValue: string;
     onSearchChange: (val: string | null) => void;
     onDelete: (id: number) => void;
+    isLoading?: boolean;
 }
 
 const ServiceTableTemplate: React.FC<ServiceTableProps> = ({
@@ -29,6 +30,7 @@ const ServiceTableTemplate: React.FC<ServiceTableProps> = ({
     searchValue,
     onSearchChange,
     onDelete,
+    isLoading,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -118,7 +120,7 @@ const ServiceTableTemplate: React.FC<ServiceTableProps> = ({
             onSearchChange={(val) => onSearchChange(val)}
             count={pagination.totalRecords}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     );
 };

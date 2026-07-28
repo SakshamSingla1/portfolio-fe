@@ -25,7 +25,7 @@ const NavlinkListingPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, isLoading: _isLoading } = useQuery({
+    const { data: pageResponse, isLoading } = useQuery({
         queryKey: ['navlinks', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => navlinkService.getAllNavlinks({
             page: pagination.currentPage.toString(),
@@ -83,6 +83,7 @@ const NavlinkListingPage: React.FC = () => {
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
+            isLoading={isLoading}
             filterContent={
                 <div className="w-full sm:w-72">
                     <AutoCompleteInput

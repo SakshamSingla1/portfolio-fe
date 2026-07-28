@@ -24,6 +24,7 @@ interface ResumeTableTemplateProps {
     onSearchChange?: (val: string) => void;
     filterContent?: React.ReactNode;
     onRefresh?: () => void;
+    isLoading?: boolean;
 }
 
 const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
@@ -34,7 +35,8 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
     searchValue,
     onSearchChange,
     filterContent,
-    onRefresh
+    onRefresh,
+    isLoading
 }) => {
     const { showSnackbar } = useSnackbar();
 
@@ -145,7 +147,7 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
                 onSearchChange={onSearchChange}
                 filterContent={filterContent}
             >
-                <TableV1 schema={schema} records={records} />
+                <TableV1 schema={schema} records={records} isLoading={isLoading} />
             </ListingShell>
             <DeleteConfirmation
                 open={idPendingDelete != null}

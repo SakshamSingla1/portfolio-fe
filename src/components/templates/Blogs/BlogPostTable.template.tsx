@@ -20,6 +20,7 @@ interface IBlogPostTableTemplateProps {
     onSearchChange?: (val: string) => void;
     onDelete?: (id: number) => Promise<void>;
     filterContent?: React.ReactNode;
+    isLoading?: boolean;
 }
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -116,6 +117,7 @@ const BlogPostTableTemplate: React.FC<IBlogPostTableTemplateProps> = ({
     onSearchChange,
     onDelete,
     filterContent,
+    isLoading,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -192,7 +194,7 @@ const BlogPostTableTemplate: React.FC<IBlogPostTableTemplateProps> = ({
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     );
 };

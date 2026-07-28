@@ -20,6 +20,7 @@ interface RoleTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     filterContent?: React.ReactNode;
+    isLoading?: boolean;
 }
 
 const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
@@ -29,7 +30,8 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    filterContent
+    filterContent,
+    isLoading
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -100,7 +102,7 @@ const RoleTableTemplate: React.FC<RoleTableTemplateProps> = ({
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     )
 }

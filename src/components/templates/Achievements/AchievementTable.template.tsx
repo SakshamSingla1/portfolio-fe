@@ -19,6 +19,7 @@ interface IAchievementsTableTemplateProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    isLoading?: boolean;
 }
 
 const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
@@ -27,7 +28,8 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
     handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
-    onSearchChange
+    onSearchChange,
+    isLoading
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -106,7 +108,7 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     );
 }

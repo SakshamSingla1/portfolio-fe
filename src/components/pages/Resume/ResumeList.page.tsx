@@ -23,7 +23,7 @@ const ResumeListPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, isLoading: _isLoading, refetch } = useQuery({
+    const { data: pageResponse, isLoading, refetch } = useQuery({
         queryKey: ['resumes', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => resumeService.getByProfile({
             page: pagination.currentPage.toString(),
@@ -83,6 +83,7 @@ const ResumeListPage: React.FC = () => {
                 searchValue={filters.search}
                 onSearchChange={(val) => handleFiltersChange("search", val)}
                 onRefresh={() => refetch()}
+                isLoading={isLoading}
                 filterContent={
                     <div className="w-full sm:w-72">
                         <AutoCompleteInput

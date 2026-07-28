@@ -20,7 +20,7 @@ const ListingServicesPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, isLoading: _isLoading, refetch } = useQuery({
+    const { data: pageResponse, isLoading, refetch } = useQuery({
         queryKey: ['services', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => serviceService.getAll({
             page: pagination.currentPage.toString(),
@@ -76,6 +76,7 @@ const ListingServicesPage: React.FC = () => {
                 searchValue={filters.search}
                 onSearchChange={(val) => { setFilters({ search: val ?? "" }); setPagination((p) => ({ ...p, currentPage: 0 })); }}
                 onDelete={(id) => setIdPendingDelete(id)}
+                isLoading={isLoading}
             />
             <DeleteConfirmation
                 open={idPendingDelete != null}

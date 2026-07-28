@@ -102,6 +102,7 @@ interface ColorThemeListingTemplateProps {
     handlePaginationChange: (event: any, newPage: number) => void;
     handleRowsPerPageChange: (event: any) => void;
     onRefresh?: () => void;
+    isLoading?: boolean;
 }
 
 const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
@@ -109,7 +110,8 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
     pagination,
     handlePaginationChange,
     handleRowsPerPageChange,
-    onRefresh
+    onRefresh,
+    isLoading
 }) => {
     const colors = useColors();
     const navigate = useNavigate();
@@ -180,7 +182,23 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 addButtonOnClick={() => navigate(ADMIN_ROUTES.COLOR_THEME_ADD)}
             >
                 <div className="px-2 py-3 sm:p-6">
-                    {colorThemes.length > 0 && (
+                    {isLoading && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-12">
+                            {Array.from({ length: pagination.pageSize || 6 }).map((_, i) => (
+                                <div
+                                    key={`theme-skeleton-${i}`}
+                                    className="rounded-2xl animate-pulse"
+                                    style={{
+                                        height: 180,
+                                        background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {!isLoading && colorThemes.length > 0 && (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-12">
                                 {colorThemes.map((theme, i) => (
@@ -249,7 +267,7 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                         </>
                     )}
 
-                    {colorThemes.length === 0 && (
+                    {!isLoading && colorThemes.length === 0 && (
                         <div className="py-32 flex flex-col items-center justify-center text-center">
                             <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6 opacity-20">
                                 <TbPalette size={40} />

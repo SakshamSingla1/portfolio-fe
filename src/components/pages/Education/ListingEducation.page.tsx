@@ -21,7 +21,7 @@ const ListingEducationPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, isLoading: _isLoading } = useQuery({
+    const { data: pageResponse, isLoading } = useQuery({
         queryKey: ['educations', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => educationService.getAllByProfile({
             page: pagination.currentPage.toString(),
@@ -81,6 +81,7 @@ const ListingEducationPage: React.FC = () => {
             handleRowsPerPageChange={handleRowsPerPageChange}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
+            isLoading={isLoading}
         />
     )
 }

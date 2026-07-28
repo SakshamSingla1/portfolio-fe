@@ -24,6 +24,7 @@ interface UserTableTemplateProps {
     onSearchChange?: (val: string) => void;
     filterContent?: React.ReactNode;
     onRefresh?: () => void;
+    isLoading?: boolean;
 }
 
 const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
@@ -35,6 +36,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     onSearchChange,
     filterContent,
     onRefresh,
+    isLoading,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -135,7 +137,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     )
 }

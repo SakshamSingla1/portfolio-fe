@@ -18,6 +18,7 @@ interface ILanguageTableProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    isLoading?: boolean;
 }
 
 const LanguageTableTemplate: React.FC<ILanguageTableProps> = ({
@@ -27,6 +28,7 @@ const LanguageTableTemplate: React.FC<ILanguageTableProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
+    isLoading,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -86,7 +88,7 @@ const LanguageTableTemplate: React.FC<ILanguageTableProps> = ({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     );
 };

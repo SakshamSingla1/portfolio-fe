@@ -21,6 +21,7 @@ interface INavlinkListTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     filterContent?: React.ReactNode;
+    isLoading?: boolean;
 }
 
 const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
@@ -30,7 +31,8 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    filterContent
+    filterContent,
+    isLoading
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -109,7 +111,7 @@ const NavlinkListTableTemplate: React.FC<INavlinkListTableTemplateProps> = ({
             onSearchChange={onSearchChange}
             filterContent={filterContent}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     )
 }

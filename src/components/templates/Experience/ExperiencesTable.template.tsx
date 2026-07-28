@@ -19,6 +19,7 @@ interface ExperienceTableTemplateProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    isLoading?: boolean;
 }
 
 const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
@@ -27,7 +28,8 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
     handlePaginationChange,
     handleRowsPerPageChange,
     searchValue,
-    onSearchChange
+    onSearchChange,
+    isLoading
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -95,7 +97,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
         >
-            <TableV1 schema={schema} records={records} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>
     );
 }
