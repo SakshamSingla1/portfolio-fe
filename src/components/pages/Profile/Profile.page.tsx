@@ -143,7 +143,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const embedSnippet = profileData?.userName
-    ? `<iframe src="${API_ORIGIN}/embed/${profileData.userName}" width="420" height="460" frameborder="0" style="border:none;border-radius:12px;overflow:hidden;" title="${(profileData as any).fullName ?? 'Portfolio'} — Portfolio Card"></iframe>`
+    ? `<iframe src="${API_ORIGIN}/embed/${profileData.userName}" width="420" height="400" frameborder="0" style="border:none;border-radius:18px;overflow:hidden;" title="${(profileData as any).fullName ?? 'Portfolio'} — Portfolio Card"></iframe>`
     : "";
 
   const copyEmbedSnippet = () => {
@@ -391,8 +391,8 @@ const ProfilePage: React.FC = () => {
                     <iframe
                       src={`${API_ORIGIN}/embed/${profileData.userName}`}
                       width={420}
-                      height={460}
-                      style={{ border: "none", borderRadius: 12, maxWidth: "100%", background: "#fff" }}
+                      height={400}
+                      style={{ border: "none", borderRadius: 18, maxWidth: "100%", background: "#fff" }}
                       title={`${profileData.fullName ?? "Portfolio"} — Embed preview`}
                     />
                   </div>
