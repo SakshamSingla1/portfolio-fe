@@ -65,6 +65,7 @@ const ProfilePage: React.FC = () => {
   const [digestEnabled, setDigestEnabled] = useState<boolean>(true);
   const [settingsSaving, setSettingsSaving] = useState<boolean>(false);
   const [embedCopied, setEmbedCopied] = useState<boolean>(false);
+  const [emailCopyState, setEmailCopyState] = useState<"idle" | "copying" | "copied" | "error">("idle");
 
   const { data: profileData, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -152,6 +153,34 @@ const ProfilePage: React.FC = () => {
       setEmbedCopied(true);
       setTimeout(() => setEmbedCopied(false), 2000);
     });
+  };
+
+  const copyForEmail = async () => {
+    if (!profileData?.userName) return;
+    setEmailCopyState("copying");
+    try {
+      const res = await fetch(`${API_ORIGIN}/embed/${profileData.userName}/email`);
+      if (!res.ok) throw new Error("Failed to fetch email card");
+      const html = await res.text();
+
+      const plainTextFallback = `${API_ORIGIN}/embed/${profileData.userName}`;
+      if (navigator.clipboard && "write" in navigator.clipboard && typeof ClipboardItem !== "undefined") {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/html": new Blob([html], { type: "text/html" }),
+            "text/plain": new Blob([plainTextFallback], { type: "text/plain" }),
+          }),
+        ]);
+      } else {
+        // Fallback for browsers without rich-clipboard support — at least get the link across
+        await navigator.clipboard.writeText(plainTextFallback);
+      }
+      setEmailCopyState("copied");
+    } catch {
+      setEmailCopyState("error");
+    } finally {
+      setTimeout(() => setEmailCopyState("idle"), 2500);
+    }
   };
 
   return (
@@ -426,6 +455,27 @@ const ProfilePage: React.FC = () => {
                     >
                       Open in New Tab
                     </a>
+                  )}
+                  {profileData?.userName && (
+                    <button
+                      onClick={copyForEmail}
+                      disabled={emailCopyState === "copying"}
+                      title="Copies a version with clickable links you can paste directly into an email compose window"
+                      style={{
+                        padding: "6px 16px", borderRadius: 10,
+                        background: emailCopyState === "error" ? colors.error50 : "transparent",
+                        border: `1px solid ${emailCopyState === "error" ? colors.error200 : colors.neutral300}`,
+                        color: emailCopyState === "error" ? colors.error600 : colors.neutral600,
+                        fontSize: 13, fontWeight: 500,
+                        cursor: emailCopyState === "copying" ? "not-allowed" : "pointer",
+                        opacity: emailCopyState === "copying" ? 0.7 : 1,
+                      }}
+                    >
+                      {emailCopyState === "copied" ? "Copied for Email!"
+                        : emailCopyState === "copying" ? "Copying…"
+                        : emailCopyState === "error" ? "Failed — try again"
+                        : "Copy for Email"}
+                    </button>
                   )}
                 </div>
               </SectionCard>
