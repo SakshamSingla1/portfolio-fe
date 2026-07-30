@@ -332,32 +332,50 @@ const ProfilePage: React.FC = () => {
               </div>
             </SectionCard>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8 items-start">
               <SectionCard
                 title="Export Portfolio"
                 subtitle="Download a complete PDF — ideal for email submissions and HR systems."
                 icon={FiFile}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <FiFile style={{ color: colors.primary500 }} />
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Full Portfolio PDF</p>
-                      <p className="text-xs" style={{ color: colors.neutral500 }}>All sections — experience, skills, projects, publications and more</p>
-                    </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <FiFile style={{ color: colors.primary500 }} />
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Full Portfolio PDF</p>
+                    <p className="text-xs" style={{ color: colors.neutral500 }}>A single polished document, ready to attach anywhere</p>
                   </div>
-                  <button
-                    onClick={downloadPortfolioPdf}
-                    style={{
-                      padding: "6px 16px", borderRadius: 10,
-                      background: colors.primary50, border: `1px solid ${colors.primary200}`,
-                      color: colors.primary600, fontSize: 13, fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Download PDF
-                  </button>
                 </div>
+
+                <div className="rounded-xl p-3 mb-4" style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}` }}>
+                  <p className="text-xs font-semibold mb-2" style={{ color: colors.neutral500 }}>WHAT'S INCLUDED</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Profile & About", "Experience", "Education", "Skills", "Projects", "Certifications", "Achievements", "Publications", "Testimonials"].map(section => (
+                      <span
+                        key={section}
+                        className="text-xs"
+                        style={{
+                          padding: "3px 10px", borderRadius: 999,
+                          background: colors.neutral0, border: `1px solid ${colors.neutral200}`,
+                          color: colors.neutral600,
+                        }}
+                      >
+                        {section}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={downloadPortfolioPdf}
+                  style={{
+                    width: "100%", padding: "8px 16px", borderRadius: 10,
+                    background: colors.primary50, border: `1px solid ${colors.primary200}`,
+                    color: colors.primary600, fontSize: 13, fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Download PDF
+                </button>
               </SectionCard>
 
               <SectionCard
