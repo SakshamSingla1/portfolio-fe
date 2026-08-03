@@ -14,6 +14,7 @@ import ProfileCompletionTemplate from "./ProfileCompletion.template";
 import RecentMessagesTemplate from "./RecentMessages.template";
 import RecentActivitiesTemplate from "./RecentActivities.template";
 import QuickActionsTemplate from "./QuickActions.template";
+import { Card, SectionLabel, SkeletonBlock } from "./shared/DashboardUI";
 
 interface DashboardTemplateProps {
   dashboardData: IDashboardSummary | null;
@@ -182,68 +183,17 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   const profileImg = dashboardData?.profileSummary?.profileImageUrl || "";
   const firstName = fullName.split(" ")[0] || "there";
 
-  const cardShadow = isDark ? "0 1px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)" : "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)";
-
-  const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({
-    children, className = "",
-  }) => (
-    <div
-      className={`rounded-2xl overflow-hidden ${className}`}
-      style={{
-        background: colors.neutral0,
-        border: `1.5px solid ${colors.neutral300}`,
-        boxShadow: cardShadow,
-      }}
-    >
-      <div className="p-4 sm:p-5">{children}</div>
-    </div>
-  );
-
-  const SectionLabel: React.FC<{
-    children: React.ReactNode;
-    count?: number;
-    accent?: string;
-  }> = ({ children, count, accent }) => (
-    <div className="flex items-center justify-between mb-4">
-      <span
-        className="text-[10px] font-black uppercase tracking-[0.1em]"
-        style={{ color: accent ?? colors.primary700 }}
-      >
-        {children}
-      </span>
-      {count !== undefined && count > 0 && (
-        <span
-          className="text-[11px] font-semibold tabular-nums px-2 py-0.5 rounded-full"
-          style={{
-            background: isDark ? colors.primary900 : colors.primary50,
-            color: isDark ? colors.primary300 : colors.primary700,
-          }}
-        >
-          {count}
-        </span>
-      )}
-    </div>
-  );
-
   /* ─── Skeleton ───────────────────────────────────────────── */
   const Skeleton = () => (
     <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
       <div className={isMobile ? "space-y-4" : "col-span-7 space-y-4"}>
         {[60, 280, 200].map((h, i) => (
-          <div
-            key={i}
-            className="rounded-2xl animate-pulse"
-            style={{ height: h, background: colors.neutral100 }}
-          />
+          <SkeletonBlock key={i} height={h} />
         ))}
       </div>
       <div className={isMobile ? "space-y-4" : "col-span-5 space-y-4"}>
         {[260, 200].map((h, i) => (
-          <div
-            key={i}
-            className="rounded-2xl animate-pulse"
-            style={{ height: h, background: colors.neutral100 }}
-          />
+          <SkeletonBlock key={i} height={h} />
         ))}
       </div>
     </div>
@@ -293,61 +243,65 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="flex items-center justify-between mb-5"
+        className="mb-4"
       >
-        <div className="flex-1 min-w-0">
-          <h1
-            className="font-bold tracking-tight"
-            style={{ fontSize: isMobile ? 18 : 22, color: colors.neutral900, lineHeight: 1.2 }}
-          >
-            {getGreeting()}, {firstName}.
-          </h1>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <p className="text-xs" style={{ color: colors.neutral500 }}>{formatDate()}</p>
-            {profileTitle && (
-              <>
-                <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
-                <p className="text-xs font-medium" style={{ color: colors.neutral600 }}>{profileTitle}</p>
-              </>
-            )}
-            {profileLoc && (
-              <>
-                <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
-                <p className="text-xs" style={{ color: colors.neutral500 }}>{profileLoc}</p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {fullName && (
-          <div className="ml-4 shrink-0">
-            {profileImg ? (
-              <img
-                src={profileImg}
-                alt={fullName}
-                className="rounded-full object-cover"
-                style={{
-                  width: isMobile ? 40 : 48,
-                  height: isMobile ? 40 : 48,
-                  border: `2px solid ${colors.primary200}`,
-                }}
-              />
-            ) : (
-              <div
-                className="rounded-full flex items-center justify-center font-bold"
-                style={{
-                  width: isMobile ? 40 : 48,
-                  height: isMobile ? 40 : 48,
-                  fontSize: isMobile ? 14 : 16,
-                  ...avatarPalette(fullName, isDark),
-                  border: `2px solid ${colors.primary200}`,
-                }}
+        <Card hero>
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <h1
+                className="font-bold tracking-tight"
+                style={{ fontSize: isMobile ? 18 : 22, color: colors.neutral900, lineHeight: 1.2 }}
               >
-                {getInitials(fullName)}
+                {getGreeting()}, {firstName}.
+              </h1>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <p className="text-xs" style={{ color: colors.neutral500 }}>{formatDate()}</p>
+                {profileTitle && (
+                  <>
+                    <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
+                    <p className="text-xs font-medium" style={{ color: colors.neutral600 }}>{profileTitle}</p>
+                  </>
+                )}
+                {profileLoc && (
+                  <>
+                    <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
+                    <p className="text-xs" style={{ color: colors.neutral500 }}>{profileLoc}</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {fullName && (
+              <div className="ml-4 shrink-0">
+                {profileImg ? (
+                  <img
+                    src={profileImg}
+                    alt={fullName}
+                    className="rounded-full object-cover"
+                    style={{
+                      width: isMobile ? 40 : 48,
+                      height: isMobile ? 40 : 48,
+                      border: `2px solid ${colors.primary200}`,
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="rounded-full flex items-center justify-center font-bold"
+                    style={{
+                      width: isMobile ? 40 : 48,
+                      height: isMobile ? 40 : 48,
+                      fontSize: isMobile ? 14 : 16,
+                      ...avatarPalette(fullName, isDark),
+                      border: `2px solid ${colors.primary200}`,
+                    }}
+                  >
+                    {getInitials(fullName)}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
+        </Card>
       </motion.div>
 
       {!dashboardData ? (
@@ -424,7 +378,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
               >
-                <Card>
+                <Card hero>
                   <SectionLabel count={dashboardData.recentMessages.length}>
                     Recent Messages
                   </SectionLabel>
@@ -437,7 +391,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.15 }}
               >
-                <Card>
+                <Card hero>
                   <SectionLabel>Quick Add</SectionLabel>
                   <QuickActionsTemplate />
                 </Card>
@@ -451,7 +405,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.12 }}
               >
-                <Card>
+                <Card hero>
                   <SectionLabel>Portfolio Score</SectionLabel>
                   <ProfileCompletionTemplate profileCompletion={dashboardData.profileCompletion} />
                 </Card>
@@ -462,7 +416,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.18 }}
               >
-                <Card>
+                <Card hero>
                   <SectionLabel count={dashboardData.recentActivities.length}>
                     Activity
                   </SectionLabel>

@@ -5,7 +5,8 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IDailyView, IPortfolioView } from "../../../services/useDashboardService";
-import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe } from "react-icons/fi";
+import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2 } from "react-icons/fi";
+import { EmptyState } from "./shared/DashboardUI";
 
 interface ViewAnalyticsProps {
   viewStats: IViewStats | null | undefined;
@@ -778,6 +779,34 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
   const hasBrowserData   = Object.keys(browserBreakdown).length > 0;
   const hasLocationData  = Object.keys(locationBreakdown).length > 0;
   const hasReferrerData  = Object.keys(referrerBreakdown).length > 0;
+
+  const hasAnyData = totalViews > 0 || recentViews.length > 0;
+
+  if (!hasAnyData) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        style={cardStyle}
+      >
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})` }} />
+        <div className="p-4 sm:p-5">
+          <div className="flex items-center gap-2 mb-4 sm:mb-5">
+            <LivePulse active={false} />
+            <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: colors.primary700 }}>
+              Analytics · Portfolio Views
+            </span>
+          </div>
+          <EmptyState
+            icon={<FiBarChart2 size={20} />}
+            title="No traffic yet"
+            subtitle="Once people start viewing your portfolio, visits, devices, and traffic sources will show up here."
+          />
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
