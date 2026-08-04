@@ -310,6 +310,9 @@ const Sidebar: React.FC<{
                   active={isActive}
                   collapsed={collapsed}
                   colors={colors}
+                  // Help and Settings always load fresh (full page reload)
+                  // instead of client-side routing.
+                  forceReload={item.name === "HELP" || item.name === "SETTINGS"}
                 />
               );
             })}

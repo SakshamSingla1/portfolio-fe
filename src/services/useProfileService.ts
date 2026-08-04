@@ -18,12 +18,15 @@ export const PROFILE_URLS = {
     UPLOAD_ABOUT_ME_IMAGE: "/profile/upload/about-image",
 
     // Admin
+    ADMIN_CREATE_USER: "/profile/users",
     ADMIN_GET_ALL_USERS: "/profile/users",
     ADMIN_GET_USER_BY_ID: "/profile/users/:id",
     ADMIN_UPDATE_STATUS: "/profile/users/:id/status",
     ADMIN_UPDATE_ROLE: "/profile/users/:id/role",
     ADMIN_TOGGLE_VERIFY: "/profile/users/:id/verify",
-    ADMIN_DELETE_USER: "/profile/users/:id"
+    ADMIN_DELETE_USER: "/profile/users/:id",
+    ADMIN_BULK_UPDATE_STATUS: "/profile/users/bulk-status",
+    ADMIN_BULK_DELETE_USERS: "/profile/users/bulk"
 };
 
 // =========================
@@ -96,7 +99,28 @@ export interface StatusUpdateRequest {
 }
 
 export interface RoleUpdateRequest {
-    roleId: number | null;
+    // The backend's RoleUpdateRequest holds the role id as a numeric string
+    // (Long.parseLong'd server-side) — not a "roleId" field.
+    role: string;
+}
+
+export interface AdminCreateUserRequest {
+    fullName: string;
+    userName: string;
+    email: string;
+    password: string;
+    phone?: string;
+    roleId: number;
+    status?: string;
+}
+
+export interface BulkStatusUpdateRequest {
+    ids: number[];
+    status: string;
+}
+
+export interface BulkUserIdsRequest {
+    ids: number[];
 }
 
 export interface ProfileSettingsRequest {
@@ -151,6 +175,10 @@ export const useProfileService = () => {
     // =========================
     // ADMIN APIs
     // =========================
+    const createUser = (body: AdminCreateUserRequest) => {
+        return request(API_METHOD.POST, PROFILE_URLS.ADMIN_CREATE_USER, user, body);
+    };
+
     const getAllUsers = (params?: GetProfilesParams) => {
         return request(API_METHOD.GET, PROFILE_URLS.ADMIN_GET_ALL_USERS, user, null, params ? { params } : null);
     };
@@ -197,6 +225,14 @@ export const useProfileService = () => {
         );
     };
 
+    const bulkUpdateStatus = (body: BulkStatusUpdateRequest) => {
+        return request(API_METHOD.PATCH, PROFILE_URLS.ADMIN_BULK_UPDATE_STATUS, user, body);
+    };
+
+    const bulkDeleteUsers = (body: BulkUserIdsRequest) => {
+        return request(API_METHOD.DELETE, PROFILE_URLS.ADMIN_BULK_DELETE_USERS, user, body);
+    };
+
     return {
         get,
         update,
@@ -204,11 +240,14 @@ export const useProfileService = () => {
         uploadProfileImage,
         uploadLogo,
         uploadAboutMeImage,
+        createUser,
         getAllUsers,
         getUserById,
         updateUserStatus,
         updateUserRole,
         toggleUserVerification,
-        deleteUser
+        deleteUser,
+        bulkUpdateStatus,
+        bulkDeleteUsers
     };
 };

@@ -10,6 +10,10 @@ export interface NavItemProps {
     active?: boolean;
     collapsed?: boolean;
     colors: any;
+    /** Renders a plain <a> instead of react-router's <Link>, forcing a full
+     * browser reload on navigation instead of client-side routing. Used for
+     * tabs (Help, Settings) that should always load fresh. */
+    forceReload?: boolean;
 }
 
 const useStyles = createUseStyles({
@@ -104,12 +108,15 @@ const NavItem: React.FC<NavItemProps> = ({
     active = false,
     collapsed = false,
     colors,
+    forceReload = false,
 }) => {
     const classes = useStyles({ colors, active, collapsed });
+    const NavTag = forceReload ? "a" : Link;
+    const navTagProps = forceReload ? { href: to } : { to };
 
     return (
-        <Link
-            to={to}
+        <NavTag
+            {...(navTagProps as any)}
             className={classes.navItem}
             title={collapsed ? label : ""}
         >
@@ -161,7 +168,7 @@ const NavItem: React.FC<NavItemProps> = ({
                     }}
                 />
             )}
-        </Link>
+        </NavTag>
     );
 };
 

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useAuthService } from "../../../services/useAuthService";
-import { ADMIN_ROUTES, REGEX, ROLES } from "../../../utils/constant";
-import { HTTP_STATUS, useColors } from "../../../utils/types";
+import { useProfileService } from "../../../services/useProfileService";
+import { useRoleService } from "../../../services/useRoleService";
+import { ADMIN_ROUTES, REGEX } from "../../../utils/constant";
+import { HTTP_STATUS, Status, useColors } from "../../../utils/types";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
+import CustomRadioGroup, { type RadioOption } from "../../molecules/CustomRadioGroup/CustomRadioGroup";
 import FormShell from "../../templates/Shared/FormShell.template";
 
 const validationSchema = Yup.object({
@@ -22,16 +24,27 @@ const validationSchema = Yup.object({
         .oneOf([Yup.ref("password")], "Passwords must match")
         .required("Please confirm your password"),
     phone: Yup.string().matches(REGEX.PHONE_NUMBER, "Enter a valid 10-digit phone number").optional(),
+    roleId: Yup.string().required("Role is required"),
+    status: Yup.string().required("Status is required"),
 });
 
 const AddUserPage: React.FC = () => {
     const navigate = useNavigate();
-    const authService = useAuthService();
+    const profileService = useProfileService();
+    const roleService = useRoleService();
     const { showSnackbar } = useSnackbar();
     const colors = useColors();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [roleOptions, setRoleOptions] = useState<RadioOption[]>([]);
 
     const onClose = () => navigate(ADMIN_ROUTES.USER);
+
+    useEffect(() => {
+        roleService.getAllRolesByCriteria({ size: 100 }).then((res: any) => {
+            const roles = res?.data?.data?.content ?? [];
+            setRoleOptions(roles.map((r: any) => ({ value: String(r.id), label: r.name })));
+        }).catch(() => setRoleOptions([]));
+    }, []);
 
     const formik = useFormik({
         initialValues: {
@@ -41,23 +54,24 @@ const AddUserPage: React.FC = () => {
             password: "",
             confirmPassword: "",
             phone: "",
+            roleId: "",
+            status: Status.ACTIVE,
         },
         validationSchema,
         onSubmit: async (values) => {
             setIsSubmitting(true);
             try {
-                const response = await authService.register({
+                const response = await profileService.createUser({
                     fullName: values.fullName,
                     userName: values.userName,
                     email: values.email,
                     password: values.password,
-                    // No lower-privilege role exists in this system (only ADMIN/SUPER_ADMIN);
-                    // the backend hardcodes new registrations to ADMIN regardless of this field.
-                    role: ROLES.ADMIN,
-                    phone: values.phone,
+                    phone: values.phone || undefined,
+                    roleId: Number(values.roleId),
+                    status: values.status,
                 });
                 if (response?.status === HTTP_STATUS.OK) {
-                    showSnackbar("success", "User created — OTP verification email sent");
+                    showSnackbar("success", "User created successfully");
                     onClose();
                 } else {
                     showSnackbar("error", response?.data?.message ?? "Failed to create user");
@@ -73,7 +87,7 @@ const AddUserPage: React.FC = () => {
     return (
         <FormShell
             title="Add User"
-            subtitle="Create a new user account. A verification OTP will be sent to their email."
+            subtitle="Create a new user account with immediate access — no email verification step."
             breadcrumb="Users"
             onBack={onClose}
         >
@@ -136,13 +150,39 @@ const AddUserPage: React.FC = () => {
                         error={Boolean(formik.touched.confirmPassword && formik.errors.confirmPassword)}
                         helperText={formik.touched.confirmPassword && formik.errors.confirmPassword ? formik.errors.confirmPassword : ""}
                     />
+
+                    <div>
+                        <div className="text-sm font-semibold mb-2" style={{ color: colors.neutral700 }}>Role</div>
+                        <CustomRadioGroup
+                            name="roleId"
+                            options={roleOptions}
+                            value={formik.values.roleId}
+                            onChange={(e) => formik.setFieldValue("roleId", e.target.value)}
+                        />
+                        {formik.touched.roleId && formik.errors.roleId && (
+                            <div className="text-xs mt-1" style={{ color: colors.error500 }}>{formik.errors.roleId}</div>
+                        )}
+                    </div>
+
+                    <div>
+                        <div className="text-sm font-semibold mb-2" style={{ color: colors.neutral700 }}>Initial Status</div>
+                        <CustomRadioGroup
+                            name="status"
+                            options={Object.values(Status).filter((s) => s !== Status.DELETED).map((s) => ({ value: s, label: s.charAt(0) + s.slice(1).toLowerCase() }))}
+                            value={formik.values.status}
+                            onChange={(e) => formik.setFieldValue("status", e.target.value)}
+                        />
+                        {formik.touched.status && formik.errors.status && (
+                            <div className="text-xs mt-1" style={{ color: colors.error500 }}>{formik.errors.status}</div>
+                        )}
+                    </div>
                 </div>
 
                 <div
                     className="flex justify-end gap-3 px-5 py-4"
                     style={{ borderTop: `1px solid ${colors.neutral200}` }}
                 >
-                    <Button label="Cancel" variant="tertiaryContained" onClick={onClose} />
+                    <Button label="Cancel" variant="tertiaryContained" onClick={onClose} disabled={isSubmitting} />
                     <Button label={isSubmitting ? "Creating..." : "Create User"} variant="primaryContained" type="submit" disabled={isSubmitting} />
                 </div>
             </form>

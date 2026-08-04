@@ -13,19 +13,27 @@ const ViewUserPage: React.FC = () => {
     const { showSnackbar } = useSnackbar();
 
     const [user,setUserTo] = useState<UserResponse | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const loadUser = async () => {
+        setIsLoading(true);
         try {
             const response = await profileService.getUserById(id ? Number(id) : null);
             setUserTo(response.data.data);
         } catch {
             showSnackbar("error", "Failed to load user details");
+        } finally {
+            setIsLoading(false);
         }
     }
 
     useEffect(() => {
         loadUser();
     }, [])
+
+    if (isLoading) {
+        return <UserFormTemplate mode={MODE.VIEW} user={null} isLoading />;
+    }
 
     return (
         <UserFormTemplate mode={MODE.VIEW} user={user} />

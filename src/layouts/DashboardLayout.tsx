@@ -449,7 +449,7 @@ const DashboardLayout: React.FC = () => {
                       My Profile
                     </button>
 
-                    <button className={classes.dropdownItem} onClick={() => navigate("/settings")}>
+                    <button className={classes.dropdownItem} onClick={() => { window.location.href = "/settings"; }}>
                       <FiSettings size={16} />
                       Dashboard Settings
                     </button>
