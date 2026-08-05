@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createUseStyles } from "react-jss";
@@ -110,7 +110,11 @@ const NavItem: React.FC<NavItemProps> = ({
     colors,
     forceReload = false,
 }) => {
-    const classes = useStyles({ colors, active, collapsed });
+    // Rendered ~20-28 times per Sidebar render (once per nav link) — a fresh
+    // object here means every one of them regenerates its own stylesheet on
+    // every Sidebar re-render, including ones from unrelated layout state.
+    const stylesTheme = useMemo(() => ({ colors, active, collapsed }), [colors, active, collapsed]);
+    const classes = useStyles(stylesTheme);
     const NavTag = forceReload ? "a" : Link;
     const navTagProps = forceReload ? { href: to } : { to };
 

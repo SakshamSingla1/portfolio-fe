@@ -178,7 +178,12 @@ const Sidebar: React.FC<{
   const location = useLocation();
 
   const colors = useColors();
-  const classes = useStyles({ ...colors, collapsed });
+  // Must stay referentially stable across renders that don't change colors/
+  // collapsed — a fresh spread here regenerates this entire stylesheet (plus
+  // every NavItem's own, since it renders ~20-28 of them) on every render,
+  // including ones triggered by unrelated DashboardLayout state.
+  const stylesTheme = useMemo(() => ({ ...colors, collapsed }), [colors, collapsed]);
+  const classes = useStyles(stylesTheme);
 
   // Create navigation groups from rolePermissions
   const groupedMenuItems = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useColors } from "../../../utils/types";
 import Button from "../../atoms/Button/Button";
@@ -8,6 +8,7 @@ import { InputAdornment } from "@mui/material";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
 import { usePermissionHelper } from "../../../hooks/usePermissionHelper";
+import { useDebounce } from "../../../utils/helper";
 
 export interface ListingStat {
   label: string;
@@ -76,6 +77,21 @@ const ListingShell: React.FC<ListingShellProps> = ({
   const isMobile = useIsMobile();
   const { canAdd } = usePermissionHelper();
   const [showFilters, setShowFilters] = useState(false);
+
+  // The text field updates instantly (so typing feels responsive), but the
+  // callback that actually drives each page's React Query queryKey/network
+  // fetch is debounced — this one shared shell backs ~19 listing pages, and
+  // none of them debounced search themselves, so every keystroke was firing
+  // a full network request plus a full table recompute.
+  const [localSearch, setLocalSearch] = useState(searchValue ?? "");
+  useEffect(() => {
+    setLocalSearch(searchValue ?? "");
+  }, [searchValue]);
+  const debouncedSearchChange = useDebounce((val: string) => onSearchChange?.(val), 400);
+  const handleSearchInput = (val: string) => {
+    setLocalSearch(val);
+    debouncedSearchChange(val);
+  };
 
   const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
   const accent = accentColor ?? colors.primary600;
@@ -254,8 +270,8 @@ const ListingShell: React.FC<ListingShellProps> = ({
                     {onSearchChange && (
                       <TextField
                         placeholder={searchPlaceholder ?? "Search..."}
-                        value={searchValue ?? ""}
-                        onChange={(e) => onSearchChange(e.target.value)}
+                        value={localSearch}
+                        onChange={(e) => handleSearchInput(e.target.value)}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start" className="pl-[11px]">
@@ -276,8 +292,8 @@ const ListingShell: React.FC<ListingShellProps> = ({
                   <div className="w-full sm:w-72">
                     <TextField
                       placeholder={searchPlaceholder ?? "Search..."}
-                      value={searchValue ?? ""}
-                      onChange={(e) => onSearchChange(e.target.value)}
+                      value={localSearch}
+                      onChange={(e) => handleSearchInput(e.target.value)}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start" className="pl-[11px]">

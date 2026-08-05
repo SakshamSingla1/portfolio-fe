@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { FiBell, FiCheck, FiInbox } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -151,7 +151,10 @@ const useStyles = createUseStyles({
 const NotificationBell: React.FC = () => {
     const colors = useColors();
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    const jssTheme = { ...colors, isMobile };
+    // This component polls every 30s and lives inside DashboardLayout, so a
+    // fresh object here regenerated its whole stylesheet on every poll tick
+    // and every unrelated layout re-render.
+    const jssTheme = useMemo(() => ({ ...colors, isMobile }), [colors, isMobile]);
     const classes = useStyles(jssTheme);
     const navigate = useNavigate();
     const notificationService = useNotificationService();
