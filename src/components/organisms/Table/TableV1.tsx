@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import TablePagination from '@mui/material/TablePagination';
 import { createUseStyles } from "react-jss";
 import { useColors } from "../../../utils/types";
@@ -467,7 +467,14 @@ const TableV1: React.FC<TableProps> = ({
   onRowClick,
 }) => {
   const colors = useColors();
-  const classes = useStyles({ theme: colors });
+  // `{ theme: colors }` must stay referentially stable across renders that
+  // don't actually change the theme — react-jss keys its dynamic-rule cache
+  // off this object's identity, so a fresh literal here made TableV1 (used by
+  // every listing page) regenerate its entire stylesheet — a real forced
+  // style recalc, not just a wasted render — on every parent re-render (e.g.
+  // every checkbox click when a `records`/`schema` prop is recreated).
+  const stylesTheme = useMemo(() => ({ theme: colors }), [colors]);
+  const classes = useStyles(stylesTheme);
   const [isMobile, setIsMobile] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
 

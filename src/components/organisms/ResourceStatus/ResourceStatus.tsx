@@ -3,6 +3,9 @@ import { RESOURCE_STATUS } from "../../../utils/constant";
 import { useColors } from "../../../utils/types";
 import { FiCheckCircle, FiPauseCircle, FiSlash, FiTrash2 } from "react-icons/fi";
 
+// `rsPulse` is defined once, globally, in index.css — not injected per
+// instance here, so a table full of "Active" rows doesn't mount one
+// duplicate <style> + one concurrent animation per row.
 const PulseDot: React.FC<{ color: string }> = ({ color }) => (
   <span style={{ position: "relative", display: "inline-flex", width: 7, height: 7, flexShrink: 0 }}>
     <span style={{
@@ -10,7 +13,6 @@ const PulseDot: React.FC<{ color: string }> = ({ color }) => (
       animation: "rsPulse 2s ease-in-out infinite", opacity: 0.5,
     }} />
     <span style={{ position: "relative", display: "inline-flex", width: 7, height: 7, borderRadius: "50%", background: color }} />
-    <style>{`@keyframes rsPulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(2.4);opacity:0} }`}</style>
   </span>
 );
 

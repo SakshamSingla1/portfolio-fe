@@ -3,6 +3,15 @@
 /* Make Tailwind dark: variants respond to html.dark class (set by ThemeContext) */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Shared keyframes for ResourceStatus's "active" pulse dot — defined once
+   globally instead of every row injecting its own <style> with a duplicate
+   @keyframes declaration (a listing page with 25-50 active rows previously
+   meant 25-50 concurrent animations plus 25-50 redundant style elements). */
+@keyframes rsPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(2.4); opacity: 0; }
+}
+
 /* ── Jodit editor: force content area to respect the app's dark/light mode ─── */
 /* .jodit-dark-wrapper is set on the wrapper div when isDark === true           */
 .jodit-dark-wrapper .jodit-container,

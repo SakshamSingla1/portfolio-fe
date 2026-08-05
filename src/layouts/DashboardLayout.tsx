@@ -56,26 +56,28 @@ const useStyles = createUseStyles({
     position: "absolute",
     top: "-5%",
     right: "-5%",
-    width: "40vw",
-    height: "40vw",
+    width: "26vw",
+    height: "26vw",
     background: `radial-gradient(circle, ${c.primary500}10 0%, transparent 70%)`,
-    filter: "blur(80px)",
+    filter: "blur(48px)",
     borderRadius: "50%",
     willChange: "opacity, transform",
     animation: "$glowPulse1 10s ease-in-out infinite",
+    "@media (prefers-reduced-motion: reduce)": { animation: "none" },
   }),
 
   glow2: (c: any) => ({
     position: "absolute",
     bottom: "5%",
     left: "5%",
-    width: "35vw",
-    height: "35vw",
+    width: "22vw",
+    height: "22vw",
     background: `radial-gradient(circle, ${c.accent500}10 0%, transparent 70%)`,
-    filter: "blur(80px)",
+    filter: "blur(48px)",
     borderRadius: "50%",
     willChange: "opacity, transform",
     animation: "$glowPulse2 12s ease-in-out infinite",
+    "@media (prefers-reduced-motion: reduce)": { animation: "none" },
   }),
 
   sidebarWrapper: (c: any) => ({
@@ -287,6 +289,9 @@ const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuthenticatedUser();
   const { isDark, setColorMode } = useTheme();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mainContentRef = useRef<HTMLElement>(null);
+  const glow1Ref = useRef<HTMLDivElement>(null);
+  const glow2Ref = useRef<HTMLDivElement>(null);
 
   const breadcrumbs = useMemo(() => getBreadcrumbsFromUrl(location.pathname), [location.pathname]);
 
@@ -315,6 +320,41 @@ const DashboardLayout: React.FC = () => {
   }, [location.pathname, isMobile]);
 
   useEffect(() => {
+    // These two glows sit behind every admin route and animate forever via
+    // CSS keyframes — pausing them while the content area is actively
+    // scrolling (resuming ~150ms after it settles) removes that standing
+    // compositing cost during the exact moment scrolling would otherwise
+    // feel janky, same fix already applied to portfolio-main's ambient
+    // canvas/glow effects.
+    const scrollEl = mainContentRef.current;
+    if (!scrollEl) return;
+
+    let scrollTimeout: ReturnType<typeof setTimeout> | 0 = 0;
+    const setPaused = (paused: boolean) => {
+      const state = paused ? "paused" : "running";
+      if (glow1Ref.current) glow1Ref.current.style.animationPlayState = state;
+      if (glow2Ref.current) glow2Ref.current.style.animationPlayState = state;
+    };
+    const handleScroll = () => {
+      if (!scrollTimeout) setPaused(true);
+      else clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        scrollTimeout = 0;
+        if (!document.hidden) setPaused(false);
+      }, 150);
+    };
+    const handleVisibility = () => setPaused(document.hidden);
+
+    scrollEl.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollEl.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isDropdownOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -329,8 +369,8 @@ const DashboardLayout: React.FC = () => {
     <div className={classes.layoutWrapper}>
       {/* Ambient background effects */}
       <div className={classes.ambientGlow}>
-        <div className={classes.glow1} />
-        <div className={classes.glow2} />
+        <div ref={glow1Ref} className={classes.glow1} />
+        <div ref={glow2Ref} className={classes.glow2} />
       </div>
 
       <AnimatePresence>
@@ -473,7 +513,7 @@ const DashboardLayout: React.FC = () => {
           </div>
         </header>
 
-        <main className={classes.mainContent}>
+        <main ref={mainContentRef} className={classes.mainContent}>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
