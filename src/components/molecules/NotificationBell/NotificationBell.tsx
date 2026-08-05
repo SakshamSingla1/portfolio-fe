@@ -286,4 +286,7 @@ const NotificationBell: React.FC = () => {
     );
 };
 
-export default NotificationBell;
+// Takes no props, so this only re-renders from its own internal state now —
+// stops it re-rendering (and regenerating its stylesheet, see jssTheme above)
+// whenever DashboardLayout re-renders for an unrelated reason.
+export default React.memo(NotificationBell);

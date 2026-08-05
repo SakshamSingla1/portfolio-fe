@@ -392,7 +392,7 @@ const DashboardLayout: React.FC = () => {
       </AnimatePresence>
 
       <div className={classes.sidebarWrapper}>
-        <Sidebar collapsed={false} setCollapsed={() => { }} />
+        <Sidebar collapsed={false} />
       </div>
 
       <div className={classes.contentWrapper}>

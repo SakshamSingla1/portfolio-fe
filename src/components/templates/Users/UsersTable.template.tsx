@@ -123,7 +123,8 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
         }
     }, [toggleUserVerification, showSnackbar, onRefresh]);
 
-    const allOnPageSelected = users.length > 0 && users.every((u) => u.id && selectedIds.includes(u.id));
+    const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+    const allOnPageSelected = users.length > 0 && users.every((u) => u.id && selectedIdSet.has(u.id));
 
     const runDelete = async () => {
         if (!deleteTarget?.id || !onDelete) return;
@@ -153,7 +154,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             <input
                 key={`select-${user.id}`}
                 type="checkbox"
-                checked={!!user.id && selectedIds.includes(user.id)}
+                checked={!!user.id && selectedIdSet.has(user.id)}
                 onChange={() => user.id && onToggleSelect(user.id)}
                 onClick={(e) => e.stopPropagation()}
                 style={{ width: 16, height: 16, cursor: "pointer" }}
@@ -185,7 +186,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
                 <FiCheck />
             </button>}
         </div>
-    ]) ?? [], [users, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView, handleVerifyUser, selectedIds, onToggleSelect, onDelete]);
+    ]) ?? [], [users, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView, handleVerifyUser, selectedIdSet, onToggleSelect, onDelete]);
 
     const schema = useMemo(() => ({
         id: 1,
@@ -220,7 +221,12 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
         ],
         hover: true,
         striped: true
-    }), [isMobile, pagination, handlePaginationChange, handleRowsPerPageChange, onToggleSelectAll, allOnPageSelected]);
+        // Depend on pagination's primitive fields, not the object itself —
+        // the caller rebuilds `pagination` as a fresh object literal every
+        // render (see ListingUsers.page.tsx's paginationWithTotal), so this
+        // memo was invalidating on renders where nothing pagination-related
+        // actually changed.
+    }), [isMobile, pagination.totalRecords, pagination.currentPage, pagination.pageSize, handlePaginationChange, handleRowsPerPageChange, onToggleSelectAll, allOnPageSelected]);
 
     return (
         <ListingShell

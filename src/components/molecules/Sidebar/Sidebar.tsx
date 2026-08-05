@@ -172,7 +172,6 @@ const useStyles = createUseStyles({
 
 const Sidebar: React.FC<{
   collapsed: boolean;
-  setCollapsed: (v: boolean) => void;
 }> = ({ collapsed }) => {
   const { user, rolePermissions, logout } = useAuthenticatedUser();
   const location = useLocation();
@@ -369,4 +368,7 @@ const Sidebar: React.FC<{
   );
 };
 
-export default Sidebar;
+// DashboardLayout re-renders on every unrelated state change (dropdown open,
+// search panel toggle, resize) — memo stops Sidebar (and its ~20-28 NavItems)
+// from re-rendering along with it when its own props haven't changed.
+export default React.memo(Sidebar);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
 import { type IPagination, Status } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
@@ -71,11 +71,17 @@ const ListingUsersPage: React.FC = () => {
 
     const pageData = pageResponse?.data?.data;
     const users = pageData?.content ?? [];
-    const paginationWithTotal: IPagination = {
+    const totalRecords = pageData?.totalElements ?? 0;
+    const totalPages = pageData?.totalPages ?? 0;
+    // Memoized on primitive fields — a fresh object here every render was
+    // silently invalidating UsersTable's `schema` memo (which the table's
+    // own useMemo call depended on by object reference) on every unrelated
+    // re-render, not just when pagination actually changed.
+    const paginationWithTotal: IPagination = useMemo(() => ({
         ...pagination,
-        totalRecords: pageData?.totalElements ?? 0,
-        totalPages: pageData?.totalPages ?? 0,
-    };
+        totalRecords,
+        totalPages,
+    }), [pagination.currentPage, pagination.pageSize, totalRecords, totalPages]);
 
     const handleFiltersChange = (name: string, value: any) => {
         setFiltersTo({ ...filters, [name]: value ?? "" });
