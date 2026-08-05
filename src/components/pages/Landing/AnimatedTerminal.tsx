@@ -64,7 +64,6 @@ const AnimatedTerminal = () => {
       overflow: 'hidden',
       boxShadow: `0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px ${C.border}`,
     }}>
-      {/* Title bar */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -81,7 +80,6 @@ const AnimatedTerminal = () => {
         </span>
       </div>
 
-      {/* Content */}
       <div style={{ padding: '20px 20px 24px', minHeight: 220, display: 'flex', flexDirection: 'column', gap: 2 }}>
         {LINES.map((line, i) => (
           <TerminalLine key={i} line={line} visible={i < visibleCount} />

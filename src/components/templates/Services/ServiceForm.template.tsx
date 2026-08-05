@@ -140,7 +140,6 @@ const ServiceFormTemplate = ({ onSubmit, mode, service }: ServiceFormProps) => {
             onBack={() => navigate(-1)}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
-                {/* Basic Info */}
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
@@ -184,7 +183,6 @@ const ServiceFormTemplate = ({ onSubmit, mode, service }: ServiceFormProps) => {
                     </div>
                 </div>
 
-                {/* Description */}
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />
@@ -199,7 +197,6 @@ const ServiceFormTemplate = ({ onSubmit, mode, service }: ServiceFormProps) => {
                     />
                 </div>
 
-                {/* Banner + Status */}
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                         <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />

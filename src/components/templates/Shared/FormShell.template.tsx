@@ -44,7 +44,6 @@ const FormShell: React.FC<FormShellProps> = ({
           boxShadow: cardShadow,
         }}
       >
-        {/* Accent top line */}
         <div
           style={{
             height: 3,

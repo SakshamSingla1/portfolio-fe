@@ -123,7 +123,6 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
               border: `1px solid ${borderColor}`,
             }}
           >
-            {/* Unread / stale accent bar */}
             {isUnread && (
               <div
                 className="absolute left-0 top-0 bottom-0 rounded-l-xl"
@@ -131,7 +130,6 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
               />
             )}
 
-            {/* Avatar */}
             <div
               className="shrink-0 rounded-full flex items-center justify-center font-bold text-xs"
               style={{ width: 34, height: 34, background: bg, color: fg }}
@@ -139,7 +137,6 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
               {initials}
             </div>
 
-            {/* Body */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="font-semibold text-xs truncate" style={{ color: colors.neutral800 }}>
@@ -165,7 +162,6 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
                 {msg.message}
               </div>
 
-              {/* Status chip */}
               <div className="mt-1.5 flex items-center gap-1.5">
                 <span
                   className="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full"
@@ -179,7 +175,6 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
               </div>
             </div>
 
-            {/* Unread / stale badge */}
             {isUnread && (
               <div
                 className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full self-start mt-0.5"

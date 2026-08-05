@@ -57,7 +57,6 @@ const SettingsTemplate: React.FC = () => {
       transition={{ duration: 0.3, ease: "easeOut" }}
       style={{ padding: isMobile ? "8px 4px 16px" : "16px 16px 24px" }}
     >
-      {/* Page header card */}
       <div
         className="rounded-2xl overflow-hidden mb-4"
         style={{
@@ -88,7 +87,6 @@ const SettingsTemplate: React.FC = () => {
         </div>
       </div>
 
-      {/* Content card */}
       <div
         className="rounded-2xl overflow-hidden"
         style={{

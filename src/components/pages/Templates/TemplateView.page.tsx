@@ -214,7 +214,6 @@ const TemplateViewPage: React.FC = () => {
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="grid gap-y-6 max-w-4xl"
         >
-            {/* Header */}
             <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-3">
                     <button
@@ -251,7 +250,6 @@ const TemplateViewPage: React.FC = () => {
                 <Button variant="primaryContained" label="Edit Template" onClick={goEdit} startIcon={<FiEdit2 size={14} />} />
             </div>
 
-            {/* Meta row */}
             <div
                 className="flex flex-wrap gap-x-6 gap-y-2 text-sm px-1"
                 style={{ color: colors.neutral500 }}
@@ -269,13 +267,11 @@ const TemplateViewPage: React.FC = () => {
                 )}
             </div>
 
-            {/* Channel content */}
             {activeChannels.length > 0 ? (
                 <div
                     className="rounded-2xl overflow-hidden"
                     style={{ border: `1.5px solid ${isDark ? colors.neutral700 : colors.neutral200}` }}
                 >
-                    {/* Tab bar */}
                     <div
                         className="flex border-b"
                         style={{
@@ -305,7 +301,6 @@ const TemplateViewPage: React.FC = () => {
                     </div>
 
                     <div className="p-5 grid gap-y-5">
-                        {/* Subject (email) */}
                         {activeTab === "email" && template.subject && (
                             <FieldRow
                                 label="Subject" value={previewSubject || template.subject}
@@ -314,7 +309,6 @@ const TemplateViewPage: React.FC = () => {
                             />
                         )}
 
-                        {/* WhatsApp template name */}
                         {activeTab === "whatsapp" && template.whatsappTemplateName && (
                             <FieldRow
                                 label="Template Name (Meta)" value={template.whatsappTemplateName}
@@ -322,7 +316,6 @@ const TemplateViewPage: React.FC = () => {
                             />
                         )}
 
-                        {/* SMS / WhatsApp recipient */}
                         {(activeTab === "sms" || activeTab === "whatsapp") && template.messageTo && (
                             <FieldRow
                                 label="Recipient" value={template.messageTo}
@@ -331,7 +324,6 @@ const TemplateViewPage: React.FC = () => {
                             />
                         )}
 
-                        {/* Body + view toggle */}
                         <div>
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider"
@@ -401,7 +393,6 @@ const TemplateViewPage: React.FC = () => {
                             </AnimatePresence>
                         </div>
 
-                        {/* Email extra fields */}
                         {activeTab === "email" && (template.emailTo || template.emailCc || template.emailBcc || template.emailReplyTo) && (
                             <div
                                 className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t"
@@ -434,7 +425,6 @@ const TemplateViewPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Variable Playground */}
             {detectedVars.length > 0 && (
                 <div
                     className="rounded-2xl overflow-hidden"

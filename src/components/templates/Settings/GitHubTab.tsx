@@ -104,7 +104,6 @@ const GitHubTab: React.FC = () => {
             transition={{ duration: 0.3 }}
             style={{ padding: "24px", width: "100%" }}
         >
-            {/* Header */}
             <div className="flex items-center gap-2 mb-1">
                 <div
                     className="flex items-center justify-center p-2 rounded-xl"
@@ -120,7 +119,6 @@ const GitHubTab: React.FC = () => {
                 Your GitHub profile URL powers the GitHub stats section on your public portfolio.
             </p>
 
-            {/* Status card */}
             <div
                 className="flex items-center gap-3 rounded-2xl p-4 mb-6"
                 style={{
@@ -161,7 +159,6 @@ const GitHubTab: React.FC = () => {
                 )}
             </div>
 
-            {/* Input */}
             <div className="flex flex-col gap-4">
                 <TextField
                     label="GitHub Username"
@@ -200,7 +197,6 @@ const GitHubTab: React.FC = () => {
                 </div>
             </div>
 
-            {/* Info box */}
             <div
                 className="rounded-xl px-4 py-3 mt-6"
                 style={{ background: colors.neutral50, border: `1px solid ${colors.neutral200}` }}

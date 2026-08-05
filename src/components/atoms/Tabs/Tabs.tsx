@@ -34,7 +34,6 @@ const Tabs: React.FC<TabsProps> = ({
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
 
-  // Detect mobile breakpoint
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
     check();
@@ -55,7 +54,6 @@ const Tabs: React.FC<TabsProps> = ({
     }
   }, [value]);
 
-  // Track scroll to show fade indicators
   const updateFades = () => {
     const el = scrollRef.current;
     if (!el) return;

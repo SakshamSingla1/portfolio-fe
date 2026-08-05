@@ -75,7 +75,6 @@ const SeoTab: React.FC = () => {
             transition={{ duration: 0.3 }}
             style={{ padding: "24px", width: "100%" }}
         >
-            {/* Header */}
             <div className="flex items-center gap-2 mb-1">
                 <div className="flex items-center justify-center p-2 rounded-xl"
                     style={{ background: colors.primary100, color: colors.primary600 }}>
@@ -87,7 +86,6 @@ const SeoTab: React.FC = () => {
                 Control how each page appears in search engines and social previews.
             </p>
 
-            {/* Page selector */}
             <div className="flex gap-2 mb-6 flex-wrap">
                 {PAGES.map(p => (
                     <button key={p.key} onClick={() => setActiveKey(p.key)}
@@ -103,7 +101,6 @@ const SeoTab: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-                {/* Basic SEO */}
                 <SectionCard title="Search Engine" colors={colors}>
                     <TextField label="Page Title" value={current.title ?? ""} onChange={e => update("title", e.target.value)}
                         helperText="Recommended: 50–60 characters" />
@@ -123,7 +120,6 @@ const SeoTab: React.FC = () => {
                     </div>
                 </SectionCard>
 
-                {/* OG / Social */}
                 <SectionCard title="Social Preview (Open Graph)" colors={colors} collapsible>
                     <TextField label="OG Title" value={current.ogTitle ?? ""} onChange={e => update("ogTitle", e.target.value)}
                         helperText="Defaults to Page Title if empty" />

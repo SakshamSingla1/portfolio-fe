@@ -193,7 +193,6 @@ const AdvancedCheckbox: React.FC<AdvancedCheckboxProps> = ({
         }
       />
       
-      {/* Label */}
       {label && (
         <label
           htmlFor={id}

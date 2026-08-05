@@ -16,7 +16,6 @@ const DashboardMockup = () => {
       overflow: 'hidden',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
     }}>
-      {/* Header bar */}
       <div style={{
         padding: '12px 16px',
         borderBottom: `1px solid ${C.border}`,
@@ -38,7 +37,6 @@ const DashboardMockup = () => {
         </div>
       </div>
 
-      {/* Stats grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: C.border }}>
         {rows.map(({ label, count, color }) => (
           <div key={label} style={{ background: C.surface, padding: '16px 18px' }}>
@@ -48,7 +46,6 @@ const DashboardMockup = () => {
         ))}
       </div>
 
-      {/* Footer */}
       <div style={{ padding: '10px 16px', borderTop: `1px solid ${C.border}`, background: C.surfaceAlt }}>
         <span style={{ fontSize: 10.5, fontFamily: 'monospace', color: C.muted }}>Last sync: just now</span>
       </div>

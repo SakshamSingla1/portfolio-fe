@@ -97,7 +97,6 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
 
   useEffect(() => {
     if (!open) {
-      // Reset state when dialog is closed
       setOtp(['', '', '', '', '', '']);
       setError('');
       setCanResend(false);
@@ -122,7 +121,6 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
       setOtp(newOtp);
       setError('');
 
-      // Move to next input
       if (value !== '' && index < 5) {
         inputRefs.current[index + 1].current?.focus();
       }
@@ -131,7 +129,6 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      // Move to previous input on backspace
       inputRefs.current[index - 1].current?.focus();
     } else if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1].current?.focus();

@@ -43,7 +43,6 @@ const MSG = (pct: number): { label: string; sub: string } => {
   return               { label: "Getting Started", sub: "Add key content to build score." };
 };
 
-// Check if a section key is in the backend's missingSections list
 const isSectionMissing = (sectionKey: string, missing: string[]) => {
   const k = sectionKey.toLowerCase();
   return missing.some((m) => {
@@ -101,8 +100,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
     const startDeg = currentAngle;
     const endDeg = startDeg + span;
     currentAngle = endDeg + GAP_DEG;
-    
-    // Resolve completion properly by matching against backend strings
+
     const complete = !isSectionMissing(section.key, missingSections);
     
     return { ...section, startDeg, endDeg, complete };
@@ -110,7 +108,6 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
 
   const hoveredSeg = segments.find(s => s.key === hoveredKey);
 
-  // Center display size
   const centerSize = (r * 2) - strokeW + 2;
 
   return (
@@ -136,7 +133,6 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
               />
             </filter>
             
-            {/* Linear Gradients for each segment */}
             {COMPLETION_SECTIONS.map((sec) => (
               <linearGradient id={`grad-${sec.key.replace(/\s+/g, "-")}`} key={sec.key} x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor={sec.colors[0]} />
@@ -155,7 +151,6 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
             strokeWidth={strokeW - 2}
           />
 
-          {/* Custom SVG Segments */}
           {segments.map((seg) => {
             const isHovered = hoveredKey === seg.key;
             const anyHovered = hoveredKey !== null;
@@ -170,7 +165,6 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
             const route = SECTION_ROUTES[seg.key];
             const isClickable = !seg.complete && !!route;
 
-            // Determine opacity to emphasize the hovered segment
             const opacity = isHovered ? 1 : anyHovered ? 0.35 : 1;
 
             return (

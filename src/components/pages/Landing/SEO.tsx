@@ -20,7 +20,6 @@ const SEO = ({ ogImageUrl }: SEOProps) => {
       <meta name="robots" content="index, follow" />
       <meta name="keywords" content="portfolio builder, developer portfolio, self-hosted portfolio, CMS portfolio, Spring Boot, React portfolio" />
 
-      {/* Open Graph */}
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:title" content={DEFAULT_TITLE} />
@@ -30,17 +29,14 @@ const SEO = ({ ogImageUrl }: SEOProps) => {
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
 
-      {/* Twitter / X */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={DEFAULT_TITLE} />
       <meta name="twitter:description" content={DEFAULT_DESCRIPTION} />
       <meta name="twitter:image" content={ogImage} />
       <meta name="twitter:image:alt" content="Portfolios Builder" />
 
-      {/* Theme */}
       <meta name="theme-color" content="#14B8A0" />
 
-      {/* Favicon */}
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       <link rel="apple-touch-icon" href="/pb-logo-icon.png" />
     </Helmet>

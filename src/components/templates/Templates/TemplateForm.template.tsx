@@ -113,7 +113,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                             boxShadow: `0 24px 64px -12px ${colors.neutral900}40`,
                         }}
                     >
-                        {/* Header */}
                         <div
                             className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0"
                             style={{ borderColor: colors.neutral200 }}
@@ -144,7 +143,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                         </div>
 
                         <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
-                            {/* Left: Variable inputs */}
                             {detectedVars.length > 0 && (
                                 <div
                                     className="lg:w-64 flex-shrink-0 p-4 overflow-y-auto border-b lg:border-b-0 lg:border-r"
@@ -185,7 +183,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                 </div>
                             )}
 
-                            {/* Right: Preview */}
                             <div className="flex-1 flex flex-col overflow-hidden">
                                 {activeTab === "email" && previewSubject && (
                                     <div
@@ -215,7 +212,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                     </div>
                                 )}
 
-                                {/* Body preview */}
                                 <div className="flex-1 overflow-y-auto p-5">
                                     <div className="flex items-center justify-between mb-3">
                                         <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.neutral400 }}>
@@ -317,7 +313,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
         return variables.filter((v) => v.variableName.toLowerCase().includes(q));
     }, [variables, varSearch]);
 
-    // Channel dot icon for tabs
     const ChannelIcon = ({ Icon, isOn }: { Icon: React.ElementType; isOn: boolean }) => (
         <span className="relative flex items-center">
             <Icon size={15} />
@@ -362,7 +357,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
             />
 
             <div className="grid gap-y-6">
-                {/* Template name + additional data */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <TextField
                         fullWidth
@@ -381,7 +375,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                     />
                 </div>
 
-                {/* Channel tabs */}
                 <div>
                     <div className="flex items-center justify-between mb-3">
                         <p className="text-sm font-semibold" style={{ color: colors.neutral600 }}>
@@ -404,7 +397,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                     <Tabs schema={tabs} value={activeTab} setValue={setActiveTab} />
                 </div>
 
-                {/* Variable insertion panel */}
                 <div
                     className="rounded-xl border overflow-hidden"
                     style={{
@@ -412,7 +404,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                         background: colors.neutral50,
                     }}
                 >
-                    {/* Panel header */}
                     <div
                         className="flex items-center justify-between px-4 py-3 border-b"
                         style={{ borderColor: colors.neutral200 }}
@@ -439,7 +430,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                         </span>
                     </div>
 
-                    {/* Search + chips */}
                     <div className="p-4">
                         {variables.length > 0 && (
                             <div className="relative mb-3">
@@ -514,7 +504,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                     </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex justify-end gap-3">
                     <Button variant="tertiaryContained" label="Cancel" onClick={onClose} />
                     <Button

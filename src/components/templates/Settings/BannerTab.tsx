@@ -75,7 +75,6 @@ const BannerTab: React.FC = () => {
 
     return (
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "8px 0" }}>
-            {/* Toast */}
             <AnimatePresence>
                 {toast && (
                     <motion.div
@@ -98,7 +97,6 @@ const BannerTab: React.FC = () => {
                 )}
             </AnimatePresence>
 
-            {/* Current banner preview */}
             {currentImage ? (
                 <div
                     style={{
@@ -149,7 +147,6 @@ const BannerTab: React.FC = () => {
                     )}
                 </div>
             ) : (
-                /* Drop zone */
                 <div
                     onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                     onDragLeave={() => setDragOver(false)}
@@ -200,7 +197,6 @@ const BannerTab: React.FC = () => {
                 }}
             />
 
-            {/* Replace button when image exists */}
             {currentImage && !uploading && (
                 <button
                     onClick={() => inputRef.current?.click()}

@@ -275,7 +275,6 @@ const ProfilePage: React.FC = () => {
               icon={FiSettings}
             >
               <div className="flex flex-col">
-                {/* Discoverable toggle */}
                 <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
                   <div className="flex items-center gap-3">
                     <FiGlobe style={{ color: colors.primary500 }} />
@@ -306,7 +305,6 @@ const ProfilePage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Digest toggle */}
                 <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
                   <div className="flex items-center gap-3">
                     <FiMail style={{ color: colors.primary500 }} />
@@ -337,7 +335,6 @@ const ProfilePage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* QR download */}
                 <div className="flex items-center justify-between pt-3">
                   <div className="flex items-center gap-3">
                     <FiDownload style={{ color: colors.primary500 }} />

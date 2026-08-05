@@ -255,7 +255,6 @@ const AnimatedTerminal = () => {
         fontFamily: '"SF Mono", "Fira Code", Consolas, monospace',
       }}
     >
-      {/* Title bar */}
       <div style={{
         background: '#0A0B0E',
         padding: '11px 16px',
@@ -271,7 +270,6 @@ const AnimatedTerminal = () => {
           terminal — portfolios-builder
         </div>
       </div>
-      {/* Lines */}
       <div style={{ padding: '18px 20px', minHeight: 180 }}>
         {TERMINAL_LINES.map(({ text, color }, i) => (
           <AnimatePresence key={i}>
@@ -352,7 +350,6 @@ const DashboardMockup = () => (
       boxShadow: `0 48px 96px rgba(0,0,0,0.65), 0 0 0 1px ${C.teal}10`,
     }}
   >
-    {/* Title bar */}
     <div style={{
       background: '#0A0B0E',
       padding: '11px 18px',
@@ -380,9 +377,7 @@ const DashboardMockup = () => (
       </div>
     </div>
 
-    {/* Body */}
     <div style={{ display: 'flex', height: 360 }}>
-      {/* Sidebar */}
       <div style={{
         width: 165,
         background: '#080A0C',
@@ -431,9 +426,7 @@ const DashboardMockup = () => (
         ))}
       </div>
 
-      {/* Main */}
       <div style={{ flex: 1, padding: '18px 20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Good morning, Admin</div>
@@ -454,7 +447,6 @@ const DashboardMockup = () => (
           </div>
         </div>
 
-        {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
           {[
             { label: 'Profile Views', val: '2,841', delta: '+12%', color: C.teal, ChartPts: true },
@@ -496,7 +488,6 @@ const DashboardMockup = () => (
           ))}
         </div>
 
-        {/* Weekly chart area */}
         <div style={{
           background: C.surfaceAlt,
           borderRadius: 10,
@@ -530,7 +521,6 @@ const DashboardMockup = () => (
           </div>
         </div>
 
-        {/* Activity */}
         <div>
           <div style={{ fontSize: 10, color: C.textSub, marginBottom: 7, fontFamily: 'monospace' }}>Recent Activity</div>
           {[
@@ -722,7 +712,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          {/* API health badge */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '4px 10px', borderRadius: 99,
@@ -797,7 +786,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         />
 
         <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }} className="hero-grid">
-          {/* Left: copy */}
           <motion.div
             initial="hidden"
             animate="visible"
@@ -822,7 +810,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               {heroEyebrow}
             </motion.div>
 
-            {/* Headline */}
             <motion.div variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: CUBIC } } }}>
               <h1 style={{ fontWeight: 900, fontSize: 'clamp(44px, 6vw, 80px)', lineHeight: 0.95, letterSpacing: '-0.045em', margin: 0, color: C.text }}>
                 {heroHeadline1}
@@ -842,7 +829,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               </h1>
             </motion.div>
 
-            {/* Sub */}
             <motion.p
               variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.1 } } }}
               style={{ fontSize: 'clamp(14px, 1.5vw, 17px)', lineHeight: 1.8, color: C.textSub, maxWidth: 480, margin: '0 0 36px' }}
@@ -850,7 +836,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               {heroDescription}
             </motion.p>
 
-            {/* CTAs */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, delay: 0.25 } } }}
               style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}
@@ -886,7 +871,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               </a>
             </motion.div>
 
-            {/* Trust badges */}
             <motion.div
               variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4, delay: 0.4 } } }}
               style={{ display: 'flex', gap: 22, marginTop: 28, flexWrap: 'wrap' }}
@@ -899,7 +883,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             </motion.div>
           </motion.div>
 
-          {/* Right: terminal */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -1140,7 +1123,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             ))}
           </div>
 
-          {/* Data flow */}
           <motion.div {...fadeUp(0.3)} style={{
             marginTop: 32, padding: '20px 24px', borderRadius: 14,
             background: C.surface, border: `1px solid ${C.border}`,

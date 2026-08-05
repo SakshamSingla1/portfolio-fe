@@ -37,7 +37,6 @@ const DashboardPreview = ({ bannerUrl }: DashboardPreviewProps) => (
           </div>
         )}
 
-        {/* Glow beneath */}
         <div style={{
           position: 'absolute', bottom: -60, left: '10%', right: '10%', height: 120,
           background: `radial-gradient(ellipse, ${C.teal}18 0%, transparent 70%)`,

@@ -196,7 +196,6 @@ const GithubIntegrationPage: React.FC = () => {
             transition={{ duration: 0.3 }}
             style={{ padding: "16px 16px 32px" }}
         >
-            {/* Header */}
             <div className="rounded-2xl overflow-hidden mb-5" style={panelStyle}>
                 <div style={{ height: 3, background: `linear-gradient(90deg, ${colors.primary600} 0%, ${colors.primary400}28 100%)` }} />
                 <div className="px-5 py-4 flex items-center justify-between gap-3">
@@ -273,7 +272,6 @@ const GithubIntegrationPage: React.FC = () => {
             ) : (
                 /* Connected */
                 <>
-                    {/* Stats row */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                         <StatPill icon={<FiBook size={13} />} label="Repos" value={integration.cachedPublicRepos} />
                         <StatPill icon={<TbStar size={13} />} label="Stars" value={integration.cachedTotalStars} />
@@ -281,14 +279,12 @@ const GithubIntegrationPage: React.FC = () => {
                         <StatPill icon={<FiUser size={13} />} label="Username" value={`@${integration.githubUsername}`} />
                     </div>
 
-                    {/* Last synced */}
                     {integration.lastSyncedAt && (
                         <p className="text-[11px] mb-4" style={{ color: colors.neutral400 }}>
                             Last synced: {new Date(integration.lastSyncedAt).toLocaleString()}
                         </p>
                     )}
 
-                    {/* Repos */}
                     <div className="rounded-2xl overflow-hidden" style={panelStyle}>
                         <div className="px-5 py-3.5" style={{ borderBottom: `1px solid ${colors.neutral200}` }}>
                             <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: colors.neutral500 }}>

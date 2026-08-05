@@ -133,7 +133,6 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
           padding: isMobile ? "12px 10px" : "20px 24px",
         }}
       >
-        {/* shimmer overlay */}
         <div className="absolute inset-0 opacity-0 group-hover/card:opacity-100 pointer-events-none overflow-hidden">
           <div className="absolute inset-0 translate-x-[-100%] group-hover/card:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
         </div>
@@ -215,7 +214,6 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
             const groupColor = group.colorShades.find(s => s.colorName.toLowerCase().includes("500"))?.colorCode || primaryColor;
             return (
               <div key={group.groupName} className="relative">
-                {/* Group label row */}
                 <div className="flex items-center gap-2 mb-2">
                   <span
                     className="h-2 w-2 rounded-full shrink-0"
@@ -228,7 +226,6 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
                   <span className="text-[9px] font-bold opacity-20 tabular-nums">{group.colorShades.length}</span>
                 </div>
 
-                {/* Swatches */}
                 <div className="flex w-full gap-0.5">
                   {group.colorShades.map((shade: ColorShade) => (
                     <motion.div
@@ -277,7 +274,6 @@ const ColorCard: React.FC<ColorCardProps> = ({ colorTheme, onDelete }) => {
                   ))}
                 </div>
 
-                {/* Shade number labels */}
                 <div className="flex w-full gap-0.5 mt-1">
                   {group.colorShades.map((shade: ColorShade) => (
                     <div

@@ -322,7 +322,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                     {/* ── LEFT COLUMN ── */}
                     <div className="flex flex-col gap-5">
 
-                        {/* POST DETAILS */}
                         <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                             <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                                 <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
@@ -330,7 +329,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                             </h3>
                             <div className="flex flex-col gap-6">
 
-                                {/* Title */}
                                 <div>
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                                         <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase" as const, color: colors.neutral400 }}>
@@ -362,7 +360,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                                     )}
                                 </div>
 
-                                {/* Slug */}
                                 <div>
                                     <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase" as const, color: colors.neutral400, display: "block", marginBottom: 8 }}>
                                         Slug <span style={{ color: colors.error500 }}>*</span>
@@ -390,7 +387,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                             </div>
                         </div>
 
-                        {/* CONTENT */}
                         <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={{ ...cardStyle, overflow: "visible" }}>
                             <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                                 <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />
@@ -417,7 +413,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                             </div>
                         </div>
 
-                        {/* EXCERPT */}
                         <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold flex items-center" style={sectionTitleStyle}>
@@ -452,7 +447,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                     {/* ── RIGHT COLUMN ── */}
                     <div className="flex flex-col gap-4">
 
-                        {/* STATUS */}
                         <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold flex items-center" style={sectionTitleStyle}>
@@ -484,7 +478,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                             </div>
                         </div>
 
-                        {/* COVER IMAGE */}
                         <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                             <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                                 <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.success500 }} />
@@ -505,7 +498,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                             </p>
                         </div>
 
-                        {/* TAGS */}
                         <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold flex items-center" style={sectionTitleStyle}>
@@ -585,7 +577,6 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                             </div>
                         </div>
 
-                        {/* READ TIME */}
                         <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                             <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
                                 <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.secondary500 }} />

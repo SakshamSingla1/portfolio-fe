@@ -62,18 +62,15 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
         outline: "none",
       }}
     >
-      {/* Hover fill */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         style={{ background: `linear-gradient(135deg, ${accent}0a, ${accent}04)` }}
       />
-      {/* Bottom accent line */}
       <div
         className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ height: 2, background: accent }}
       />
 
-      {/* Icon container */}
       <div
         className="relative flex items-center justify-center rounded-xl mb-4 transition-transform duration-200 group-hover:scale-110"
         style={{
@@ -86,7 +83,6 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
         <Icon size={isMobile ? 15 : 18} />
       </div>
 
-      {/* Number + unread badge */}
       <div className="relative flex items-end gap-1.5 mb-2">
         <span
           className="tabular-nums font-black leading-none"
@@ -108,7 +104,6 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
         )}
       </div>
 
-      {/* Label */}
       <span
         className="relative font-bold uppercase"
         style={{ fontSize: "9px", color: colors.neutral400, letterSpacing: "0.1em" }}
@@ -185,13 +180,11 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
 
   return (
     <div style={containerStyle}>
-      {/* Accent top line */}
       <div style={{
         height: 2,
         background: `linear-gradient(90deg, ${colors.primary600} 0%, ${colors.primary400} 55%, ${colors.primary600}00 100%)`,
       }} />
 
-      {/* Hero row */}
       <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"}`}>
         {HERO_STATS.map((s, i) => {
           const { key: statKey, ...statProps } = s;
@@ -219,10 +212,8 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
         })}
       </div>
 
-      {/* Divider */}
       <div style={{ height: 1, background: colors.neutral200 }} />
 
-      {/* Secondary row */}
       {isMobile ? (
         <div className="flex overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           {SECONDARY_STATS.map((s, i) => {

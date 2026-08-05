@@ -104,13 +104,11 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
         );
 
         if (existingIndex >= 0) {
-            // Remove permission
             const updatedPermissions = currentPermissions.filter(
                 (_, index) => index !== existingIndex
             );
             formik.setFieldValue('rolePermissions', updatedPermissions);
         } else {
-            // Add permission
             formik.setFieldValue('rolePermissions', [
                 ...currentPermissions,
                 { navLinkId, permissionId }
@@ -127,12 +125,10 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     const handleSelectAllForNavlink = (navLinkId: any) => {
         const currentPermissions = formik.values.rolePermissions;
 
-        // Remove all existing permissions for this navlink
         const otherPermissions = currentPermissions.filter(
             p => String(p.navLinkId) !== String(navLinkId)
         );
 
-        // Add all permissions for this navlink
         const newPermissions = permissions.map(permission => ({
             navLinkId,
             permissionId: permission.id ?? null
@@ -144,7 +140,6 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     const handleUpdateAllForNavlink = (navLinkId: any) => {
         const currentPermissions = formik.values.rolePermissions;
 
-        // Remove all existing permissions for this navlink
         const otherPermissions = currentPermissions.filter(
             p => String(p.navLinkId) !== String(navLinkId)
         );
@@ -322,7 +317,6 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
 
                                     return (
                                         <div key={navlink.id} className="rounded-lg overflow-hidden transition-all duration-200 border" style={{ borderColor: colors.neutral300 }}>
-                                            {/* Navlink Header */}
                                             <div className="px-4 py-3 border-b" style={{ backgroundColor: colors.neutral100, borderColor: colors.neutral300 }}>
                                                 <div className="flex justify-between items-center">
                                                     <div className="flex items-center gap-3">
@@ -367,7 +361,6 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
                                                 </div>
                                             </div>
 
-                                            {/* Permissions Grid */}
                                             {isExpanded && (
                                                 <div className="p-4">
                                                     {!hasFilteredPermissions ? (

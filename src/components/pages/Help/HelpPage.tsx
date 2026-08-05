@@ -289,7 +289,6 @@ const QuickStart = ({ colors }: { colors: any }) => (
                     e.currentTarget.style.transform = "translateX(0)";
                   }}
                 >
-                  {/* Step number */}
                   <div
                     className="h-12 w-12 rounded-[12px] border flex flex-col items-center justify-center shrink-0"
                     style={{ backgroundColor: colors.neutral0, borderColor: `${colors.neutral200}60` }}
@@ -297,14 +296,12 @@ const QuickStart = ({ colors }: { colors: any }) => (
                     <span className="text-[7px] uppercase tracking-widest font-black" style={{ color: colors.neutral600 }}>step</span>
                     <span className="font-black text-base leading-none" style={{ color: colors.primary600 }}>{s.num}</span>
                   </div>
-                  {/* Icon */}
                   <div
                     className="h-10 w-10 rounded-[10px] flex items-center justify-center shrink-0 mt-1"
                     style={{ backgroundColor: `${colors[colorKey]}12` }}
                   >
                     <s.icon style={{ fontSize: 16, color: colors[colorKey] }} />
                   </div>
-                  {/* Content */}
                   <div className="flex-1 min-w-0 pt-0.5">
                     <p className="font-bold text-sm m-0" style={{ color: colors.neutral800 }}>{s.title}</p>
                     <p className="text-xs mt-1 leading-relaxed" style={{ color: colors.neutral500 }}>{s.desc}</p>
@@ -659,7 +656,6 @@ const FAQ = ({ colors }: { colors: any }) => {
 
   return (
     <div className="mt-6 space-y-4">
-      {/* Search */}
       <div className="relative">
         <FaSearch
           className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -734,7 +730,6 @@ export default function HelpPage() {
 
   return (
     <div className="relative w-full mx-auto py-8 px-5 sm:px-8 min-h-screen overflow-hidden">
-      {/* Ambient blobs */}
       <div
         className="absolute top-[-10%] right-[-5%] w-[45vw] h-[45vw] blur-[120px] opacity-[0.06] pointer-events-none rounded-full"
         style={{ background: `radial-gradient(circle, ${colors.primary500}, transparent)` }}
@@ -744,7 +739,6 @@ export default function HelpPage() {
         style={{ background: `radial-gradient(circle, ${colors.accent500 || colors.secondary500}, transparent)` }}
       />
 
-      {/* Hero */}
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 mb-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-6">
           <div
@@ -767,7 +761,6 @@ export default function HelpPage() {
           </div>
         </div>
 
-        {/* Stat chips */}
         <div className="flex flex-wrap gap-3">
           {[
             { label: "Setup Steps",   value: "11",  color: "primary" },
@@ -795,7 +788,6 @@ export default function HelpPage() {
         </div>
       </motion.div>
 
-      {/* Tabs */}
       <div className="relative z-10">
         <Tabs schema={schema} value={activeTab} setValue={setActiveTab} fullWidth />
       </div>

@@ -94,7 +94,6 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
             style={{ paddingBottom: isLast ? 0 : 18 }}
             onClick={() => navigate(route)}
           >
-            {/* Timeline connector */}
             {!isLast && (
               <div
                 className="absolute left-[14px] top-8 bottom-0 w-px"
@@ -106,7 +105,6 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
               />
             )}
 
-            {/* Icon container */}
             <div
               className="shrink-0 flex items-center justify-center rounded-lg mt-0.5 transition-transform duration-200 group-hover:scale-110"
               style={{
@@ -119,7 +117,6 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
               <Icon size={12} />
             </div>
 
-            {/* Content */}
             <div className="flex-1 min-w-0 pt-0.5">
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span

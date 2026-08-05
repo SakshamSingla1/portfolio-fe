@@ -79,7 +79,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                 style={{ backgroundColor: colors.neutral50, maxHeight: "92vh" }}
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Header */}
                 <div
                     className="flex items-start justify-between px-8 py-6 border-b"
                     style={{ borderColor: colors.neutral300, backgroundColor: colors.neutral50 }}
@@ -104,9 +103,7 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                     </button>
                 </div>
 
-                {/* Body */}
                 <div className="px-8 py-8 overflow-y-auto flex-1 space-y-6 custom-scroll">
-                    {/* Sender info */}
                     <div
                         className="rounded-2xl p-6"
                         style={{ backgroundColor: colors.neutral50, border: `1.5px solid ${colors.neutral300}` }}
@@ -122,7 +119,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                         )}
                     </div>
 
-                    {/* Original message */}
                     <div>
                         <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: colors.neutral600 }}>
                             Message
@@ -140,7 +136,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Previous reply (if any) */}
                     <AnimatePresence>
                         {(replied || message.replyMessage) && (
                             <motion.div
@@ -174,7 +169,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                         )}
                     </AnimatePresence>
 
-                    {/* Reply composer */}
                     {!replied && !message.replyMessage && (
                         <div>
                             <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: colors.neutral600 }}>
@@ -193,7 +187,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                     )}
                 </div>
 
-                {/* Footer */}
                 <div
                     className="flex justify-end gap-3 px-8 py-5 border-t"
                     style={{ borderColor: colors.neutral300, backgroundColor: colors.neutral50 }}

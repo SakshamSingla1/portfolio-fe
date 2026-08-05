@@ -73,7 +73,6 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendin
             transition={{ duration: 0.4, ease: "easeOut" }}
         >
             <div className="px-8 py-10">
-                {/* Header */}
                 <div className="mb-8">
                     <motion.div
                         className="inline-flex items-center justify-center p-3 rounded-2xl mb-5 text-white text-2xl"

@@ -87,7 +87,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* Toast */}
             <AnimatePresence>
                 {toast && (
                     <motion.div
@@ -109,7 +108,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                 )}
             </AnimatePresence>
 
-            {/* Asset list */}
             {assets.length > 0 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {assets.map((asset) => (
