@@ -12,7 +12,6 @@ import type { LandingConfig } from '../../../services/useLandingPageService';
 
 const PLATFORM_RESOURCE_ID = 1;
 
-// ── Char Counter ───────────────────────────────────────────────────────────────
 const CharCounter: React.FC<{ value: string; max: number }> = ({ value, max }) => {
     const colors = useColors();
     const len = value?.length ?? 0;
@@ -38,7 +37,6 @@ const CharCounter: React.FC<{ value: string; max: number }> = ({ value, max }) =
     );
 };
 
-// ── Enhanced Tags Input ────────────────────────────────────────────────────────
 interface TagsInputProps {
     label: string;
     hint?: string;
@@ -169,7 +167,6 @@ const TagsInput: React.FC<TagsInputProps> = ({
     );
 };
 
-// ── Section Card ───────────────────────────────────────────────────────────────
 interface SectionCardProps {
     icon: React.ReactNode;
     title: string;
@@ -272,7 +269,6 @@ const SectionCard: React.FC<SectionCardProps> = ({
     );
 };
 
-// ── Field With Char Counter ────────────────────────────────────────────────────
 const FieldWithCount: React.FC<{ children: React.ReactNode; value: string; max: number }> = ({
     children, value, max,
 }) => (
@@ -282,7 +278,6 @@ const FieldWithCount: React.FC<{ children: React.ReactNode; value: string; max: 
     </div>
 );
 
-// ── Completion helpers ─────────────────────────────────────────────────────────
 const HERO_TOTAL = 7;
 const CTA_TOTAL = 5;
 const BANNER_TOTAL = 1;
@@ -295,7 +290,6 @@ const ctaFilled = (c: LandingConfig) =>
     [c.ctaBadgeText, c.ctaHeadline, c.ctaDescription, c.ctaButtonText]
         .filter(v => v?.trim()).length + ((c.ctaTrustPoints?.length ?? 0) > 0 ? 1 : 0);
 
-// ── Main Form ─────────────────────────────────────────────────────────────────
 interface LandingConfigFormProps {
     config: LandingConfig;
     saving: boolean;
@@ -364,7 +358,6 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
     return (
         <div className="flex flex-col gap-6">
 
-            {/* ── Overall progress ─────────────────────────────────────────── */}
             <div
                 className="px-5 py-4 rounded-2xl"
                 style={{
@@ -404,7 +397,6 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
                 </div>
             </div>
 
-            {/* ── Hero Section ─────────────────────────────────────────────── */}
             <SectionCard
                 icon={<FiZap size={18} />}
                 title="Hero Section"
@@ -472,7 +464,6 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
                 </div>
             </SectionCard>
 
-            {/* ── CTA Section ──────────────────────────────────────────────── */}
             <SectionCard
                 icon={<FiTarget size={18} />}
                 title="CTA Section"
@@ -526,7 +517,6 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
                 </div>
             </SectionCard>
 
-            {/* ── Banner Image ─────────────────────────────────────────────── */}
             <SectionCard
                 icon={<LuImage size={18} />}
                 title="Hero Banner Image"
@@ -550,7 +540,6 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
                 </div>
             </SectionCard>
 
-            {/* ── Sticky save footer ───────────────────────────────────────── */}
             <div
                 className="sticky bottom-4 flex items-center justify-between px-5 py-4 rounded-2xl"
                 style={{

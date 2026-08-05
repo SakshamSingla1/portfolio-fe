@@ -154,7 +154,6 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({ children }) 
   );
 };
 
-// Custom hook for easier usage
 export const useSnackbar = () => {
   const context = React.useContext(SnackbarContext);
   if (context === undefined) {

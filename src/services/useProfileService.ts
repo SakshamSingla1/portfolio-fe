@@ -4,9 +4,6 @@ import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import useFileService from "./useFileService";
 
-// =========================
-// URLS
-// =========================
 export const PROFILE_URLS = {
     GET_BY_ID: "/profile",
     GET_ALL: "/profile",
@@ -16,8 +13,6 @@ export const PROFILE_URLS = {
     UPLOAD_PROFILE_IMAGE: "/profile/upload/profile-image",
     UPLOAD_PROFILE_LOGO: "/profile/upload/logo",
     UPLOAD_ABOUT_ME_IMAGE: "/profile/upload/about-image",
-
-    // Admin
     ADMIN_CREATE_USER: "/profile/users",
     ADMIN_GET_ALL_USERS: "/profile/users",
     ADMIN_GET_USER_BY_ID: "/profile/users/:id",
@@ -29,17 +24,11 @@ export const PROFILE_URLS = {
     ADMIN_BULK_DELETE_USERS: "/profile/users/bulk"
 };
 
-// =========================
-// ENUMS
-// =========================
 export const VerificationStatus = {
     PENDING: "PENDING",
     VERIFIED: "VERIFIED",
 };
 
-// =========================
-// TYPES
-// =========================
 export interface ImageUploadResponse {
     url: string;
     publicId: string;
@@ -138,16 +127,10 @@ export interface GetProfilesParams {
     sortDir?: string;
 }
 
-// =========================
-// SERVICE
-// =========================
 export const useProfileService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
 
-    // =========================
-    // PROFILE
-    // =========================
     const get = () => {
         return request(API_METHOD.GET, PROFILE_URLS.GET_BY_ID, user);
     };
@@ -160,9 +143,6 @@ export const useProfileService = () => {
         return request(API_METHOD.PATCH, PROFILE_URLS.PATCH_SETTINGS, user, settings);
     };
 
-    // =========================
-    // IMAGE UPLOADS
-    // =========================
     const uploadProfileImage = (file: File) =>
         fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: true, sortOrder: 0 });
 
@@ -172,9 +152,6 @@ export const useProfileService = () => {
     const uploadAboutMeImage = (file: File) =>
         fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: false, sortOrder: 1, metaData: "ABOUT_ME_IMAGE" });
 
-    // =========================
-    // ADMIN APIs
-    // =========================
     const createUser = (body: AdminCreateUserRequest) => {
         return request(API_METHOD.POST, PROFILE_URLS.ADMIN_CREATE_USER, user, body);
     };

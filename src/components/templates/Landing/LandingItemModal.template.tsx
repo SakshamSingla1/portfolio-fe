@@ -10,8 +10,6 @@ import Button from '../../atoms/Button/Button';
 import TextField from '../../atoms/TextField/TextField';
 import { useColors } from '../../../utils/types';
 
-// ── TagsInput ────────────────────────────────────────────────────────────────
-
 interface TagsInputProps {
     label: string;
     value: string[];
@@ -78,8 +76,6 @@ const TagsInput: React.FC<TagsInputProps> = ({ label, value, onChange }) => {
     );
 };
 
-// ── Field layout helpers ─────────────────────────────────────────────────────
-
 const HintText = ({ text, colors }: { text: string; colors: ReturnType<typeof useColors> }) => (
     <p style={{ fontSize: 11, color: colors.neutral400, marginTop: 4, marginLeft: 2 }}>{text}</p>
 );
@@ -89,8 +85,6 @@ const TwoCol = ({ children }: { children: React.ReactNode }) => (
         {children}
     </div>
 );
-
-// ── Modal ────────────────────────────────────────────────────────────────────
 
 interface LandingItemModalProps {
     open: boolean;
@@ -189,10 +183,8 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                 }
             }}
         >
-            {/* ── Accent line ───────────────────────────────────────────────── */}
             <Box sx={{ height: 3, background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}28 100%)`, flexShrink: 0 }} />
 
-            {/* ── Title ─────────────────────────────────────────────────────── */}
             <DialogTitle
                 sx={{
                     display: 'flex', alignItems: 'center', gap: 1.5,
@@ -235,7 +227,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                 </IconButton>
             </DialogTitle>
 
-            {/* ── Content ───────────────────────────────────────────────────── */}
             <DialogContent
                 sx={{
                     padding: 0,
@@ -245,7 +236,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
             >
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-                    {/* ── Feature ─────────────────────────────────────────── */}
                     {type === 'feature' && (
                         <>
                             {sectionLabel('Basic Information')}
@@ -282,7 +272,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                         </>
                     )}
 
-                    {/* ── FAQ ─────────────────────────────────────────────── */}
                     {type === 'faq' && (
                         <>
                             {sectionLabel('Content')}
@@ -303,7 +292,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                         </>
                     )}
 
-                    {/* ── Step ────────────────────────────────────────────── */}
                     {type === 'step' && (
                         <>
                             {sectionLabel('Basic Information')}
@@ -348,7 +336,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                         </>
                     )}
 
-                    {/* ── Audience ─────────────────────────────────────────── */}
                     {type === 'audience' && (
                         <>
                             {sectionLabel('Basic Information')}
@@ -385,7 +372,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                         </>
                     )}
 
-                    {/* ── Testimonial ──────────────────────────────────────── */}
                     {type === 'testimonial' && (
                         <>
                             {sectionLabel('Author')}
@@ -427,7 +413,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                         </>
                     )}
 
-                    {/* ── Settings (all types) ─────────────────────────────── */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
                         {sectionLabel('Settings')}
                         {sortOrderField}
@@ -436,7 +421,6 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                 </div>
             </DialogContent>
 
-            {/* ── Actions ───────────────────────────────────────────────────── */}
             <DialogActions
                 sx={{
                     px: 3, py: 2, gap: 1,

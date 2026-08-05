@@ -70,7 +70,6 @@ const EmailNotificationForm: React.FC<Props> = ({ formik, setEditorRef }) => {
                         />
                     </div>
 
-                    {/* Advanced fields — collapsible */}
                     <div
                         style={{
                             borderRadius: 8,

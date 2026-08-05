@@ -184,7 +184,6 @@ const Sidebar: React.FC<{
   const stylesTheme = useMemo(() => ({ ...colors, collapsed }), [colors, collapsed]);
   const classes = useStyles(stylesTheme);
 
-  // Create navigation groups from rolePermissions
   const groupedMenuItems = useMemo(() => {
     if (!rolePermissions?.navLinks) return {};
 
@@ -221,7 +220,6 @@ const Sidebar: React.FC<{
       }
     });
 
-    // Sort items within each group
     Object.keys(sortedGroups).forEach((groupName) => {
       sortedGroups[groupName] = sortedGroups[groupName].sort(
         (a: any, b: any) => (parseInt(a.index) ?? 999) - (parseInt(b.index) ?? 999)

@@ -23,7 +23,6 @@ export interface CustomRadioGroupProps {
     orientation?: "horizontal" | "vertical";
 }
 
-// ── Radio indicator ─────────────────────────────────────────────────────────────
 // Pure CSS transition — no external animation library
 const RadioDot: React.FC<{
     selected: boolean;
@@ -114,7 +113,6 @@ const CustomRadioGroup: React.FC<CustomRadioGroupProps> = ({
         </p>
     ) : null;
 
-    // ── Default ─────────────────────────────────────────────────────────────────
     if (variant === "default") {
         return (
             <div>
@@ -195,7 +193,6 @@ const CustomRadioGroup: React.FC<CustomRadioGroupProps> = ({
         );
     }
 
-    // ── Pills ───────────────────────────────────────────────────────────────────
     if (variant === "pills") {
         return (
             <div>
@@ -315,7 +312,6 @@ const CustomRadioGroup: React.FC<CustomRadioGroupProps> = ({
                                     "border-color 0.2s ease, box-shadow 0.2s ease",
                             }}
                         >
-                            {/* Checkmark circle — top right */}
                             <span
                                 style={{
                                     position: "absolute",

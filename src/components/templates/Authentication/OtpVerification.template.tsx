@@ -122,7 +122,6 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
                     </p>
                 </div>
 
-                {/* OTP Input */}
                 <div className="flex justify-center mb-6">
                     <motion.input
                         className="text-center text-3xl tracking-[0.6rem] font-black rounded-2xl p-4 w-full max-w-xs focus:outline-none transition-all duration-200"

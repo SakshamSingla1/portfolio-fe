@@ -23,8 +23,6 @@ import LandingAudienceTableTemplate from '../../templates/Landing/LandingAudienc
 import LandingTestimonialsTableTemplate from '../../templates/Landing/LandingTestimonialsTable.template';
 import LandingItemModalTemplate from '../../templates/Landing/LandingItemModal.template';
 
-// ── Empty factories ─────────────────────────────────────────────────────────────
-
 const emptyConfig = (): LandingConfig => ({
     heroEyebrow: '', heroHeadline1: '', heroHeadline2: '', heroDescription: '',
     heroPrimaryCtaText: '', heroSecondaryCtaText: '', heroTrustBadges: [],
@@ -35,8 +33,6 @@ const emptyFaq = (): LandingFaq => ({ question: '', answer: '', sortOrder: 0, is
 const emptyStep = (): LandingStep => ({ stepNumber: '', iconName: '', colorKey: '', title: '', bullets: [], sortOrder: 0, isActive: true });
 const emptyAudience = (): LandingAudienceCard => ({ iconName: '', colorKey: '', title: '', description: '', sortOrder: 0, isActive: true });
 const emptyTestimonial = (): LandingTestimonial => ({ authorName: '', authorRole: '', authorCompany: '', avatarUrl: '', content: '', linkedinUrl: '', sortOrder: 0, isActive: true });
-
-// ── Component ───────────────────────────────────────────────────────────────────
 
 const LandingManagement = () => {
     const service = useLandingPageService();
@@ -60,8 +56,6 @@ const LandingManagement = () => {
 
     const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: number } | null>(null);
     const [deleting, setDeleting] = useState(false);
-
-    // ── Data loading ──────────────────────────────────────────────────────────
 
     const loadAll = useCallback(async () => {
         setLoading(true);
@@ -92,8 +86,6 @@ const LandingManagement = () => {
 
     useEffect(() => { loadAll(); }, []);
 
-    // ── Config ────────────────────────────────────────────────────────────────
-
     const saveConfig = async () => {
         setConfigSaving(true);
         const res = await service.updateConfig(config);
@@ -106,8 +98,6 @@ const LandingManagement = () => {
         }
         setConfigSaving(false);
     };
-
-    // ── Modal ─────────────────────────────────────────────────────────────────
 
     const openModal = (type: string, data: any) => {
         setModal({ open: true, type, data });
@@ -140,8 +130,6 @@ const LandingManagement = () => {
         setSaving(false);
     };
 
-    // ── Delete ────────────────────────────────────────────────────────────────
-
     const confirmDelete = (type: string, id: number) => setDeleteTarget({ type, id });
 
     const handleDelete = async () => {
@@ -164,8 +152,6 @@ const LandingManagement = () => {
         setDeleting(false);
         setDeleteTarget(null);
     };
-
-    // ── Tab schema ────────────────────────────────────────────────────────────
 
     const tabSchema: ITabsSchema[] = [
         {

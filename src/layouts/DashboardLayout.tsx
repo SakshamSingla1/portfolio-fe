@@ -367,7 +367,6 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <div className={classes.layoutWrapper}>
-      {/* Ambient background effects */}
       <div className={classes.ambientGlow}>
         <div ref={glow1Ref} className={classes.glow1} />
         <div ref={glow2Ref} className={classes.glow2} />

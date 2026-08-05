@@ -47,7 +47,6 @@ const getGreeting = (): string => {
 const formatDate = (): string =>
   new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
-/* ─ Avatar helpers ───────────────────────────────────────────── */
 const AVATAR_PALETTES = [
   { bg: "#ede9fe", fg: "#7c3aed" },
   { bg: "#dbeafe", fg: "#1d4ed8" },
@@ -75,7 +74,6 @@ const getInitials = (name: string) => {
   return w.length === 1 ? w[0][0].toUpperCase() : (w[0][0] + w[w.length - 1][0]).toUpperCase();
 };
 
-/* ─── Focus chip ─────────────────────────────────────────────── */
 interface FocusChipProps {
   label: string;
   color: string;
@@ -100,7 +98,6 @@ const FocusChip: React.FC<FocusChipProps> = ({ label, color, onClick }) => (
   </button>
 );
 
-/* ─── Engagement Strip ───────────────────────────────────────────── */
 const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
   viewStats,
   stats,
@@ -183,7 +180,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   const profileImg = dashboardData?.profileSummary?.profileImageUrl || "";
   const firstName = fullName.split(" ")[0] || "there";
 
-  /* ─── Skeleton ───────────────────────────────────────────── */
   const Skeleton = () => (
     <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
       <div className={isMobile ? "space-y-4" : "col-span-7 space-y-4"}>
@@ -238,7 +234,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   return (
     <div style={{ padding: isMobile ? "12px 10px 24px" : "20px 20px 32px" }}>
 
-      {/* ─ Greeting header ─────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
@@ -309,7 +304,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
       ) : (
         <div className="space-y-4">
 
-          {/* ─ Stats strip ──────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -318,7 +312,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             <StatsTemplate stats={dashboardData.stats} />
           </motion.div>
 
-          {/* ─ Focus strip ──────────────────────────────────── */}
           {(() => {
             const chips = buildFocusChips();
             if (chips.length === 0) return null;
@@ -347,7 +340,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             );
           })()}
 
-          {/* ─ Engagement Strip ─────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
@@ -359,7 +351,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             />
           </motion.div>
 
-          {/* ─ View Analytics ───────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -368,7 +359,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             <ViewAnalyticsTemplate viewStats={dashboardData.viewStats ?? EMPTY_VIEW_STATS} />
           </motion.div>
 
-          {/* ─ Main grid ────────────────────────────────────── */}
           <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
 
             {/* Left column */}

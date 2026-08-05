@@ -103,7 +103,6 @@ const ListingShell: React.FC<ListingShellProps> = ({
       transition={{ duration: 0.3, ease: "easeOut" }}
       style={{ padding: isMobile ? "8px 4px 16px" : "16px 16px 24px", position: "relative", overflow: "hidden" }}
     >
-      {/* Ambient blobs */}
       <div
         className="absolute pointer-events-none rounded-full"
         style={{
@@ -127,7 +126,6 @@ const ListingShell: React.FC<ListingShellProps> = ({
         }}
       />
 
-      {/* Header card */}
       <div
         className="rounded-2xl overflow-hidden mb-4"
         style={{
@@ -138,10 +136,8 @@ const ListingShell: React.FC<ListingShellProps> = ({
           zIndex: 1,
         }}
       >
-        {/* Accent gradient line */}
         <div style={{ height: 3, background: `linear-gradient(90deg, ${accent} 0%, ${accent}28 100%)` }} />
 
-        {/* Hero row */}
         <div className={`flex items-center justify-between gap-4 ${isMobile ? "px-3 py-3.5" : "px-5 py-4"}`}>
           <div className="flex items-center gap-4 min-w-0 flex-1">
             {icon && (
@@ -219,7 +215,6 @@ const ListingShell: React.FC<ListingShellProps> = ({
           )}
         </div>
 
-        {/* Stat chips */}
         {stats && stats.length > 0 && (
           <div
             className={`flex flex-wrap gap-2 ${isMobile ? "px-3 pb-3" : "px-5 pb-4"}`}
@@ -238,7 +233,6 @@ const ListingShell: React.FC<ListingShellProps> = ({
           </div>
         )}
 
-        {/* Filters / Search */}
         {(onSearchChange || filterContent) && (
           <div
             className={`${isMobile ? "px-3 pb-3" : "px-5 pb-4"}`}
@@ -312,7 +306,6 @@ const ListingShell: React.FC<ListingShellProps> = ({
         )}
       </div>
 
-      {/* Content card */}
       <div
         className="rounded-2xl overflow-hidden"
         style={{
