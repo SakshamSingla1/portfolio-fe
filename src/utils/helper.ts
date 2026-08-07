@@ -148,7 +148,7 @@ export const enumToNormalKey = (enumKey: string): string => {
   return enumKey
     .toLowerCase()
     .split('_')
-    .map(word => word.replace('and', '&'))
+    .map(word => word === 'and' ? '&' : word)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
