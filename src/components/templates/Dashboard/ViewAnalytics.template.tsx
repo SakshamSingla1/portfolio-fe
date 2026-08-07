@@ -1,12 +1,13 @@
-import React, { useId } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
-import type { IViewStats, IDailyView, IPortfolioView } from "../../../services/useDashboardService";
+import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2 } from "react-icons/fi";
 import { EmptyState } from "./shared/DashboardUI";
+import { TrendAreaChart, DeviceDonutChart } from "./AnalyticsCharts";
 
 interface ViewAnalyticsProps {
   viewStats: IViewStats | null | undefined;
@@ -59,93 +60,6 @@ const exactTime = (iso: string): string => {
 };
 
 
-const Sparkline: React.FC<{ data: IDailyView[]; color: string; height?: number }> = ({
-  data, color, height = 56,
-}) => {
-  const gradId = useId();
-  const W = 320;
-  const counts = data.map((d) => d.count);
-  const max = Math.max(...counts, 1);
-  const toY = (v: number) => height - 6 - ((v / max) * (height - 14));
-
-  const pts = data.map((d, i) => ({
-    x: (i / Math.max(data.length - 1, 1)) * W,
-    y: toY(d.count),
-  }));
-
-  let linePath = "";
-  let fillPath = "";
-
-  if (pts.length > 1) {
-    linePath = pts.reduce((acc, p, i) => {
-      if (i === 0) return `M ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
-      const prev = pts[i - 1];
-      const cx = ((prev.x + p.x) / 2).toFixed(1);
-      return `${acc} C ${cx} ${prev.y.toFixed(1)}, ${cx} ${p.y.toFixed(1)}, ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
-    }, "");
-    fillPath = `${linePath} L ${W} ${height} L 0 ${height} Z`;
-  }
-
-  const peakIdx = counts.indexOf(max);
-  const peak = pts[peakIdx];
-
-  return (
-    <div className="w-full relative">
-      <svg
-        width="100%"
-        height={height}
-        viewBox={`0 0 ${W} ${height}`}
-        preserveAspectRatio="none"
-        className="overflow-visible"
-      >
-        <defs>
-          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor={color} stopOpacity="0.25" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
-          </linearGradient>
-        </defs>
-        {fillPath && <path d={fillPath} fill={`url(#${gradId})`} />}
-        {linePath && (
-          <motion.path
-            d={linePath}
-            fill="none"
-            stroke={color}
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
-          />
-        )}
-        {peak && (
-          <motion.circle
-            cx={peak.x}
-            cy={peak.y}
-            r={4}
-            fill={color}
-            stroke="#fff"
-            strokeWidth={2}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 1.4, type: "spring", stiffness: 400 }}
-          />
-        )}
-      </svg>
-      <div className="flex justify-between mt-1 px-0.5">
-        {data.map((d, i) => (
-          <span
-            key={i}
-            className="text-[9px] font-medium"
-            style={{ color: "#94a3b8", letterSpacing: "0.03em", textAlign: "center", flex: 1 }}
-          >
-            {d.day}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 
 const LivePulse: React.FC<{ active?: boolean }> = ({ active = true }) => (
@@ -279,16 +193,6 @@ const BreakdownBars: React.FC<{
 };
 
 
-const DeviceBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => (
-  <BreakdownBars
-    breakdown={breakdown}
-    items={[
-      { key: "DESKTOP", label: "Desktop", color: "#3b82f6", icon: <FiMonitor size={11} /> },
-      { key: "MOBILE",  label: "Mobile",  color: "#8b5cf6", icon: <FiSmartphone size={11} /> },
-      { key: "TABLET",  label: "Tablet",  color: "#f59e0b", icon: <FiTablet size={11} /> },
-    ]}
-  />
-);
 
 
 const BROWSER_COLORS: Record<string, string> = {
@@ -850,12 +754,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                 className="rounded-2xl p-4"
                 style={{ background: isDark ? `${ACCENT}15` : `${ACCENT}08`, border: `1px solid ${ACCENT}20` }}
               >
-                <div className="flex items-end justify-between gap-4">
-                  <MetricCell label="Views Today" value={viewsToday} delay={0} accent={ACCENT} hero />
-                  <div className="flex-1 min-w-0 hidden sm:block">
-                    {weeklyTrend.length > 0 && <Sparkline data={weeklyTrend} color={ACCENT} height={52} />}
-                  </div>
-                </div>
+                <MetricCell label="Views Today" value={viewsToday} delay={0} accent={ACCENT} hero />
               </div>
 
               {}
@@ -883,7 +782,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                   <span className="text-[9px] font-black uppercase tracking-widest block mb-2" style={{ color: colors.neutral400 }}>
                     7-Day Trend
                   </span>
-                  <Sparkline data={weeklyTrend} color={ACCENT} height={48} />
+                  <TrendAreaChart data={weeklyTrend} color={ACCENT} height={140} />
                 </div>
               )}
 
@@ -920,7 +819,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                   <FiEye size={11} style={{ color: colors.neutral400 }} />
                 </div>
                 <div className="flex-1 flex flex-col justify-end">
-                  <Sparkline data={weeklyTrend} color={ACCENT} height={64} />
+                  <TrendAreaChart data={weeklyTrend} color={ACCENT} height={180} />
                 </div>
               </div>
             )}
@@ -928,7 +827,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
             {}
             <div style={panelStyle}>
               {panelLabel("Devices")}
-              <DeviceBreakdown breakdown={deviceBreakdown} />
+              <DeviceDonutChart breakdown={deviceBreakdown} />
             </div>
 
             {}
