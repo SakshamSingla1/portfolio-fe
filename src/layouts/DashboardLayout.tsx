@@ -13,6 +13,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { getBreadcrumbsFromUrl } from "../utils/helper";
 import NotificationBell from "../components/molecules/NotificationBell/NotificationBell";
 import SearchPanel from "../components/molecules/SearchPanel/SearchPanel";
+import CommandPalette from "../components/molecules/CommandPalette/CommandPalette";
 
 const useStyles = createUseStyles({
   layoutWrapper: (c: any) => ({
@@ -430,6 +431,22 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           <div className={classes.headerRight}>
+            {!isMobile && (
+              <button
+                onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
+                title="Command palette"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors"
+                style={{ border: `1px solid ${colors.neutral200}`, background: "transparent", color: colors.neutral400, cursor: "pointer" }}
+              >
+                <span className="text-xs">Jump to…</span>
+                <kbd
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                  style={{ background: colors.neutral100, color: colors.neutral500 }}
+                >
+                  ⌘K
+                </kbd>
+              </button>
+            )}
             <button className={classes.iconButton} onClick={() => setIsSearchOpen(true)} title="Global Search">
               <FiSearch size={20} />
             </button>
@@ -531,6 +548,8 @@ const DashboardLayout: React.FC = () => {
       <AnimatePresence>
         {isSearchOpen && <SearchPanel onClose={() => setIsSearchOpen(false)} />}
       </AnimatePresence>
+
+      <CommandPalette />
     </div>
   );
 };
