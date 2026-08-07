@@ -67,24 +67,45 @@ const ContactUsListPage: React.FC = () => {
         setPagination((prev) => ({ ...prev, pageSize: newRowsPerPage }));
     };
 
+    const markReadLocally = (ids: (number | null | undefined)[]) => {
+        const idSet = new Set(ids.map(String));
+        queryClient.setQueryData(['contactUs', queryParams], (old: any) => {
+            if (!old?.content) return old;
+            return {
+                ...old,
+                content: old.content.map((item: ContactUs) =>
+                    idSet.has(String(item.id)) ? { ...item, status: "READ" } : item
+                ),
+            };
+        });
+    };
+
     const handleMarkRead = async (id?: number | null) => {
         if (!id) return;
         try {
             const response = await contactUsService.markAsRead(id);
             if (response.status === HTTP_STATUS.OK) {
-                queryClient.setQueryData(['contactUs', queryParams], (old: any) => {
-                    if (!old?.content) return old;
-                    return {
-                        ...old,
-                        content: old.content.map((item: ContactUs) =>
-                            String(item.id) === String(id) ? { ...item, status: "READ" } : item
-                        ),
-                    };
-                });
+                markReadLocally([id]);
                 showSnackbar('success', 'Marked as read successfully');
             }
         } catch {
             showSnackbar('error', 'Failed to mark as read');
+        }
+    };
+
+    const handleBulkMarkRead = async (ids: number[]) => {
+        if (!ids.length) return;
+        try {
+            const results = await Promise.all(ids.map((id) => contactUsService.markAsRead(id)));
+            const succeeded = ids.filter((_, i) => results[i]?.status === HTTP_STATUS.OK);
+            if (succeeded.length) markReadLocally(succeeded);
+            if (succeeded.length === ids.length) {
+                showSnackbar('success', `Marked ${succeeded.length} message(s) as read`);
+            } else {
+                showSnackbar('error', `Marked ${succeeded.length} of ${ids.length} as read`);
+            }
+        } catch {
+            showSnackbar('error', 'Failed to mark messages as read');
         }
     };
 
@@ -104,6 +125,7 @@ const ContactUsListPage: React.FC = () => {
             handlePaginationChange={handlePaginationChange}
             handleRowsPerPageChange={handleRowsPerPageChange}
             handleMarkRead={handleMarkRead}
+            handleBulkMarkRead={handleBulkMarkRead}
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
         />
