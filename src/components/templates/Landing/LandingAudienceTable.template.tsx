@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Chip } from '@mui/material';
-import { LuPlus } from 'react-icons/lu';
-import Button from '../../atoms/Button/Button';
+import { LuGlobe } from 'react-icons/lu';
 import ActionButtons from '../../atoms/TableUtils/ActionButtons';
 import TableV1 from '../../organisms/Table/TableV1';
 import type { ColumnType } from '../../organisms/Table/TableV1';
+import ListingShell from '../Shared/ListingShell.template';
+import { StatusPill, ColorSwatch } from './LandingBadges';
 import type { LandingAudienceCard } from '../../../services/useLandingPageService';
 
 interface LandingAudienceTableProps {
@@ -44,31 +44,23 @@ const LandingAudienceTableTemplate: React.FC<LandingAudienceTableProps> = ({
     const records = useMemo(() => audience.map(a => [
         a.title,
         <code key={`icon-${a.id}`}>{a.iconName}</code>,
-        <Chip key={`color-${a.id}`} size="small" label={a.colorKey} />,
+        <ColorSwatch key={`color-${a.id}`} colorKey={a.colorKey} />,
         a.sortOrder,
-        <Chip
-            key={`status-${a.id}`}
-            size="small"
-            label={a.isActive ? 'Active' : 'Inactive'}
-            color={a.isActive ? 'success' : 'default'}
-        />,
+        <StatusPill key={`status-${a.id}`} isActive={a.isActive} />,
         Action(a),
     ]), [audience, onEdit, onDelete]);
 
     return (
-        <div className="flex flex-col">
-            <div className="flex justify-between items-center px-5 py-4">
-                <h2 className="text-base font-semibold text-gray-800">Audience Cards</h2>
-                <Button
-                    variant="primaryContained"
-                    label="Add"
-                    iconButton={<LuPlus size={14} />}
-                    buttonWithImg
-                    onClick={onAdd}
-                />
-            </div>
+        <ListingShell
+            title="Audience Cards"
+            description="Who this portfolio builder is for, shown on the landing page"
+            icon={<LuGlobe />}
+            count={audience.length}
+            addButtonLabel="Add Audience Card"
+            addButtonOnClick={onAdd}
+        >
             <TableV1 schema={schema} records={records} />
-        </div>
+        </ListingShell>
     );
 };
 

@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Chip } from '@mui/material';
-import { LuPlus } from 'react-icons/lu';
-import Button from '../../atoms/Button/Button';
+import { LuStar } from 'react-icons/lu';
 import ActionButtons from '../../atoms/TableUtils/ActionButtons';
 import TableV1 from '../../organisms/Table/TableV1';
 import type { ColumnType } from '../../organisms/Table/TableV1';
+import ListingShell from '../Shared/ListingShell.template';
+import { StatusPill } from './LandingBadges';
 import type { LandingTestimonial } from '../../../services/useLandingPageService';
 
 interface LandingTestimonialsTableProps {
@@ -46,29 +46,21 @@ const LandingTestimonialsTableTemplate: React.FC<LandingTestimonialsTableProps> 
         t.authorRole,
         t.authorCompany,
         t.sortOrder,
-        <Chip
-            key={`status-${t.id}`}
-            size="small"
-            label={t.isActive ? 'Active' : 'Inactive'}
-            color={t.isActive ? 'success' : 'default'}
-        />,
+        <StatusPill key={`status-${t.id}`} isActive={t.isActive} />,
         Action(t),
     ]), [testimonials, onEdit, onDelete]);
 
     return (
-        <div className="flex flex-col">
-            <div className="flex justify-between items-center px-5 py-4">
-                <h2 className="text-base font-semibold text-gray-800">Testimonials</h2>
-                <Button
-                    variant="primaryContained"
-                    label="Add"
-                    iconButton={<LuPlus size={14} />}
-                    buttonWithImg
-                    onClick={onAdd}
-                />
-            </div>
+        <ListingShell
+            title="Testimonials"
+            description="Quotes from clients shown on the landing page"
+            icon={<LuStar />}
+            count={testimonials.length}
+            addButtonLabel="Add Testimonial"
+            addButtonOnClick={onAdd}
+        >
             <TableV1 schema={schema} records={records} />
-        </div>
+        </ListingShell>
     );
 };
 

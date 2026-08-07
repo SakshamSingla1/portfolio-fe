@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Chip } from '@mui/material';
-import { LuPlus } from 'react-icons/lu';
-import Button from '../../atoms/Button/Button';
+import { LuLayers } from 'react-icons/lu';
 import ActionButtons from '../../atoms/TableUtils/ActionButtons';
 import TableV1 from '../../organisms/Table/TableV1';
 import type { ColumnType } from '../../organisms/Table/TableV1';
+import ListingShell from '../Shared/ListingShell.template';
+import { StatusPill, IndexBadge } from './LandingBadges';
 import type { LandingStep } from '../../../services/useLandingPageService';
 
 interface LandingStepsTableProps {
@@ -42,33 +42,25 @@ const LandingStepsTableTemplate: React.FC<LandingStepsTableProps> = ({
     }), []);
 
     const records = useMemo(() => steps.map(s => [
-        <Chip key={`step-${s.id}`} size="small" label={s.stepNumber} />,
+        <IndexBadge key={`step-${s.id}`} value={s.stepNumber} />,
         s.title,
         <code key={`icon-${s.id}`}>{s.iconName}</code>,
         s.sortOrder,
-        <Chip
-            key={`status-${s.id}`}
-            size="small"
-            label={s.isActive ? 'Active' : 'Inactive'}
-            color={s.isActive ? 'success' : 'default'}
-        />,
+        <StatusPill key={`status-${s.id}`} isActive={s.isActive} />,
         Action(s),
     ]), [steps, onEdit, onDelete]);
 
     return (
-        <div className="flex flex-col">
-            <div className="flex justify-between items-center px-5 py-4">
-                <h2 className="text-base font-semibold text-gray-800">Steps</h2>
-                <Button
-                    variant="primaryContained"
-                    label="Add"
-                    iconButton={<LuPlus size={14} />}
-                    buttonWithImg
-                    onClick={onAdd}
-                />
-            </div>
+        <ListingShell
+            title="How To Use"
+            description="Ordered steps shown in the landing page's how-it-works section"
+            icon={<LuLayers />}
+            count={steps.length}
+            addButtonLabel="Add Step"
+            addButtonOnClick={onAdd}
+        >
             <TableV1 schema={schema} records={records} />
-        </div>
+        </ListingShell>
     );
 };
 
