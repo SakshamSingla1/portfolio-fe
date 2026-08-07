@@ -158,7 +158,8 @@ const ServiceFormTemplate = ({ onSubmit, mode, service }: ServiceFormProps) => {
                         />
                         <TextField
                             label="Icon"
-                            placeholder="Emoji or icon key e.g. 🖥️"
+                            placeholder="e.g. code, server, design, cloud — or an emoji"
+                            helperText="Matches a built-in icon by keyword (code, server, design, database, cloud, mobile, security...); falls back to an emoji if you paste one, or a briefcase if left blank"
                             {...formik.getFieldProps("icon")}
                             disabled={mode === MODE.VIEW}
                         />
