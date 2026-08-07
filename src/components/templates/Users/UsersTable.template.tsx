@@ -1,16 +1,16 @@
 import React, { useMemo, useCallback, useState } from "react";
-import { type ColumnType } from "../../organisms/Table/TableV1";
-import { type IPagination, useColors, Status } from "../../../utils/types";
+import { type ColumnType, type TableSelection } from "../../organisms/Table/TableV1";
+import { type IPagination, Status } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateUtils, makeRoute } from "../../../utils/helper";
+import { exportToCsv } from "../../../utils/csvExport";
 import TableV1 from "../../organisms/Table/TableV1";
-import ListingShell from "../Shared/ListingShell.template";
+import ListingShell, { type BulkAction } from "../Shared/ListingShell.template";
 import { type UserResponse } from "../../../services/useProfileService";
-import { FiCheck, FiTrash2 } from "react-icons/fi";
+import { FiCheck, FiTrash2, FiUserCheck, FiUserX, FiSlash } from "react-icons/fi";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
-import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useProfileService } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
@@ -32,6 +32,7 @@ interface UserTableTemplateProps {
     selectedIds?: number[];
     onToggleSelect?: (id: number) => void;
     onToggleSelectAll?: () => void;
+    onClearSelection?: () => void;
     onBulkDelete?: () => void | Promise<void>;
     onBulkStatusChange?: (status: string) => void | Promise<void>;
 }
@@ -55,12 +56,6 @@ const RoleChip: React.FC<{ roleName: string }> = ({ roleName }) => {
     );
 };
 
-const BULK_STATUS_OPTIONS = [
-    { label: "Active", value: Status.ACTIVE },
-    { label: "Inactive", value: Status.INACTIVE },
-    { label: "Blocked", value: Status.BLOCKED },
-];
-
 const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     users,
     pagination,
@@ -75,16 +70,16 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     selectedIds = [],
     onToggleSelect,
     onToggleSelectAll,
+    onClearSelection,
     onBulkDelete,
     onBulkStatusChange,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
-    const colors = useColors();
     const { showSnackbar } = useSnackbar();
     const { toggleUserVerification } = useProfileService();
-    const { canDelete } = usePermissionHelper();
+    const { canDelete, canEdit } = usePermissionHelper();
 
     const [deleteTarget, setDeleteTarget] = useState<UserResponse | null>(null);
     const [bulkAction, setBulkAction] = useState<null | "delete" | { status: string }>(null);
@@ -124,7 +119,6 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     }, [toggleUserVerification, showSnackbar, onRefresh]);
 
     const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
-    const allOnPageSelected = users.length > 0 && users.every((u) => u.id && selectedIdSet.has(u.id));
 
     const runDelete = async () => {
         if (!deleteTarget?.id || !onDelete) return;
@@ -150,16 +144,6 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     };
 
     const records = useMemo(() => users?.map((user: UserResponse, index) => [
-        onToggleSelect ? (
-            <input
-                key={`select-${user.id}`}
-                type="checkbox"
-                checked={!!user.id && selectedIdSet.has(user.id)}
-                onChange={() => user.id && onToggleSelect(user.id)}
-                onClick={(e) => e.stopPropagation()}
-                style={{ width: 16, height: 16, cursor: "pointer" }}
-            />
-        ) : null,
         pagination.currentPage * pagination.pageSize + index + 1,
         <div key={`user-${user.id}`} className={`flex ${isMobile ? 'justify-end' : ''} items-center space-x-2`} title=''>
             <img src={user.profileImageUrl} alt={user.userName} className='w-10 h-10' loading="lazy" width={40} height={40} />
@@ -186,7 +170,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
                 <FiCheck />
             </button>}
         </div>
-    ]) ?? [], [users, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView, handleVerifyUser, selectedIdSet, onToggleSelect, onDelete]);
+    ]) ?? [], [users, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView, handleVerifyUser, onDelete]);
 
     const schema = useMemo(() => ({
         id: 1,
@@ -200,17 +184,6 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             handleChangeRowsPerPage: handleRowsPerPageChange
         },
         columns: [
-            {
-                label: onToggleSelectAll ? (
-                    <input
-                        type="checkbox"
-                        checked={allOnPageSelected}
-                        onChange={onToggleSelectAll}
-                        style={{ width: 16, height: 16, cursor: "pointer" }}
-                    />
-                ) as any : "",
-                key: "select", type: "custom" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true,
-            },
             { label: "Sr No.", key: "id", type: "number" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
             { label: "User", key: "user", type: "custom" as ColumnType, props: { className: '' }, priority: "high" as const },
             { label: "Username", key: "username", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
@@ -226,7 +199,29 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
         // render (see ListingUsers.page.tsx's paginationWithTotal), so this
         // memo was invalidating on renders where nothing pagination-related
         // actually changed.
-    }), [isMobile, pagination.totalRecords, pagination.currentPage, pagination.pageSize, handlePaginationChange, handleRowsPerPageChange, onToggleSelectAll, allOnPageSelected]);
+    }), [isMobile, pagination.totalRecords, pagination.currentPage, pagination.pageSize, handlePaginationChange, handleRowsPerPageChange]);
+
+    const selection: TableSelection | undefined = useMemo(() => onToggleSelect ? {
+        selectedIds: selectedIdSet,
+        getRowId: (_row, index) => users[index]?.id ?? index,
+        onToggle: (id) => onToggleSelect(Number(id)),
+        onToggleAll: () => onToggleSelectAll?.(),
+    } : undefined, [onToggleSelect, onToggleSelectAll, selectedIdSet, users]);
+
+    const bulkActions: BulkAction[] = useMemo(() => {
+        const actions: BulkAction[] = [];
+        if (canEdit && onBulkStatusChange) {
+            actions.push(
+                { label: "Mark Active", icon: <FiUserCheck size={13} />, onClick: () => setBulkAction({ status: Status.ACTIVE }) },
+                { label: "Mark Inactive", icon: <FiUserX size={13} />, onClick: () => setBulkAction({ status: Status.INACTIVE }) },
+                { label: "Block", icon: <FiSlash size={13} />, onClick: () => setBulkAction({ status: Status.BLOCKED }) },
+            );
+        }
+        if (canDelete && onBulkDelete) {
+            actions.push({ label: "Delete", icon: <FiTrash2 size={13} />, variant: "danger", onClick: () => setBulkAction("delete") });
+        }
+        return actions;
+    }, [canEdit, canDelete, onBulkStatusChange, onBulkDelete]);
 
     return (
         <ListingShell
@@ -240,34 +235,15 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
             filterContent={filterContent}
+            onExport={onToggleSelect ? () => exportToCsv("users", users.map((u) => ({
+                id: u.id, fullName: u.fullName, email: u.email, username: u.userName,
+                role: u.roleName, status: u.status, createdAt: u.createdAt ?? "",
+            }))) : undefined}
+            selectedCount={selectedIds.length}
+            onClearSelection={onClearSelection}
+            bulkActions={bulkActions}
         >
-            {selectedIds.length > 0 && canDelete && (
-                <div
-                    className="flex flex-wrap items-center gap-3 px-4 py-3"
-                    style={{ background: `${colors.primary500}08`, borderBottom: `1px solid ${colors.neutral200}` }}
-                >
-                    <span className="text-sm font-semibold" style={{ color: colors.neutral800 }}>
-                        {selectedIds.length} selected
-                    </span>
-                    <div className="w-full sm:w-56">
-                        <AutoCompleteInput
-                            placeHolder="Set status…"
-                            options={BULK_STATUS_OPTIONS}
-                            value={null}
-                            onChange={(value) => value?.value && setBulkAction({ status: String(value.value) })}
-                            onSearch={() => { }}
-                        />
-                    </div>
-                    <button
-                        onClick={() => setBulkAction("delete")}
-                        className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-lg"
-                        style={{ color: colors.error600, background: colors.error50, border: `1px solid ${colors.error200}` }}
-                    >
-                        <FiTrash2 size={14} /> Delete selected
-                    </button>
-                </div>
-            )}
-            <TableV1 schema={schema} records={records} isLoading={isLoading} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} selection={selection} />
 
             <ConfirmDialog
                 open={!!deleteTarget}

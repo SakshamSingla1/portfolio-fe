@@ -115,6 +115,8 @@ const ListingUsersPage: React.FC = () => {
         setSelectedIds(allSelected ? [] : idsOnPage);
     };
 
+    const handleClearSelection = () => setSelectedIds([]);
+
     const handleDelete = async (id: number) => {
         try {
             const res = await profileService.deleteUser(id);
@@ -185,6 +187,7 @@ const ListingUsersPage: React.FC = () => {
             selectedIds={selectedIds}
             onToggleSelect={handleToggleSelect}
             onToggleSelectAll={handleToggleSelectAll}
+            onClearSelection={handleClearSelection}
             onBulkDelete={handleBulkDelete}
             onBulkStatusChange={handleBulkStatusChange}
             filterContent={

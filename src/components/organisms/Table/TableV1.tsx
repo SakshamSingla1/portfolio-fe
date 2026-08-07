@@ -13,6 +13,7 @@ import CurrencyCell from "../../atoms/TableUtils/CurrencyCell";
 import NumberCell from "../../atoms/TableUtils/NumberCell";
 import StringCell from "../../atoms/TableUtils/StringCell";
 import DateTimeCell from "../../atoms/TableUtils/DateTimeCell";
+import Checkbox from "../../atoms/Checkbox/Checkbox";
 import { FiChevronDown, FiChevronUp, FiInbox } from "react-icons/fi";
 
 export interface Pagination {
@@ -59,6 +60,13 @@ export interface TableSchema {
   maxMobileColumns?: number;
 }
 
+export interface TableSelection {
+  selectedIds: Set<string | number>;
+  getRowId: (row: any[], index: number) => string | number;
+  onToggle: (id: string | number) => void;
+  onToggleAll: (ids: (string | number)[]) => void;
+}
+
 interface TableProps {
   schema: TableSchema;
   records: any[][];
@@ -67,6 +75,7 @@ interface TableProps {
   isLoading?: boolean;
   onRowClick?: (row: any[]) => void;
   onRowSwipe?: (row: any[], direction: 'left' | 'right') => void;
+  selection?: TableSelection;
 }
 
 const SKELETON_WIDTHS = [55, 75, 45, 65, 80, 40, 70, 50, 60, 35];
@@ -465,6 +474,7 @@ const TableV1: React.FC<TableProps> = ({
   className,
   isLoading = false,
   onRowClick,
+  selection,
 }) => {
   const colors = useColors();
   // `{ theme: colors }` must stay referentially stable across renders that
@@ -543,18 +553,25 @@ const TableV1: React.FC<TableProps> = ({
     const primaryColumn = schema.columns.find(col => col.priority === 'high') || schema.columns[0];
     const primaryValue = getCellView(row[schema.columns.indexOf(primaryColumn)], primaryColumn);
     const isExpanded = expandedCards.has(rowIndex);
+    const rowId = selection?.getRowId(row, rowIndex);
+    const isSelected = rowId !== undefined && selection?.selectedIds.has(rowId);
 
     return (
       <div
         key={rowIndex}
         className={classes.mobileCard}
-        style={{ position: 'relative' }}
+        style={isSelected ? { position: 'relative', backgroundColor: `${colors.primary500}0c` } : { position: 'relative' }}
       >
         <div
           className={classes.mobileCardHeader}
           onClick={() => toggleCardExpansion(rowIndex)}
           style={{ cursor: 'pointer', userSelect: 'none' }}
         >
+          {selection && (
+            <div onClick={(e) => e.stopPropagation()} style={{ marginRight: 4 }}>
+              <Checkbox size="small" checked={!!isSelected} onChange={() => selection.onToggle(rowId!)} />
+            </div>
+          )}
           <div className={classes.mobileCardTitle}>
             {primaryColumn.label}
           </div>
@@ -634,6 +651,16 @@ const TableV1: React.FC<TableProps> = ({
           <table className={clsx(classes.table, (!isMobile || mobileView !== 'cards') && classes.desktopTable)}>
             <thead className={classes.tableHead}>
               <tr>
+                {selection && (
+                  <th style={{ width: 44 }}>
+                    <Checkbox
+                      size="small"
+                      checked={records.length > 0 && records.every((row, i) => selection.selectedIds.has(selection.getRowId(row, i)))}
+                      indeterminate={records.some((row, i) => selection.selectedIds.has(selection.getRowId(row, i))) && !records.every((row, i) => selection.selectedIds.has(selection.getRowId(row, i)))}
+                      onChange={() => selection.onToggleAll(records.map((row, i) => selection.getRowId(row, i)))}
+                    />
+                  </th>
+                )}
                 {(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).map((col) => (
                   <th
                     key={col.key}
@@ -651,6 +678,7 @@ const TableV1: React.FC<TableProps> = ({
               {isLoading ? (
                 Array.from({ length: schema.pagination.limit }, (_, i) => (
                   <tr key={`skeleton-${i}`}>
+                    {selection && <td><div className={classes.skeletonCell} style={{ width: 18, height: 18 }} /></td>}
                     {(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).map((col, j) => (
                       <td key={col.key}>
                         <div
@@ -664,37 +692,47 @@ const TableV1: React.FC<TableProps> = ({
               ) : records.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).length}
+                    colSpan={(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).length + (selection ? 1 : 0)}
                     className={classes.emptyState}
                   >
                     <EmptyState colors={colors} />
                   </td>
                 </tr>
               ) : (
-                records.map((row, rowIndex) => (
-                  <tr
-                    key={rowIndex}
-                    className={clsx(
-                      schema.hover && 'hover:opacity-90',
-                      schema.striped && rowIndex % 2 === 0 && classes.stripedRow
-                    )}
-                    onClick={() => onRowClick?.(row)}
-                  >
-                    {(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).map((col) => {
-                      const originalIndex = schema.columns.indexOf(col);
-                      return (
-                        <td
-                          key={col.key}
-                          style={{
-                            textAlign: col.align || 'left',
-                          }}
-                        >
-                          {getCellView(row[originalIndex], col)}
+                records.map((row, rowIndex) => {
+                  const rowId = selection?.getRowId(row, rowIndex);
+                  const isSelected = rowId !== undefined && selection?.selectedIds.has(rowId);
+                  return (
+                    <tr
+                      key={rowIndex}
+                      className={clsx(
+                        schema.hover && 'hover:opacity-90',
+                        schema.striped && rowIndex % 2 === 0 && classes.stripedRow
+                      )}
+                      style={isSelected ? { backgroundColor: `${colors.primary500}0c` } : undefined}
+                      onClick={() => onRowClick?.(row)}
+                    >
+                      {selection && (
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <Checkbox size="small" checked={!!isSelected} onChange={() => selection.onToggle(rowId!)} />
                         </td>
-                      );
-                    })}
-                  </tr>
-                ))
+                      )}
+                      {(isMobile && mobileView !== 'cards' ? mobileColumns : schema.columns).map((col) => {
+                        const originalIndex = schema.columns.indexOf(col);
+                        return (
+                          <td
+                            key={col.key}
+                            style={{
+                              textAlign: col.align || 'left',
+                            }}
+                          >
+                            {getCellView(row[originalIndex], col)}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

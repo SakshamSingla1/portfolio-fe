@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useColors } from "../../../utils/types";
 import Button from "../../atoms/Button/Button";
-import { FiPlus, FiSearch, FiFilter, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import { FiPlus, FiSearch, FiFilter, FiChevronUp, FiChevronDown, FiDownload, FiX } from "react-icons/fi";
 import TextField from "../../atoms/TextField/TextField";
 import { InputAdornment } from "@mui/material";
 import { useIsMobile } from "../../../hooks/useIsMobile";
@@ -14,6 +14,13 @@ export interface ListingStat {
   label: string;
   value: number;
   icon?: React.ReactNode;
+}
+
+export interface BulkAction {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+  variant?: "default" | "danger";
 }
 
 interface ListingShellProps {
@@ -31,6 +38,11 @@ interface ListingShellProps {
   onSearchChange?: (val: string) => void;
   filterContent?: React.ReactNode;
   stats?: ListingStat[];
+  onExport?: () => void;
+  exportLabel?: string;
+  selectedCount?: number;
+  onClearSelection?: () => void;
+  bulkActions?: BulkAction[];
 }
 
 const StatChip: React.FC<{
@@ -72,6 +84,11 @@ const ListingShell: React.FC<ListingShellProps> = ({
   onSearchChange,
   filterContent,
   stats,
+  onExport,
+  exportLabel = "Export",
+  selectedCount = 0,
+  onClearSelection,
+  bulkActions,
 }) => {
   const colors = useColors();
   const isMobile = useIsMobile();
@@ -138,6 +155,44 @@ const ListingShell: React.FC<ListingShellProps> = ({
       >
         <div style={{ height: 3, background: `linear-gradient(90deg, ${accent} 0%, ${accent}28 100%)` }} />
 
+        {selectedCount > 0 ? (
+          <div
+            className={`flex items-center justify-between gap-3 flex-wrap ${isMobile ? "px-3 py-3" : "px-5 py-3.5"}`}
+            style={{ background: `${accent}0a` }}
+          >
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={onClearSelection}
+                title="Clear selection"
+                className="flex items-center justify-center rounded-full shrink-0"
+                style={{ width: 26, height: 26, background: `${accent}18`, color: accent, border: "none", cursor: "pointer" }}
+              >
+                <FiX size={14} />
+              </button>
+              <span className="text-sm font-bold tabular-nums" style={{ color: colors.neutral800 }}>
+                {selectedCount} selected
+              </span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {bulkActions?.map((action, idx) => (
+                <button
+                  key={idx}
+                  onClick={action.onClick}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                  style={{
+                    background: action.variant === "danger" ? `${colors.error500}12` : colors.neutral100,
+                    color: action.variant === "danger" ? colors.error600 ?? colors.error500 : colors.neutral700,
+                    border: `1.5px solid ${action.variant === "danger" ? `${colors.error500}30` : colors.neutral300}`,
+                    cursor: "pointer",
+                  }}
+                >
+                  {action.icon}
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
         <div className={`flex items-center justify-between gap-4 ${isMobile ? "px-3 py-3.5" : "px-5 py-4"}`}>
           <div className="flex items-center gap-4 min-w-0 flex-1">
             {icon && (
@@ -188,8 +243,22 @@ const ListingShell: React.FC<ListingShellProps> = ({
             </div>
           </div>
 
-          {isAddButtonVisible && canAdd && (
-            <div className="shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            {onExport && (
+              <Button
+                label={isMobile ? undefined : exportLabel}
+                variant="tertiaryContained"
+                startIcon={<FiDownload />}
+                onClick={onExport}
+                size={isMobile ? "small" : "medium"}
+                style={
+                  isMobile
+                    ? { minWidth: 36, width: 36, height: 36, borderRadius: "50%", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }
+                    : {}
+                }
+              />
+            )}
+            {isAddButtonVisible && canAdd && (
               <Button
                 label={isMobile ? <FiPlus size={18} /> : addButtonLabel}
                 variant="primaryContained"
@@ -211,9 +280,10 @@ const ListingShell: React.FC<ListingShellProps> = ({
                     : {}
                 }
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
+        )}
 
         {stats && stats.length > 0 && (
           <div
