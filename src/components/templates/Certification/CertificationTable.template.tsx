@@ -23,6 +23,7 @@ interface ICertificationsTableTemplateProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    filterContent?: React.ReactNode;
     isLoading?: boolean;
     onDelete?: (id: number) => void | Promise<void>;
     onBulkDelete?: (ids: number[]) => void | Promise<void>;
@@ -35,6 +36,7 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
+    filterContent,
     isLoading,
     onDelete,
     onBulkDelete,
@@ -172,6 +174,7 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
             addButtonOnClick={() => navigate(ADMIN_ROUTES.CERTIFICATIONS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            filterContent={filterContent}
             onExport={() => exportToCsv("certifications", certifications.map((c) => ({
                 id: c.id, title: c.title, issuer: c.issuer, issueDate: c.issueDate,
                 expiryDate: c.expiryDate, status: c.status, createdAt: c.createdAt,

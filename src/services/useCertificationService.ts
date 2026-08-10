@@ -40,6 +40,7 @@ export interface CertificationRequest {
 
 export interface CertificationFilterParams {
     search?: string;
+    status?: string;
     page?: string;
     size?: string;
     sortDir?: string;

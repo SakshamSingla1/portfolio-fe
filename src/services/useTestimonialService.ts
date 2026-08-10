@@ -40,6 +40,7 @@ export interface TestimonialRequest {
 
 export interface TestimonialFilterParams {
     search?: string;
+    status?: string;
     page?: string;
     size?: string;
     sortDir?: string;

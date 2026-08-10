@@ -37,6 +37,7 @@ export interface AchievementRequest {
 
 export interface AchievementFilterParams {
     search?: string;
+    status?: string;
     page?: string;
     size?: string;
     sortDir?: string;

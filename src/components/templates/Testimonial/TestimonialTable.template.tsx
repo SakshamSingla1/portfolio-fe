@@ -23,6 +23,7 @@ interface ITestimonialTableTemplateProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    filterContent?: React.ReactNode;
     isLoading?: boolean;
     onDelete?: (id: number) => void | Promise<void>;
     onBulkDelete?: (ids: number[]) => void | Promise<void>;
@@ -35,6 +36,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
+    filterContent,
     isLoading,
     onDelete,
     onBulkDelete,
@@ -165,6 +167,7 @@ const TestimonialTableTemplate: React.FC<ITestimonialTableTemplateProps> = ({
             addButtonOnClick={() => navigate(ADMIN_ROUTES.TESTIMONIALS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            filterContent={filterContent}
             onExport={() => exportToCsv("testimonials", testimonials.map((t) => ({
                 id: t.id, name: t.name, role: t.role, company: t.company,
                 status: t.status, order: t.order, createdAt: t.createdAt,

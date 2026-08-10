@@ -19,6 +19,7 @@ interface IAchievementsTableTemplateProps {
     handleRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     searchValue?: string;
     onSearchChange?: (val: string) => void;
+    filterContent?: React.ReactNode;
     isLoading?: boolean;
 }
 
@@ -29,6 +30,7 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
+    filterContent,
     isLoading
 }) => {
     const navigate = useNavigate();
@@ -107,6 +109,7 @@ const AchievementsTableTemplate: React.FC<IAchievementsTableTemplateProps> = ({
             addButtonOnClick={() => navigate(ADMIN_ROUTES.ACHIEVEMENTS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            filterContent={filterContent}
         >
             <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>

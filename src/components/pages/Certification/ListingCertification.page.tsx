@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
-import { type IPagination, HTTP_STATUS } from '../../../utils/types';
+import { type IPagination, HTTP_STATUS, StatusOptions } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import CertificationListTableTemplate from '../../templates/Certification/CertificationTable.template';
 import { useSearchParams } from 'react-router-dom';
 import { useCertificationService } from '../../../services/useCertificationService';
 import { useSnackbar } from '../../../hooks/useSnackBar';
+import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
+import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const CertificationListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const certificationService = useCertificationService();
     const { showSnackbar } = useSnackbar();
+    const isMobile = useIsMobile();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
+        status: searchParams.get("status") || "",
     };
 
     const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
@@ -24,13 +28,14 @@ const CertificationListPage: React.FC = () => {
     });
 
     const { data: pageResponse, isLoading, refetch } = useQuery({
-        queryKey: ['certifications', pagination.currentPage, pagination.pageSize, filters.search],
+        queryKey: ['certifications', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => certificationService.getAll({
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
             search: filters.search,
+            status: filters.status,
         }),
         refetchOnMount: 'always',
     });
@@ -71,9 +76,10 @@ const CertificationListPage: React.FC = () => {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            status: filters.status ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, filters.status, pagination]);
 
     const handleDelete = async (id: number) => {
         try {
@@ -114,6 +120,18 @@ const CertificationListPage: React.FC = () => {
             isLoading={isLoading}
             onDelete={handleDelete}
             onBulkDelete={handleBulkDelete}
+            filterContent={
+                <div className="w-full sm:w-72">
+                    <AutoCompleteInput
+                        label={isMobile ? "Status" : ""}
+                        placeHolder="Select Status"
+                        options={StatusOptions}
+                        value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                        onChange={(option: any) => handleFiltersChange("status", option?.value ?? "")}
+                        onSearch={() => { }}
+                    />
+                </div>
+            }
         />
     )
 }

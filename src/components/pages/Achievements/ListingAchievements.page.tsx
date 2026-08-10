@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
-import { type IPagination } from '../../../utils/types';
+import { type IPagination, StatusOptions } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import AchievementListTableTemplate from '../../templates/Achievements/AchievementTable.template';
 import { useSearchParams } from 'react-router-dom';
 import { useAchievementService } from '../../../services/useAchievementService';
+import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
+import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const AchievementListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const achievementService = useAchievementService();
+    const isMobile = useIsMobile();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
+        status: searchParams.get("status") || "",
     };
 
     const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
@@ -22,13 +26,14 @@ const AchievementListPage: React.FC = () => {
     });
 
     const { data: pageResponse, isLoading } = useQuery({
-        queryKey: ['achievements', pagination.currentPage, pagination.pageSize, filters.search],
+        queryKey: ['achievements', pagination.currentPage, pagination.pageSize, filters.search, filters.status],
         queryFn: () => achievementService.getAll({
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
             search: filters.search,
+            status: filters.status,
         }),
         refetchOnMount: 'always',
     });
@@ -69,9 +74,10 @@ const AchievementListPage: React.FC = () => {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            status: filters.status ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, filters.status, pagination]);
 
     return (
         <AchievementListTableTemplate
@@ -82,6 +88,18 @@ const AchievementListPage: React.FC = () => {
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             isLoading={isLoading}
+            filterContent={
+                <div className="w-full sm:w-72">
+                    <AutoCompleteInput
+                        label={isMobile ? "Status" : ""}
+                        placeHolder="Select Status"
+                        options={StatusOptions}
+                        value={filters.status ? StatusOptions.find(option => option.value === filters.status) : null}
+                        onChange={(option: any) => handleFiltersChange("status", option?.value ?? "")}
+                        onSearch={() => { }}
+                    />
+                </div>
+            }
         />
     );
 };
