@@ -175,20 +175,15 @@ const ListingShell: React.FC<ListingShellProps> = ({
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               {bulkActions?.map((action, idx) => (
-                <button
+                <Button
                   key={idx}
+                  label={action.label}
+                  startIcon={action.icon}
                   onClick={action.onClick}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-                  style={{
-                    background: action.variant === "danger" ? `${colors.error500}12` : colors.neutral100,
-                    color: action.variant === "danger" ? colors.error600 ?? colors.error500 : colors.neutral700,
-                    border: `1.5px solid ${action.variant === "danger" ? `${colors.error500}30` : colors.neutral300}`,
-                    cursor: "pointer",
-                  }}
-                >
-                  {action.icon}
-                  {action.label}
-                </button>
+                  variant={action.variant === "danger" ? "dangerContained" : "tertiaryContained"}
+                  size="extraSmall"
+                  rounded={false}
+                />
               ))}
             </div>
           </div>

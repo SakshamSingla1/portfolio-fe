@@ -87,10 +87,9 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               <Button label={cancelLabel} variant="tertiaryContained" onClick={onClose} disabled={loading} />
               <Button
                 label={loading ? "Please wait…" : confirmLabel}
-                variant={danger ? "primaryContained" : "primaryContained"}
+                variant={danger ? "dangerContained" : "primaryContained"}
                 onClick={onConfirm}
                 disabled={loading}
-                style={danger ? { backgroundColor: colors.error600 } : undefined}
               />
             </div>
           </motion.div>

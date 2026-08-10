@@ -8,8 +8,10 @@ type CustomVariant =
   | "primaryContained"
   | "secondaryContained"
   | "tertiaryContained"
+  | "dangerContained"
   | "primaryText"
   | "secondaryText"
+  | "dangerText"
   | "underlined"
   | "tertiaryText";
 
@@ -79,11 +81,23 @@ const StyledButton = styled(MuiButton, {
       backgroundColor: colors.neutral0,
       color: colors.neutral700,
       border: `1.5px solid ${colors.neutral300}`,
-      "&:hover": { 
+      "&:hover": {
         backgroundColor: colors.neutral50,
         borderColor: colors.neutral300,
         color: colors.neutral900,
         boxShadow: `0 2px 8px -2px ${colors.neutral900}10`,
+      },
+    },
+
+    dangerContained: {
+      backgroundColor: colors.error600 ?? colors.error500,
+      color: colors.neutral0,
+      border: `1px solid transparent`,
+      boxShadow: `0 4px 12px -2px ${colors.error500}40`,
+      "&:hover": {
+        backgroundColor: colors.error700 ?? colors.error600 ?? colors.error500,
+        boxShadow: `0 6px 16px -2px ${colors.error500}60`,
+        transform: "translateY(-1px)",
       },
     },
 
@@ -95,6 +109,11 @@ const StyledButton = styled(MuiButton, {
     secondaryText: {
       color: colors.neutral700,
       "&:hover": { color: colors.primary300 },
+    },
+
+    dangerText: {
+      color: colors.error600 ?? colors.error500,
+      "&:hover": { backgroundColor: `${colors.error500}10` },
     },
 
     tertiaryText: {
@@ -110,6 +129,17 @@ const StyledButton = styled(MuiButton, {
 
   "&.Mui-disabled": {
     opacity: 0.6,
+    cursor: "not-allowed",
+  },
+
+  // Keyboard-only focus ring — mirrors Checkbox's `&.Mui-focusVisible`
+  // convention. MUI's own focus styling doesn't reliably show through a
+  // custom-colored contained button, so without this a keyboard user
+  // tabbing through a form gets no visible indication of which button
+  // is focused.
+  "&.Mui-focusVisible": {
+    outline: "none",
+    boxShadow: `0 0 0 3px ${colors.primary100}`,
   },
 }));
 
