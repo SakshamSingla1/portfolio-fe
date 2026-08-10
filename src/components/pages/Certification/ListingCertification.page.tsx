@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
-import { type IPagination } from '../../../utils/types';
+import { type IPagination, HTTP_STATUS } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import CertificationListTableTemplate from '../../templates/Certification/CertificationTable.template';
 import { useSearchParams } from 'react-router-dom';
 import { useCertificationService } from '../../../services/useCertificationService';
+import { useSnackbar } from '../../../hooks/useSnackBar';
 
 const CertificationListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const certificationService = useCertificationService();
+    const { showSnackbar } = useSnackbar();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
@@ -21,7 +23,7 @@ const CertificationListPage: React.FC = () => {
         pageSize: Number(searchParams.get("size")) || 10,
     });
 
-    const { data: pageResponse, isLoading } = useQuery({
+    const { data: pageResponse, isLoading, refetch } = useQuery({
         queryKey: ['certifications', pagination.currentPage, pagination.pageSize, filters.search],
         queryFn: () => certificationService.getAll({
             page: pagination.currentPage.toString(),
@@ -73,6 +75,34 @@ const CertificationListPage: React.FC = () => {
         setSearchParams(params);
     }, [filters.search, pagination]);
 
+    const handleDelete = async (id: number) => {
+        try {
+            const res = await certificationService.remove(id);
+            if (res?.status === HTTP_STATUS.OK) {
+                showSnackbar('success', 'Certification deleted successfully');
+                refetch();
+            } else {
+                showSnackbar('error', res?.data?.message ?? 'Failed to delete certification');
+            }
+        } catch {
+            showSnackbar('error', 'Failed to delete certification');
+        }
+    };
+
+    const handleBulkDelete = async (ids: number[]) => {
+        try {
+            const res = await certificationService.bulkRemove(ids);
+            if (res?.status === HTTP_STATUS.OK) {
+                showSnackbar('success', res?.data?.message ?? 'Certifications deleted successfully');
+                refetch();
+            } else {
+                showSnackbar('error', res?.data?.message ?? 'Failed to delete certifications');
+            }
+        } catch {
+            showSnackbar('error', 'Failed to delete certifications');
+        }
+    };
+
     return (
         <CertificationListTableTemplate
             certifications={certifications}
@@ -82,6 +112,8 @@ const CertificationListPage: React.FC = () => {
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             isLoading={isLoading}
+            onDelete={handleDelete}
+            onBulkDelete={handleBulkDelete}
         />
     )
 }

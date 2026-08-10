@@ -8,6 +8,7 @@ export const TESTIMONIAL_URLS = {
     GET_ALL: "/testimonials",
     GET_BY_ID: "/testimonials/:id",
     UPLOAD_IMAGE: "/testimonials/:id/upload",
+    BULK_DELETE: "/testimonials/bulk",
 };
 
 export interface Testimonial {
@@ -62,6 +63,9 @@ export const useTestimonialService = () => {
         return request(API_METHOD.DELETE, url, user, null);
     };
 
+    const bulkRemove = (ids: number[]) =>
+        request(API_METHOD.DELETE, TESTIMONIAL_URLS.BULK_DELETE, user, { ids });
+
     const getById = (id: number | null) => {
         const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
         return request(API_METHOD.GET, url, user, null);
@@ -79,6 +83,7 @@ export const useTestimonialService = () => {
         create,
         update,
         remove,
+        bulkRemove,
         getById,
         getAll,
         uploadImage

@@ -1,16 +1,20 @@
-import React, { useMemo, useCallback } from "react";
-import { type ColumnType } from "../../organisms/Table/TableV1";
+import React, { useMemo, useCallback, useState } from "react";
+import { type ColumnType, type TableSelection } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { makeRoute } from "../../../utils/helper";
+import { exportToCsv } from "../../../utils/csvExport";
 import TableV1 from "../../organisms/Table/TableV1";
-import ListingShell from "../Shared/ListingShell.template";
+import ListingShell, { type BulkAction } from "../Shared/ListingShell.template";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
+import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import type { Certification } from "../../../services/useCertificationService";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { usePermissionHelper } from "../../../hooks/usePermissionHelper";
 import { FaCertificate } from "react-icons/fa";
+import { FiTrash2 } from "react-icons/fi";
 
 interface ICertificationsTableTemplateProps {
     certifications: Certification[];
@@ -20,6 +24,8 @@ interface ICertificationsTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     isLoading?: boolean;
+    onDelete?: (id: number) => void | Promise<void>;
+    onBulkDelete?: (ids: number[]) => void | Promise<void>;
 }
 
 const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> = ({
@@ -29,11 +35,19 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    isLoading
+    isLoading,
+    onDelete,
+    onBulkDelete,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const isMobile = useIsMobile();
+    const { canDelete } = usePermissionHelper();
+
+    const [deleteTarget, setDeleteTarget] = useState<Certification | null>(null);
+    const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+    const [actionBusy, setActionBusy] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const handleEdit = useCallback((id: number) => {
         const query = {
@@ -74,9 +88,54 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
             duration,
             DateUtils.dateTimeSecondToDate(certification.createdAt ?? ""),
             DateUtils.dateTimeSecondToDate(certification.updatedAt ?? ""),
-            <ActionButtons key={certification.id} onEdit={() => handleEdit(certification.id ?? 0)} onView={() => handleView(certification.id ?? 0)} />
+            <ActionButtons
+                key={certification.id}
+                onEdit={() => handleEdit(certification.id ?? 0)}
+                onView={() => handleView(certification.id ?? 0)}
+                onDelete={onDelete && certification.id ? () => setDeleteTarget(certification) : undefined}
+            />
         ];
-    }) ?? [], [certifications, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
+    }) ?? [], [certifications, pagination.currentPage, pagination.pageSize, handleEdit, handleView, onDelete]);
+
+    const selection: TableSelection | undefined = useMemo(() => onBulkDelete ? {
+        selectedIds,
+        getRowId: (_row, index) => certifications[index]?.id ?? index,
+        onToggle: (id) => setSelectedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(Number(id))) next.delete(Number(id)); else next.add(Number(id));
+            return next;
+        }),
+        onToggleAll: (ids) => setSelectedIds((prev) =>
+            ids.every((id) => prev.has(Number(id))) ? new Set() : new Set(ids.map(Number))
+        ),
+    } : undefined, [onBulkDelete, selectedIds, certifications]);
+
+    const bulkActions: BulkAction[] = useMemo(() => (canDelete && onBulkDelete) ? [
+        { label: "Delete", icon: <FiTrash2 size={13} />, variant: "danger", onClick: () => setBulkDeleteConfirm(true) },
+    ] : [], [canDelete, onBulkDelete]);
+
+    const runDelete = async () => {
+        if (!deleteTarget?.id || !onDelete) return;
+        setActionBusy(true);
+        try {
+            await onDelete(deleteTarget.id);
+        } finally {
+            setActionBusy(false);
+            setDeleteTarget(null);
+        }
+    };
+
+    const runBulkDelete = async () => {
+        if (!onBulkDelete) return;
+        setActionBusy(true);
+        try {
+            await onBulkDelete(Array.from(selectedIds));
+            setSelectedIds(new Set());
+        } finally {
+            setActionBusy(false);
+            setBulkDeleteConfirm(false);
+        }
+    };
 
     const schema = useMemo(() => ({
         id: 1,
@@ -113,8 +172,37 @@ const CertificationsTableTemplate: React.FC<ICertificationsTableTemplateProps> =
             addButtonOnClick={() => navigate(ADMIN_ROUTES.CERTIFICATIONS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            onExport={() => exportToCsv("certifications", certifications.map((c) => ({
+                id: c.id, title: c.title, issuer: c.issuer, issueDate: c.issueDate,
+                expiryDate: c.expiryDate, status: c.status, createdAt: c.createdAt,
+            })))}
+            selectedCount={selectedIds.size}
+            onClearSelection={() => setSelectedIds(new Set())}
+            bulkActions={bulkActions}
         >
-            <TableV1 schema={schema} records={records} isLoading={isLoading} />
+            <TableV1 schema={schema} records={records} isLoading={isLoading} selection={selection} />
+
+            <ConfirmDialog
+                open={!!deleteTarget}
+                title="Delete this certification?"
+                message={<>This permanently removes <strong>{deleteTarget?.title}</strong>. This cannot be undone.</>}
+                confirmLabel="Delete"
+                danger
+                loading={actionBusy}
+                onConfirm={runDelete}
+                onClose={() => setDeleteTarget(null)}
+            />
+
+            <ConfirmDialog
+                open={bulkDeleteConfirm}
+                title="Delete selected certifications?"
+                message={<>This permanently removes <strong>{selectedIds.size}</strong> certification(s). This cannot be undone.</>}
+                confirmLabel="Delete"
+                danger
+                loading={actionBusy}
+                onConfirm={runBulkDelete}
+                onClose={() => setBulkDeleteConfirm(false)}
+            />
         </ListingShell>
     )
 }

@@ -8,6 +8,7 @@ export const CERTIFICATION_URLS = {
     GET_ALL: "/certifications",
     GET_BY_ID: "/certifications/:id",
     UPLOAD_CREDENTIAL: "/certifications/:id/upload",
+    BULK_DELETE: "/certifications/bulk",
 };
 
 export interface Certification {
@@ -62,6 +63,9 @@ export const useCertificationService = () => {
         return request(API_METHOD.DELETE, url, user, null);
     };
 
+    const bulkRemove = (ids: number[]) =>
+        request(API_METHOD.DELETE, CERTIFICATION_URLS.BULK_DELETE, user, { ids });
+
     const getById = (id: number | null) => {
         const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
         return request(API_METHOD.GET, url, user, null);
@@ -79,6 +83,7 @@ export const useCertificationService = () => {
         create,
         update,
         remove,
+        bulkRemove,
         getById,
         getAll,
         uploadCredential
