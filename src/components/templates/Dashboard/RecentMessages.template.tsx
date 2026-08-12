@@ -1,8 +1,13 @@
-import React from "react";
-import type { ContactUs } from "../../../services/useContactUsService";
-import { useColors } from "../../../utils/types";
+import React, { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useContactUsService, type ContactUs } from "../../../services/useContactUsService";
+import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { motion } from "framer-motion";
+import { FiArrowRight } from "react-icons/fi";
+import { useSnackbar } from "../../../hooks/useSnackBar";
+import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
 
 interface RecentMessagesProps {
   messages: ContactUs[];
@@ -72,6 +77,43 @@ const getStatusMeta = (status: string) =>
 const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => {
   const colors = useColors();
   const { isDark } = useTheme();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const contactUsService = useContactUsService();
+  const { showSnackbar } = useSnackbar();
+
+  const [selectedMessage, setSelectedMessage] = useState<ContactUs | null>(null);
+
+  const updateMessageLocally = useCallback((id: number | null | undefined, patch: Partial<ContactUs>) => {
+    queryClient.setQueryData(["dashboard"], (old: any) => {
+      if (!old?.recentMessages) return old;
+      return {
+        ...old,
+        recentMessages: old.recentMessages.map((m: ContactUs) =>
+          m.id === id ? { ...m, ...patch } : m
+        ),
+      };
+    });
+  }, [queryClient]);
+
+  const handleClose = useCallback(async () => {
+    const wasUnread = selectedMessage?.status?.toUpperCase() === "UNREAD";
+    const id = selectedMessage?.id ?? null;
+    setSelectedMessage(null);
+    if (!wasUnread || !id) return;
+    try {
+      const response = await contactUsService.markAsRead(id);
+      if (response?.status === HTTP_STATUS.OK) {
+        updateMessageLocally(id, { status: "READ" });
+      }
+    } catch {
+      showSnackbar("error", "Failed to mark as read");
+    }
+  }, [selectedMessage, contactUsService, updateMessageLocally, showSnackbar]);
+
+  const handleReplied = useCallback((updated: ContactUs) => {
+    updateMessageLocally(updated.id, { status: updated.status, replyMessage: updated.replyMessage, repliedAt: updated.repliedAt });
+  }, [updateMessageLocally]);
 
   if (messages.length === 0) {
     return (
@@ -117,7 +159,12 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            className="flex items-start gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden"
+            whileHover={{ y: -1 }}
+            onClick={() => setSelectedMessage(msg)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter") setSelectedMessage(msg); }}
+            className="flex items-start gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden cursor-pointer transition-shadow duration-150 hover:shadow-sm"
             style={{
               background: bgColor,
               border: `1px solid ${borderColor}`,
@@ -186,6 +233,23 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
           </motion.div>
         );
       })}
+
+      <button
+        onClick={() => navigate("/messages")}
+        className="w-full flex items-center justify-center gap-1.5 mt-1 py-2 text-[11px] font-semibold rounded-lg transition-colors duration-150"
+        style={{ color: colors.primary600, background: "transparent", border: "none", cursor: "pointer" }}
+      >
+        View all messages
+        <FiArrowRight size={11} />
+      </button>
+
+      {selectedMessage && (
+        <MessageDetailModal
+          message={selectedMessage}
+          onClose={handleClose}
+          onReplied={handleReplied}
+        />
+      )}
     </div>
   );
 };

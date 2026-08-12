@@ -6,11 +6,30 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { FiCode, FiZap, FiBriefcase, FiMail } from "react-icons/fi";
+import { FiCode, FiZap, FiBriefcase, FiMail, FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 
 interface StatsProps {
   stats: IStats;
 }
+
+/** "+3 this wk" / "-1 this wk" pill — omitted entirely when delta is 0/undefined,
+ * since a flat week isn't worth a chip and would just add visual noise to every cell. */
+const DeltaChip: React.FC<{ delta?: number }> = ({ delta }) => {
+  if (!delta) return null;
+  const up = delta > 0;
+  return (
+    <span
+      className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+      style={{
+        background: up ? "#dcfce7" : "#fee2e2",
+        color: up ? "#15803d" : "#b91c1c",
+      }}
+    >
+      {up ? <FiArrowUpRight size={8} /> : <FiArrowDownRight size={8} />}
+      {Math.abs(delta)} this wk
+    </span>
+  );
+};
 
 const HERO_STATS = [
   { label: "Projects",   key: "totalProjects",   accent: "#8b5cf6", icon: FiCode,      route: "/projects" },
@@ -36,11 +55,12 @@ interface HeroStatCellProps {
   route: string;
   index: number;
   unreadCount?: number;
+  delta?: number;
   isMobile: boolean;
 }
 
 const HeroStatCell: React.FC<HeroStatCellProps> = ({
-  label, value, accent, icon: Icon, route, index, unreadCount, isMobile,
+  label, value, accent, icon: Icon, route, index, unreadCount, delta, isMobile,
 }) => {
   const colors = useColors();
   const animatedValue = useCountUp(value, index * 80 + 100);
@@ -103,6 +123,12 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
           </span>
         )}
       </div>
+
+      {Boolean(delta) && (
+        <div className="relative mb-1.5">
+          <DeltaChip delta={delta} />
+        </div>
+      )}
 
       <span
         className="relative font-bold uppercase"
@@ -190,6 +216,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
           const { key: statKey, ...statProps } = s;
           const value = (stats as any)?.[statKey] ?? 0;
           const unreadCount = statKey === "totalMessages" ? (stats.unreadMessages ?? 0) : undefined;
+          const delta = stats.weeklyDelta?.[statKey];
           const isRightEdge = isMobile ? i % 2 === 1 : i === HERO_STATS.length - 1;
           const isBottomRow = isMobile && i >= 2;
           return (
@@ -205,6 +232,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
                 value={value}
                 index={i}
                 unreadCount={unreadCount}
+                delta={delta}
                 isMobile={isMobile}
               />
             </div>

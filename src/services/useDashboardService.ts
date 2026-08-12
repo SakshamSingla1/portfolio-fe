@@ -12,6 +12,7 @@ export interface IProfileSummary {
     title: string;
     location: string;
     profileImageUrl: string;
+    portfolioUrl?: string | null;
 }
 
 export interface IDailyView {
@@ -61,6 +62,8 @@ export interface IStats {
     totalMessages: number;
     unreadMessages: number;
     totalSocialLinks: number;
+    /** Keyed by totalProjects/totalSkills/totalExperience/totalMessages: count created this week minus count created the week before. */
+    weeklyDelta?: Record<string, number>;
 }
 
 export interface IProfileCompletion {

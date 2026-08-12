@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { type IDashboardSummary, type IViewStats, type IStats } from "../../../services/useDashboardService";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -6,7 +6,8 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { AuthenticatedUserContext } from "../../../contexts/AuthenticatedUserContext";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiExternalLink, FiLink, FiCheck, FiPlus } from "react-icons/fi";
+import { useSnackbar } from "../../../hooks/useSnackBar";
 
 import StatsTemplate from "./Stats.template";
 import ViewAnalyticsTemplate from "./ViewAnalytics.template";
@@ -97,6 +98,84 @@ const FocusChip: React.FC<FocusChipProps> = ({ label, color, onClick }) => (
     {onClick && <FiArrowRight size={9} color={color} />}
   </button>
 );
+
+const LiveSiteControl: React.FC<{ portfolioUrl?: string | null; isMobile: boolean }> = ({
+  portfolioUrl,
+  isMobile,
+}) => {
+  const colors = useColors();
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
+  const [copied, setCopied] = useState(false);
+
+  if (!portfolioUrl) {
+    return (
+      <button
+        onClick={() => navigate("/social-links")}
+        className="flex items-center gap-1.5 rounded-full transition-opacity duration-150 hover:opacity-80 shrink-0"
+        style={{
+          padding: "6px 12px 6px 10px",
+          background: `${colors.primary600}0e`,
+          border: `1px dashed ${colors.primary600}40`,
+          cursor: "pointer",
+        }}
+      >
+        <FiPlus size={11} color={colors.primary600} />
+        <span className="text-[11px] font-semibold" style={{ color: colors.primary600 }}>
+          {isMobile ? "Add site link" : "Add your portfolio link"}
+        </span>
+      </button>
+    );
+  }
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(portfolioUrl);
+      setCopied(true);
+      showSnackbar("success", "Link copied to clipboard");
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      showSnackbar("error", "Failed to copy link");
+    }
+  };
+
+  const displayHost = portfolioUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+  return (
+    <div className="flex items-center gap-1.5 shrink-0">
+      <a
+        href={portfolioUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 rounded-full transition-opacity duration-150 hover:opacity-80"
+        style={{
+          padding: "6px 12px 6px 10px",
+          background: `${colors.primary600}14`,
+          border: `1px solid ${colors.primary600}28`,
+        }}
+      >
+        <FiExternalLink size={11} color={colors.primary600} />
+        <span className="text-[11px] font-semibold truncate max-w-[140px]" style={{ color: colors.primary600 }}>
+          {isMobile ? "Live site" : displayHost}
+        </span>
+      </a>
+      <button
+        onClick={handleCopy}
+        aria-label="Copy portfolio link"
+        className="flex items-center justify-center rounded-full transition-opacity duration-150 hover:opacity-80"
+        style={{
+          width: 26,
+          height: 26,
+          background: colors.neutral100,
+          border: `1px solid ${colors.neutral300}`,
+          cursor: "pointer",
+        }}
+      >
+        {copied ? <FiCheck size={11} color={colors.success600} /> : <FiLink size={11} color={colors.neutral500} />}
+      </button>
+    </div>
+  );
+};
 
 const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
   viewStats,
@@ -263,6 +342,12 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                     <p className="text-xs" style={{ color: colors.neutral500 }}>{profileLoc}</p>
                   </>
                 )}
+              </div>
+              <div className="mt-2.5">
+                <LiveSiteControl
+                  portfolioUrl={dashboardData?.profileSummary?.portfolioUrl}
+                  isMobile={isMobile}
+                />
               </div>
             </div>
 
