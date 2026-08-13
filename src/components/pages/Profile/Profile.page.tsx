@@ -3,15 +3,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
-import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail, FiMapPin, FiSettings, FiCode, FiZap, FiBriefcase } from "react-icons/fi";
+import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail, FiMapPin, FiSettings, FiCode } from "react-icons/fi";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useProfileService, type ProfileRequest } from "../../../services/useProfileService";
-import { useDashboardService } from "../../../services/useDashboardService";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
 import ProfileFormTemplate, { SectionCard } from "../../templates/Profile/ProfileForm.template";
 import Button from "../../atoms/Button/Button";
-import LiveSiteControl from "../../molecules/LiveSiteControl/LiveSiteControl";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 
 const API_BASE = import.meta.env.VITE_API_V1_URL as string;
@@ -60,7 +58,6 @@ const ProfilePage: React.FC = () => {
   const isMobile = useIsMobile();
   const { showSnackbar } = useSnackbar();
   const profileService = useProfileService();
-  const dashboardService = useDashboardService();
   const queryClient = useQueryClient();
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -76,19 +73,6 @@ const ProfilePage: React.FC = () => {
       const response = await profileService.get();
       if (response.status === HTTP_STATUS.OK) {
         return response.data.data as ProfileRequest;
-      }
-      return null;
-    },
-  });
-
-  // Same queryKey the Dashboard uses — shares its cache instead of double-fetching
-  // when a user moves between the two pages.
-  const { data: dashboardData } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: async () => {
-      const response = await dashboardService.getByProfile();
-      if (response?.status === HTTP_STATUS.OK) {
-        return response.data.data;
       }
       return null;
     },
@@ -235,79 +219,43 @@ const ProfilePage: React.FC = () => {
           <>
             {!isEditMode && profileData && (
               <div
-                className="rounded-2xl mb-6 overflow-hidden"
-                style={{ border: `1px solid ${colors.neutral200}`, boxShadow: `0 1px 4px rgba(0,0,0,0.04)` }}
+                className="rounded-2xl p-6 mb-6 flex items-center gap-5 flex-wrap sm:flex-nowrap"
+                style={{ background: colors.neutral0, border: `1px solid ${colors.neutral200}`, boxShadow: `0 1px 4px rgba(0,0,0,0.04)` }}
               >
-                <div
-                  className="flex items-center gap-5 flex-wrap sm:flex-nowrap"
-                  style={{
-                    backgroundColor: colors.primary600,
-                    backgroundImage: `linear-gradient(135deg, ${colors.primary500}, ${colors.primary700})`,
-                    padding: isMobile ? "20px" : "28px 28px 24px",
-                  }}
-                >
-                  {profileData.profileImageUrl ? (
-                    <img
-                      src={profileData.profileImageUrl}
-                      alt={profileData.fullName}
-                      className="rounded-full object-cover shrink-0"
-                      style={{ width: 84, height: 84, border: "3px solid rgba(255,255,255,0.85)" }}
-                    />
-                  ) : (
-                    <div
-                      className="rounded-full flex items-center justify-center font-bold shrink-0"
-                      style={{ width: 84, height: 84, background: "rgba(255,255,255,0.18)", color: "#fff", fontSize: 28, border: "3px solid rgba(255,255,255,0.85)" }}
-                    >
-                      {(profileData.fullName || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="text-lg font-bold truncate" style={{ color: "#fff" }}>{profileData.fullName}</h2>
-                      {profileData.availableForWork && (
-                        <span
-                          className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"
-                          style={{ background: "rgba(255,255,255,0.2)", color: "#fff" }}
-                        >
-                          ● Open to Work
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.9)" }}>{profileData.title}</p>
-                    {profileData.location && (
-                      <div className="flex items-center gap-1.5 mt-1.5 text-xs" style={{ color: "rgba(255,255,255,0.85)" }}>
-                        <FiMapPin size={13} />
-                        <span>{profileData.location}</span>
-                      </div>
+                {profileData.profileImageUrl ? (
+                  <img
+                    src={profileData.profileImageUrl}
+                    alt={profileData.fullName}
+                    className="rounded-full object-cover shrink-0"
+                    style={{ width: 84, height: 84, border: `1px solid ${colors.neutral200}` }}
+                  />
+                ) : (
+                  <div
+                    className="rounded-full flex items-center justify-center font-bold shrink-0"
+                    style={{ width: 84, height: 84, background: colors.primary500, color: colors.neutral0, fontSize: 28 }}
+                  >
+                    {(profileData.fullName || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-lg font-bold truncate" style={{ color: colors.neutral900 }}>{profileData.fullName}</h2>
+                    {profileData.availableForWork && (
+                      <span
+                        className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"
+                        style={{ background: `${colors.success500}15`, color: colors.success700 }}
+                      >
+                        ● Open to Work
+                      </span>
                     )}
                   </div>
-                </div>
-
-                <div
-                  className="flex items-center justify-between gap-4 flex-wrap px-6 py-4"
-                  style={{ background: colors.neutral0 }}
-                >
-                  {dashboardData?.stats && (
-                    <div className="flex items-center gap-5">
-                      {[
-                        { icon: FiCode, value: dashboardData.stats.totalProjects, label: "Projects" },
-                        { icon: FiZap, value: dashboardData.stats.totalSkills, label: "Skills" },
-                        { icon: FiBriefcase, value: dashboardData.stats.totalExperience, label: "Experience" },
-                      ].map(({ icon: Icon, value, label }, i) => (
-                        <div key={label} className="flex items-center gap-4">
-                          {i > 0 && <div style={{ width: 1, height: 24, background: colors.neutral200 }} />}
-                          <div className="flex items-center gap-2">
-                            <Icon size={14} style={{ color: colors.primary500 }} />
-                            <div>
-                              <div className="text-sm font-bold leading-none" style={{ color: colors.neutral900 }}>{value}</div>
-                              <div className="text-[10px] mt-0.5" style={{ color: colors.neutral400 }}>{label}</div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                  <p className="text-sm mt-0.5" style={{ color: colors.neutral600 }}>{profileData.title}</p>
+                  {profileData.location && (
+                    <div className="flex items-center gap-1.5 mt-1.5 text-xs" style={{ color: colors.neutral500 }}>
+                      <FiMapPin size={13} />
+                      <span>{profileData.location}</span>
                     </div>
                   )}
-                  <LiveSiteControl portfolioUrl={dashboardData?.profileSummary?.portfolioUrl} isMobile={isMobile} />
                 </div>
               </div>
             )}
