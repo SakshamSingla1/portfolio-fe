@@ -178,6 +178,37 @@ const LiveSiteControl: React.FC<{ portfolioUrl?: string | null; isMobile: boolea
   );
 };
 
+/** Small circular gauge for the engagement-rate cards — fills the wide empty
+ * space next to a lone percentage with a visual read of that same percentage,
+ * capped at 100% of the ring regardless of the underlying value. */
+const MiniRing: React.FC<{ pct: number; color: string }> = ({ pct, color }) => {
+  const size = 44;
+  const strokeW = 4;
+  const r = (size - strokeW) / 2;
+  const c = size / 2;
+  const circumference = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(pct, 100));
+
+  return (
+    <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+      <circle cx={c} cy={c} r={r} fill="none" stroke={`${color}20`} strokeWidth={strokeW} />
+      <motion.circle
+        cx={c}
+        cy={c}
+        r={r}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeW}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        initial={{ strokeDashoffset: circumference }}
+        animate={{ strokeDashoffset: circumference - (clamped / 100) * circumference }}
+        transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+      />
+    </svg>
+  );
+};
+
 const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
   viewStats,
   stats,
@@ -188,25 +219,25 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
   const { totalViews, resumeDownloads, uniqueVisitors } = viewStats;
   const { totalMessages } = stats;
 
-  const fmt = (n: number) =>
-    totalViews > 0 ? ((n / totalViews) * 100).toFixed(1) + "%" : "—";
+  const rawPct = (n: number) => (totalViews > 0 ? (n / totalViews) * 100 : null);
+  const fmt = (pct: number | null) => (pct !== null ? pct.toFixed(1) + "%" : "—");
 
   const items = [
     {
       label: "Contact Rate",
-      value: fmt(totalMessages),
+      pct: rawPct(totalMessages),
       detail: `${totalMessages} message${totalMessages !== 1 ? "s" : ""} · ${totalViews.toLocaleString()} views`,
       color: "#f43f5e",
     },
     {
       label: "CV Download Rate",
-      value: fmt(resumeDownloads),
+      pct: rawPct(resumeDownloads),
       detail: `${resumeDownloads} download${resumeDownloads !== 1 ? "s" : ""} · ${totalViews.toLocaleString()} views`,
       color: "#8b5cf6",
     },
     {
       label: "Unique Rate",
-      value: fmt(uniqueVisitors),
+      pct: rawPct(uniqueVisitors),
       detail: `${uniqueVisitors.toLocaleString()} unique · ${totalViews.toLocaleString()} total`,
       color: "#10b981",
     },
@@ -214,33 +245,36 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      {items.map(({ label, value, detail, color }) => (
+      {items.map(({ label, pct, detail, color }) => (
         <motion.div
           key={label}
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="rounded-xl p-3"
+          className="rounded-xl p-3 flex items-center justify-between gap-3"
           style={{
             background: isDark ? `${color}12` : `${color}08`,
             border: `1px solid ${color}22`,
           }}
         >
-          <div
-            className="font-black tabular-nums"
-            style={{ fontSize: 17, color, letterSpacing: "-0.03em", lineHeight: 1 }}
-          >
-            {value}
+          <div className="min-w-0">
+            <div
+              className="font-black tabular-nums"
+              style={{ fontSize: 17, color, letterSpacing: "-0.03em", lineHeight: 1 }}
+            >
+              {fmt(pct)}
+            </div>
+            <div
+              className="font-black uppercase mt-1"
+              style={{ fontSize: 8, letterSpacing: "0.1em", color: colors.neutral500, lineHeight: 1.2 }}
+            >
+              {label}
+            </div>
+            <div className="mt-1.5 text-[9px]" style={{ color: colors.neutral400, lineHeight: 1.3 }}>
+              {detail}
+            </div>
           </div>
-          <div
-            className="font-black uppercase mt-1"
-            style={{ fontSize: 8, letterSpacing: "0.1em", color: colors.neutral500, lineHeight: 1.2 }}
-          >
-            {label}
-          </div>
-          <div className="mt-1.5 text-[9px]" style={{ color: colors.neutral400, lineHeight: 1.3 }}>
-            {detail}
-          </div>
+          {pct !== null && <MiniRing pct={pct} color={color} />}
         </motion.div>
       ))}
     </div>

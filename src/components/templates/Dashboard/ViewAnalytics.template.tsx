@@ -5,7 +5,8 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
-import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2 } from "react-icons/fi";
+import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
+import { FaChrome, FaFirefoxBrowser, FaSafari, FaEdge, FaOpera, FaGoogle, FaLinkedin, FaGithub, FaTwitter, FaFacebook, FaInstagram, FaYoutube, FaRedditAlien } from "react-icons/fa";
 import { EmptyState } from "./shared/DashboardUI";
 import { TrendAreaChart, DeviceDonutChart } from "./AnalyticsCharts";
 import ViewsHeatmap from "./ViewsHeatmap";
@@ -63,6 +64,50 @@ const exactTime = (iso: string): string => {
 
 
 
+/** Bare-bones inline sparkline (no axes/grid) for filling the wide, otherwise-empty
+ * "Views Today" hero slot with the same 7-day trend data shown in full elsewhere —
+ * a tiny recap rather than dead space next to the headline number. */
+const MiniSparkline: React.FC<{ data: { count: number }[]; color: string }> = ({ data, color }) => {
+  if (data.length < 2) return null;
+  const width = 120;
+  const height = 40;
+  const pad = 2;
+
+  const max = Math.max(...data.map((d) => d.count), 1);
+  const points = data.map((d, i) => ({
+    x: pad + (i / (data.length - 1)) * (width - pad * 2),
+    y: height - pad - (d.count / max) * (height - pad * 2),
+  }));
+
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
+  const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(2)} ${height - pad} L ${points[0].x.toFixed(2)} ${height - pad} Z`;
+  const last = points[points.length - 1];
+
+  return (
+    <svg width={width} height={height} style={{ overflow: "visible" }}>
+      <defs>
+        <linearGradient id="mini-spark-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+          <stop offset="100%" stopColor={color} stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill="url(#mini-spark-fill)" stroke="none" />
+      <motion.path
+        d={linePath}
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+      />
+      <circle cx={last.x} cy={last.y} r={3} fill={color} />
+    </svg>
+  );
+};
+
 const LivePulse: React.FC<{ active?: boolean }> = ({ active = true }) => (
   <span className="relative inline-flex h-2.5 w-2.5">
     {active && (
@@ -104,7 +149,8 @@ const MetricCell: React.FC<{
   accent?: string;
   trend?: number | null;
   hero?: boolean;
-}> = ({ label, value, delay = 0, accent, trend, hero }) => {
+  icon?: React.ReactNode;
+}> = ({ label, value, delay = 0, accent, trend, hero, icon }) => {
   const colors = useColors();
   const animated = useCountUp(value, delay);
 
@@ -124,9 +170,10 @@ const MetricCell: React.FC<{
         {trend !== undefined && <TrendChip value={trend ?? null} />}
       </div>
       <span
-        className="font-black uppercase"
+        className="flex items-center gap-1 font-black uppercase"
         style={{ fontSize: 9, letterSpacing: "0.1em", color: colors.neutral400 }}
       >
+        {icon && <span style={{ display: "inline-flex", fontSize: 10 }}>{icon}</span>}
         {label}
       </span>
     </div>
@@ -205,6 +252,14 @@ const BROWSER_COLORS: Record<string, string> = {
   Other:   "#94a3b8",
 };
 
+const BROWSER_ICONS: Record<string, React.ReactNode> = {
+  Chrome:  <FaChrome size={11} />,
+  Firefox: <FaFirefoxBrowser size={11} />,
+  Safari:  <FaSafari size={11} />,
+  Edge:    <FaEdge size={11} />,
+  Opera:   <FaOpera size={11} />,
+};
+
 const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
   const sorted = Object.entries(breakdown)
     .sort((a, b) => b[1] - a[1])
@@ -218,6 +273,7 @@ const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ bre
         key,
         label: key,
         color: BROWSER_COLORS[key] ?? BROWSER_COLORS.Other,
+        icon: BROWSER_ICONS[key],
       }))}
     />
   );
@@ -309,6 +365,26 @@ const getSourceColor = (src: string): string => {
   return "#8b5cf6";
 };
 
+const SOURCE_ICONS: Record<string, React.ReactNode> = {
+  google:    <FaGoogle size={10} />,
+  linkedin:  <FaLinkedin size={11} />,
+  github:    <FaGithub size={11} />,
+  twitter:   <FaTwitter size={11} />,
+  facebook:  <FaFacebook size={11} />,
+  instagram: <FaInstagram size={11} />,
+  youtube:   <FaYoutube size={11} />,
+  reddit:    <FaRedditAlien size={11} />,
+};
+
+const getSourceIcon = (src: string): React.ReactNode | null => {
+  if (src === "Direct") return null;
+  const lower = src.toLowerCase();
+  for (const [key, icon] of Object.entries(SOURCE_ICONS)) {
+    if (lower.includes(key)) return icon;
+  }
+  return null;
+};
+
 const ReferrerBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
   const colors = useColors();
   const sorted = Object.entries(breakdown).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -321,11 +397,15 @@ const ReferrerBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ br
       {sorted.map(([src, count], i) => {
         const pct = Math.round((count / total) * 100);
         const color = getSourceColor(src);
+        const icon = getSourceIcon(src);
         return (
           <div key={src}>
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                {icon
+                  ? <span style={{ color, flexShrink: 0 }}>{icon}</span>
+                  : <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                }
                 <span className="text-[10px] font-semibold truncate max-w-[90px]" style={{ color: colors.neutral600 }}>
                   {src}
                 </span>
@@ -753,10 +833,18 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
               {}
               <div
-                className="rounded-2xl p-4"
+                className="rounded-2xl p-4 flex items-center justify-between gap-4"
                 style={{ background: isDark ? `${ACCENT}15` : `${ACCENT}08`, border: `1px solid ${ACCENT}20` }}
               >
                 <MetricCell label="Views Today" value={viewsToday} delay={0} accent={ACCENT} hero />
+                {!isMobile && weeklyTrend.length > 1 && (
+                  <div className="shrink-0 flex flex-col items-end gap-1">
+                    <MiniSparkline data={weeklyTrend} color={ACCENT} />
+                    <span className="text-[8.5px] font-bold uppercase tracking-wider" style={{ color: colors.neutral400 }}>
+                      7-day trend
+                    </span>
+                  </div>
+                )}
               </div>
 
               {}
@@ -764,16 +852,16 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                 {}
                 <div className="rounded-xl p-3" style={panelStyle}>
                   <div className="flex items-start justify-between gap-1">
-                    <MetricCell label="This Week" value={viewsThisWeek} delay={80} />
+                    <MetricCell label="This Week" value={viewsThisWeek} delay={80} icon={<FiCalendar />} />
                     {wowDelta !== null && <TrendChip value={wowDelta} />}
                   </div>
                 </div>
                 {[
-                  { label: "This Month", value: viewsThisMonth, delay: 140 },
-                  { label: "All Time",   value: totalViews,     delay: 200 },
-                ].map(({ label, value, delay }) => (
+                  { label: "This Month", value: viewsThisMonth, delay: 140, icon: <FiClock /> },
+                  { label: "All Time",   value: totalViews,     delay: 200, icon: <FiBarChart2 /> },
+                ].map(({ label, value, delay, icon }) => (
                   <div key={label} className="rounded-xl p-3" style={panelStyle}>
-                    <MetricCell label={label} value={value} delay={delay} />
+                    <MetricCell label={label} value={value} delay={delay} icon={icon} />
                   </div>
                 ))}
               </div>
@@ -790,7 +878,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
               {}
               {!isMobile && (hasBrowserData || hasLocationData) && (
-                <div className="grid gap-4 grid-cols-2">
+                <div className={`grid gap-4 items-start ${hasBrowserData && hasLocationData ? "grid-cols-2" : "grid-cols-1"}`}>
                   {hasBrowserData && (
                     <div style={panelStyle}>
                       {panelLabel("Browsers")}
