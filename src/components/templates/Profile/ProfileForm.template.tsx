@@ -232,7 +232,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
 
   return (
     <div className="pb-6 space-y-6">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8 items-start">
         <SectionCard
           title="Profile Images"
           subtitle="Profile & branding visuals"
