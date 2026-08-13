@@ -44,6 +44,7 @@ export interface IViewStats {
     uniqueVisitors: number;
     resumeDownloads: number;
     weeklyTrend: IDailyView[];
+    viewsHeatmap?: IDailyView[];
     deviceBreakdown: Record<string, number>;
     browserBreakdown: Record<string, number>;
     locationBreakdown: Record<string, number>;
@@ -66,9 +67,16 @@ export interface IStats {
     weeklyDelta?: Record<string, number>;
 }
 
+export interface ICompletionSnapshot {
+    date: string;
+    percentage: number;
+}
+
 export interface IProfileCompletion {
     percentage: number;
     missingSections: string[];
+    /** Last 30 days of daily snapshots, oldest first. */
+    trend?: ICompletionSnapshot[];
 }
 
 export interface IActivity {

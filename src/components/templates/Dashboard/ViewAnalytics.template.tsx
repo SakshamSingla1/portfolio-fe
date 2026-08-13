@@ -8,6 +8,7 @@ import type { IViewStats, IPortfolioView } from "../../../services/useDashboardS
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2 } from "react-icons/fi";
 import { EmptyState } from "./shared/DashboardUI";
 import { TrendAreaChart, DeviceDonutChart } from "./AnalyticsCharts";
+import ViewsHeatmap from "./ViewsHeatmap";
 
 interface ViewAnalyticsProps {
   viewStats: IViewStats | null | undefined;
@@ -635,6 +636,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     uniqueVisitors,
     resumeDownloads,
     weeklyTrend = [],
+    viewsHeatmap = [],
     deviceBreakdown = {},
     browserBreakdown = {},
     locationBreakdown = {},
@@ -861,6 +863,14 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                 <PeakHours views={recentViews} />
               </div>
             )}
+          </div>
+        )}
+
+        {}
+        {viewsHeatmap.length > 0 && (
+          <div className="mt-4" style={panelStyle}>
+            {panelLabel("90-Day Activity", <FiEye size={10} style={{ color: colors.neutral400 }} />)}
+            <ViewsHeatmap data={viewsHeatmap} />
           </div>
         )}
 

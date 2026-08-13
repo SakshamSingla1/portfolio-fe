@@ -15,6 +15,7 @@ import ProfileCompletionTemplate from "./ProfileCompletion.template";
 import RecentMessagesTemplate from "./RecentMessages.template";
 import RecentActivitiesTemplate from "./RecentActivities.template";
 import QuickActionsTemplate from "./QuickActions.template";
+import MilestoneCelebration from "./MilestoneCelebration";
 import { Card, SectionLabel, SkeletonBlock } from "./shared/DashboardUI";
 
 interface DashboardTemplateProps {
@@ -312,6 +313,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
 
   return (
     <div style={{ padding: isMobile ? "12px 10px 24px" : "20px 20px 32px" }}>
+      <MilestoneCelebration dashboardData={dashboardData} />
 
       <motion.div
         initial={{ opacity: 0, y: -6 }}
@@ -468,7 +470,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
               >
                 <Card hero>
                   <SectionLabel>Quick Add</SectionLabel>
-                  <QuickActionsTemplate />
+                  <QuickActionsTemplate missingSections={dashboardData.profileCompletion?.missingSections} />
                 </Card>
               </motion.div>
             </div>

@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
-import type { IProfileCompletion } from "../../../services/useDashboardService";
+import type { IProfileCompletion, ICompletionSnapshot } from "../../../services/useDashboardService";
 import { useCountUp } from "../../../hooks/useCountUp";
-import { FiCheck, FiMinus, FiArrowRight } from "react-icons/fi";
+import { FiCheck, FiMinus, FiArrowRight, FiArrowUpRight, FiTrendingUp } from "react-icons/fi";
 
 const SECTION_ROUTES: Record<string, string> = {
   "Profile Basics":  "/profile",
@@ -72,8 +72,71 @@ function arcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: nu
   return `M ${s.x.toFixed(3)} ${s.y.toFixed(3)} A ${r} ${r} 0 ${largeArc} 1 ${e.x.toFixed(3)} ${e.y.toFixed(3)}`;
 }
 
+/** Compact 30-day sparkline for the completion score — a plain SVG polyline rather
+ * than pulling in recharts for a handful of points in a ~180px-wide slot. */
+const CompletionSparkline: React.FC<{ trend: ICompletionSnapshot[] }> = ({ trend }) => {
+  const colors = useColors();
+  const width = 100;
+  const height = 32;
+  const pad = 3;
+
+  const min = Math.min(...trend.map((t) => t.percentage));
+  const max = Math.max(...trend.map((t) => t.percentage));
+  const range = Math.max(max - min, 1);
+
+  const points = trend.map((t, i) => {
+    const x = pad + (i / (trend.length - 1)) * (width - pad * 2);
+    const y = height - pad - ((t.percentage - min) / range) * (height - pad * 2);
+    return { x, y, ...t };
+  });
+
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
+  const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(2)} ${height - pad} L ${points[0].x.toFixed(2)} ${height - pad} Z`;
+
+  const delta = trend[trend.length - 1].percentage - trend[0].percentage;
+  const last = points[points.length - 1];
+
+  return (
+    <div className="flex items-center gap-2.5">
+      <svg width={width} height={height} style={{ overflow: "visible" }}>
+        <defs>
+          <linearGradient id="completion-spark-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={colors.primary500} stopOpacity={0.25} />
+            <stop offset="100%" stopColor={colors.primary500} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <path d={areaPath} fill="url(#completion-spark-fill)" stroke="none" />
+        <motion.path
+          d={linePath}
+          fill="none"
+          stroke={colors.primary500}
+          strokeWidth={1.75}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+        />
+        <circle cx={last.x} cy={last.y} r={2.5} fill={colors.primary500} />
+      </svg>
+      {delta !== 0 && (
+        <div
+          className="flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+          style={{
+            background: delta > 0 ? "#dcfce7" : "#fee2e2",
+            color: delta > 0 ? "#15803d" : "#b91c1c",
+          }}
+        >
+          <FiArrowUpRight size={8} style={{ transform: delta < 0 ? "rotate(90deg)" : undefined }} />
+          {Math.abs(delta)}%
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCompletion }) => {
-  const { percentage, missingSections } = profileCompletion;
+  const { percentage, missingSections, trend } = profileCompletion;
   const colors = useColors();
   const { isDark } = useTheme();
   const isMobile = useIsMobile();
@@ -321,6 +384,18 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
         <div className="text-sm font-black" style={{ color: colors.neutral800 }}>{label}</div>
         <div className="text-xs mt-0.5" style={{ color: colors.neutral400 }}>{sub}</div>
       </div>
+
+      {trend && trend.length >= 2 && (
+        <div className="mt-4 flex flex-col items-center">
+          <div className="flex items-center gap-1 mb-1.5">
+            <FiTrendingUp size={9} style={{ color: colors.neutral400 }} />
+            <span className="text-[8.5px] font-black uppercase tracking-widest" style={{ color: colors.neutral400 }}>
+              Last {trend.length} days
+            </span>
+          </div>
+          <CompletionSparkline trend={trend} />
+        </div>
+      )}
 
       {/* Section grid — 3 columns of glassmorphic status pills */}
       <div className="mt-6 w-full grid grid-cols-3 gap-2.5">
