@@ -2,22 +2,36 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
 import { createUseStyles } from 'react-jss';
 import { motion } from 'framer-motion';
+import { FiShield } from 'react-icons/fi';
 import Button from '../../atoms/Button/Button';
 
 const useStyles = createUseStyles((theme: any) => ({
   dialog: {
     '& .MuiDialog-paper': {
-      borderRadius: '16px',
-      padding: '24px',
+      borderRadius: '20px',
+      padding: '28px 24px 24px',
       maxWidth: '400px',
       width: '100%',
+      boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
     },
+  },
+  iconBadge: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 auto 16px',
+    background: `${theme.palette.background.primary.primary600}12`,
+    color: theme.palette.background.primary.primary600,
   },
   title: {
     textAlign: 'center',
     color: theme.palette.background.neutral.neutral900,
     marginBottom: '16px',
-    fontWeight: 600,
+    fontWeight: 700,
+    padding: 0,
   },
   subtitle: {
     textAlign: 'center',
@@ -35,12 +49,15 @@ const useStyles = createUseStyles((theme: any) => ({
     height: '56px',
     textAlign: 'center',
     fontSize: '24px',
-    borderRadius: '8px',
-    border: `1px solid ${theme.palette.background.neutral.neutral200}`,
+    fontWeight: 700,
+    borderRadius: '12px',
+    border: `1.5px solid ${theme.palette.background.neutral.neutral200}`,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
     '&:focus': {
       outline: 'none',
       borderColor: theme.palette.background.primary.primary600,
-      boxShadow: `0 0 0 2px ${theme.palette.background.primary.primary600}`,
+      boxShadow: `0 0 0 3px ${theme.palette.background.primary.primary600}22`,
     },
   },
   actionButtons: {
@@ -197,10 +214,14 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
       sx={{ zIndex: 2000 }}
       slotProps={{ backdrop: { sx: { backdropFilter: "blur(20px)", backgroundColor: "rgba(15,23,42,0.6)" } } }}
     >
+      <div className={classes.iconBadge}>
+        <FiShield size={22} />
+      </div>
+
       <DialogTitle id="otp-dialog-title" className={classes.title}>
         Verify Your {contactType}
       </DialogTitle>
-      
+
       <DialogContent>
         <Typography variant="body1" className={classes.subtitle}>
           We've sent a 6-digit verification code to {contactInfo}
