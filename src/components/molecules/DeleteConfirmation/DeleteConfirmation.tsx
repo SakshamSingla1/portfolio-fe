@@ -28,6 +28,8 @@ export const DeleteConfirmation: FC<DeleteConfirmationProps> = ({
       className="[&_.MuiDialog-paper]:rounded-2xl [&_.MuiDialog-paper]:p-6 [&_.MuiDialog-paper]:max-w-[400px] [&_.MuiDialog-paper]:w-full"
       maxWidth="sm"
       fullWidth
+      sx={{ zIndex: 2000 }}
+      slotProps={{ backdrop: { sx: { backdropFilter: "blur(20px)", backgroundColor: "rgba(15,23,42,0.6)" } } }}
     >
       <DialogTitle className="text-center text-neutral-900 font-semibold mb-4 p-0">
         {title}

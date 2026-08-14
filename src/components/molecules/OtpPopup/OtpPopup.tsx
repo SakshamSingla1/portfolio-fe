@@ -194,6 +194,8 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
       aria-labelledby="otp-dialog-title"
       maxWidth="xs"
       fullWidth
+      sx={{ zIndex: 2000 }}
+      slotProps={{ backdrop: { sx: { backdropFilter: "blur(20px)", backgroundColor: "rgba(15,23,42,0.6)" } } }}
     >
       <DialogTitle id="otp-dialog-title" className={classes.title}>
         Verify Your {contactType}

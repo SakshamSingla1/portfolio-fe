@@ -90,7 +90,7 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose }) => {
 
     return (
         <div
-            className="fixed inset-0 flex items-start justify-center z-[1000] bg-black/60 backdrop-blur-md px-4 pt-24"
+            className="fixed inset-0 flex items-start justify-center z-[2000] bg-black/60 backdrop-blur-xl px-4 pt-24"
             onClick={onClose}
         >
             <div

@@ -128,8 +128,8 @@ const CommandPalette: React.FC = () => {
         <AnimatePresence>
             {isOpen && (
                 <div
-                    className="fixed inset-0 flex items-start justify-center z-[1000] px-4 pt-24"
-                    style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+                    className="fixed inset-0 flex items-start justify-center z-[2000] px-4 pt-24"
+                    style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)" }}
                     onClick={close}
                 >
                     <motion.div

@@ -47,6 +47,8 @@ const GenerateTestimonialLinkModal: React.FC<IGenerateTestimonialLinkModalProps>
             className="[&_.MuiDialog-paper]:rounded-2xl [&_.MuiDialog-paper]:p-6 [&_.MuiDialog-paper]:max-w-[440px] [&_.MuiDialog-paper]:w-full"
             maxWidth="sm"
             fullWidth
+            sx={{ zIndex: 2000 }}
+            slotProps={{ backdrop: { sx: { backdropFilter: "blur(20px)", backgroundColor: "rgba(15,23,42,0.6)" } } }}
         >
             <DialogTitle className="text-neutral-900 font-bold p-0 mb-5">
                 {generatedUrl ? "Link Generated" : "Generate Testimonial Link"}

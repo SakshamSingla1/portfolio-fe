@@ -97,8 +97,8 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                    style={{ background: `${colors.neutral900}99`, backdropFilter: "blur(4px)" }}
+                    className="fixed inset-0 z-[2000] flex items-center justify-center p-4"
+                    style={{ background: `${colors.neutral900}99`, backdropFilter: "blur(20px)" }}
                     onClick={(e) => e.target === e.currentTarget && onClose()}
                 >
                     <motion.div

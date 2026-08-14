@@ -286,7 +286,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
             {showZoomModal && previewImage && typeof document !== 'undefined' && createPortal(
                 <div
-                    className="fixed inset-0 z-[1000000] flex items-center justify-center bg-black/30 transition-opacity duration-300"
+                    className="fixed inset-0 z-[1000000] flex items-center justify-center bg-black/60 backdrop-blur-xl transition-opacity duration-300"
                     style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
                     onClick={() => setShowZoomModal(false)}
                 >

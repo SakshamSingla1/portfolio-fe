@@ -49,7 +49,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 flex items-center justify-center z-[1000] bg-black/60 backdrop-blur-md px-4"
+          className="fixed inset-0 flex items-center justify-center z-[2000] bg-black/60 backdrop-blur-xl px-4"
           onClick={() => !loading && onClose()}
         >
           <motion.div
