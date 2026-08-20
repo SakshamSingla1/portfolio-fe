@@ -93,6 +93,20 @@ const ListingBlogsPage: React.FC = () => {
         }
     };
 
+    const handleArchive = async (id: number) => {
+        try {
+            const res = await blogPostService.archive(id);
+            if (res?.status === HTTP_STATUS.OK) {
+                showSnackbar("success", "Blog post archived");
+                refetch();
+            } else {
+                showSnackbar("error", "Failed to archive blog post");
+            }
+        } catch {
+            showSnackbar("error", "Failed to archive blog post");
+        }
+    };
+
     useEffect(() => {
         const params: Record<string, string> = {
             page: pagination.currentPage.toString(),
@@ -112,6 +126,7 @@ const ListingBlogsPage: React.FC = () => {
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             onDelete={handleDelete}
+            onArchive={handleArchive}
             isLoading={isLoading}
             filterContent={
                 <div className="w-full sm:w-64">

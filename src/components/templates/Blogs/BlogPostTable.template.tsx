@@ -10,6 +10,7 @@ import { ADMIN_ROUTES } from "../../../utils/constant";
 import { type BlogPostSummary, BlogStatus } from "../../../services/useBlogPostService";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { TbArticle } from "react-icons/tb";
+import { FiArchive } from "react-icons/fi";
 
 interface IBlogPostTableTemplateProps {
     posts: BlogPostSummary[];
@@ -19,9 +20,38 @@ interface IBlogPostTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     onDelete?: (id: number) => Promise<void>;
+    onArchive?: (id: number) => Promise<void>;
     filterContent?: React.ReactNode;
     isLoading?: boolean;
 }
+
+const ArchiveButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+    const colors = useColors();
+    return (
+        <button
+            onClick={(e) => { e.stopPropagation(); onClick(); }}
+            title="Archive"
+            style={{
+                width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center",
+                borderRadius: 8, border: `1.5px solid ${colors.neutral300}`, background: "transparent",
+                cursor: "pointer", transition: "all 0.18s ease", flexShrink: 0, color: colors.neutral500,
+            }}
+            onMouseEnter={(e) => {
+                const b = e.currentTarget;
+                b.style.background = `${colors.neutral500}10`;
+                b.style.borderColor = colors.neutral300;
+                b.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+                const b = e.currentTarget;
+                b.style.background = "transparent";
+                b.style.transform = "translateY(0)";
+            }}
+        >
+            <FiArchive size={13} />
+        </button>
+    );
+};
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
     const colors = useColors();
@@ -116,6 +146,7 @@ const BlogPostTableTemplate: React.FC<IBlogPostTableTemplateProps> = ({
     searchValue,
     onSearchChange,
     onDelete,
+    onArchive,
     filterContent,
     isLoading,
 }) => {
@@ -148,13 +179,17 @@ const BlogPostTableTemplate: React.FC<IBlogPostTableTemplateProps> = ({
         post.status === BlogStatus.PUBLISHED && post.publishedAt
             ? DateUtils.dateTimeSecondToDate(post.publishedAt)
             : DateUtils.dateTimeSecondToDate(post.createdAt ?? ""),
-        <ActionButtons
-            key={`actions-${post.id}`}
-            onEdit={() => handleEdit(post.id)}
-            onView={() => handleView(post.id)}
-            onDelete={onDelete ? () => onDelete(post.id) : undefined}
-        />,
-    ]), [posts, pagination.currentPage, pagination.pageSize, handleEdit, handleView, onDelete]);
+        <div key={`actions-${post.id}`} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <ActionButtons
+                onEdit={() => handleEdit(post.id)}
+                onView={() => handleView(post.id)}
+                onDelete={onDelete ? () => onDelete(post.id) : undefined}
+            />
+            {onArchive && post.status !== BlogStatus.ARCHIVED && (
+                <ArchiveButton onClick={() => onArchive(post.id)} />
+            )}
+        </div>,
+    ]), [posts, pagination.currentPage, pagination.pageSize, handleEdit, handleView, onDelete, onArchive]);
 
     const schema = useMemo(() => ({
         id: 1,
