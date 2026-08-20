@@ -23,6 +23,7 @@ const PUBLICATION_TYPES = [
 const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
     type: Yup.string().required("Type is required"),
+    url: Yup.string().url("Enter a valid URL"),
 });
 
 interface PublicationFormProps {
@@ -105,6 +106,8 @@ const PublicationFormTemplate = ({
                             label="URL"
                             placeholder="https://..."
                             {...formik.getFieldProps("url")}
+                            error={formik.touched.url && Boolean(formik.errors.url)}
+                            helperText={Boolean(formik.touched.url && formik.errors.url) ? formik.errors.url : ""}
                             disabled={mode === MODE.VIEW}
                         />
                     </div>

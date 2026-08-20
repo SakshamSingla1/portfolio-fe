@@ -77,6 +77,9 @@ const SmsNotificationForm: React.FC<Props> = ({ formik, setEditorRef }) => {
                             placeholder="Compose your SMS… keep it under 160 chars per segment"
                             minHeight={180}
                         />
+                        {formik.touched.message && formik.errors.message && (
+                            <span style={{ fontSize: 12, color: colors.error400 }}>{formik.errors.message}</span>
+                        )}
                     </div>
 
                     <TextField

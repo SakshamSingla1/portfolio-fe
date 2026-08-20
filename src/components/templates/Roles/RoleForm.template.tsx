@@ -30,7 +30,7 @@ const validationSchema = Yup.object({
             navLinkId: Yup.number().nullable().required('Navlink ID is required'),
             permissionId: Yup.number().nullable().required('Permission ID is required')
         })
-    ).min(0, 'At least one permission should be selected')
+    ).min(1, 'At least one permission should be selected')
 });
 
 const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, onSubmit }) => {

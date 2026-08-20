@@ -51,6 +51,8 @@ const EmailNotificationForm: React.FC<Props> = ({ formik, setEditorRef }) => {
                         label="Subject *"
                         placeholder="e.g. Hello {{fullName}}, your code is {{otp}}"
                         {...formik.getFieldProps("subject")}
+                        error={formik.touched.subject && Boolean(formik.errors.subject)}
+                        helperText={Boolean(formik.touched.subject && formik.errors.subject) ? formik.errors.subject : ""}
                     />
 
                     <div style={{ display: "grid", gap: 6 }}>
@@ -68,6 +70,9 @@ const EmailNotificationForm: React.FC<Props> = ({ formik, setEditorRef }) => {
                             onEditorReady={setEditorRef}
                             placeholder="Compose your email body… use {{variableName}} for dynamic content"
                         />
+                        {formik.touched.messageBody && formik.errors.messageBody && (
+                            <span style={{ fontSize: 12, color: colors.error400 }}>{formik.errors.messageBody}</span>
+                        )}
                     </div>
 
                     <div
@@ -113,10 +118,38 @@ const EmailNotificationForm: React.FC<Props> = ({ formik, setEditorRef }) => {
                                     background: colors.neutral50,
                                 }}
                             >
-                                <TextField fullWidth label="Email To"  placeholder="recipient@example.com" {...formik.getFieldProps("emailTo")} />
-                                <TextField fullWidth label="Email CC"  placeholder="cc@example.com"        {...formik.getFieldProps("emailCc")} />
-                                <TextField fullWidth label="Email BCC" placeholder="bcc@example.com"       {...formik.getFieldProps("emailBcc")} />
-                                <TextField fullWidth label="Reply-To"  placeholder="reply@example.com"     {...formik.getFieldProps("emailReplyTo")} />
+                                <TextField
+                                    fullWidth
+                                    label="Email To"
+                                    placeholder="recipient@example.com"
+                                    {...formik.getFieldProps("emailTo")}
+                                    error={formik.touched.emailTo && Boolean(formik.errors.emailTo)}
+                                    helperText={Boolean(formik.touched.emailTo && formik.errors.emailTo) ? formik.errors.emailTo : ""}
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="Email CC"
+                                    placeholder="cc@example.com"
+                                    {...formik.getFieldProps("emailCc")}
+                                    error={formik.touched.emailCc && Boolean(formik.errors.emailCc)}
+                                    helperText={Boolean(formik.touched.emailCc && formik.errors.emailCc) ? formik.errors.emailCc : ""}
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="Email BCC"
+                                    placeholder="bcc@example.com"
+                                    {...formik.getFieldProps("emailBcc")}
+                                    error={formik.touched.emailBcc && Boolean(formik.errors.emailBcc)}
+                                    helperText={Boolean(formik.touched.emailBcc && formik.errors.emailBcc) ? formik.errors.emailBcc : ""}
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="Reply-To"
+                                    placeholder="reply@example.com"
+                                    {...formik.getFieldProps("emailReplyTo")}
+                                    error={formik.touched.emailReplyTo && Boolean(formik.errors.emailReplyTo)}
+                                    helperText={Boolean(formik.touched.emailReplyTo && formik.errors.emailReplyTo) ? formik.errors.emailReplyTo : ""}
+                                />
                             </div>
                         )}
                     </div>

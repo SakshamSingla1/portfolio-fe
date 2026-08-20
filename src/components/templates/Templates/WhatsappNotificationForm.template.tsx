@@ -56,6 +56,8 @@ const WhatsappNotificationForm: React.FC<Props> = ({ formik, setEditorRef }) => 
                             label="Template Name (Meta-approved)"
                             placeholder="e.g. otp_verification"
                             {...formik.getFieldProps("whatsappTemplateName")}
+                            error={formik.touched.whatsappTemplateName && Boolean(formik.errors.whatsappTemplateName)}
+                            helperText={Boolean(formik.touched.whatsappTemplateName && formik.errors.whatsappTemplateName) ? formik.errors.whatsappTemplateName : ""}
                         />
                     </div>
 
@@ -73,6 +75,9 @@ const WhatsappNotificationForm: React.FC<Props> = ({ formik, setEditorRef }) => 
                             placeholder="Compose your WhatsApp template body… use {{variableName}} for dynamic content"
                             minHeight={200}
                         />
+                        {formik.touched.whatsappTemplateBody && formik.errors.whatsappTemplateBody && (
+                            <span style={{ fontSize: 12, color: colors.error400 }}>{formik.errors.whatsappTemplateBody}</span>
+                        )}
                     </div>
                 </>
             )}
