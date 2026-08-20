@@ -216,17 +216,39 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   const profileImg = dashboardData?.profileSummary?.profileImageUrl || "";
   const firstName = fullName.split(" ")[0] || "there";
 
+  // Mirrors the real layout (stat grid, engagement strip, two-column cards) rather
+  // than arbitrary gray blocks, so the loading state doesn't jump/reflow once data lands.
   const Skeleton = () => (
-    <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
-      <div className={isMobile ? "space-y-4" : "col-span-7 space-y-4"}>
-        {[60, 280, 200].map((h, i) => (
-          <SkeletonBlock key={i} height={h} />
+    <div className="space-y-4">
+      <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"} gap-px rounded-2xl overflow-hidden`} style={{ background: colors.neutral300 }}>
+        {Array.from({ length: isMobile ? 4 : 4 }).map((_, i) => (
+          <div key={i} style={{ background: colors.neutral0, padding: isMobile ? "18px 14px" : "22px 20px" }}>
+            <SkeletonBlock height={42} className="!rounded-xl !w-[42px]" />
+            <SkeletonBlock height={30} className="!w-16 mt-4" />
+            <SkeletonBlock height={8} className="!w-12 mt-2" />
+          </div>
         ))}
       </div>
-      <div className={isMobile ? "space-y-4" : "col-span-5 space-y-4"}>
-        {[260, 200].map((h, i) => (
-          <SkeletonBlock key={i} height={h} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[0, 1, 2].map((i) => (
+          <SkeletonBlock key={i} height={72} />
         ))}
+      </div>
+
+      <SkeletonBlock height={260} />
+
+      <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
+        <div className={isMobile ? "space-y-4" : "col-span-7 space-y-4"}>
+          {[220, 180].map((h, i) => (
+            <SkeletonBlock key={i} height={h} />
+          ))}
+        </div>
+        <div className={isMobile ? "space-y-4" : "col-span-5 space-y-4"}>
+          {[180, 200].map((h, i) => (
+            <SkeletonBlock key={i} height={h} />
+          ))}
+        </div>
       </div>
     </div>
   );

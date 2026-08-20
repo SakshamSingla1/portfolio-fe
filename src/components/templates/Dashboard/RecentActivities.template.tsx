@@ -7,6 +7,7 @@ import {
   FiUser, FiBook, FiBriefcase, FiZap, FiCode,
   FiMessageSquare, FiStar, FiAward, FiTrendingUp,
 } from "react-icons/fi";
+import { EmptyState } from "./shared/DashboardUI";
 
 interface IActivity {
   type: string;
@@ -63,19 +64,7 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
   const navigate = useNavigate();
 
   if (activities.length === 0) {
-    return (
-      <div
-        className="py-8 text-center rounded-xl"
-        style={{ border: `1px dashed ${colors.neutral200}` }}
-      >
-        <div className="text-sm font-semibold" style={{ color: colors.neutral500 }}>
-          No activity yet
-        </div>
-        <div className="text-xs mt-1" style={{ color: colors.neutral400 }}>
-          Actions you take will appear here
-        </div>
-      </div>
-    );
+    return <EmptyState icon={<FiUser />} title="No activity yet" subtitle="Actions you take will appear here" />;
   }
 
   return (

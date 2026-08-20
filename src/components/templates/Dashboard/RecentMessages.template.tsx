@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
+import { EmptyState } from "./shared/DashboardUI";
 
 interface RecentMessagesProps {
   messages: ContactUs[];
@@ -116,25 +117,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
   }, [updateMessageLocally]);
 
   if (messages.length === 0) {
-    return (
-      <div
-        className="flex flex-col items-center justify-center py-8 rounded-xl text-center"
-        style={{ border: `1px dashed ${colors.neutral200}` }}
-      >
-        <div
-          className="w-11 h-11 rounded-full flex items-center justify-center mb-3 text-xl"
-          style={{ background: colors.primary50, color: colors.primary500 }}
-        >
-          ✉
-        </div>
-        <div className="text-sm font-semibold" style={{ color: colors.neutral600 }}>
-          No messages yet
-        </div>
-        <div className="text-xs mt-0.5" style={{ color: colors.neutral400 }}>
-          Visitors who contact you will appear here
-        </div>
-      </div>
-    );
+    return <EmptyState icon="✉" title="No messages yet" subtitle="Visitors who contact you will appear here" />;
   }
 
   return (

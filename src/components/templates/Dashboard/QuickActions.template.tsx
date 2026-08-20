@@ -77,7 +77,7 @@ const QuickActionsTemplate: React.FC<QuickActionsProps> = ({ missingSections }) 
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLButtonElement;
-              el.style.borderColor = missing ? `${action.dot}40` : colors.neutral200;
+              el.style.borderColor = missing ? `${action.dot}40` : colors.neutral300;
               el.style.boxShadow = "none";
             }}
           >
