@@ -42,6 +42,7 @@ export interface SkillFilterParams {
     page?: string;
     size?: string;
     search?: string;
+    category?: string;
     sortDir?: string;
     sortBy?: string;
 }

@@ -20,6 +20,7 @@ interface ExperienceTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     isLoading?: boolean;
+    filterContent?: React.ReactNode;
 }
 
 const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
@@ -29,7 +30,8 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    isLoading
+    isLoading,
+    filterContent,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -96,6 +98,7 @@ const ExperienceTableTemplate: React.FC<ExperienceTableTemplateProps> = ({
             addButtonOnClick={() => navigate(ADMIN_ROUTES.EXPERIENCE_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            filterContent={filterContent}
         >
             <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>

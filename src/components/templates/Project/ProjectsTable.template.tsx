@@ -20,6 +20,7 @@ interface ProjectsTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     isLoading?: boolean;
+    filterContent?: React.ReactNode;
 }
 
 const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
@@ -29,7 +30,8 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    isLoading
+    isLoading,
+    filterContent,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -109,6 +111,7 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
             addButtonOnClick={() => navigate(ADMIN_ROUTES.PROJECTS_ADD)}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            filterContent={filterContent}
         >
             <TableV1 schema={schema} records={records} isLoading={isLoading} />
         </ListingShell>

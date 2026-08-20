@@ -52,6 +52,7 @@ export interface ProjectFilterParams {
     page?: string;
     size?: string;
     search?: string;
+    workStatus?: string;
     sortDir?: string;
     sortBy?: string;
 }

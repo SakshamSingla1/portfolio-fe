@@ -18,6 +18,14 @@ export const EmploymentStatus = {
   FREELANCE: "FREELANCE",
 }
 
+export const EmploymentStatusOptions = [
+  { label: "Current", value: EmploymentStatus.CURRENT },
+  { label: "Previous", value: EmploymentStatus.PREVIOUS },
+  { label: "Internship", value: EmploymentStatus.INTERNSHIP },
+  { label: "Contract", value: EmploymentStatus.CONTRACT },
+  { label: "Freelance", value: EmploymentStatus.FREELANCE },
+];
+
 export interface ExperienceRequest {
   companyName: string;
   jobTitle: string;
@@ -45,6 +53,7 @@ export interface ExperienceFilterParams {
   search?: string;
   page?: string;
   size?: string;
+  employmentStatus?: string;
   sortDir?: string;
   sortBy?: string;
 }

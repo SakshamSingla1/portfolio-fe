@@ -20,6 +20,7 @@ interface SkillTableTemplateProps {
     searchValue?: string;
     onSearchChange?: (val: string) => void;
     stats: SkillStats | null;
+    filterContent?: React.ReactNode;
 }
 
 const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({
@@ -29,7 +30,8 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({
     handleRowsPerPageChange,
     searchValue,
     onSearchChange,
-    stats
+    stats,
+    filterContent,
 }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -106,6 +108,7 @@ const SkillTableTemplate: React.FC<SkillTableTemplateProps> = ({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
             stats={statsList}
+            filterContent={filterContent}
         >
             <TableV1 schema={schema} records={records} />
         </ListingShell>

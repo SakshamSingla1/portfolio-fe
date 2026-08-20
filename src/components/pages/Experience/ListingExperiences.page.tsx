@@ -4,14 +4,18 @@ import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
 import ExperienceListTableTemplate from '../../templates/Experience/ExperiencesTable.template';
 import { useSearchParams } from 'react-router-dom';
-import { useExperienceService } from '../../../services/useExperienceService';
+import { useExperienceService, EmploymentStatusOptions } from '../../../services/useExperienceService';
+import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
+import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const ExperienceListPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const experienceService = useExperienceService();
+    const isMobile = useIsMobile();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
+        employmentStatus: searchParams.get("employmentStatus") || "",
     };
 
     const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
@@ -22,13 +26,14 @@ const ExperienceListPage: React.FC = () => {
     });
 
     const { data: pageResponse, isLoading } = useQuery({
-        queryKey: ['experiences', pagination.currentPage, pagination.pageSize, filters.search],
+        queryKey: ['experiences', pagination.currentPage, pagination.pageSize, filters.search, filters.employmentStatus],
         queryFn: () => experienceService.getAllByProfile({
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
             search: filters.search,
+            employmentStatus: filters.employmentStatus || undefined,
         }),
         refetchOnMount: 'always',
     });
@@ -66,9 +71,10 @@ const ExperienceListPage: React.FC = () => {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            employmentStatus: filters.employmentStatus ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, filters.employmentStatus, pagination]);
 
     return (
         <ExperienceListTableTemplate
@@ -79,6 +85,18 @@ const ExperienceListPage: React.FC = () => {
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             isLoading={isLoading}
+            filterContent={
+                <div className="w-full sm:w-64">
+                    <AutoCompleteInput
+                        label={isMobile ? "Status" : ""}
+                        placeHolder="Filter by status"
+                        options={EmploymentStatusOptions}
+                        value={filters.employmentStatus ? EmploymentStatusOptions.find(o => o.value === filters.employmentStatus) ?? null : null}
+                        onChange={(option: any) => handleFiltersChange("employmentStatus", option?.value ?? "")}
+                        onSearch={() => { }}
+                    />
+                </div>
+            }
         />
     )
 }

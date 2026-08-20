@@ -2,16 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
 import { type IPagination } from '../../../utils/types';
 import { initialPaginationValues } from '../../../utils/constant';
-import { useProjectService } from '../../../services/useProjectService';
+import { useProjectService, WorkStatusOptions } from '../../../services/useProjectService';
 import { useSearchParams } from 'react-router-dom';
 import ProjectsTable from '../../templates/Project/ProjectsTable.template';
+import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
+import { useIsMobile } from '../../../hooks/useIsMobile';
 
 const ListingProjectsPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const projectService = useProjectService();
+    const isMobile = useIsMobile();
 
     const initialFiltersValues: any = {
         search: searchParams.get("search") || "",
+        workStatus: searchParams.get("workStatus") || "",
     };
 
     const [filters, setFiltersTo] = useState<any>(initialFiltersValues);
@@ -22,13 +26,14 @@ const ListingProjectsPage: React.FC = () => {
     });
 
     const { data: pageResponse, isLoading } = useQuery({
-        queryKey: ['projects', pagination.currentPage, pagination.pageSize, filters.search],
+        queryKey: ['projects', pagination.currentPage, pagination.pageSize, filters.search, filters.workStatus],
         queryFn: () => projectService.getByProfile({
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             sortDir: "DESC",
             sortBy: "createdAt",
             search: filters.search,
+            workStatus: filters.workStatus || undefined,
         }),
         refetchOnMount: 'always',
     });
@@ -66,9 +71,10 @@ const ListingProjectsPage: React.FC = () => {
             page: pagination.currentPage.toString(),
             size: pagination.pageSize.toString(),
             search: filters.search ?? "",
+            workStatus: filters.workStatus ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, filters.workStatus, pagination]);
 
     return (
         <ProjectsTable
@@ -79,6 +85,18 @@ const ListingProjectsPage: React.FC = () => {
             searchValue={filters.search}
             onSearchChange={(val) => handleFiltersChange("search", val)}
             isLoading={isLoading}
+            filterContent={
+                <div className="w-full sm:w-64">
+                    <AutoCompleteInput
+                        label={isMobile ? "Status" : ""}
+                        placeHolder="Filter by status"
+                        options={WorkStatusOptions}
+                        value={filters.workStatus ? WorkStatusOptions.find(o => o.value === filters.workStatus) ?? null : null}
+                        onChange={(option: any) => handleFiltersChange("workStatus", option?.value ?? "")}
+                        onSearch={() => { }}
+                    />
+                </div>
+            }
         />
     )
 }
