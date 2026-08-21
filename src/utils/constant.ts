@@ -68,6 +68,8 @@ export const ADMIN_ROUTES = {
     COLOR_THEME_EDIT: "/themes/:id/edit",
     COLOR_THEME_VIEW: "/themes/:id",
 
+    PORTFOLIO_TEMPLATE: "/portfolio-templates",
+
     RESUMES: "/resumes",
 
     SOCIAL_LINKS: "/social-links",

@@ -15,6 +15,7 @@ const SettingRoutes = lazy(() => import('./AdminRoutes/SettingRoutes'));
 const ProfileRoutes = lazy(() => import('./AdminRoutes/ProfileRoutes'));
 const NavLinkRoutes = lazy(() => import('./AdminRoutes/NavLinkRoutes'));
 const ColorThemeRoutes = lazy(() => import('./AdminRoutes/ColorThemeRoutes'));
+const PortfolioTemplateRoutes = lazy(() => import('./AdminRoutes/PortfolioTemplateRoutes'));
 const TemplateRoutes = lazy(() => import('./AdminRoutes/TemplateRoutes'));
 const ResumeRoutes = lazy(() => import('./AdminRoutes/ResumeRouter'));
 const SocialLinkRoutes = lazy(() => import('./AdminRoutes/SocialLinkRoutes'));
@@ -89,6 +90,7 @@ export const AdminRouter: React.FC = () => {
           <Route path="settings/*" element={<div><SettingRoutes /></div>} />
           <Route path="navlinks/*" element={<div><NavLinkRoutes /></div>} />
           <Route path="themes/*" element={<div><ColorThemeRoutes /></div>} />
+          <Route path="portfolio-templates/*" element={<div><PortfolioTemplateRoutes /></div>} />
           <Route path="notifications/*" element={<div><TemplateRoutes /></div>} />
           <Route path="resumes/*" element={<div><ResumeRoutes /></div>} />
           <Route path="social-links/*" element={<div><SocialLinkRoutes /></div>} />

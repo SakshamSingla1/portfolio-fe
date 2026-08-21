@@ -4,7 +4,7 @@ import { LuGraduationCap, LuFolderKanban, LuAward, LuShieldCheck } from "react-i
 import {
     TbCode, TbUser, TbMessageChatbot, TbBell, TbSettings, TbLink, TbShare, TbLayoutDashboard,
     TbUsers, TbHelp, TbIcons, TbBrowser, TbChartBar, TbArticle, TbLanguage, TbBriefcase,
-    TbBrandGithub, TbFileText,
+    TbBrandGithub, TbFileText, TbLayoutGrid,
 } from "react-icons/tb";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { CgFileDocument } from "react-icons/cg";
@@ -20,6 +20,7 @@ const NAV_ICON_MAP: Record<string, React.ReactElement> = {
     MESSAGES: <TbMessageChatbot />,
     NOTIFICATIONS: <TbBell />,
     THEMES: <IoColorPaletteOutline />,
+    PORTFOLIO_TEMPLATES: <TbLayoutGrid />,
     SETTINGS: <TbSettings />,
     NAV_LINKS: <TbLink />,
     RESUMES: <CgFileDocument />,
