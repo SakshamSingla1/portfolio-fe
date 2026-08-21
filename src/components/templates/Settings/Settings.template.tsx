@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiLock, FiShield, FiSettings, FiSearch, FiGithub } from "react-icons/fi";
+import { FiLock, FiShield, FiSearch, FiGithub, FiImage, FiSettings } from "react-icons/fi";
 import { motion } from "framer-motion";
 import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import PasswordTab from "./PasswordTab";
@@ -7,15 +7,13 @@ import ChangeEmailTab from "./ChangeEmailTab";
 import TwoFactorTab from "./TwoFactorTab";
 import SeoTab from "./SeoTab";
 import GitHubTab from "./GitHubTab";
-import { useColors } from "../../../utils/types";
+import BannerTab from "./BannerTab";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { Card, SectionLabel, PageHeaderBanner } from "../Dashboard/shared/DashboardUI";
 
 const SettingsTemplate: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("password");
-  const colors = useColors();
   const isMobile = useIsMobile();
-
-  const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
   const tabs: ITabsSchema[] = [
     {
@@ -48,6 +46,12 @@ const SettingsTemplate: React.FC = () => {
       icon: <FiGithub />,
       component: <GitHubTab />,
     },
+    {
+      label: "Banner",
+      value: "banner",
+      icon: <FiImage />,
+      component: <BannerTab />,
+    },
   ];
 
   return (
@@ -57,68 +61,21 @@ const SettingsTemplate: React.FC = () => {
       transition={{ duration: 0.3, ease: "easeOut" }}
       style={{ padding: isMobile ? "8px 4px 16px" : "16px 16px 24px" }}
     >
-      <div
-        className="rounded-2xl overflow-hidden mb-4"
-        style={{
-          background: colors.neutral0,
-          border: `1.5px solid ${colors.neutral300}`,
-          boxShadow: cardShadow,
-        }}
-      >
-        <div style={{ height: 3, background: `linear-gradient(90deg, ${colors.primary600} 0%, ${colors.primary400}28 100%)` }} />
-        <div className={`${isMobile ? "px-3 py-3" : "px-5 py-4"} flex items-center gap-3`}>
-          <div
-            className="flex items-center justify-center rounded-xl"
-            style={{ width: 38, height: 38, background: `${colors.primary500}12`, color: colors.primary600 }}
-          >
-            <FiSettings size={17} />
-          </div>
-          <div>
-            <h1
-              className="font-black tracking-tight"
-              style={{ fontSize: 20, color: colors.neutral900, letterSpacing: "-0.025em", margin: 0 }}
-            >
-              Account Settings
-            </h1>
-            <p className="text-xs mt-0.5" style={{ color: colors.neutral600 }}>
-              Manage your security preferences and account configuration
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeaderBanner
+        icon={<FiSettings size={17} />}
+        title="Account Settings"
+        subtitle="Manage your security preferences, visibility, and account configuration"
+      />
 
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: colors.neutral0,
-          border: `1.5px solid ${colors.neutral300}`,
-          boxShadow: cardShadow,
-        }}
-      >
-        <div
-          className={`flex items-center gap-2 ${isMobile ? "px-3" : "px-5"} py-3`}
-          style={{ borderBottom: `1px solid ${colors.neutral100}` }}
-        >
-          <div
-            className="rounded-full"
-            style={{ width: 7, height: 7, background: colors.primary500 }}
-          />
-          <span
-            className="font-black uppercase tracking-widest"
-            style={{ fontSize: "9px", color: colors.neutral500, letterSpacing: "0.1em" }}
-          >
-            Security Settings
-          </span>
-        </div>
-        <div className={isMobile ? "px-2 py-4" : "p-5"}>
-          <Tabs
-            schema={tabs}
-            value={activeTab}
-            setValue={(val: string) => setActiveTab(val)}
-            fullWidth
-          />
-        </div>
-      </div>
+      <Card hero>
+        <SectionLabel>Settings</SectionLabel>
+        <Tabs
+          schema={tabs}
+          value={activeTab}
+          setValue={(val: string) => setActiveTab(val)}
+          fullWidth
+        />
+      </Card>
     </motion.div>
   );
 };

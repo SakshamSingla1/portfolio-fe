@@ -18,6 +18,23 @@ const empty = (key: PageKey): SeoMetaDTO => ({
     indexable: true, followLinks: true,
 });
 
+const isValidUrl = (value: string): boolean => {
+    if (!value) return true;
+    try {
+        const url = new URL(value);
+        return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+        return false;
+    }
+};
+
+const CHAR_LIMITS = { title: 60, description: 160 } as const;
+
+const charCountHelper = (value: string, limit: number, base: string) => {
+    const len = value.length;
+    return `${base} · ${len}/${limit} characters${len > limit ? " (over recommended length)" : ""}`;
+};
+
 const SeoTab: React.FC = () => {
     const colors = useColors();
     const seoService = useSeoMetaService();
@@ -44,6 +61,7 @@ const SeoTab: React.FC = () => {
     }, []);
 
     const current = data[activeKey];
+    const hasBlockingError = !isValidUrl(current.canonicalUrl ?? "") || !isValidUrl(current.ogImageUrl ?? "");
 
     const update = (field: keyof SeoMetaDTO, value: any) => {
         setData(prev => ({ ...prev, [activeKey]: { ...prev[activeKey], [field]: value } }));
@@ -103,15 +121,19 @@ const SeoTab: React.FC = () => {
             <div className="flex flex-col gap-4">
                 <SectionCard title="Search Engine" colors={colors}>
                     <TextField label="Page Title" value={current.title ?? ""} onChange={e => update("title", e.target.value)}
-                        helperText="Recommended: 50–60 characters" />
+                        error={(current.title ?? "").length > CHAR_LIMITS.title}
+                        helperText={charCountHelper(current.title ?? "", CHAR_LIMITS.title, "Recommended: 50–60 characters")} />
                     <TextField label="Meta Description" value={current.description ?? ""}
                         onChange={e => update("description", e.target.value)} multiline rows={3}
-                        helperText="Recommended: 150–160 characters" />
+                        error={(current.description ?? "").length > CHAR_LIMITS.description}
+                        helperText={charCountHelper(current.description ?? "", CHAR_LIMITS.description, "Recommended: 150–160 characters")} />
                     <TextField label="Keywords (comma-separated)" value={(current.keywords ?? []).join(", ")}
                         onChange={e => handleKeywordsChange(e.target.value)}
                         helperText="e.g. developer, portfolio, react" />
                     <TextField label="Canonical URL" value={current.canonicalUrl ?? ""}
-                        onChange={e => update("canonicalUrl", e.target.value)} />
+                        onChange={e => update("canonicalUrl", e.target.value)}
+                        error={!isValidUrl(current.canonicalUrl ?? "")}
+                        helperText={!isValidUrl(current.canonicalUrl ?? "") ? "Enter a valid http(s) URL" : "e.g. https://yoursite.com/education"} />
                     <div className="flex gap-4 flex-wrap">
                         <Toggle label="Allow indexing" checked={current.indexable ?? true}
                             onChange={v => update("indexable", v)} colors={colors} />
@@ -127,12 +149,13 @@ const SeoTab: React.FC = () => {
                         onChange={e => update("ogDescription", e.target.value)} multiline rows={3} />
                     <TextField label="OG Image URL" value={current.ogImageUrl ?? ""}
                         onChange={e => update("ogImageUrl", e.target.value)}
-                        helperText="Recommended: 1200×630px" />
+                        error={!isValidUrl(current.ogImageUrl ?? "")}
+                        helperText={!isValidUrl(current.ogImageUrl ?? "") ? "Enter a valid http(s) URL" : "Recommended: 1200×630px"} />
                 </SectionCard>
 
                 <div className="flex justify-end">
                     <Button label={saving ? "Saving…" : "Save Changes"} variant="primaryContained"
-                        disabled={saving} startIcon={<FiSave size={14} />} onClick={handleSave} />
+                        disabled={saving || hasBlockingError} startIcon={<FiSave size={14} />} onClick={handleSave} />
                 </div>
             </div>
         </motion.div>

@@ -13,6 +13,10 @@ const GITHUB_BASE = "https://github.com/";
 const extractUsername = (url: string): string =>
     url.replace(/^https?:\/\/(www\.)?github\.com\/?/i, "").replace(/\/$/, "").trim();
 
+// GitHub usernames: alphanumeric or single hyphens, cannot start/end with a hyphen, max 39 chars
+const GITHUB_USERNAME_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
+const isValidGithubUsername = (value: string): boolean => GITHUB_USERNAME_PATTERN.test(value);
+
 const GitHubTab: React.FC = () => {
     const colors = useColors();
     const socialService = useSocialLinkService();
@@ -38,11 +42,17 @@ const GitHubTab: React.FC = () => {
 
     const isConfigured = !!githubLink;
     const isDirty = username !== (githubLink ? extractUsername(githubLink.url) : "");
+    const trimmedUsername = username.trim();
+    const usernameError = trimmedUsername.length > 0 && !isValidGithubUsername(trimmedUsername);
 
     const handleSave = async () => {
         const trimmed = username.trim();
         if (!trimmed) {
             showSnackbar("error", "GitHub username cannot be empty");
+            return;
+        }
+        if (!isValidGithubUsername(trimmed)) {
+            showSnackbar("error", "Enter a valid GitHub username");
             return;
         }
         const url = `${GITHUB_BASE}${trimmed}`;
@@ -166,7 +176,12 @@ const GitHubTab: React.FC = () => {
                     onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
                     placeholder="e.g. torvalds"
                     disabled={saving}
-                    helperText={username.trim() ? `Profile URL: ${GITHUB_BASE}${username.trim()}` : ""}
+                    error={usernameError}
+                    helperText={
+                        usernameError
+                            ? "Usernames may only contain letters, numbers, and single hyphens"
+                            : trimmedUsername ? `Profile URL: ${GITHUB_BASE}${trimmedUsername}` : ""
+                    }
                     InputProps={{
                         startAdornment: (
                             <span className="text-sm mr-1" style={{ color: colors.neutral400, whiteSpace: "nowrap" }}>
@@ -191,7 +206,7 @@ const GitHubTab: React.FC = () => {
                         label={saving ? "Saving…" : isConfigured ? "Update Username" : "Connect GitHub"}
                         variant="primaryContained"
                         startIcon={<FiGithub size={14} />}
-                        disabled={saving || !username.trim() || !isDirty}
+                        disabled={saving || !trimmedUsername || !isDirty || usernameError}
                         onClick={handleSave}
                     />
                 </div>

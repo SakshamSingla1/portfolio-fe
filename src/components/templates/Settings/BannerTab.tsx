@@ -1,30 +1,29 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiUploadCloud, FiTrash2, FiImage } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import usePlatformSettingsService, { type IPlatformSettings } from "../../../services/usePlatformSettingsService";
 import useFileService from "../../../services/useFileService";
+import { useSnackbar } from "../../../hooks/useSnackBar";
+import { Card, SectionLabel } from "../Dashboard/shared/DashboardUI";
 
 const BANNER_RESOURCE_TYPE = "BANNER";
-const PLATFORM_RESOURCE_ID = 1;
+// Must match the backend's hardcoded PlatformSettingsServiceImpl.BANNER_RESOURCE_ID —
+// this is a singleton platform-wide asset, not tied to any real profile/resource row.
+const PLATFORM_RESOURCE_ID = -1;
 
 const BannerTab: React.FC = () => {
     const colors = useColors();
     const settingsService = usePlatformSettingsService();
     const fileService = useFileService();
+    const { showSnackbar } = useSnackbar();
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [settings, setSettings] = useState<IPlatformSettings | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [deleting, setDeleting] = useState(false);
-    const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
     const [dragOver, setDragOver] = useState(false);
-
-    const showToast = (msg: string, ok: boolean) => {
-        setToast({ msg, ok });
-        setTimeout(() => setToast(null), 3000);
-    };
 
     useEffect(() => {
         settingsService.getSettings().then((res: any) => {
@@ -34,7 +33,7 @@ const BannerTab: React.FC = () => {
 
     const handleFile = async (file: File) => {
         if (!file.type.startsWith("image/")) {
-            showToast("Please select an image file.", false);
+            showSnackbar("error", "Please select an image file.");
             return;
         }
         const previousAssetId = settings?.bannerAssetId ?? null;
@@ -51,10 +50,10 @@ const BannerTab: React.FC = () => {
             if (previousAssetId) fileService.deleteFile(previousAssetId);
             setSettings({ bannerImageUrl: asset.path, bannerAssetId: asset.id });
             setPreview(null);
-            showToast("Banner uploaded successfully.", true);
+            showSnackbar("success", "Banner uploaded successfully.");
         } else {
             setPreview(null);
-            showToast("Upload failed. Please try again.", false);
+            showSnackbar("error", "Upload failed. Please try again.");
         }
     };
 
@@ -65,39 +64,24 @@ const BannerTab: React.FC = () => {
         setDeleting(false);
         if (res?.status === HTTP_STATUS.OK) {
             setSettings(null);
-            showToast("Banner removed.", true);
+            showSnackbar("success", "Banner removed.");
         } else {
-            showToast("Delete failed.", false);
+            showSnackbar("error", "Delete failed.");
         }
     };
 
     const currentImage = preview ?? settings?.bannerImageUrl ?? null;
 
     return (
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "8px 0" }}>
-            <AnimatePresence>
-                {toast && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        style={{
-                            marginBottom: 16,
-                            padding: "10px 16px",
-                            borderRadius: 10,
-                            fontSize: 13,
-                            fontWeight: 600,
-                            background: toast.ok ? `${colors.success500}15` : `${colors.error500}15`,
-                            color: toast.ok ? colors.success600 : colors.error600,
-                            border: `1px solid ${toast.ok ? colors.success500 : colors.error500}30`,
-                        }}
-                    >
-                        {toast.msg}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {currentImage ? (
+        <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ maxWidth: 680, margin: "0 auto" }}
+        >
+            <Card hero>
+                <SectionLabel accent={colors.primary600}>Platform Banner</SectionLabel>
+                {currentImage ? (
                 <div
                     style={{
                         borderRadius: 14,
@@ -221,7 +205,8 @@ const BannerTab: React.FC = () => {
             </p>
 
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
+            </Card>
+        </motion.div>
     );
 };
 
