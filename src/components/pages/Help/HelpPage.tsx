@@ -1,17 +1,23 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   FaRocket, FaUser, FaCode, FaBookOpen, FaProjectDiagram, FaShareAlt,
   FaPalette, FaLink, FaGlobe, FaUsers, FaShieldAlt, FaBell, FaCheckCircle,
   FaArrowRight, FaCloudUploadAlt, FaGithub, FaCog, FaBolt, FaLightbulb,
   FaGraduationCap, FaCertificate, FaTrophy, FaComments, FaFileAlt,
-  FaSearch, FaChevronDown, FaImage, FaMagic, FaLock,
+  FaSearch, FaChevronDown, FaImage, FaMagic, FaLock, FaPlus, FaTrash, FaEdit,
 } from "react-icons/fa";
 import { FiZap, FiLayout, FiSettings, FiBook, FiHelpCircle } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
-import { useColors } from "../../../utils/types";
+import TextField from "../../atoms/TextField/TextField";
+import Button from "../../atoms/Button/Button";
+import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
+import { useColors, HTTP_STATUS } from "../../../utils/types";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
+import { useSnackbar } from "../../../hooks/useSnackBar";
+import { useHelpFaqService, type HelpFaq } from "../../../services/useHelpFaqService";
 
 // ── Shared primitives ──────────────────────────────────────────────────────────
 
@@ -197,56 +203,8 @@ const deploymentSteps = [
   { icon: FaGlobe, title: "Verify & Smoke Test", desc: "Open your live URL, check the portfolio renders, test the contact form, and confirm SSL is active." },
 ];
 
-const faqs = [
-  {
-    q: "How do I change the color theme?",
-    a: "Go to Color Themes in the sidebar. Pick a preset card and click Apply, or click 'New Theme' to build a custom palette. Use the Preview Panel to see changes live before committing. Your selection applies instantly to both the admin dashboard and public portfolio.",
-  },
-  {
-    q: "What is the difference between Achievements and Certifications?",
-    a: "Certifications are formal credentials issued by a third party (AWS, Google, Coursera etc.) with an issuer, date, and verification URL. Achievements are general recognitions — hackathon wins, internal awards, open-source contributions, speaking engagements — that don't have a formal issuer.",
-  },
-  {
-    q: "Can I have multiple resumes uploaded?",
-    a: "Yes. Go to Resumes and upload as many versions as you need (e.g., a one-page summary and a detailed multi-page CV). Visitors see all uploaded files and can choose which to download.",
-  },
-  {
-    q: "Why don't I see Users, Roles, or Nav Links in the sidebar?",
-    a: "Those are admin-only modules visible only to accounts with the admin role. If you need access, ask an existing admin to elevate your role under Users → Edit User → Role.",
-  },
-  {
-    q: "What is the difference between Nav Links and Social Links?",
-    a: "Nav Links control the dashboard sidebar navigation — adding, removing, and reordering items (admin only). Social Links manage the public profile URLs (GitHub, LinkedIn, Twitter etc.) that appear on your public portfolio page, editable by all users.",
-  },
-  {
-    q: "How do I add project screenshots?",
-    a: "Open a project in Add or Edit mode and scroll to the Media section. Use the file uploader to attach images. Supported formats are JPG, PNG, WebP, and SVG. The first uploaded image becomes the project thumbnail on listing pages.",
-  },
-  {
-    q: "What file formats are supported for logos?",
-    a: "The logo uploader accepts PNG, JPG, WebP, and SVG. SVG is strongly recommended because it renders sharply at any size. Logos are reused across Skills and Projects so you only need to upload each once.",
-  },
-  {
-    q: "How do I preview my public portfolio?",
-    a: "Click Main Site in the sidebar or navigate to /main-site. This renders the full visitor-facing view using your current data and active theme. No changes are needed to publish — your data is always live.",
-  },
-  {
-    q: "What is Landing Page management?",
-    a: "Landing Page (under the sidebar) lets you configure the sections on your public-facing landing page — Features, FAQs, How-it-works steps, Target Audience cards, and Testimonials. Each item can be toggled active/inactive, reordered, and edited without touching code.",
-  },
-  {
-    q: "How do I switch between light and dark mode?",
-    a: "Click the sun/moon toggle in the top navigation bar. Your preference is saved locally. The selected mode applies to both the admin dashboard and — depending on your theme settings — may also follow the visitor's system preference on the public portfolio.",
-  },
-  {
-    q: "Can I use the same logo across multiple skills?",
-    a: "Yes. Logos are stored once in the Logos module and referenced by ID across Skills, Projects, and Experience. Updating a logo in one place automatically updates it everywhere it is referenced.",
-  },
-  {
-    q: "How do Email Templates and variables work?",
-    a: "In Email Templates you write notification bodies using {{variableName}} placeholders. Template Variables (a sub-section of Templates) defines the available variables and their descriptions. The platform substitutes real values at send time — for example {{recipientName}} becomes the actual user's name.",
-  },
-];
+// FAQ content is now admin-editable (Help FAQ backend) rather than hardcoded here —
+// see the FAQ tab component below, which fetches it via useHelpFaqService.
 
 // ── Tab: Quick Start ───────────────────────────────────────────────────────────
 
@@ -590,24 +548,79 @@ const Deployment = ({ colors }: { colors: any }) => (
 
 // ── Tab: FAQ ───────────────────────────────────────────────────────────────────
 
-const FAQItem = ({ item, colors, index }: { item: typeof faqs[0]; colors: any; index: number }) => {
+const emptyFaqDraft = (): HelpFaq => ({ question: "", answer: "", sortOrder: 0, isActive: true });
+
+const FaqEditorForm = ({
+  draft, colors, saving, onChange, onSave, onCancel,
+}: {
+  draft: HelpFaq; colors: any; saving: boolean;
+  onChange: (next: HelpFaq) => void; onSave: () => void; onCancel: () => void;
+}) => (
+  <Card colors={colors} className="!p-4" style={{ borderColor: `${colors.primary500}40`, backgroundColor: `${colors.primary500}04` }}>
+    <div className="flex flex-col gap-3">
+      <TextField
+        label="Question" value={draft.question}
+        onChange={(e) => onChange({ ...draft, question: e.target.value })}
+        placeholder="e.g. How do I change the color theme?"
+      />
+      <TextField
+        label="Answer" value={draft.answer} multiline rows={3}
+        onChange={(e) => onChange({ ...draft, answer: e.target.value })}
+        placeholder="Write the answer shown when this question is expanded"
+      />
+      <div className="flex items-center gap-4 flex-wrap">
+        <TextField
+          label="Sort Order" type="number" value={draft.sortOrder}
+          onChange={(e) => onChange({ ...draft, sortOrder: Number(e.target.value) || 0 })}
+          style={{ width: 140 }}
+        />
+        <label className="flex items-center gap-2 text-sm cursor-pointer select-none" style={{ color: colors.neutral700 }}>
+          <input
+            type="checkbox"
+            checked={draft.isActive}
+            onChange={(e) => onChange({ ...draft, isActive: e.target.checked })}
+          />
+          Active (visible to all users)
+        </label>
+      </div>
+      <div className="flex items-center justify-end gap-2 mt-1">
+        <Button label="Cancel" variant="tertiaryContained" size="small" onClick={onCancel} disabled={saving} />
+        <Button
+          label={saving ? "Saving…" : "Save"}
+          variant="primaryContained"
+          size="small"
+          disabled={saving || !draft.question.trim() || !draft.answer.trim()}
+          onClick={onSave}
+        />
+      </div>
+    </div>
+  </Card>
+);
+
+const FAQItem = ({
+  item, colors, index, isSuperAdmin, managing, onEdit, onDelete,
+}: {
+  item: HelpFaq; colors: any; index: number; isSuperAdmin: boolean; managing: boolean;
+  onEdit: () => void; onDelete: () => void;
+}) => {
   const [open, setOpen] = useState(false);
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.04 }}>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full text-left"
-        style={{ background: "none", border: "none", padding: 0 }}
+      <Card
+        colors={colors}
+        className="!p-4"
+        style={{
+          borderColor: open ? `${colors.primary500}40` : `${colors.neutral200}60`,
+          backgroundColor: open ? `${colors.primary500}04` : colors.neutral0,
+          opacity: isSuperAdmin && !item.isActive ? 0.55 : 1,
+        }}
       >
-        <Card
-          colors={colors}
-          className="!p-4 cursor-pointer"
-          style={{
-            borderColor: open ? `${colors.primary500}40` : `${colors.neutral200}60`,
-            backgroundColor: open ? `${colors.primary500}04` : colors.neutral0,
-          }}
-        >
-          <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3">
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="flex items-start gap-3 flex-1 min-w-0 text-left"
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+          >
             <div
               className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0 font-black text-xs mt-0.5"
               style={{ backgroundColor: `${colors.primary500}12`, color: colors.primary600, border: `1px solid ${colors.primary500}20` }}
@@ -615,7 +628,12 @@ const FAQItem = ({ item, colors, index }: { item: typeof faqs[0]; colors: any; i
               Q
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm m-0" style={{ color: colors.neutral800 }}>{item.q}</p>
+              <p className="font-bold text-sm m-0" style={{ color: colors.neutral800 }}>
+                {item.question}
+                {isSuperAdmin && !item.isActive && (
+                  <span className="ml-2 text-[9px] font-black uppercase tracking-wider" style={{ color: colors.warning600 }}>Inactive</span>
+                )}
+              </p>
               <AnimatePresence>
                 {open && (
                   <motion.p
@@ -627,67 +645,178 @@ const FAQItem = ({ item, colors, index }: { item: typeof faqs[0]; colors: any; i
                     className="text-xs mt-2.5 leading-relaxed overflow-hidden"
                     style={{ color: colors.neutral500 }}
                   >
-                    {item.a}
+                    {item.answer}
                   </motion.p>
                 )}
               </AnimatePresence>
             </div>
+          </button>
+          {managing ? (
+            <div className="flex items-center gap-2 shrink-0">
+              <button onClick={onEdit} title="Edit" style={{ background: "none", border: "none", cursor: "pointer", color: colors.neutral400 }}>
+                <FaEdit size={13} />
+              </button>
+              <button onClick={onDelete} title="Delete" style={{ background: "none", border: "none", cursor: "pointer", color: colors.error500 }}>
+                <FaTrash size={13} />
+              </button>
+            </div>
+          ) : (
             <FaChevronDown
               className="shrink-0 mt-1 transition-transform duration-200"
-              style={{
-                fontSize: 11,
-                color: colors.neutral400,
-                transform: open ? "rotate(180deg)" : "rotate(0deg)",
-              }}
+              style={{ fontSize: 11, color: colors.neutral400, transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
             />
-          </div>
-        </Card>
-      </button>
+          )}
+        </div>
+      </Card>
     </motion.div>
   );
 };
 
-const FAQ = ({ colors }: { colors: any }) => {
+const FAQ = ({ colors, isSuperAdmin }: { colors: any; isSuperAdmin: boolean }) => {
   const [search, setSearch] = useState("");
+  const [managing, setManaging] = useState(false);
+  const [editingId, setEditingId] = useState<number | "new" | null>(null);
+  const [draft, setDraft] = useState<HelpFaq>(emptyFaqDraft());
+  const [deleteTarget, setDeleteTarget] = useState<HelpFaq | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const helpFaqService = useHelpFaqService();
+  const { showSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+
+  const { data: faqs, isLoading } = useQuery({
+    queryKey: ["help-faqs", managing && isSuperAdmin],
+    queryFn: async () => {
+      const res = await (managing && isSuperAdmin ? helpFaqService.getFaqsForManage() : helpFaqService.getFaqs());
+      if (res?.status === HTTP_STATUS.OK) return (res.data.data ?? []) as HelpFaq[];
+      return [];
+    },
+  });
+
   const filtered = useMemo(
-    () => faqs.filter((f) => f.q.toLowerCase().includes(search.toLowerCase()) || f.a.toLowerCase().includes(search.toLowerCase())),
-    [search]
+    () => (faqs ?? []).filter((f) => f.question.toLowerCase().includes(search.toLowerCase()) || f.answer.toLowerCase().includes(search.toLowerCase())),
+    [faqs, search]
   );
+
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ["help-faqs"] });
+
+  const startAdd = () => { setDraft(emptyFaqDraft()); setEditingId("new"); };
+  const startEdit = (item: HelpFaq) => { setDraft(item); setEditingId(item.id ?? "new"); };
+  const cancelEdit = () => setEditingId(null);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = editingId === "new" || !draft.id
+        ? await helpFaqService.createFaq(draft)
+        : await helpFaqService.updateFaq(draft.id, draft);
+      if (res?.status === HTTP_STATUS.OK) {
+        showSnackbar("success", editingId === "new" ? "FAQ created" : "FAQ updated");
+        setEditingId(null);
+        refresh();
+      } else {
+        showSnackbar("error", "Failed to save FAQ");
+      }
+    } catch {
+      showSnackbar("error", "Failed to save FAQ");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget?.id) return;
+    setDeleting(true);
+    try {
+      const res = await helpFaqService.deleteFaq(deleteTarget.id);
+      if (res?.status === HTTP_STATUS.OK) {
+        showSnackbar("success", "FAQ deleted");
+        refresh();
+      } else {
+        showSnackbar("error", "Failed to delete FAQ");
+      }
+    } catch {
+      showSnackbar("error", "Failed to delete FAQ");
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
+  };
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="relative">
-        <FaSearch
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-          style={{ fontSize: 12, color: colors.neutral400 }}
-        />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search questions…"
-          className="w-full text-sm pl-9 pr-4 py-2.5 rounded-xl outline-none"
-          style={{
-            backgroundColor: colors.neutral0,
-            border: `1.5px solid ${colors.neutral200}`,
-            color: colors.neutral900,
-          }}
-          onFocus={(e) => (e.target.style.borderColor = colors.primary400)}
-          onBlur={(e) => (e.target.style.borderColor = colors.neutral200)}
-        />
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <FaSearch
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ fontSize: 12, color: colors.neutral400 }}
+          />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search questions…"
+            className="w-full text-sm pl-9 pr-4 py-2.5 rounded-xl outline-none"
+            style={{ backgroundColor: colors.neutral0, border: `1.5px solid ${colors.neutral200}`, color: colors.neutral900 }}
+            onFocus={(e) => (e.target.style.borderColor = colors.primary400)}
+            onBlur={(e) => (e.target.style.borderColor = colors.neutral200)}
+          />
+        </div>
+        {isSuperAdmin && (
+          <Button
+            label={managing ? "Done" : "Manage FAQs"}
+            variant={managing ? "primaryContained" : "tertiaryContained"}
+            size="small"
+            onClick={() => { setManaging((v) => !v); setEditingId(null); }}
+          />
+        )}
       </div>
 
-      {filtered.length === 0 ? (
+      {managing && editingId === "new" && (
+        <FaqEditorForm draft={draft} colors={colors} saving={saving} onChange={setDraft} onSave={handleSave} onCancel={cancelEdit} />
+      )}
+
+      {isLoading ? (
+        <Card colors={colors} className="text-center !py-10">
+          <p className="text-sm" style={{ color: colors.neutral400 }}>Loading FAQs…</p>
+        </Card>
+      ) : filtered.length === 0 ? (
         <Card colors={colors} className="text-center !py-10">
           <FiHelpCircle style={{ fontSize: 28, color: colors.neutral300, margin: "0 auto 8px" }} />
-          <p className="text-sm font-medium" style={{ color: colors.neutral400 }}>No questions match "{search}"</p>
+          <p className="text-sm font-medium" style={{ color: colors.neutral400 }}>
+            {search ? `No questions match "${search}"` : "No FAQs yet"}
+          </p>
         </Card>
       ) : (
         <div className="space-y-2">
           {filtered.map((f, i) => (
-            <FAQItem key={f.q} item={f} colors={colors} index={i} />
+            editingId === f.id ? (
+              <FaqEditorForm key={f.id} draft={draft} colors={colors} saving={saving} onChange={setDraft} onSave={handleSave} onCancel={cancelEdit} />
+            ) : (
+              <FAQItem
+                key={f.id ?? f.question}
+                item={f}
+                colors={colors}
+                index={i}
+                isSuperAdmin={isSuperAdmin}
+                managing={managing}
+                onEdit={() => startEdit(f)}
+                onDelete={() => setDeleteTarget(f)}
+              />
+            )
           ))}
         </div>
+      )}
+
+      {managing && editingId !== "new" && (
+        <button
+          onClick={startAdd}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-colors duration-150"
+          style={{ border: `1.5px dashed ${colors.primary300}`, color: colors.primary600, background: "transparent", cursor: "pointer" }}
+        >
+          <FaPlus size={11} /> Add FAQ
+        </button>
       )}
 
       <Card colors={colors} style={{ borderColor: `${colors.primary500}30`, backgroundColor: `${colors.primary500}04` }}>
@@ -704,6 +833,15 @@ const FAQ = ({ colors }: { colors: any }) => {
           </div>
         </div>
       </Card>
+
+      <DeleteConfirmation
+        open={!!deleteTarget}
+        title="Delete this FAQ?"
+        description={deleteTarget ? `"${deleteTarget.question}" will be permanently removed.` : ""}
+        onDelete={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        deleteButtonText={deleting ? "Deleting…" : "Delete"}
+      />
     </div>
   );
 };
@@ -723,7 +861,7 @@ export default function HelpPage() {
       { label: "All Modules",    value: "modules", icon: <FiLayout />,    component: <AllModules colors={colors} isAdmin={isAdmin} isSuperAdmin={isSuperAdmin} /> },
       { label: "Tips",           value: "tips",   icon: <FaLightbulb />,  component: <Tips colors={colors} /> },
       { label: "Deployment",     value: "deploy", icon: <FaCloudUploadAlt />, component: <Deployment colors={colors} /> },
-      { label: "FAQ",            value: "faq",    icon: <FiHelpCircle />, component: <FAQ colors={colors} /> },
+      { label: "FAQ",            value: "faq",    icon: <FiHelpCircle />, component: <FAQ colors={colors} isSuperAdmin={isSuperAdmin} /> },
     ],
     [colors, isAdmin, isSuperAdmin]
   );
