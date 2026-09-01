@@ -96,13 +96,12 @@ const ContactUsListPage: React.FC = () => {
     const handleBulkMarkRead = async (ids: number[]) => {
         if (!ids.length) return;
         try {
-            const results = await Promise.all(ids.map((id) => contactUsService.markAsRead(id)));
-            const succeeded = ids.filter((_, i) => results[i]?.status === HTTP_STATUS.OK);
-            if (succeeded.length) markReadLocally(succeeded);
-            if (succeeded.length === ids.length) {
-                showSnackbar('success', `Marked ${succeeded.length} message(s) as read`);
+            const response = await contactUsService.markAsReadBulk(ids);
+            if (response.status === HTTP_STATUS.OK) {
+                markReadLocally(ids);
+                showSnackbar('success', `Marked ${ids.length} message(s) as read`);
             } else {
-                showSnackbar('error', `Marked ${succeeded.length} of ${ids.length} as read`);
+                showSnackbar('error', 'Failed to mark messages as read');
             }
         } catch {
             showSnackbar('error', 'Failed to mark messages as read');

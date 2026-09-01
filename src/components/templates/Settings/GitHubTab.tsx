@@ -28,7 +28,7 @@ const GitHubTab: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        socialService.getAll({ size: "100" }).then((res: any) => {
+        socialService.getAll({ size: "50" }).then((res: any) => {
             if (res?.status === HTTP_STATUS.OK) {
                 const all: SocialLinkResponse[] = res.data.data?.content ?? res.data.data ?? [];
                 const gh = all.find((l) => l.platform === "GITHUB");

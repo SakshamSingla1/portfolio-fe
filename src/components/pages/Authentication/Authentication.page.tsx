@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AUTH_STATE } from "../../../utils/types";
 
 import AuthenticationTemplate from "../../templates/Authentication/Authentication.template";
-import LoginWithEmailTemplate from "../../templates/Authentication/LoginWithEmail.template";
-import LoginWithPhoneTemplate from "../../templates/Authentication/LoginWithPhone.template";
-import OtpVerificationTemplate from "../../templates/Authentication/OtpVerification.template";
-import ForgotPasswordTemplate from "../../templates/Authentication/ForgotPassword.template";
-import ResetPasswordTemplate from "../../templates/Authentication/ResetPassword.template";
-import RegistrationTemplate from "../../templates/Authentication/Registration.template";
-import TwoFactorVerificationTemplate from "../../templates/Authentication/TwoFactorVerification.template";
+
+const LoginWithEmailTemplate = lazy(() => import("../../templates/Authentication/LoginWithEmail.template"));
+const LoginWithPhoneTemplate = lazy(() => import("../../templates/Authentication/LoginWithPhone.template"));
+const OtpVerificationTemplate = lazy(() => import("../../templates/Authentication/OtpVerification.template"));
+const ForgotPasswordTemplate = lazy(() => import("../../templates/Authentication/ForgotPassword.template"));
+const ResetPasswordTemplate = lazy(() => import("../../templates/Authentication/ResetPassword.template"));
+const RegistrationTemplate = lazy(() => import("../../templates/Authentication/Registration.template"));
+const TwoFactorVerificationTemplate = lazy(() => import("../../templates/Authentication/TwoFactorVerification.template"));
 
 const Authentication: React.FC = () => {
   const [authState, setAuthState] = useState<AUTH_STATE | null>(null);
@@ -85,7 +86,7 @@ const Authentication: React.FC = () => {
 
   return (
     <AuthenticationTemplate setAuthState={setAuthState}>
-      {renderAuthView()}
+      <Suspense fallback={null}>{renderAuthView()}</Suspense>
     </AuthenticationTemplate>
   );
 };

@@ -6,6 +6,7 @@ import { replaceUrlParams } from "../utils/helper";
 export const CONTACT_US_URLS = {
     GET_BY_PROFILE: "/contact-us",
     MARK_AS_READ: "/contact-us/:id/mark-read",
+    MARK_AS_READ_BULK: "/contact-us/mark-read-bulk",
     REPLY: "/contact-us/:id/reply",
 };
 
@@ -49,6 +50,11 @@ export const useContactUsService = () => {
         return request(API_METHOD.PATCH, url, user);
     };
 
+    const markAsReadBulk = (ids: number[]) => {
+        const url = CONTACT_US_URLS.MARK_AS_READ_BULK;
+        return request(API_METHOD.POST, url, user, { ids });
+    };
+
     const reply = (id: number, message: string) => {
         const url = replaceUrlParams(CONTACT_US_URLS.REPLY, { id });
         return request(API_METHOD.POST, url, user, { message });
@@ -57,6 +63,7 @@ export const useContactUsService = () => {
     return {
         getByProfile,
         markAsRead,
+        markAsReadBulk,
         reply,
     };
 };

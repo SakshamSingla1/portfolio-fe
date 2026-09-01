@@ -63,7 +63,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         const params: LogoFilterParams = {
             search: searchTerm || "",
             page: "0",
-            size: "1000"
+            size: "50"
         };
         try {
             const response = await logoServiceRef.current.getAll(params);

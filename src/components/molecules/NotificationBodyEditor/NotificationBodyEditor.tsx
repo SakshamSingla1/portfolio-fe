@@ -1,9 +1,14 @@
-import React, { useMemo } from "react";
-import JoditEditor from "jodit-react";
+import React, { useMemo, lazy, Suspense } from "react";
+import type { IJodit } from "jodit/esm/types/jodit";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useColors } from "../../../utils/types";
 
-type JoditInstance = React.ElementRef<typeof JoditEditor>;
+// jodit-react is a ~1.1MB chunk — load it only when a form page actually
+// renders an editable NotificationBodyEditor, instead of blocking first paint of
+// every page that imports this component.
+const JoditEditor = lazy(() => import("jodit-react"));
+
+type JoditInstance = IJodit;
 
 interface Props {
     value: string;
@@ -80,13 +85,15 @@ const NotificationBodyEditor: React.FC<Props> = ({
                         : `0 1px 3px 0 ${colors.neutral900}08`,
                 } as React.CSSProperties}
             >
-                <JoditEditor
-                    key={isDark ? "dark" : "light"}
-                    ref={handleRef}
-                    value={value}
-                    config={config}
-                    onBlur={onBlur}
-                />
+                <Suspense fallback={<div style={{ minHeight, background: isDark ? colors.neutral900 : colors.neutral0 }} />}>
+                    <JoditEditor
+                        key={isDark ? "dark" : "light"}
+                        ref={handleRef}
+                        value={value}
+                        config={config}
+                        onBlur={onBlur}
+                    />
+                </Suspense>
             </div>
             <div
                 className="flex items-center gap-2 px-1 text-xs"

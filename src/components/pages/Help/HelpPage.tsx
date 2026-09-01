@@ -855,6 +855,19 @@ export default function HelpPage() {
   const isSuperAdmin = user?.roleName === "SUPER_ADMIN";
   const isAdmin = user?.roleName === "ADMIN" || isSuperAdmin;
 
+  const helpFaqService = useHelpFaqService();
+  // Lightweight FAQ count for the stats chip below. Shares its queryKey/fetcher
+  // shape with the FAQ tab's own (non-managing) query so React Query can dedupe
+  // the request instead of this component maintaining a second, divergent fetch.
+  const { data: faqs } = useQuery({
+    queryKey: ["help-faqs", false],
+    queryFn: async () => {
+      const res = await helpFaqService.getFaqs();
+      if (res?.status === HTTP_STATUS.OK) return (res.data.data ?? []) as HelpFaq[];
+      return [];
+    },
+  });
+
   const schema = useMemo<ITabsSchema[]>(
     () => [
       { label: "Quick Start",    value: "start",  icon: <FaRocket />,     component: <QuickStart colors={colors} /> },
@@ -904,7 +917,7 @@ export default function HelpPage() {
             { label: "Setup Steps",   value: "11",  color: "primary" },
             { label: "Modules",       value: "18+", color: "accent" },
             { label: "Tips & Tricks", value: "12",  color: "success" },
-            { label: "FAQs",          value: `${faqs.length}`, color: "warning" },
+            { label: "FAQs",          value: `${faqs?.length ?? 0}`, color: "warning" },
           ].map((chip) => {
             const c5 = `${chip.color}500` as any;
             const c7 = `${chip.color}700` as any;
