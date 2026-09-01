@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
@@ -26,11 +27,13 @@ const SEO_URLS = {
 export const useSeoMetaService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getAll = () => request(API_METHOD.GET, SEO_URLS.BASE, user);
+    return useMemo(() => {
+        const getAll = () => request(API_METHOD.GET, SEO_URLS.BASE, user);
 
-    const getByPageKey = (key: PageKey) => request(API_METHOD.GET, SEO_URLS.BY_PAGE_KEY(key), user);
+        const getByPageKey = (key: PageKey) => request(API_METHOD.GET, SEO_URLS.BY_PAGE_KEY(key), user);
 
-    const upsert = (dto: SeoMetaDTO) => request(API_METHOD.PUT, SEO_URLS.BASE, user, dto);
+        const upsert = (dto: SeoMetaDTO) => request(API_METHOD.PUT, SEO_URLS.BASE, user, dto);
 
-    return { getAll, getByPageKey, upsert };
+        return { getAll, getByPageKey, upsert };
+    }, [user]);
 };

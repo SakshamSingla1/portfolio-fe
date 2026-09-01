@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
@@ -39,24 +40,26 @@ const GITHUB_URLS = {
 export const useGithubIntegrationService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getOAuthUrl = () =>
-        request(API_METHOD.GET, GITHUB_URLS.OAUTH_URL, user);
+    return useMemo(() => {
+        const getOAuthUrl = () =>
+            request(API_METHOD.GET, GITHUB_URLS.OAUTH_URL, user);
 
-    const getIntegration = () =>
-        request(API_METHOD.GET, GITHUB_URLS.INTEGRATION, user);
+        const getIntegration = () =>
+            request(API_METHOD.GET, GITHUB_URLS.INTEGRATION, user);
 
-    const sync = () =>
-        request(API_METHOD.POST, GITHUB_URLS.SYNC, user);
+        const sync = () =>
+            request(API_METHOD.POST, GITHUB_URLS.SYNC, user);
 
-    const disconnect = () =>
-        request(API_METHOD.DELETE, GITHUB_URLS.INTEGRATION, user);
+        const disconnect = () =>
+            request(API_METHOD.DELETE, GITHUB_URLS.INTEGRATION, user);
 
-    const updateRepo = (id: number, isVisible?: boolean, sortOrder?: number) => {
-        const params = new URLSearchParams();
-        if (isVisible !== undefined) params.set("isVisible", String(isVisible));
-        if (sortOrder !== undefined) params.set("sortOrder", String(sortOrder));
-        return request(API_METHOD.PATCH, `${GITHUB_URLS.REPO(id)}?${params}`, user);
-    };
+        const updateRepo = (id: number, isVisible?: boolean, sortOrder?: number) => {
+            const params = new URLSearchParams();
+            if (isVisible !== undefined) params.set("isVisible", String(isVisible));
+            if (sortOrder !== undefined) params.set("sortOrder", String(sortOrder));
+            return request(API_METHOD.PATCH, `${GITHUB_URLS.REPO(id)}?${params}`, user);
+        };
 
-    return { getOAuthUrl, getIntegration, sync, disconnect, updateRepo };
+        return { getOAuthUrl, getIntegration, sync, disconnect, updateRepo };
+    }, [user]);
 };

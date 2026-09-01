@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
@@ -98,14 +99,16 @@ export interface IDashboardSummary {
 export const useDashboardService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getByProfile = () => {
-        const url = DASHBOARD_URLS.DASHBOARD_SUMMARY;
-        return request(API_METHOD.GET, url, user, null);
-    };
+    return useMemo(() => {
+        const getByProfile = () => {
+            const url = DASHBOARD_URLS.DASHBOARD_SUMMARY;
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    return {
-        getByProfile,
-    };
+        return {
+            getByProfile,
+        };
+    }, [user]);
 }
 
 export default useDashboardService;

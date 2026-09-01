@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
@@ -35,26 +36,28 @@ export interface LanguageFilterParams {
 export const useLanguageService = () => {
     const { user } = useAuthenticatedUser();
 
-    const create = (language: LanguageRequest) =>
-        request(API_METHOD.POST, LANGUAGE_URLS.GET_ALL, user, language);
+    return useMemo(() => {
+        const create = (language: LanguageRequest) =>
+            request(API_METHOD.POST, LANGUAGE_URLS.GET_ALL, user, language);
 
-    const update = (id: number | null, language: LanguageRequest) => {
-        const url = replaceUrlParams(LANGUAGE_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, language);
-    };
+        const update = (id: number | null, language: LanguageRequest) => {
+            const url = replaceUrlParams(LANGUAGE_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, language);
+        };
 
-    const remove = (id: number | null) => {
-        const url = replaceUrlParams(LANGUAGE_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: number | null) => {
+            const url = replaceUrlParams(LANGUAGE_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(LANGUAGE_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(LANGUAGE_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    const getAll = (params: LanguageFilterParams) =>
-        request(API_METHOD.GET, LANGUAGE_URLS.GET_ALL, user, null, { params });
+        const getAll = (params: LanguageFilterParams) =>
+            request(API_METHOD.GET, LANGUAGE_URLS.GET_ALL, user, null, { params });
 
-    return { create, update, remove, getById, getAll };
+        return { create, update, remove, getById, getAll };
+    }, [user]);
 };

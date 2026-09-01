@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -61,48 +62,50 @@ export const useProjectService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
 
-    const getAll = () => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.GET, url, user, null, null, null);
-    };
+    return useMemo(() => {
+        const getAll = () => {
+            const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+            return request(API_METHOD.GET, url, user, null, null, null);
+        };
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null, null, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null, null, null);
+        };
 
-    const create = (project: Project) => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
-        return request(API_METHOD.POST, url, user, project);
-    };
+        const create = (project: Project) => {
+            const url = replaceUrlParams(AUTH_URLS.GET_ALL, {});
+            return request(API_METHOD.POST, url, user, project);
+        };
 
-    const update = (id: number | null, project: Project) => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, project);
-    };
+        const update = (id: number | null, project: Project) => {
+            const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, project);
+        };
 
-    const deleteProject = (id: number | null) => {
-        const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const deleteProject = (id: number | null) => {
+            const url = replaceUrlParams(AUTH_URLS.GET_ALL_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const getByProfile = (params: ProjectFilterParams) => {
-        const url = AUTH_URLS.GET_BY_PROFILE;
-        return request(API_METHOD.GET, url, user, null, { params });
-    };
+        const getByProfile = (params: ProjectFilterParams) => {
+            const url = AUTH_URLS.GET_BY_PROFILE;
+            return request(API_METHOD.GET, url, user, null, { params });
+        };
 
-    const uploadProjectImage = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "PROJECT");
+        const uploadProjectImage = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "PROJECT");
 
-    return {
-        getAll,
-        getById,
-        create,
-        update,
-        deleteProject,
-        getByProfile,
-        uploadProjectImage,
-    };
+        return {
+            getAll,
+            getById,
+            create,
+            update,
+            deleteProject,
+            getByProfile,
+            uploadProjectImage,
+        };
+    }, [user, fileService]);
 };
 
 export default useProjectService;

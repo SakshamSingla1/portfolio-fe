@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
@@ -49,61 +50,63 @@ export interface GroupedNavlinkResponse {
 export const useNavlinkService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getAllNavlinks = (params: NavlinkFilterRequest) =>
-        request(
-            API_METHOD.GET,
-            NAVLINK_URLS.ALL,
-            user,
-            null,
-            { params }
-        );
+    return useMemo(() => {
+        const getAllNavlinks = (params: NavlinkFilterRequest) =>
+            request(
+                API_METHOD.GET,
+                NAVLINK_URLS.ALL,
+                user,
+                null,
+                { params }
+            );
 
-    const getNavlinkById = (id: number | null) =>
-        request(
-            API_METHOD.GET,
-            replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
-            user,
-            null
-        );
+        const getNavlinkById = (id: number | null) =>
+            request(
+                API_METHOD.GET,
+                replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
+                user,
+                null
+            );
 
-    const getNavlinkByRole = (role: string) =>
-        request(
-            API_METHOD.GET,
-            replaceUrlParams(NAVLINK_URLS.BY_ROLE, { role }),
-            user,
-            null
-        );
+        const getNavlinkByRole = (role: string) =>
+            request(
+                API_METHOD.GET,
+                replaceUrlParams(NAVLINK_URLS.BY_ROLE, { role }),
+                user,
+                null
+            );
 
-    const createNavlink = (navlink: NavlinkRequest) =>
-        request(
-            API_METHOD.POST,
-            NAVLINK_URLS.BASE,
-            user,
-            navlink
-        );
+        const createNavlink = (navlink: NavlinkRequest) =>
+            request(
+                API_METHOD.POST,
+                NAVLINK_URLS.BASE,
+                user,
+                navlink
+            );
 
-    const updateNavlink = (id: number | null, navlink: NavlinkRequest) =>
-        request(
-            API_METHOD.PUT,
-            replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
-            user,
-            navlink
-        );
+        const updateNavlink = (id: number | null, navlink: NavlinkRequest) =>
+            request(
+                API_METHOD.PUT,
+                replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
+                user,
+                navlink
+            );
 
-    const deleteNavlink = (id: number | null) =>
-        request(
-            API_METHOD.DELETE,
-            replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
-            user,
-            null
-        );
+        const deleteNavlink = (id: number | null) =>
+            request(
+                API_METHOD.DELETE,
+                replaceUrlParams(NAVLINK_URLS.BY_ID, { id }),
+                user,
+                null
+            );
 
-    return {
-        getAllNavlinks,
-        getNavlinkById,
-        getNavlinkByRole,
-        createNavlink,
-        updateNavlink,
-        deleteNavlink,
-    };
+        return {
+            getAllNavlinks,
+            getNavlinkById,
+            getNavlinkByRole,
+            createNavlink,
+            updateNavlink,
+            deleteNavlink,
+        };
+    }, [user]);
 };

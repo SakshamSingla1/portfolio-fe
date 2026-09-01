@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { replaceUrlParams } from "../utils/helper";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 
@@ -9,26 +10,28 @@ export const PUBLIC_RESUME_URLS = {
 export const usePublicResumeService = () => {
   const { user } = useAuthenticatedUser();
 
-  const getViewResumeUrl = () => {
-    if (!user?.userName) return null;
-    return `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
-      PUBLIC_RESUME_URLS.VIEW_RESUME,
-      { username: user.userName }
-    )}`;
-  };
+  return useMemo(() => {
+    const getViewResumeUrl = () => {
+      if (!user?.userName) return null;
+      return `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
+        PUBLIC_RESUME_URLS.VIEW_RESUME,
+        { username: user.userName }
+      )}`;
+    };
 
-  const getDownloadResumeUrl = () => {
-    if (!user?.userName) return null;
-    return `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
-      PUBLIC_RESUME_URLS.DOWNLOAD_RESUME,
-      { username: user.userName }
-    )}`;
-  };
+    const getDownloadResumeUrl = () => {
+      if (!user?.userName) return null;
+      return `${import.meta.env.VITE_API_V1_URL}${replaceUrlParams(
+        PUBLIC_RESUME_URLS.DOWNLOAD_RESUME,
+        { username: user.userName }
+      )}`;
+    };
 
-  return {
-    getViewResumeUrl,
-    getDownloadResumeUrl,
-  };
+    return {
+      getViewResumeUrl,
+      getDownloadResumeUrl,
+    };
+  }, [user]);
 };
 
 export default usePublicResumeService;

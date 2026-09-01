@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -51,44 +52,46 @@ export const useCertificationService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
 
-    const create = (certification: CertificationRequest) =>
-        request(API_METHOD.POST, CERTIFICATION_URLS.GET_ALL, user, certification);
+    return useMemo(() => {
+        const create = (certification: CertificationRequest) =>
+            request(API_METHOD.POST, CERTIFICATION_URLS.GET_ALL, user, certification);
 
-    const update = (id: number | null, certification: CertificationRequest) => {
-        const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, certification);
-    };
+        const update = (id: number | null, certification: CertificationRequest) => {
+            const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, certification);
+        };
 
-    const remove = (id: number | null) => {
-        const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: number | null) => {
+            const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const bulkRemove = (ids: number[]) =>
-        request(API_METHOD.DELETE, CERTIFICATION_URLS.BULK_DELETE, user, { ids });
+        const bulkRemove = (ids: number[]) =>
+            request(API_METHOD.DELETE, CERTIFICATION_URLS.BULK_DELETE, user, { ids });
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(CERTIFICATION_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    const getAll = (params: CertificationFilterParams) => {
-        const url = CERTIFICATION_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, { params: params });
-    };
+        const getAll = (params: CertificationFilterParams) => {
+            const url = CERTIFICATION_URLS.GET_ALL;
+            return request(API_METHOD.GET, url, user, null, { params: params });
+        };
 
-    const uploadCredential = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "CERTIFICATION", { isPrimary: true });
+        const uploadCredential = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "CERTIFICATION", { isPrimary: true });
 
-    return {
-        create,
-        update,
-        remove,
-        bulkRemove,
-        getById,
-        getAll,
-        uploadCredential
-    };
+        return {
+            create,
+            update,
+            remove,
+            bulkRemove,
+            getById,
+            getAll,
+            uploadCredential
+        };
+    }, [user, fileService]);
 };
 
 export default useCertificationService;

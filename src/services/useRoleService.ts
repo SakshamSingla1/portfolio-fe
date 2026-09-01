@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
@@ -85,67 +86,69 @@ export interface GetAllRolesParams {
 export const useRoleService = () => {
     const { user } = useAuthenticatedUser();
 
-    const createRole = (roleData: RoleRequestBodyDTO) => {
-        return request(
-            API_METHOD.POST,
-            ROLE_URLS.CREATE,
-            user,
-            roleData
-        );
-    };
+    return useMemo(() => {
+        const createRole = (roleData: RoleRequestBodyDTO) => {
+            return request(
+                API_METHOD.POST,
+                ROLE_URLS.CREATE,
+                user,
+                roleData
+            );
+        };
 
-    const updateRole = (id: number | null, roleData: RoleRequestBodyDTO) => {
-        const url = replaceUrlParams(ROLE_URLS.UPDATE, { id });
-        return request(
-            API_METHOD.PUT,
-            url,
-            user,
-            roleData
-        );
-    };
+        const updateRole = (id: number | null, roleData: RoleRequestBodyDTO) => {
+            const url = replaceUrlParams(ROLE_URLS.UPDATE, { id });
+            return request(
+                API_METHOD.PUT,
+                url,
+                user,
+                roleData
+            );
+        };
 
-    const getRolePermissionsByRoleId = (id: number | null) => {
-        const url = replaceUrlParams(ROLE_URLS.GET_ROLE_PERMISSIONS, { id });
-        return request(
-            API_METHOD.GET,
-            url,
-            user
-        );
-    };
+        const getRolePermissionsByRoleId = (id: number | null) => {
+            const url = replaceUrlParams(ROLE_URLS.GET_ROLE_PERMISSIONS, { id });
+            return request(
+                API_METHOD.GET,
+                url,
+                user
+            );
+        };
 
-    const getAllRolesByCriteria = (params?: GetAllRolesParams) => {
-        return request(
-            API_METHOD.GET,
-            ROLE_URLS.GET_ALL_ROLES,
-            user,
-            null,
-            params ? { params } : null
-        );
-    };
+        const getAllRolesByCriteria = (params?: GetAllRolesParams) => {
+            return request(
+                API_METHOD.GET,
+                ROLE_URLS.GET_ALL_ROLES,
+                user,
+                null,
+                params ? { params } : null
+            );
+        };
 
-    const getRolePermissionsByUserId = (userId: string) => {
-        const url = replaceUrlParams(ROLE_URLS.GET_USER_ROLE_PERMISSIONS, { userId });
-        return request(
-            API_METHOD.GET,
-            url,
-            user
-        );
-    };
+        const getRolePermissionsByUserId = (userId: string) => {
+            const url = replaceUrlParams(ROLE_URLS.GET_USER_ROLE_PERMISSIONS, { userId });
+            return request(
+                API_METHOD.GET,
+                url,
+                user
+            );
+        };
 
-    const deleteRole = (id: number | null) => {
-        return request(
-            API_METHOD.DELETE,
-            replaceUrlParams(ROLE_URLS.DELETE, { id }),
-            user
-        );
-    };
+        const deleteRole = (id: number | null) => {
+            return request(
+                API_METHOD.DELETE,
+                replaceUrlParams(ROLE_URLS.DELETE, { id }),
+                user
+            );
+        };
 
-    return {
-        createRole,
-        updateRole,
-        getRolePermissionsByRoleId,
-        getAllRolesByCriteria,
-        getRolePermissionsByUserId,
-        deleteRole
-    };
+        return {
+            createRole,
+            updateRole,
+            getRolePermissionsByRoleId,
+            getAllRolesByCriteria,
+            getRolePermissionsByUserId,
+            deleteRole
+        };
+    }, [user]);
 };

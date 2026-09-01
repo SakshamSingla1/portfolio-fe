@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -32,38 +33,40 @@ export interface LogoFilterParams {
 export const useLogoService = () => {
   const { user } = useAuthenticatedUser();
 
-  const getAll = (params: LogoFilterParams) => {
-    const url = replaceUrlParams(LOGO_URLS.LOGO, {});
-    return request(API_METHOD.GET, url, user, null, { params });
-  };
+  return useMemo(() => {
+    const getAll = (params: LogoFilterParams) => {
+      const url = replaceUrlParams(LOGO_URLS.LOGO, {});
+      return request(API_METHOD.GET, url, user, null, { params });
+    };
 
-  const getById = (id: number | null) => {
-    const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
-    return request(API_METHOD.GET, url, user, null);
-  };
+    const getById = (id: number | null) => {
+      const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
+      return request(API_METHOD.GET, url, user, null);
+    };
 
-  const create = (logo: LogoRequest) => {
-    const url = replaceUrlParams(LOGO_URLS.LOGO, {});
-    return request(API_METHOD.POST, url, user, logo);
-  };
+    const create = (logo: LogoRequest) => {
+      const url = replaceUrlParams(LOGO_URLS.LOGO, {});
+      return request(API_METHOD.POST, url, user, logo);
+    };
 
-  const update = (id: number | null, logo: LogoRequest) => {
-    const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
-    return request(API_METHOD.PUT, url, user, logo);
-  };
+    const update = (id: number | null, logo: LogoRequest) => {
+      const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
+      return request(API_METHOD.PUT, url, user, logo);
+    };
 
-  const remove = (id: number | null) => {
-    const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
-    return request(API_METHOD.DELETE, url, user, null);
-  };
+    const remove = (id: number | null) => {
+      const url = replaceUrlParams(LOGO_URLS.LOGO_BY_ID, { id });
+      return request(API_METHOD.DELETE, url, user, null);
+    };
 
-  return {
-    getAll,
-    getById,
-    create,
-    update,
-    remove,
-  };
+    return {
+      getAll,
+      getById,
+      create,
+      update,
+      remove,
+    };
+  }, [user]);
 };
 
 export default useLogoService;

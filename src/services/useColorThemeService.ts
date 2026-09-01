@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from "."
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
@@ -43,31 +44,34 @@ export interface ColorTheme {
 
 export const useColorThemeService = () => {
     const { user } = useAuthenticatedUser();
-    const getColorTheme = async (params: ColorThemeFilterRequest) => {
-        return request(API_METHOD.GET, COLOR_THEME_URLS.GET_COLOR_THEME, user, null, { params });
-    }
 
-    const getColorThemeById = async (id: number | null) => {
-        return request(API_METHOD.GET, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user);
-    }
+    return useMemo(() => {
+        const getColorTheme = async (params: ColorThemeFilterRequest) => {
+            return request(API_METHOD.GET, COLOR_THEME_URLS.GET_COLOR_THEME, user, null, { params });
+        }
 
-    const createColorTheme = async (colorTheme: ColorTheme) => {
-        return request(API_METHOD.POST, COLOR_THEME_URLS.GET_COLOR_THEME, user, colorTheme);
-    }
+        const getColorThemeById = async (id: number | null) => {
+            return request(API_METHOD.GET, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user);
+        }
 
-    const updateColorTheme = async (id: number | null, colorTheme: ColorTheme) => {
-        return request(API_METHOD.PUT, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user, colorTheme);
-    }
+        const createColorTheme = async (colorTheme: ColorTheme) => {
+            return request(API_METHOD.POST, COLOR_THEME_URLS.GET_COLOR_THEME, user, colorTheme);
+        }
 
-    const deleteColorTheme = async (id: number | null) => {
-        return request(API_METHOD.DELETE, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user);
-    }
+        const updateColorTheme = async (id: number | null, colorTheme: ColorTheme) => {
+            return request(API_METHOD.PUT, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user, colorTheme);
+        }
 
-    return {
-        getColorTheme,
-        getColorThemeById,
-        createColorTheme,
-        updateColorTheme,
-        deleteColorTheme
-    }
+        const deleteColorTheme = async (id: number | null) => {
+            return request(API_METHOD.DELETE, replaceUrlParams(COLOR_THEME_URLS.GET_COLOR_THEME_BY_ID, { id }), user);
+        }
+
+        return {
+            getColorTheme,
+            getColorThemeById,
+            createColorTheme,
+            updateColorTheme,
+            deleteColorTheme
+        };
+    }, [user]);
 }

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -84,53 +85,55 @@ export interface BlogPostFilterParams {
 export const useBlogPostService = () => {
     const { user } = useAuthenticatedUser();
 
-    const create = (post: BlogPostRequest) =>
-        request(API_METHOD.POST, BLOG_POST_URLS.BASE, user, post);
+    return useMemo(() => {
+        const create = (post: BlogPostRequest) =>
+            request(API_METHOD.POST, BLOG_POST_URLS.BASE, user, post);
 
-    const update = (id: number, post: BlogPostRequest) => {
-        const url = replaceUrlParams(BLOG_POST_URLS.BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, post);
-    };
+        const update = (id: number, post: BlogPostRequest) => {
+            const url = replaceUrlParams(BLOG_POST_URLS.BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, post);
+        };
 
-    const getById = (id: number) => {
-        const url = replaceUrlParams(BLOG_POST_URLS.BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null);
-    };
+        const getById = (id: number) => {
+            const url = replaceUrlParams(BLOG_POST_URLS.BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    const remove = (id: number) => {
-        const url = replaceUrlParams(BLOG_POST_URLS.BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: number) => {
+            const url = replaceUrlParams(BLOG_POST_URLS.BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const getAll = (params: BlogPostFilterParams) =>
-        request(API_METHOD.GET, BLOG_POST_URLS.BASE, user, null, { params });
+        const getAll = (params: BlogPostFilterParams) =>
+            request(API_METHOD.GET, BLOG_POST_URLS.BASE, user, null, { params });
 
-    const publish = (id: number) => {
-        const url = replaceUrlParams(BLOG_POST_URLS.PUBLISH, { id });
-        return request(API_METHOD.PATCH, url, user, null);
-    };
+        const publish = (id: number) => {
+            const url = replaceUrlParams(BLOG_POST_URLS.PUBLISH, { id });
+            return request(API_METHOD.PATCH, url, user, null);
+        };
 
-    const archive = (id: number) => {
-        const url = replaceUrlParams(BLOG_POST_URLS.ARCHIVE, { id });
-        return request(API_METHOD.PATCH, url, user, null);
-    };
+        const archive = (id: number) => {
+            const url = replaceUrlParams(BLOG_POST_URLS.ARCHIVE, { id });
+            return request(API_METHOD.PATCH, url, user, null);
+        };
 
-    const uploadCoverImage = (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        return request(API_METHOD.POST, BLOG_POST_URLS.COVER_UPLOAD, user, formData);
-    };
+        const uploadCoverImage = (file: File) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            return request(API_METHOD.POST, BLOG_POST_URLS.COVER_UPLOAD, user, formData);
+        };
 
-    return {
-        create,
-        update,
-        getById,
-        remove,
-        getAll,
-        publish,
-        archive,
-        uploadCoverImage,
-    };
+        return {
+            create,
+            update,
+            getById,
+            remove,
+            getAll,
+            publish,
+            archive,
+            uploadCoverImage,
+        };
+    }, [user]);
 };
 
 export default useBlogPostService;

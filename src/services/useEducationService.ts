@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -38,36 +39,38 @@ export interface EducationFilterParams {
 export const useEducationService = () => {
     const { user } = useAuthenticatedUser();
 
-    const create = (education: Education) =>
-        request(API_METHOD.POST, EDUCATION_URLS.GET_ALL, user, education);
+    return useMemo(() => {
+        const create = (education: Education) =>
+            request(API_METHOD.POST, EDUCATION_URLS.GET_ALL, user, education);
 
-    const update = (id: number | null, education: Education) => {
-        const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
-        return request(API_METHOD.PUT, url, user, education);
-    };
+        const update = (id: number | null, education: Education) => {
+            const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
+            return request(API_METHOD.PUT, url, user, education);
+        };
 
-    const remove = (id: number | null) => {
-        const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: number | null) => {
+            const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
-        return request(API_METHOD.GET, url, user, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(EDUCATION_URLS.GET_BY_DEGREE, { id });
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    const getAllByProfile = (params: EducationFilterParams) => {
-        const url = EDUCATION_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, { params });
-    };
+        const getAllByProfile = (params: EducationFilterParams) => {
+            const url = EDUCATION_URLS.GET_ALL;
+            return request(API_METHOD.GET, url, user, null, { params });
+        };
 
-    return {
-        create,
-        update,
-        remove,
-        getById,
-        getAllByProfile,
-    };
+        return {
+            create,
+            update,
+            remove,
+            getById,
+            getAllByProfile,
+        };
+    }, [user]);
 };
 
 export default useEducationService;

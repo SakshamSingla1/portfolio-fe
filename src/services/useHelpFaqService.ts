@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -20,13 +21,15 @@ export interface HelpFaq {
 export const useHelpFaqService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getFaqs           = ()                            => request(API_METHOD.GET,    URLS.FAQS, user, null);
-    const getFaqsForManage  = ()                            => request(API_METHOD.GET,    URLS.FAQS_MANAGE, user, null);
-    const createFaq         = (data: HelpFaq)               => request(API_METHOD.POST,   URLS.FAQS, user, data);
-    const updateFaq         = (id: number, data: HelpFaq)   => request(API_METHOD.PUT,    replaceUrlParams(URLS.FAQ_ID, { id }), user, data);
-    const deleteFaq         = (id: number)                  => request(API_METHOD.DELETE, replaceUrlParams(URLS.FAQ_ID, { id }), user, null);
+    return useMemo(() => {
+        const getFaqs           = ()                            => request(API_METHOD.GET,    URLS.FAQS, user, null);
+        const getFaqsForManage  = ()                            => request(API_METHOD.GET,    URLS.FAQS_MANAGE, user, null);
+        const createFaq         = (data: HelpFaq)               => request(API_METHOD.POST,   URLS.FAQS, user, data);
+        const updateFaq         = (id: number, data: HelpFaq)   => request(API_METHOD.PUT,    replaceUrlParams(URLS.FAQ_ID, { id }), user, data);
+        const deleteFaq         = (id: number)                  => request(API_METHOD.DELETE, replaceUrlParams(URLS.FAQ_ID, { id }), user, null);
 
-    return { getFaqs, getFaqsForManage, createFaq, updateFaq, deleteFaq };
+        return { getFaqs, getFaqsForManage, createFaq, updateFaq, deleteFaq };
+    }, [user]);
 };
 
 export default useHelpFaqService;

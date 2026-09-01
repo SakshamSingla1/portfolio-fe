@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -48,40 +49,42 @@ export const useAchievementService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
 
-    const create = (achievement: AchievementRequest) =>
-        request(API_METHOD.POST, ACHIEVEMENT_URLS.GET_ALL, user, achievement);
+    return useMemo(() => {
+        const create = (achievement: AchievementRequest) =>
+            request(API_METHOD.POST, ACHIEVEMENT_URLS.GET_ALL, user, achievement);
 
-    const update = (id: number | null, achievement: AchievementRequest) => {
-        const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, achievement);
-    };
+        const update = (id: number | null, achievement: AchievementRequest) => {
+            const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, achievement);
+        };
 
-    const remove = (id: number | null) => {
-        const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: number | null) => {
+            const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(ACHIEVEMENT_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    const getAll = (params: AchievementFilterParams) => {
-        const url = ACHIEVEMENT_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, { params: params });
-    };
+        const getAll = (params: AchievementFilterParams) => {
+            const url = ACHIEVEMENT_URLS.GET_ALL;
+            return request(API_METHOD.GET, url, user, null, { params: params });
+        };
 
-    const uploadImage = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "ACHIEVEMENT", { isPrimary: true });
+        const uploadImage = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "ACHIEVEMENT", { isPrimary: true });
 
-    return {
-        create,
-        update,
-        remove,
-        getById,
-        getAll,
-        uploadImage
-    };
+        return {
+            create,
+            update,
+            remove,
+            getById,
+            getAll,
+            uploadImage
+        };
+    }, [user, fileService]);
 };
 
 export default useAchievementService;

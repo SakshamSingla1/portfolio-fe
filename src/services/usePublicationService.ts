@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -45,36 +46,38 @@ export interface PublicationFilterParams {
 export const usePublicationService = () => {
     const { user } = useAuthenticatedUser();
 
-    const create = (publication: PublicationRequest) =>
-        request(API_METHOD.POST, PUBLICATION_URLS.GET_ALL, user, publication);
+    return useMemo(() => {
+        const create = (publication: PublicationRequest) =>
+            request(API_METHOD.POST, PUBLICATION_URLS.GET_ALL, user, publication);
 
-    const update = (id: number | null, publication: PublicationRequest) => {
-        const url = replaceUrlParams(PUBLICATION_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, publication);
-    };
+        const update = (id: number | null, publication: PublicationRequest) => {
+            const url = replaceUrlParams(PUBLICATION_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, publication);
+        };
 
-    const remove = (id: number | null) => {
-        const url = replaceUrlParams(PUBLICATION_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: number | null) => {
+            const url = replaceUrlParams(PUBLICATION_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(PUBLICATION_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(PUBLICATION_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    const getAll = (params: PublicationFilterParams) => {
-        const url = PUBLICATION_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, { params: params });
-    };
+        const getAll = (params: PublicationFilterParams) => {
+            const url = PUBLICATION_URLS.GET_ALL;
+            return request(API_METHOD.GET, url, user, null, { params: params });
+        };
 
-    return {
-        create,
-        update,
-        remove,
-        getById,
-        getAll,
-    };
+        return {
+            create,
+            update,
+            remove,
+            getById,
+            getAll,
+        };
+    }, [user]);
 };
 
 export default usePublicationService;

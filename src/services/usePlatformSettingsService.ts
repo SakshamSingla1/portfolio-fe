@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 
@@ -11,10 +12,12 @@ export interface IPlatformSettings {
 }
 
 export const usePlatformSettingsService = () => {
-    const getSettings = () =>
-        request(API_METHOD.GET, URLS.PUBLIC_GET, null, null);
+    return useMemo(() => {
+        const getSettings = () =>
+            request(API_METHOD.GET, URLS.PUBLIC_GET, null, null);
 
-    return { getSettings };
+        return { getSettings };
+    }, []);
 };
 
 export default usePlatformSettingsService;

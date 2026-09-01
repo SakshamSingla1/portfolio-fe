@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -51,44 +52,46 @@ export const useTestimonialService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
 
-    const create = (testimonial: TestimonialRequest) =>
-        request(API_METHOD.POST, TESTIMONIAL_URLS.GET_ALL, user, testimonial);
+    return useMemo(() => {
+        const create = (testimonial: TestimonialRequest) =>
+            request(API_METHOD.POST, TESTIMONIAL_URLS.GET_ALL, user, testimonial);
 
-    const update = (id: number | null, testimonial: TestimonialRequest) => {
-        const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, testimonial);
-    };
+        const update = (id: number | null, testimonial: TestimonialRequest) => {
+            const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, testimonial);
+        };
 
-    const remove = (id: number | null) => {
-        const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const remove = (id: number | null) => {
+            const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    const bulkRemove = (ids: number[]) =>
-        request(API_METHOD.DELETE, TESTIMONIAL_URLS.BULK_DELETE, user, { ids });
+        const bulkRemove = (ids: number[]) =>
+            request(API_METHOD.DELETE, TESTIMONIAL_URLS.BULK_DELETE, user, { ids });
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(TESTIMONIAL_URLS.GET_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null);
+        };
 
-    const getAll = (params: TestimonialFilterParams) => {
-        const url = TESTIMONIAL_URLS.GET_ALL;
-        return request(API_METHOD.GET, url, user, null, { params });
-    };
+        const getAll = (params: TestimonialFilterParams) => {
+            const url = TESTIMONIAL_URLS.GET_ALL;
+            return request(API_METHOD.GET, url, user, null, { params });
+        };
 
-    const uploadImage = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "TESTIMONIAL", { isPrimary: true });
+        const uploadImage = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "TESTIMONIAL", { isPrimary: true });
 
-    return {
-        create,
-        update,
-        remove,
-        bulkRemove,
-        getById,
-        getAll,
-        uploadImage
-    };
+        return {
+            create,
+            update,
+            remove,
+            bulkRemove,
+            getById,
+            getAll,
+            uploadImage
+        };
+    }, [user, fileService]);
 };
 
 export default useTestimonialService;

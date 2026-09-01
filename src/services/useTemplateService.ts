@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { API_METHOD } from "../utils/constant";
@@ -75,26 +76,28 @@ export interface ITemplateVariable {
 export const useTemplateService = () => {
     const { user } = useAuthenticatedUser();
 
-    const createTemplate = (data: INotificationTemplateFormPayload) =>
-        request(API_METHOD.POST, TEMPLATE_URLS.CREATE_TEMPLATE, user, data, null, null);
+    return useMemo(() => {
+        const createTemplate = (data: INotificationTemplateFormPayload) =>
+            request(API_METHOD.POST, TEMPLATE_URLS.CREATE_TEMPLATE, user, data, null, null);
 
-    const getTemplateById = (id: number) =>
-        request(API_METHOD.GET, replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_ID, { id }), user, null, null, null);
+        const getTemplateById = (id: number) =>
+            request(API_METHOD.GET, replaceUrlParams(TEMPLATE_URLS.GET_TEMPLATE_BY_ID, { id }), user, null, null, null);
 
-    const updateTemplateById = (id: number, data: INotificationTemplateFormPayload) =>
-        request(API_METHOD.PUT, replaceUrlParams(TEMPLATE_URLS.UPDATE_TEMPLATE_BY_ID, { id }), user, data, null, null);
+        const updateTemplateById = (id: number, data: INotificationTemplateFormPayload) =>
+            request(API_METHOD.PUT, replaceUrlParams(TEMPLATE_URLS.UPDATE_TEMPLATE_BY_ID, { id }), user, data, null, null);
 
-    const getAllTemplates = (params: ITemplateFilterRequest) =>
-        request(API_METHOD.GET, TEMPLATE_URLS.GET_ALL_TEMPLATES, user, null, { params }, null);
+        const getAllTemplates = (params: ITemplateFilterRequest) =>
+            request(API_METHOD.GET, TEMPLATE_URLS.GET_ALL_TEMPLATES, user, null, { params }, null);
 
-    const getTemplateVariables = (params: ITemplateFilterRequest) =>
-        request(API_METHOD.GET, TEMPLATE_URLS.GET_TEMPLATE_VARIABLES, user, null, { params }, null);
+        const getTemplateVariables = (params: ITemplateFilterRequest) =>
+            request(API_METHOD.GET, TEMPLATE_URLS.GET_TEMPLATE_VARIABLES, user, null, { params }, null);
 
-    return {
-        createTemplate,
-        getTemplateById,
-        updateTemplateById,
-        getAllTemplates,
-        getTemplateVariables,
-    };
+        return {
+            createTemplate,
+            getTemplateById,
+            updateTemplateById,
+            getAllTemplates,
+            getTemplateVariables,
+        };
+    }, [user]);
 };

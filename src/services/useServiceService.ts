@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -49,25 +50,27 @@ export const useServiceService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
 
-    const create = (req: ServiceRequest) =>
-        request(API_METHOD.POST, SERVICE_URLS.GET_ALL, user, req);
+    return useMemo(() => {
+        const create = (req: ServiceRequest) =>
+            request(API_METHOD.POST, SERVICE_URLS.GET_ALL, user, req);
 
-    const update = (id: number | null, req: ServiceRequest) =>
-        request(API_METHOD.PUT, replaceUrlParams(SERVICE_URLS.GET_BY_ID, { id }), user, req);
+        const update = (id: number | null, req: ServiceRequest) =>
+            request(API_METHOD.PUT, replaceUrlParams(SERVICE_URLS.GET_BY_ID, { id }), user, req);
 
-    const remove = (id: number | null) =>
-        request(API_METHOD.DELETE, replaceUrlParams(SERVICE_URLS.GET_BY_ID, { id }), user, null);
+        const remove = (id: number | null) =>
+            request(API_METHOD.DELETE, replaceUrlParams(SERVICE_URLS.GET_BY_ID, { id }), user, null);
 
-    const getById = (id: number | null) =>
-        request(API_METHOD.GET, replaceUrlParams(SERVICE_URLS.GET_BY_ID, { id }), user, null);
+        const getById = (id: number | null) =>
+            request(API_METHOD.GET, replaceUrlParams(SERVICE_URLS.GET_BY_ID, { id }), user, null);
 
-    const getAll = (params: ServiceFilterParams) =>
-        request(API_METHOD.GET, SERVICE_URLS.GET_ALL, user, null, { params });
+        const getAll = (params: ServiceFilterParams) =>
+            request(API_METHOD.GET, SERVICE_URLS.GET_ALL, user, null, { params });
 
-    const uploadBanner = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "SERVICE", { isPrimary: true });
+        const uploadBanner = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "SERVICE", { isPrimary: true });
 
-    return { create, update, remove, getById, getAll, uploadBanner };
+        return { create, update, remove, getById, getAll, uploadBanner };
+    }, [user, fileService]);
 };
 
 export default useServiceService;

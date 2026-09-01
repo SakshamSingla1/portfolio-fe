@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -35,38 +36,40 @@ export interface ResumeActivateRequest {
 export const useResumeService = () => {
   const { user } = useAuthenticatedUser();
 
-  const uploadResume = (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    return request(
-      API_METHOD.POST,
-      RESUME_URLS.UPLOAD,
-      user,
-      formData
-    );
-  };
+  return useMemo(() => {
+    const uploadResume = (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      return request(
+        API_METHOD.POST,
+        RESUME_URLS.UPLOAD,
+        user,
+        formData
+      );
+    };
 
-  const getByProfile = (params: ResumeSearchParams) => {
-    const url = RESUME_URLS.GET_BY_PROFILE;
-    return request(API_METHOD.GET, url, user, null, { params });
-  };
+    const getByProfile = (params: ResumeSearchParams) => {
+      const url = RESUME_URLS.GET_BY_PROFILE;
+      return request(API_METHOD.GET, url, user, null, { params });
+    };
 
-  const activateResume = (data: ResumeActivateRequest) => {
-    const url = RESUME_URLS.ACTIVATE;
-    return request(API_METHOD.PUT, url, user, null, { params: { resumeId: data.resumeId } });
-  };
+    const activateResume = (data: ResumeActivateRequest) => {
+      const url = RESUME_URLS.ACTIVATE;
+      return request(API_METHOD.PUT, url, user, null, { params: { resumeId: data.resumeId } });
+    };
 
-  const deleteResume = (resumeId: number | null) => {
-    const url = replaceUrlParams(RESUME_URLS.DELETE, { resumeId });
-    return request(API_METHOD.DELETE, url, user, null);
-  };
+    const deleteResume = (resumeId: number | null) => {
+      const url = replaceUrlParams(RESUME_URLS.DELETE, { resumeId });
+      return request(API_METHOD.DELETE, url, user, null);
+    };
 
-  return {
-    uploadResume,
-    getByProfile,
-    activateResume,
-    deleteResume,
-  };
+    return {
+      uploadResume,
+      getByProfile,
+      activateResume,
+      deleteResume,
+    };
+  }, [user]);
 };
 
 export default useResumeService;

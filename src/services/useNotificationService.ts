@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -28,26 +29,28 @@ export interface NotificationFilterParams {
 export const useNotificationService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getAll = (params: NotificationFilterParams) =>
-        request(API_METHOD.GET, NOTIFICATION_URLS.GET_ALL, user, null, { params });
+    return useMemo(() => {
+        const getAll = (params: NotificationFilterParams) =>
+            request(API_METHOD.GET, NOTIFICATION_URLS.GET_ALL, user, null, { params });
 
-    const getUnreadCount = () =>
-        request(API_METHOD.GET, NOTIFICATION_URLS.UNREAD_COUNT, user, null);
+        const getUnreadCount = () =>
+            request(API_METHOD.GET, NOTIFICATION_URLS.UNREAD_COUNT, user, null);
 
-    const markAsRead = (id: number) => {
-        const url = replaceUrlParams(NOTIFICATION_URLS.MARK_READ, { id });
-        return request(API_METHOD.PUT, url, user, null);
-    };
+        const markAsRead = (id: number) => {
+            const url = replaceUrlParams(NOTIFICATION_URLS.MARK_READ, { id });
+            return request(API_METHOD.PUT, url, user, null);
+        };
 
-    const markAllAsRead = () =>
-        request(API_METHOD.PUT, NOTIFICATION_URLS.MARK_ALL_READ, user, null);
+        const markAllAsRead = () =>
+            request(API_METHOD.PUT, NOTIFICATION_URLS.MARK_ALL_READ, user, null);
 
-    return {
-        getAll,
-        getUnreadCount,
-        markAsRead,
-        markAllAsRead,
-    };
+        return {
+            getAll,
+            getUnreadCount,
+            markAsRead,
+            markAllAsRead,
+        };
+    }, [user]);
 };
 
 export default useNotificationService;

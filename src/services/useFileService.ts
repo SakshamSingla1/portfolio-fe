@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
@@ -43,56 +44,58 @@ export interface IFileUploadOptions {
 export const useFileService = () => {
     const { user } = useAuthenticatedUser();
 
-    const upload = (
-        file: File,
-        resourceId: string | number | null,
-        resourceType: string,
-        options: IFileUploadOptions = {}
-    ) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("resourceId", String(resourceId));
-        formData.append("resourceType", resourceType);
-        if (options.isPrimary !== undefined)
-            formData.append("isPrimary", String(options.isPrimary));
-        if (options.sortOrder !== undefined)
-            formData.append("sortOrder", String(options.sortOrder));
-        if (options.platform)
-            formData.append("platform", options.platform);
-        if (options.metaData)
-            formData.append("metaData", options.metaData);
-        return request(API_METHOD.POST, URLS.UPLOAD, user, formData);
-    };
+    return useMemo(() => {
+        const upload = (
+            file: File,
+            resourceId: string | number | null,
+            resourceType: string,
+            options: IFileUploadOptions = {}
+        ) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("resourceId", String(resourceId));
+            formData.append("resourceType", resourceType);
+            if (options.isPrimary !== undefined)
+                formData.append("isPrimary", String(options.isPrimary));
+            if (options.sortOrder !== undefined)
+                formData.append("sortOrder", String(options.sortOrder));
+            if (options.platform)
+                formData.append("platform", options.platform);
+            if (options.metaData)
+                formData.append("metaData", options.metaData);
+            return request(API_METHOD.POST, URLS.UPLOAD, user, formData);
+        };
 
-    const getSingleton = (resourceType: string) =>
-        request(API_METHOD.GET, URLS.GET_SINGLETON(resourceType), user, null);
+        const getSingleton = (resourceType: string) =>
+            request(API_METHOD.GET, URLS.GET_SINGLETON(resourceType), user, null);
 
-    const getPublicSingleton = (resourceType: string) =>
-        request(API_METHOD.GET, URLS.GET_PUBLIC_SINGLETON(resourceType), null, null);
+        const getPublicSingleton = (resourceType: string) =>
+            request(API_METHOD.GET, URLS.GET_PUBLIC_SINGLETON(resourceType), null, null);
 
-    const getByResource = (resourceId: string | number | null, resourceType: string) =>
-        request(
-            API_METHOD.GET,
-            URLS.GET_BY_RESOURCE(resourceType, resourceId),
-            user,
-            null
-        );
+        const getByResource = (resourceId: string | number | null, resourceType: string) =>
+            request(
+                API_METHOD.GET,
+                URLS.GET_BY_RESOURCE(resourceType, resourceId),
+                user,
+                null
+            );
 
-    const getById = (id: string | number | null) =>
-        request(API_METHOD.GET, URLS.GET_BY_ID(id), user, null);
+        const getById = (id: string | number | null) =>
+            request(API_METHOD.GET, URLS.GET_BY_ID(id), user, null);
 
-    const deleteFile = (id: string | number | null) =>
-        request(API_METHOD.DELETE, URLS.DELETE_BY_ID(id), user, null);
+        const deleteFile = (id: string | number | null) =>
+            request(API_METHOD.DELETE, URLS.DELETE_BY_ID(id), user, null);
 
-    const deleteByResource = (resourceId: string | number | null, resourceType: string) =>
-        request(
-            API_METHOD.DELETE,
-            URLS.DELETE_BY_RESOURCE(resourceType, resourceId),
-            user,
-            null
-        );
+        const deleteByResource = (resourceId: string | number | null, resourceType: string) =>
+            request(
+                API_METHOD.DELETE,
+                URLS.DELETE_BY_RESOURCE(resourceType, resourceId),
+                user,
+                null
+            );
 
-    return { upload, getSingleton, getPublicSingleton, getByResource, getById, deleteFile, deleteByResource };
+        return { upload, getSingleton, getPublicSingleton, getByResource, getById, deleteFile, deleteByResource };
+    }, [user]);
 };
 
 export default useFileService;

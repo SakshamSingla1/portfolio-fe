@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
@@ -17,10 +18,12 @@ export interface SearchResult {
 export const useSearchService = () => {
     const { user } = useAuthenticatedUser();
 
-    const search = (query: string) =>
-        request(API_METHOD.GET, SEARCH_URLS.SEARCH, user, null, { params: { q: query } });
+    return useMemo(() => {
+        const search = (query: string) =>
+            request(API_METHOD.GET, SEARCH_URLS.SEARCH, user, null, { params: { q: query } });
 
-    return { search };
+        return { search };
+    }, [user]);
 };
 
 export default useSearchService;

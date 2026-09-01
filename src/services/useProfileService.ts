@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
@@ -131,100 +132,102 @@ export const useProfileService = () => {
     const { user } = useAuthenticatedUser();
     const fileService = useFileService();
 
-    const get = () => {
-        return request(API_METHOD.GET, PROFILE_URLS.GET_BY_ID, user);
-    };
+    return useMemo(() => {
+        const get = () => {
+            return request(API_METHOD.GET, PROFILE_URLS.GET_BY_ID, user);
+        };
 
-    const update = (profile: ProfileRequest) => {
-        return request(API_METHOD.PUT, PROFILE_URLS.GET_BY_ID, user, profile);
-    };
+        const update = (profile: ProfileRequest) => {
+            return request(API_METHOD.PUT, PROFILE_URLS.GET_BY_ID, user, profile);
+        };
 
-    const updateSettings = (settings: ProfileSettingsRequest) => {
-        return request(API_METHOD.PATCH, PROFILE_URLS.PATCH_SETTINGS, user, settings);
-    };
+        const updateSettings = (settings: ProfileSettingsRequest) => {
+            return request(API_METHOD.PATCH, PROFILE_URLS.PATCH_SETTINGS, user, settings);
+        };
 
-    const uploadProfileImage = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: true, sortOrder: 0 });
+        const uploadProfileImage = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: true, sortOrder: 0 });
 
-    const uploadLogo = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "PROFILE_LOGO", { isPrimary: true, sortOrder: 0 });
+        const uploadLogo = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "PROFILE_LOGO", { isPrimary: true, sortOrder: 0 });
 
-    const uploadAboutMeImage = (file: File) =>
-        fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: false, sortOrder: 1, metaData: "ABOUT_ME_IMAGE" });
+        const uploadAboutMeImage = (file: File) =>
+            fileService.upload(file, user?.id ?? "", "PROFILE", { isPrimary: false, sortOrder: 1, metaData: "ABOUT_ME_IMAGE" });
 
-    const createUser = (body: AdminCreateUserRequest) => {
-        return request(API_METHOD.POST, PROFILE_URLS.ADMIN_CREATE_USER, user, body);
-    };
+        const createUser = (body: AdminCreateUserRequest) => {
+            return request(API_METHOD.POST, PROFILE_URLS.ADMIN_CREATE_USER, user, body);
+        };
 
-    const getAllUsers = (params?: GetProfilesParams) => {
-        return request(API_METHOD.GET, PROFILE_URLS.ADMIN_GET_ALL_USERS, user, null, params ? { params } : null);
-    };
+        const getAllUsers = (params?: GetProfilesParams) => {
+            return request(API_METHOD.GET, PROFILE_URLS.ADMIN_GET_ALL_USERS, user, null, params ? { params } : null);
+        };
 
-    const getUserById = (id: number | null) => {
-        return request(
-            API_METHOD.GET,
-            replaceUrlParams(PROFILE_URLS.ADMIN_GET_USER_BY_ID, { id }),
-            user
-        );
-    };
+        const getUserById = (id: number | null) => {
+            return request(
+                API_METHOD.GET,
+                replaceUrlParams(PROFILE_URLS.ADMIN_GET_USER_BY_ID, { id }),
+                user
+            );
+        };
 
-    const updateUserStatus = (id: number | null, body: StatusUpdateRequest) => {
-        return request(
-            API_METHOD.PUT,
-            replaceUrlParams(PROFILE_URLS.ADMIN_UPDATE_STATUS, { id }),
-            user,
-            body
-        );
-    };
+        const updateUserStatus = (id: number | null, body: StatusUpdateRequest) => {
+            return request(
+                API_METHOD.PUT,
+                replaceUrlParams(PROFILE_URLS.ADMIN_UPDATE_STATUS, { id }),
+                user,
+                body
+            );
+        };
 
-    const updateUserRole = (id: number | null, body: RoleUpdateRequest) => {
-        return request(
-            API_METHOD.PUT,
-            replaceUrlParams(PROFILE_URLS.ADMIN_UPDATE_ROLE, { id }),
-            user,
-            body
-        );
-    };
+        const updateUserRole = (id: number | null, body: RoleUpdateRequest) => {
+            return request(
+                API_METHOD.PUT,
+                replaceUrlParams(PROFILE_URLS.ADMIN_UPDATE_ROLE, { id }),
+                user,
+                body
+            );
+        };
 
-    const toggleUserVerification = (id: number | null) => {
-        return request(
-            API_METHOD.PUT,
-            replaceUrlParams(PROFILE_URLS.ADMIN_TOGGLE_VERIFY, { id }),
-            user
-        );
-    };
+        const toggleUserVerification = (id: number | null) => {
+            return request(
+                API_METHOD.PUT,
+                replaceUrlParams(PROFILE_URLS.ADMIN_TOGGLE_VERIFY, { id }),
+                user
+            );
+        };
 
-    const deleteUser = (id: number | null) => {
-        return request(
-            API_METHOD.DELETE,
-            replaceUrlParams(PROFILE_URLS.ADMIN_DELETE_USER, { id }),
-            user
-        );
-    };
+        const deleteUser = (id: number | null) => {
+            return request(
+                API_METHOD.DELETE,
+                replaceUrlParams(PROFILE_URLS.ADMIN_DELETE_USER, { id }),
+                user
+            );
+        };
 
-    const bulkUpdateStatus = (body: BulkStatusUpdateRequest) => {
-        return request(API_METHOD.PATCH, PROFILE_URLS.ADMIN_BULK_UPDATE_STATUS, user, body);
-    };
+        const bulkUpdateStatus = (body: BulkStatusUpdateRequest) => {
+            return request(API_METHOD.PATCH, PROFILE_URLS.ADMIN_BULK_UPDATE_STATUS, user, body);
+        };
 
-    const bulkDeleteUsers = (body: BulkUserIdsRequest) => {
-        return request(API_METHOD.DELETE, PROFILE_URLS.ADMIN_BULK_DELETE_USERS, user, body);
-    };
+        const bulkDeleteUsers = (body: BulkUserIdsRequest) => {
+            return request(API_METHOD.DELETE, PROFILE_URLS.ADMIN_BULK_DELETE_USERS, user, body);
+        };
 
-    return {
-        get,
-        update,
-        updateSettings,
-        uploadProfileImage,
-        uploadLogo,
-        uploadAboutMeImage,
-        createUser,
-        getAllUsers,
-        getUserById,
-        updateUserStatus,
-        updateUserRole,
-        toggleUserVerification,
-        deleteUser,
-        bulkUpdateStatus,
-        bulkDeleteUsers
-    };
+        return {
+            get,
+            update,
+            updateSettings,
+            uploadProfileImage,
+            uploadLogo,
+            uploadAboutMeImage,
+            createUser,
+            getAllUsers,
+            getUserById,
+            updateUserStatus,
+            updateUserRole,
+            toggleUserVerification,
+            deleteUser,
+            bulkUpdateStatus,
+            bulkDeleteUsers
+        };
+    }, [user, fileService]);
 };

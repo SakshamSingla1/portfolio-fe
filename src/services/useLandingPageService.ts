@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -97,46 +98,48 @@ export interface LandingPageData {
 export const useLandingPageService = () => {
     const { user } = useAuthenticatedUser();
 
-    // Public
-    const getPage = () => request(API_METHOD.GET, URLS.PAGE, null, null);
+    return useMemo(() => {
+        // Public
+        const getPage = () => request(API_METHOD.GET, URLS.PAGE, null, null);
 
-    const getConfig  = ()                          => request(API_METHOD.GET, URLS.CONFIG, user, null);
-    const updateConfig = (data: LandingConfig)     => request(API_METHOD.PUT, URLS.CONFIG, user, data);
+        const getConfig  = ()                          => request(API_METHOD.GET, URLS.CONFIG, user, null);
+        const updateConfig = (data: LandingConfig)     => request(API_METHOD.PUT, URLS.CONFIG, user, data);
 
-    const getFeatures      = ()                                  => request(API_METHOD.GET,    URLS.FEATURES, user, null);
-    const createFeature    = (data: LandingFeature)              => request(API_METHOD.POST,   URLS.FEATURES, user, data);
-    const updateFeature    = (id: number, data: LandingFeature)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.FEATURE_ID, { id }), user, data);
-    const deleteFeature    = (id: number)                        => request(API_METHOD.DELETE, replaceUrlParams(URLS.FEATURE_ID, { id }), user, null);
+        const getFeatures      = ()                                  => request(API_METHOD.GET,    URLS.FEATURES, user, null);
+        const createFeature    = (data: LandingFeature)              => request(API_METHOD.POST,   URLS.FEATURES, user, data);
+        const updateFeature    = (id: number, data: LandingFeature)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.FEATURE_ID, { id }), user, data);
+        const deleteFeature    = (id: number)                        => request(API_METHOD.DELETE, replaceUrlParams(URLS.FEATURE_ID, { id }), user, null);
 
-    const getFaqs     = ()                              => request(API_METHOD.GET,    URLS.FAQS, user, null);
-    const createFaq   = (data: LandingFaq)              => request(API_METHOD.POST,   URLS.FAQS, user, data);
-    const updateFaq   = (id: number, data: LandingFaq)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.FAQ_ID, { id }), user, data);
-    const deleteFaq   = (id: number)                    => request(API_METHOD.DELETE, replaceUrlParams(URLS.FAQ_ID, { id }), user, null);
+        const getFaqs     = ()                              => request(API_METHOD.GET,    URLS.FAQS, user, null);
+        const createFaq   = (data: LandingFaq)              => request(API_METHOD.POST,   URLS.FAQS, user, data);
+        const updateFaq   = (id: number, data: LandingFaq)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.FAQ_ID, { id }), user, data);
+        const deleteFaq   = (id: number)                    => request(API_METHOD.DELETE, replaceUrlParams(URLS.FAQ_ID, { id }), user, null);
 
-    const getSteps     = ()                               => request(API_METHOD.GET,    URLS.STEPS, user, null);
-    const createStep   = (data: LandingStep)              => request(API_METHOD.POST,   URLS.STEPS, user, data);
-    const updateStep   = (id: number, data: LandingStep)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.STEP_ID, { id }), user, data);
-    const deleteStep   = (id: number)                     => request(API_METHOD.DELETE, replaceUrlParams(URLS.STEP_ID, { id }), user, null);
+        const getSteps     = ()                               => request(API_METHOD.GET,    URLS.STEPS, user, null);
+        const createStep   = (data: LandingStep)              => request(API_METHOD.POST,   URLS.STEPS, user, data);
+        const updateStep   = (id: number, data: LandingStep)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.STEP_ID, { id }), user, data);
+        const deleteStep   = (id: number)                     => request(API_METHOD.DELETE, replaceUrlParams(URLS.STEP_ID, { id }), user, null);
 
-    const getAudienceCards    = ()                                       => request(API_METHOD.GET,    URLS.AUDIENCE, user, null);
-    const createAudienceCard  = (data: LandingAudienceCard)              => request(API_METHOD.POST,   URLS.AUDIENCE, user, data);
-    const updateAudienceCard  = (id: number, data: LandingAudienceCard)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.AUDIENCE_ID, { id }), user, data);
-    const deleteAudienceCard  = (id: number)                             => request(API_METHOD.DELETE, replaceUrlParams(URLS.AUDIENCE_ID, { id }), user, null);
+        const getAudienceCards    = ()                                       => request(API_METHOD.GET,    URLS.AUDIENCE, user, null);
+        const createAudienceCard  = (data: LandingAudienceCard)              => request(API_METHOD.POST,   URLS.AUDIENCE, user, data);
+        const updateAudienceCard  = (id: number, data: LandingAudienceCard)  => request(API_METHOD.PUT,    replaceUrlParams(URLS.AUDIENCE_ID, { id }), user, data);
+        const deleteAudienceCard  = (id: number)                             => request(API_METHOD.DELETE, replaceUrlParams(URLS.AUDIENCE_ID, { id }), user, null);
 
-    const getTestimonials    = ()                                         => request(API_METHOD.GET,    URLS.TESTIMONIALS, user, null);
-    const createTestimonial  = (data: LandingTestimonial)                 => request(API_METHOD.POST,   URLS.TESTIMONIALS, user, data);
-    const updateTestimonial  = (id: number, data: LandingTestimonial)     => request(API_METHOD.PUT,    replaceUrlParams(URLS.TESTIMONIAL_ID, { id }), user, data);
-    const deleteTestimonial  = (id: number)                               => request(API_METHOD.DELETE, replaceUrlParams(URLS.TESTIMONIAL_ID, { id }), user, null);
+        const getTestimonials    = ()                                         => request(API_METHOD.GET,    URLS.TESTIMONIALS, user, null);
+        const createTestimonial  = (data: LandingTestimonial)                 => request(API_METHOD.POST,   URLS.TESTIMONIALS, user, data);
+        const updateTestimonial  = (id: number, data: LandingTestimonial)     => request(API_METHOD.PUT,    replaceUrlParams(URLS.TESTIMONIAL_ID, { id }), user, data);
+        const deleteTestimonial  = (id: number)                               => request(API_METHOD.DELETE, replaceUrlParams(URLS.TESTIMONIAL_ID, { id }), user, null);
 
-    return {
-        getPage,
-        getConfig, updateConfig,
-        getFeatures, createFeature, updateFeature, deleteFeature,
-        getFaqs, createFaq, updateFaq, deleteFaq,
-        getSteps, createStep, updateStep, deleteStep,
-        getAudienceCards, createAudienceCard, updateAudienceCard, deleteAudienceCard,
-        getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial,
-    };
+        return {
+            getPage,
+            getConfig, updateConfig,
+            getFeatures, createFeature, updateFeature, deleteFeature,
+            getFaqs, createFaq, updateFaq, deleteFaq,
+            getSteps, createStep, updateStep, deleteStep,
+            getAudienceCards, createAudienceCard, updateAudienceCard, deleteAudienceCard,
+            getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial,
+        };
+    }, [user]);
 };
 
 export default useLandingPageService;

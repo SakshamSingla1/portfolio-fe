@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
@@ -37,36 +38,38 @@ export interface SocialLinkFilterParams {
 export const useSocialLinkService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getAll = (params: SocialLinkFilterParams) => {
-        const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK, {});
-        return request(API_METHOD.GET, url, user, null, { params }, null);
-    };
+    return useMemo(() => {
+        const getAll = (params: SocialLinkFilterParams) => {
+            const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK, {});
+            return request(API_METHOD.GET, url, user, null, { params }, null);
+        };
 
-    const getById = (id: number | null) => {
-        const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
-        return request(API_METHOD.GET, url, user, null, null, null);
-    };
+        const getById = (id: number | null) => {
+            const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
+            return request(API_METHOD.GET, url, user, null, null, null);
+        };
 
-    const create = (socialLink: SocialLink) => {
-        const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK, {});
-        return request(API_METHOD.POST, url, user, socialLink);
-    };
+        const create = (socialLink: SocialLink) => {
+            const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK, {});
+            return request(API_METHOD.POST, url, user, socialLink);
+        };
 
-    const update = (id: number | null, socialLink: SocialLink) => {
-        const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
-        return request(API_METHOD.PUT, url, user, socialLink);
-    };
+        const update = (id: number | null, socialLink: SocialLink) => {
+            const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
+            return request(API_METHOD.PUT, url, user, socialLink);
+        };
 
-    const deleteSocialLink = (id: number | null) => {
-        const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const deleteSocialLink = (id: number | null) => {
+            const url = replaceUrlParams(SOCIAL_LINK_URLS.SOCIAL_LINK_BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    return {
-        getAll,
-        getById,
-        create,
-        update,
-        deleteSocialLink,
-    };
+        return {
+            getAll,
+            getById,
+            create,
+            update,
+            deleteSocialLink,
+        };
+    }, [user]);
 }

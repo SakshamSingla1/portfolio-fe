@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
@@ -40,32 +41,34 @@ export interface ContactUsFilterParams {
 export const useContactUsService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getByProfile = (params: ContactUsFilterParams) => {
-        const url = CONTACT_US_URLS.GET_BY_PROFILE;
-        return request(API_METHOD.GET, url, user, null, {params});
-    };
+    return useMemo(() => {
+        const getByProfile = (params: ContactUsFilterParams) => {
+            const url = CONTACT_US_URLS.GET_BY_PROFILE;
+            return request(API_METHOD.GET, url, user, null, {params});
+        };
 
-    const markAsRead = (id: number | null) => {
-        const url = replaceUrlParams(CONTACT_US_URLS.MARK_AS_READ, { id });
-        return request(API_METHOD.PATCH, url, user);
-    };
+        const markAsRead = (id: number | null) => {
+            const url = replaceUrlParams(CONTACT_US_URLS.MARK_AS_READ, { id });
+            return request(API_METHOD.PATCH, url, user);
+        };
 
-    const markAsReadBulk = (ids: number[]) => {
-        const url = CONTACT_US_URLS.MARK_AS_READ_BULK;
-        return request(API_METHOD.POST, url, user, { ids });
-    };
+        const markAsReadBulk = (ids: number[]) => {
+            const url = CONTACT_US_URLS.MARK_AS_READ_BULK;
+            return request(API_METHOD.POST, url, user, { ids });
+        };
 
-    const reply = (id: number, message: string) => {
-        const url = replaceUrlParams(CONTACT_US_URLS.REPLY, { id });
-        return request(API_METHOD.POST, url, user, { message });
-    };
+        const reply = (id: number, message: string) => {
+            const url = replaceUrlParams(CONTACT_US_URLS.REPLY, { id });
+            return request(API_METHOD.POST, url, user, { message });
+        };
 
-    return {
-        getByProfile,
-        markAsRead,
-        markAsReadBulk,
-        reply,
-    };
+        return {
+            getByProfile,
+            markAsRead,
+            markAsReadBulk,
+            reply,
+        };
+    }, [user]);
 };
 
 export default useContactUsService;

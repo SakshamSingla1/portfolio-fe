@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { request } from ".";
 import { API_METHOD } from "../utils/constant";
 import { replaceUrlParams } from "../utils/helper";
@@ -25,28 +26,30 @@ export interface ProfileTemplateResponse {
 export const useProfileTemplateService = () => {
     const { user } = useAuthenticatedUser();
 
-    const getProfileTemplate = () => {
-        return request(API_METHOD.GET, PROFILE_TEMPLATE_URLS.GET_PROFILE_TEMPLATE, user);
-    };
+    return useMemo(() => {
+        const getProfileTemplate = () => {
+            return request(API_METHOD.GET, PROFILE_TEMPLATE_URLS.GET_PROFILE_TEMPLATE, user);
+        };
 
-    const assignTemplateToUser = (requestData: ProfileTemplateRequest) => {
-        return request(API_METHOD.POST, PROFILE_TEMPLATE_URLS.GET_PROFILE_TEMPLATE, user, requestData);
-    };
+        const assignTemplateToUser = (requestData: ProfileTemplateRequest) => {
+            return request(API_METHOD.POST, PROFILE_TEMPLATE_URLS.GET_PROFILE_TEMPLATE, user, requestData);
+        };
 
-    const resetTemplate = () => {
-        return request(API_METHOD.DELETE, PROFILE_TEMPLATE_URLS.GET_PROFILE_TEMPLATE, user);
-    };
+        const resetTemplate = () => {
+            return request(API_METHOD.DELETE, PROFILE_TEMPLATE_URLS.GET_PROFILE_TEMPLATE, user);
+        };
 
-    const getTemplateUsersCount = (templateKey: TemplateKey) => {
-        return request(API_METHOD.GET, replaceUrlParams(PROFILE_TEMPLATE_URLS.GET_TEMPLATE_USERS_COUNT_BY_KEY, { templateKey }), user);
-    };
+        const getTemplateUsersCount = (templateKey: TemplateKey) => {
+            return request(API_METHOD.GET, replaceUrlParams(PROFILE_TEMPLATE_URLS.GET_TEMPLATE_USERS_COUNT_BY_KEY, { templateKey }), user);
+        };
 
-    return {
-        getProfileTemplate,
-        assignTemplateToUser,
-        resetTemplate,
-        getTemplateUsersCount,
-    };
+        return {
+            getProfileTemplate,
+            assignTemplateToUser,
+            resetTemplate,
+            getTemplateUsersCount,
+        };
+    }, [user]);
 };
 
 export default useProfileTemplateService;

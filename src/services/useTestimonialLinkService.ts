@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { API_METHOD } from "../utils/constant";
 import { request } from ".";
 import { replaceUrlParams } from "../utils/helper";
@@ -28,22 +29,24 @@ export interface CreateTestimonialLinkRequest {
 export const useTestimonialLinkService = () => {
     const { user } = useAuthenticatedUser();
 
-    const createLink = (req: CreateTestimonialLinkRequest) =>
-        request(API_METHOD.POST, TESTIMONIAL_LINK_URLS.BASE, user, req);
+    return useMemo(() => {
+        const createLink = (req: CreateTestimonialLinkRequest) =>
+            request(API_METHOD.POST, TESTIMONIAL_LINK_URLS.BASE, user, req);
 
-    const getLinks = () =>
-        request(API_METHOD.GET, TESTIMONIAL_LINK_URLS.BASE, user, null);
+        const getLinks = () =>
+            request(API_METHOD.GET, TESTIMONIAL_LINK_URLS.BASE, user, null);
 
-    const revokeLink = (id: number) => {
-        const url = replaceUrlParams(TESTIMONIAL_LINK_URLS.BY_ID, { id });
-        return request(API_METHOD.DELETE, url, user, null);
-    };
+        const revokeLink = (id: number) => {
+            const url = replaceUrlParams(TESTIMONIAL_LINK_URLS.BY_ID, { id });
+            return request(API_METHOD.DELETE, url, user, null);
+        };
 
-    return {
-        createLink,
-        getLinks,
-        revokeLink,
-    };
+        return {
+            createLink,
+            getLinks,
+            revokeLink,
+        };
+    }, [user]);
 };
 
 export default useTestimonialLinkService;
