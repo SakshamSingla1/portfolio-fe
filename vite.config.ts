@@ -5,7 +5,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    chunkSizeWarningLimit: 1000,
+    // jodit-react is a single ~1.1MB third-party bundle we can't split further;
+    // it's already lazy-loaded on-demand (never in the initial page load), so
+    // the default 500KB/1000KB warning threshold is a known false positive here.
+    chunkSizeWarningLimit: 1200,
     rollupOptions: {
       output: {
         manualChunks(id) {
