@@ -74,7 +74,7 @@ const ListingProjectsPage: React.FC = () => {
             workStatus: filters.workStatus ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, filters.workStatus, pagination]);
+    }, [filters.search, filters.workStatus, pagination, setSearchParams]);
 
     return (
         <ProjectsTable

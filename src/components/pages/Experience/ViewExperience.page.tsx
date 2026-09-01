@@ -12,22 +12,21 @@ const ViewExperiencePage = () => {
     const { showSnackbar } = useSnackbar();
     const [experience, setExperience] = useState<ExperienceResponse | null>(null);
 
-    const getExperience = async (id: number | null) => {
-        try {
-            const response = await experienceService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setExperience(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getExperience = async (id: number | null) => {
+            try {
+                const response = await experienceService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setExperience(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getExperience(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, experienceService, showSnackbar]);
 
     return (
         <div>

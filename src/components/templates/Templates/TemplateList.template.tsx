@@ -66,57 +66,6 @@ const TemplateListTableTemplate: React.FC<Props> = ({
         }));
     }, [navigate, searchParams]);
 
-    const ChannelBadges = (isEmail: number, isSms: number, isWhatsapp: number) => (
-        <div className="flex flex-wrap gap-1">
-            {isEmail === 1 && (
-                <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                    style={{ background: colors.primary100, color: colors.primary700 }}
-                >
-                    <FiMail size={10} /> Email
-                </span>
-            )}
-            {isSms === 1 && (
-                <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                    style={{ background: colors.success100, color: colors.success700 }}
-                >
-                    <FiMessageSquare size={10} /> SMS
-                </span>
-            )}
-            {isWhatsapp === 1 && (
-                <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                    style={{ background: colors.secondary100, color: colors.secondary700 }}
-                >
-                    <FiMessageCircle size={10} /> WhatsApp
-                </span>
-            )}
-            {isEmail === 0 && isSms === 0 && isWhatsapp === 0 && (
-                <span style={{ color: colors.neutral400, fontSize: 12 }}>—</span>
-            )}
-        </div>
-    );
-
-    const ActionCell = (id: number) => (
-        <div className="flex items-center gap-3">
-            <FiEye
-                className="w-4 h-4 cursor-pointer transition-colors"
-                style={{ color: colors.neutral400 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = colors.primary600)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral400)}
-                onClick={() => handleView(id)}
-            />
-            <FiEdit
-                className="w-4 h-4 cursor-pointer transition-colors"
-                style={{ color: colors.neutral400 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = colors.primary600)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral400)}
-                onClick={() => handleEdit(id)}
-            />
-        </div>
-    );
-
     const visibleTemplates = useMemo(() => templates.filter((t) => {
         if (channelFilter === "email")    return t.isEmail    === 1;
         if (channelFilter === "sms")      return t.isSms      === 1;
@@ -142,16 +91,68 @@ const TemplateListTableTemplate: React.FC<Props> = ({
 
     const records = useMemo(() => {
         if (loading) return [];
+
+        const channelBadges = (isEmail: number, isSms: number, isWhatsapp: number) => (
+            <div className="flex flex-wrap gap-1">
+                {isEmail === 1 && (
+                    <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: colors.primary100, color: colors.primary700 }}
+                    >
+                        <FiMail size={10} /> Email
+                    </span>
+                )}
+                {isSms === 1 && (
+                    <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: colors.success100, color: colors.success700 }}
+                    >
+                        <FiMessageSquare size={10} /> SMS
+                    </span>
+                )}
+                {isWhatsapp === 1 && (
+                    <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: colors.secondary100, color: colors.secondary700 }}
+                    >
+                        <FiMessageCircle size={10} /> WhatsApp
+                    </span>
+                )}
+                {isEmail === 0 && isSms === 0 && isWhatsapp === 0 && (
+                    <span style={{ color: colors.neutral400, fontSize: 12 }}>—</span>
+                )}
+            </div>
+        );
+
+        const actionCell = (id: number) => (
+            <div className="flex items-center gap-3">
+                <FiEye
+                    className="w-4 h-4 cursor-pointer transition-colors"
+                    style={{ color: colors.neutral400 }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = colors.primary600)}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral400)}
+                    onClick={() => handleView(id)}
+                />
+                <FiEdit
+                    className="w-4 h-4 cursor-pointer transition-colors"
+                    style={{ color: colors.neutral400 }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = colors.primary600)}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral400)}
+                    onClick={() => handleEdit(id)}
+                />
+            </div>
+        );
+
         return visibleTemplates.map((t: INotificationTemplate, index) => [
             pagination.currentPage * pagination.pageSize + index + 1,
             t.template,
             t.subject || "—",
-            ChannelBadges(t.isEmail, t.isSms, t.isWhatsapp),
+            channelBadges(t.isEmail, t.isSms, t.isWhatsapp),
             DateUtils.dateTimeSecondToDate(t.createdAt ?? ""),
             DateUtils.dateTimeSecondToDate(t.updatedAt ?? ""),
-            ActionCell(t.id),
+            actionCell(t.id),
         ]);
-    }, [loading, visibleTemplates, pagination.currentPage, pagination.pageSize, handleEdit, handleView]);
+    }, [loading, visibleTemplates, pagination.currentPage, pagination.pageSize, handleEdit, handleView, colors]);
 
     const schema = useMemo(() => ({
         id: 1,

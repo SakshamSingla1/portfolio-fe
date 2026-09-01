@@ -60,7 +60,7 @@ const ColorThemeListingPage: React.FC = () => {
             size: String(pagination.pageSize),
         };
         setSearchParams(params);
-    }, [pagination.currentPage, pagination.pageSize]);
+    }, [pagination.currentPage, pagination.pageSize, setSearchParams]);
 
     return (
         <ColorThemeListingTemplate

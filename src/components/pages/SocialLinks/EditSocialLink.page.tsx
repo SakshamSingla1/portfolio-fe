@@ -31,20 +31,19 @@ const SocialLinkEditPage: React.FC = () => {
         }
     };
 
-    const loadSocialLink = async () => {
-        try {
-            const response = await socialLinkService.getById(id);
-            if (response?.status === HTTP_STATUS.OK) {
-                setSocialLink(response.data.data);
-            }
-        } catch {
-            showSnackbar('error', 'Failed to load social link');
-        }
-    };
-
     useEffect(() => {
+        const loadSocialLink = async () => {
+            try {
+                const response = await socialLinkService.getById(id);
+                if (response?.status === HTTP_STATUS.OK) {
+                    setSocialLink(response.data.data);
+                }
+            } catch {
+                showSnackbar('error', 'Failed to load social link');
+            }
+        };
         loadSocialLink();
-    }, []);
+    }, [id, socialLinkService, showSnackbar]);
 
     return (
         <div>

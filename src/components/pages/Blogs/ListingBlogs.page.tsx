@@ -115,7 +115,7 @@ const ListingBlogsPage: React.FC = () => {
             status: filters.status ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, filters.status, pagination.currentPage, pagination.pageSize]);
+    }, [filters.search, filters.status, pagination.currentPage, pagination.pageSize, setSearchParams]);
 
     return (
         <BlogPostTableTemplate

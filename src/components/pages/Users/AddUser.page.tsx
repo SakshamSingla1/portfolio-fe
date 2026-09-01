@@ -44,7 +44,7 @@ const AddUserPage: React.FC = () => {
             const roles = res?.data?.data?.content ?? [];
             setRoleOptions(roles.map((r: any) => ({ value: String(r.id), label: r.name })));
         }).catch(() => setRoleOptions([]));
-    }, []);
+    }, [roleService]);
 
     const formik = useFormik({
         initialValues: {

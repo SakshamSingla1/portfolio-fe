@@ -132,7 +132,7 @@ const GithubIntegrationPage: React.FC = () => {
             setSearchParams({}, { replace: true });
             queryClient.invalidateQueries({ queryKey: ["github-integration"] });
         }
-    }, []);
+    }, [searchParams, setSearchParams, queryClient, showSnackbar]);
 
     const { data: integration, isLoading } = useQuery({
         queryKey: ["github-integration"],

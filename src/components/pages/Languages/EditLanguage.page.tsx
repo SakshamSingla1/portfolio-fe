@@ -18,7 +18,7 @@ const EditLanguagePage = () => {
         languageService.getById(Number(id)).then((res) => {
             if (res?.status === HTTP_STATUS.OK) setLanguage(res.data.data);
         });
-    }, [id]);
+    }, [id, languageService]);
 
     const handleSubmit = async (values: LanguageRequest) => {
         try {

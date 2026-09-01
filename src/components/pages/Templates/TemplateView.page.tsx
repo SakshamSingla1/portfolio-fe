@@ -154,7 +154,7 @@ const TemplateViewPage: React.FC = () => {
                 }
             })
             .finally(() => setLoading(false));
-    }, [id]);
+    }, [id, templateService]);
 
     const goBack = () => navigate(makeRoute(ADMIN_ROUTES.TEMPLATES, {
         query: { page: searchParams.get("page") || "", size: searchParams.get("size") || "", search: searchParams.get("search") || "" },
@@ -179,7 +179,7 @@ const TemplateViewPage: React.FC = () => {
         const fromBody    = extractVars(stripHtml(currentBody));
         const fromSubject = extractVars(currentSubject);
         return Array.from(new Set([...fromSubject, ...fromBody]));
-    }, [currentBody, currentSubject, activeTab]);
+    }, [currentBody, currentSubject]);
 
     const previewSubject = useMemo(() => substituteVars(currentSubject, varValues), [currentSubject, varValues]);
 

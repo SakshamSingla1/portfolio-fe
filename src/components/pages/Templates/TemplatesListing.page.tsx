@@ -67,7 +67,7 @@ const TemplatesListingPage: React.FC = () => {
             size: String(pagination.pageSize),
             search: filters.search ?? "",
         });
-    }, [filters, pagination.currentPage, pagination.pageSize]);
+    }, [filters, pagination.currentPage, pagination.pageSize, setSearchParams]);
 
     const emailCount    = templates.filter((t: any) => t.isEmail    === 1).length;
     const smsCount      = templates.filter((t: any) => t.isSms      === 1).length;

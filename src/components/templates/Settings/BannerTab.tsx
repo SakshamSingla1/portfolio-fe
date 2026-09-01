@@ -29,7 +29,7 @@ const BannerTab: React.FC = () => {
         settingsService.getSettings().then((res: any) => {
             if (res?.status === HTTP_STATUS.OK) setSettings(res.data.data);
         });
-    }, []);
+    }, [settingsService]);
 
     const handleFile = async (file: File) => {
         if (!file.type.startsWith("image/")) {

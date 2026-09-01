@@ -120,9 +120,11 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
   });
   const [activeResume, setActiveResume] = useState<DocumentUploadResponse | null>(null);
 
+  const { setFieldValue } = formik;
+
   const handleAboutMeChange = useCallback(
-    (value: string) => formik.setFieldValue("aboutMe", value),
-    [formik.setFieldValue]
+    (value: string) => setFieldValue("aboutMe", value),
+    [setFieldValue]
   );
 
   const uploadProfileImage = async (file: File): Promise<ImageUploadResponse> => {
@@ -228,7 +230,7 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
     if (formik.values.userName) {
       loadActiveResume();
     }
-  }, [formik.values.userName]);
+  }, [formik.values.userName, loadActiveResume]);
 
   return (
     <div className="pb-6 space-y-6">

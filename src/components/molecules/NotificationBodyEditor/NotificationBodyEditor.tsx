@@ -65,7 +65,7 @@ const NotificationBodyEditor: React.FC<Props> = ({
             lineHeight: "1.7",
             padding: "12px 16px",
         },
-    }), [isDark, disabled, colors, placeholder, minHeight]);
+    }), [isDark, disabled, placeholder, minHeight]);
 
     const handleRef = (editor: JoditInstance | null) => {
         if (editor && onEditorReady) onEditorReady(editor);

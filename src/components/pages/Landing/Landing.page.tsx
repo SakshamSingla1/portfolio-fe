@@ -612,7 +612,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
       .then((r) => r.ok ? r.json() : null)
       .then((json) => { if (json?.data) setProfileMaster(json.data); })
       .catch(() => {});
-  }, []);
+  }, [platformSettingsService, landingService]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = heroRef.current?.getBoundingClientRect();

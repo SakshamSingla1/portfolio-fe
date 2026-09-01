@@ -68,7 +68,7 @@ const ListingLogosPage: React.FC = () => {
             search: filters.search ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, pagination]);
+    }, [filters.search, pagination, setSearchParams]);
 
     return (
         <LogoTableTemplate

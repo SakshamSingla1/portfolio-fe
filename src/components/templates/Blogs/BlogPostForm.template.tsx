@@ -113,7 +113,7 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
         tagService.getAll({ size: 200 }).then((res) => {
             if (res?.data?.data?.content) setTagOptions(res.data.data.content);
         });
-    }, []);
+    }, [tagService]);
 
     useEffect(() => {
         if (post?.tags) setSelectedTags(post.tags);
@@ -163,9 +163,11 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
         },
     });
 
+    const { setFieldValue } = formik;
+
     const handleContentChange = useCallback(
-        (value: string) => formik.setFieldValue("content", value),
-        [formik.setFieldValue]
+        (value: string) => setFieldValue("content", value),
+        [setFieldValue]
     );
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

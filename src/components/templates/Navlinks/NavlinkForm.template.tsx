@@ -48,9 +48,11 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
     onSubmit,
   });
 
+  const { setValues } = formik;
+
   useEffect(() => {
     if (navlink) {
-      formik.setValues({
+      setValues({
         index: navlink.index || '',
         name: navlink.name || '',
         path: navlink.path || '',
@@ -59,7 +61,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
         status: navlink.status,
       });
     }
-  }, [navlink]);
+  }, [navlink, setValues]);
 
   const title =
     mode === MODE.ADD ? 'Add Navlink' : mode === MODE.EDIT ? 'Edit Navlink' : 'Navlink Details';

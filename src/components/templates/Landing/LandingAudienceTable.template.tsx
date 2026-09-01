@@ -20,13 +20,6 @@ const LandingAudienceTableTemplate: React.FC<LandingAudienceTableProps> = ({
     onEdit,
     onDelete,
 }) => {
-    const Action = (item: LandingAudienceCard) => (
-        <ActionButtons
-            onEdit={() => onEdit(item)}
-            onDelete={() => onDelete(item.id!)}
-        />
-    );
-
     const schema = useMemo(() => ({
         id: 1,
         hover: true,
@@ -47,7 +40,11 @@ const LandingAudienceTableTemplate: React.FC<LandingAudienceTableProps> = ({
         <ColorSwatch key={`color-${a.id}`} colorKey={a.colorKey} />,
         a.sortOrder,
         <StatusPill key={`status-${a.id}`} isActive={a.isActive} />,
-        Action(a),
+        <ActionButtons
+            key={`actions-${a.id}`}
+            onEdit={() => onEdit(a)}
+            onDelete={() => onDelete(a.id!)}
+        />,
     ]), [audience, onEdit, onDelete]);
 
     return (

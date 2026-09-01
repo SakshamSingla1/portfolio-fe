@@ -98,6 +98,8 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
     },
   });
 
+  const { setValues, setFieldValue } = formik;
+
   const uploadLogo = async (file: File): Promise<ImageUploadResponse> => {
     const previewUrl = URL.createObjectURL(file);
     setPendingLogoFile(file);
@@ -117,12 +119,12 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
 
   useEffect(() => {
     if (logo) {
-      formik.setValues({
+      setValues({
         name: logo.name || "",
         url: logo.url || "",
       });
     }
-  }, [logo]);
+  }, [logo, setValues]);
 
   useEffect(() => {
     const name = formik.values.name;
@@ -142,14 +144,14 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
         if (slug) {
           const generatedUrl = devicon(slug);
           if (currentUrl !== generatedUrl) {
-            formik.setFieldValue("url", generatedUrl);
+            setFieldValue("url", generatedUrl);
           }
         }
       } else if (!name && isDevIconUrl) {
-        formik.setFieldValue("url", "");
+        setFieldValue("url", "");
       }
     }
-  }, [formik.values.name, mode]);
+  }, [formik.values.name, formik.values.url, mode, setFieldValue]);
 
   const title =
     mode === MODE.ADD ? "Create Logo" : mode === MODE.EDIT ? "Modify Logo" : "View Logo";

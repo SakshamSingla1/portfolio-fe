@@ -31,20 +31,19 @@ const NavlinkEditPage: React.FC = () => {
         }
     };
 
-    const loadNavlink = async () => {
-        try {
-            const response = await navlinkService.getNavlinkById(id);
-            if (response?.status === HTTP_STATUS.OK) {
-                setNavlink(response.data.data);
-            }
-        } catch {
-            showSnackbar('error', 'Failed to load navlink');
-        }
-    };
-
     useEffect(() => {
+        const loadNavlink = async () => {
+            try {
+                const response = await navlinkService.getNavlinkById(id);
+                if (response?.status === HTTP_STATUS.OK) {
+                    setNavlink(response.data.data);
+                }
+            } catch {
+                showSnackbar('error', 'Failed to load navlink');
+            }
+        };
         loadNavlink();
-    }, []);
+    }, [id, navlinkService, showSnackbar]);
 
     return (
         <div>

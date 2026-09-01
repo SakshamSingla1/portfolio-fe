@@ -15,21 +15,20 @@ const NavlinkViewPage: React.FC = () => {
 
     const [navlink, setNavlink] = useState<NavlinkResponse | null>(null);
 
-    const loadNavlink = async (id: number | null) => {
-        try {
-            const response = await navlinkService.getNavlinkById(id);
-            if (response?.status === HTTP_STATUS.OK) {
-                setNavlink(response.data.data);
-            }
-        } catch {
-            showSnackbar('error', 'Failed to load navlink');
-        }
-    };
-
     useEffect(() => {
+        const loadNavlink = async (id: number | null) => {
+            try {
+                const response = await navlinkService.getNavlinkById(id);
+                if (response?.status === HTTP_STATUS.OK) {
+                    setNavlink(response.data.data);
+                }
+            } catch {
+                showSnackbar('error', 'Failed to load navlink');
+            }
+        };
         if(id)
         loadNavlink(id);
-    }, [id]);
+    }, [id, navlinkService, showSnackbar]);
 
     return (
         <div>

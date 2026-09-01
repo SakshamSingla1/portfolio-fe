@@ -12,22 +12,21 @@ const ViewSocialLinkPage = () => {
     const { showSnackbar } = useSnackbar();
     const [socialLink, setSocialLink] = useState<SocialLinkResponse | null>(null);
 
-    const getSocialLink = async (id: number | null) => {
-        try {
-            const response = await socialLinkService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setSocialLink(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getSocialLink = async (id: number | null) => {
+            try {
+                const response = await socialLinkService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setSocialLink(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getSocialLink(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, socialLinkService, showSnackbar]);
 
     return (
         <div>

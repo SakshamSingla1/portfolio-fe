@@ -55,28 +55,30 @@ const ProjectsTableTemplate: React.FC<ProjectsTableTemplateProps> = ({
         navigate(makeRoute(ADMIN_ROUTES.PROJECTS_VIEW, { query, params: { id: String(id) } }));
     }, [navigate, searchParams]);
 
-    const getTechImages = (skills: SkillDropdown[]) => {
-        const visibleSkills = skills.slice(0, 3);
-        const remaining = skills.length - 3;
-        return (
-            <div className={`flex items-center space-x-2 ${isMobile ? 'justify-end' : ''}`}>
-                {visibleSkills.map((skill) => (
-                    <img key={skill.logoName} src={skill.logoUrl} alt={skill.logoName} className="w-10 h-10" loading="lazy" width={40} height={40} />
-                ))}
-                {remaining > 0 && (
-                    <span className="text-sm font-medium text-gray-500">+{remaining}</span>
-                )}
-            </div>
-        );
-    };
+    const records = useMemo(() => {
+        const getTechImages = (skills: SkillDropdown[]) => {
+            const visibleSkills = skills.slice(0, 3);
+            const remaining = skills.length - 3;
+            return (
+                <div className={`flex items-center space-x-2 ${isMobile ? 'justify-end' : ''}`}>
+                    {visibleSkills.map((skill) => (
+                        <img key={skill.logoName} src={skill.logoUrl} alt={skill.logoName} className="w-10 h-10" loading="lazy" width={40} height={40} />
+                    ))}
+                    {remaining > 0 && (
+                        <span className="text-sm font-medium text-gray-500">+{remaining}</span>
+                    )}
+                </div>
+            );
+        };
 
-    const records = useMemo(() => projects?.map((project: ProjectResponse, index) => [
-        pagination.currentPage * pagination.pageSize + index + 1,
-        project.projectName,
-        getTechImages(project.skills),
-        project.workStatus === WorkStatusType.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate || ""),
-        <ActionButtons key={project.id} onEdit={() => handleEdit(project.id ?? 0)} onView={() => handleView(project.id ?? 0)} />
-    ]) ?? [], [projects, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView]);
+        return projects?.map((project: ProjectResponse, index) => [
+            pagination.currentPage * pagination.pageSize + index + 1,
+            project.projectName,
+            getTechImages(project.skills),
+            project.workStatus === WorkStatusType.CURRENT ? DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - Present" : DateUtils.formatDateTimeToDateMonthYear(project.projectStartDate) + " - " + DateUtils.formatDateTimeToDateMonthYear(project.projectEndDate || ""),
+            <ActionButtons key={project.id} onEdit={() => handleEdit(project.id ?? 0)} onView={() => handleView(project.id ?? 0)} />
+        ]) ?? [];
+    }, [projects, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView]);
 
     const schema = useMemo(() => ({
         id: 1,

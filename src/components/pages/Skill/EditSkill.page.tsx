@@ -28,22 +28,21 @@ const SkillEditDetailsPage = () => {
             }
         }
 
-    const getSkill = async (id: number | null) => {
-        try {
-            const response = await skillService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setSkill(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error',`${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getSkill = async (id: number | null) => {
+            try {
+                const response = await skillService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setSkill(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error',`${error}`);
+            }
+        };
         if (id) {
             getSkill(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, skillService, showSnackbar]);
 
     return (
         <div>

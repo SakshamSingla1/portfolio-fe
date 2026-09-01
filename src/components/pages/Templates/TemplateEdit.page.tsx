@@ -84,35 +84,7 @@ const TemplateEditPage: React.FC = () => {
         },
     });
 
-    const loadTemplate = async () => {
-        try {
-            const res = await templateService.getTemplateById(Number(id));
-            if (res?.status === HTTP_STATUS.OK) {
-                const d = res.data.data;
-                formik.setValues({
-                    template: d.template,
-                    message: d.message,
-                    messageTo: d.messageTo,
-                    subject: d.subject,
-                    messageBody: d.messageBody,
-                    emailTo: d.emailTo,
-                    emailCc: d.emailCc,
-                    emailBcc: d.emailBcc,
-                    emailReplyTo: d.emailReplyTo,
-                    isSms: d.isSms,
-                    isEmail: d.isEmail,
-                    isWhatsapp: d.isWhatsapp,
-                    whatsappTemplateName: d.whatsappTemplateName,
-                    whatsappTemplateBody: d.whatsappTemplateBody,
-                    additionalData: d.additionalData,
-                    dltTemplateId: d.dltTemplateId,
-                    templateGroupId: d.templateGroupId,
-                });
-            }
-        } catch (err) {
-            showSnackbar("error", `${err}`);
-        }
-    };
+    const { setValues } = formik;
 
     const onClose = () => {
         navigate(makeRoute(ADMIN_ROUTES.TEMPLATES, {
@@ -125,8 +97,37 @@ const TemplateEditPage: React.FC = () => {
     };
 
     useEffect(() => {
+        const loadTemplate = async () => {
+            try {
+                const res = await templateService.getTemplateById(Number(id));
+                if (res?.status === HTTP_STATUS.OK) {
+                    const d = res.data.data;
+                    setValues({
+                        template: d.template,
+                        message: d.message,
+                        messageTo: d.messageTo,
+                        subject: d.subject,
+                        messageBody: d.messageBody,
+                        emailTo: d.emailTo,
+                        emailCc: d.emailCc,
+                        emailBcc: d.emailBcc,
+                        emailReplyTo: d.emailReplyTo,
+                        isSms: d.isSms,
+                        isEmail: d.isEmail,
+                        isWhatsapp: d.isWhatsapp,
+                        whatsappTemplateName: d.whatsappTemplateName,
+                        whatsappTemplateBody: d.whatsappTemplateBody,
+                        additionalData: d.additionalData,
+                        dltTemplateId: d.dltTemplateId,
+                        templateGroupId: d.templateGroupId,
+                    });
+                }
+            } catch (err) {
+                showSnackbar("error", `${err}`);
+            }
+        };
         loadTemplate();
-    }, [id]);
+    }, [id, templateService, setValues, showSnackbar]);
 
     return (
         <div className="grid gap-y-4">

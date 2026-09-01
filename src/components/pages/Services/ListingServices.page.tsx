@@ -64,7 +64,7 @@ const ListingServicesPage: React.FC = () => {
 
     useEffect(() => {
         setSearchParams({ page: pagination.currentPage.toString(), size: pagination.pageSize.toString(), search: filters.search });
-    }, [filters.search, pagination.currentPage, pagination.pageSize]);
+    }, [filters.search, pagination.currentPage, pagination.pageSize, setSearchParams]);
 
     return (
         <>

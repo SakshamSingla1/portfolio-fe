@@ -175,7 +175,7 @@ const NotificationBell: React.FC = () => {
         const res = await notificationService.getUnreadCount();
         const count = res?.data?.data;
         if (typeof count === "number") setUnreadCount(count);
-    }, []);
+    }, [notificationService]);
 
     useEffect(() => {
         fetchUnreadCount();
@@ -202,7 +202,7 @@ const NotificationBell: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [notificationService]);
 
     const handleToggle = () => {
         const next = !isOpen;

@@ -30,20 +30,19 @@ const ColorThemeEditPage: React.FC = () => {
         }
     }
 
-    const loadColorThemeData = async () => {
-        colorThemeService.getColorThemeById(themeId)
-            .then((res: any) => {
-                if (res.status === HTTP_STATUS.OK) {
-                    setColorTheme(res.data.data);
-                }
-            })
-            .catch(() => showSnackbar('error', 'Failed to load color theme'));
-    }
-
     useEffect(() => {
+        const loadColorThemeData = async () => {
+            colorThemeService.getColorThemeById(themeId)
+                .then((res: any) => {
+                    if (res.status === HTTP_STATUS.OK) {
+                        setColorTheme(res.data.data);
+                    }
+                })
+                .catch(() => showSnackbar('error', 'Failed to load color theme'));
+        };
         if (!themeId) return;
         loadColorThemeData();
-    }, [themeId]);
+    }, [themeId, colorThemeService, showSnackbar]);
 
     return (
         <div>

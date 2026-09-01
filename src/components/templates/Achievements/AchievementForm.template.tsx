@@ -121,9 +121,11 @@ const AchievementFormTemplate = ({
         },
     });
 
+    const { setFieldValue } = formik;
+
     const handleDescriptionChange = useCallback(
-        (value: string) => formik.setFieldValue("description", value),
-        [formik.setFieldValue]
+        (value: string) => setFieldValue("description", value),
+        [setFieldValue]
     );
 
     const handleProofSelect = (file: File) => {

@@ -20,13 +20,6 @@ const LandingFeaturesTableTemplate: React.FC<LandingFeaturesTableProps> = ({
     onEdit,
     onDelete,
 }) => {
-    const Action = (item: LandingFeature) => (
-        <ActionButtons
-            onEdit={() => onEdit(item)}
-            onDelete={() => onDelete(item.id!)}
-        />
-    );
-
     const schema = useMemo(() => ({
         id: 3,
         hover: true,
@@ -47,7 +40,11 @@ const LandingFeaturesTableTemplate: React.FC<LandingFeaturesTableProps> = ({
         <ColorSwatch key={`color-${f.id}`} colorKey={f.colorKey} />,
         f.sortOrder,
         <StatusPill key={`status-${f.id}`} isActive={f.isActive} />,
-        Action(f),
+        <ActionButtons
+            key={`actions-${f.id}`}
+            onEdit={() => onEdit(f)}
+            onDelete={() => onDelete(f.id!)}
+        />,
     ]), [features, onEdit, onDelete]);
 
     return (

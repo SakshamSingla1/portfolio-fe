@@ -28,22 +28,21 @@ const EditTestimonialPage = () => {
         }
     }
 
-    const getTestimonial = async (id: number | null) => {
-        try {
-            const response = await testimonialService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setTestimonial(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getTestimonial = async (id: number | null) => {
+            try {
+                const response = await testimonialService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setTestimonial(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getTestimonial(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, testimonialService, showSnackbar]);
 
     return (
         <div>

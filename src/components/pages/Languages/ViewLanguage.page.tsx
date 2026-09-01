@@ -15,7 +15,7 @@ const ViewLanguagePage = () => {
         languageService.getById(Number(id)).then((res) => {
             if (res?.status === HTTP_STATUS.OK) setLanguage(res.data.data);
         });
-    }, [id]);
+    }, [id, languageService]);
 
     return <LanguageFormTemplate onSubmit={async () => {}} mode={MODE.VIEW} language={language} />;
 };

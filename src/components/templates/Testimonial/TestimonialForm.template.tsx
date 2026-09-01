@@ -122,9 +122,11 @@ const TestimonialFormTemplate = ({
         },
     });
 
+    const { setFieldValue } = formik;
+
     const handleMessageChange = useCallback(
-        (value: string) => formik.setFieldValue("message", value),
-        [formik.setFieldValue]
+        (value: string) => setFieldValue("message", value),
+        [setFieldValue]
     );
 
     const handleImageSelect = (file: File) => {

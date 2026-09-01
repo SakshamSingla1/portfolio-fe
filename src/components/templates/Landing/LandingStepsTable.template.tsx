@@ -20,13 +20,6 @@ const LandingStepsTableTemplate: React.FC<LandingStepsTableProps> = ({
     onEdit,
     onDelete,
 }) => {
-    const Action = (item: LandingStep) => (
-        <ActionButtons
-            onEdit={() => onEdit(item)}
-            onDelete={() => onDelete(item.id!)}
-        />
-    );
-
     const schema = useMemo(() => ({
         id: 4,
         hover: true,
@@ -47,7 +40,11 @@ const LandingStepsTableTemplate: React.FC<LandingStepsTableProps> = ({
         <code key={`icon-${s.id}`}>{s.iconName}</code>,
         s.sortOrder,
         <StatusPill key={`status-${s.id}`} isActive={s.isActive} />,
-        Action(s),
+        <ActionButtons
+            key={`actions-${s.id}`}
+            onEdit={() => onEdit(s)}
+            onDelete={() => onDelete(s.id!)}
+        />,
     ]), [steps, onEdit, onDelete]);
 
     return (

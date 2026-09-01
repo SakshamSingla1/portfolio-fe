@@ -28,22 +28,21 @@ const EditAchievementPage = () => {
         }
     }
 
-    const getAchievement = async (id: number | null) => {
-        try {
-            const response = await achievementService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setAchievement(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getAchievement = async (id: number | null) => {
+            try {
+                const response = await achievementService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setAchievement(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getAchievement(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, achievementService, showSnackbar]);
 
     return (
         <div>

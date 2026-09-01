@@ -18,7 +18,7 @@ const EditServicePage = () => {
         serviceService.getById(Number(id)).then((res) => {
             if (res?.status === HTTP_STATUS.OK) setService(res.data.data);
         });
-    }, [id]);
+    }, [id, serviceService]);
 
     const handleSubmit = async (values: ServiceRequest) => {
         try {

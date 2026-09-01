@@ -82,9 +82,9 @@ const LandingManagement = () => {
         } finally {
             setLoading(false);
         }
-    }, [showSnackbar]);
+    }, [service, showSnackbar]);
 
-    useEffect(() => { loadAll(); }, []);
+    useEffect(() => { loadAll(); }, [loadAll]);
 
     const saveConfig = async () => {
         setConfigSaving(true);

@@ -28,22 +28,21 @@ const EditCertificationPage = () => {
         }
     }
 
-    const getCertification = async (id: number | null) => {
-        try {
-            const response = await certificationService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setCertification(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getCertification = async (id: number | null) => {
+            try {
+                const response = await certificationService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setCertification(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getCertification(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, certificationService, showSnackbar]);
 
     return (
         <div>

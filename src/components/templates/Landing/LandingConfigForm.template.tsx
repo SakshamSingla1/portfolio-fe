@@ -316,7 +316,7 @@ const LandingConfigFormTemplate: React.FC<LandingConfigFormProps> = ({
                 }
             }
         });
-    }, []);
+    }, [fileService]);
 
     const handleBannerUpload = async (file: File): Promise<ImageUploadResponse> => {
         const res = await fileService.upload(file, PLATFORM_RESOURCE_ID, 'BANNER', { isPrimary: true, sortOrder: 0 });

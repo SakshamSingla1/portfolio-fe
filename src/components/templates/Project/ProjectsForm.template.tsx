@@ -138,9 +138,11 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
         },
     });
 
+    const { setFieldValue } = formik;
+
     const handleDescriptionChange = useCallback(
-        (value: string) => formik.setFieldValue("projectDescription", value),
-        [formik.setFieldValue]
+        (value: string) => setFieldValue("projectDescription", value),
+        [setFieldValue]
     );
 
     const loadSkills = useCallback(async (search = "") => {
@@ -246,7 +248,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
 
     useEffect(() => {
         loadSkills();
-    }, []);
+    }, [loadSkills]);
 
     const cardStyle: React.CSSProperties = {
         background: colors.neutral0,

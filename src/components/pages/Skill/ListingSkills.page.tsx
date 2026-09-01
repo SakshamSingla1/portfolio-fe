@@ -37,17 +37,6 @@ const ListingSkillsPage: React.FC = () => {
         }));
     };
 
-    const loadSkillStats = async () => {
-        try {
-            const response = await skillService.getStats();
-            if (response?.status === HTTP_STATUS.OK) {
-                setSkillStats(response?.data?.data);
-            }
-        } catch {
-            showSnackbar("error", "Failed to load skill stats");
-        }
-    };
-
     const { data: pageResponse } = useQuery({
         queryKey: ['skills', pagination.currentPage, pagination.pageSize, filters.search, filters.category],
         queryFn: () => skillService.getByProfile({
@@ -83,8 +72,19 @@ const ListingSkillsPage: React.FC = () => {
     };
 
     useEffect(() => {
+        const loadSkillStats = async () => {
+            try {
+                const response = await skillService.getStats();
+                if (response?.status === HTTP_STATUS.OK) {
+                    setSkillStats(response?.data?.data);
+                }
+            } catch {
+                showSnackbar("error", "Failed to load skill stats");
+            }
+        };
+
         loadSkillStats();
-    }, []);
+    }, [skillService, showSnackbar]);
 
     useEffect(() => {
         const params: Record<string, string> = {
@@ -94,7 +94,7 @@ const ListingSkillsPage: React.FC = () => {
             category: filters.category ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, filters.category, pagination]);
+    }, [filters.search, filters.category, pagination, setSearchParams]);
 
     return (
         <div className="grid gap-y-4">

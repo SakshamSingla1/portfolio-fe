@@ -79,7 +79,7 @@ const CertificationListPage: React.FC = () => {
             status: filters.status ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, filters.status, pagination]);
+    }, [filters.search, filters.status, pagination, setSearchParams]);
 
     const handleDelete = async (id: number) => {
         try {

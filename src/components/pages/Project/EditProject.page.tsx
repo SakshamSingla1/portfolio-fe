@@ -28,22 +28,21 @@ const EditProjectPage = () => {
         }
     }
 
-    const getProject = async (id: number | null) => {
-        try {
-            const response = await projectService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setProject(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getProject = async (id: number | null) => {
+            try {
+                const response = await projectService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setProject(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getProject(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, projectService, showSnackbar]);
 
     return (
         <div>

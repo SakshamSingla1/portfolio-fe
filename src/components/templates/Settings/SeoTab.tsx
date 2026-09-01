@@ -58,7 +58,7 @@ const SeoTab: React.FC = () => {
                 });
             }
         });
-    }, []);
+    }, [seoService]);
 
     const current = data[activeKey];
     const hasBlockingError = !isValidUrl(current.canonicalUrl ?? "") || !isValidUrl(current.ogImageUrl ?? "");

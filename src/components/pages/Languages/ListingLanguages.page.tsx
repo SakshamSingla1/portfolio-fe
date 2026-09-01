@@ -51,7 +51,7 @@ const ListingLanguagesPage: React.FC = () => {
             size: pagination.pageSize.toString(),
             search: filters.search,
         });
-    }, [filters.search, pagination.currentPage, pagination.pageSize]);
+    }, [filters.search, pagination.currentPage, pagination.pageSize, setSearchParams]);
 
     return (
         <LanguageTableTemplate

@@ -74,7 +74,7 @@ const ExperienceListPage: React.FC = () => {
             employmentStatus: filters.employmentStatus ?? "",
         };
         setSearchParams(params);
-    }, [filters.search, filters.employmentStatus, pagination]);
+    }, [filters.search, filters.employmentStatus, pagination, setSearchParams]);
 
     return (
         <ExperienceListTableTemplate

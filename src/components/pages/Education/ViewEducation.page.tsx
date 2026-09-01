@@ -12,22 +12,21 @@ const ViewEducationPage = () => {
     const { showSnackbar } = useSnackbar();
     const [education, setEducation] = useState<Education | null>(null);
 
-    const getEducation = async (id: number | null) => {
-        try {
-            const response = await educationService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setEducation(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getEducation = async (id: number | null) => {
+            try {
+                const response = await educationService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setEducation(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getEducation(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, educationService, showSnackbar]);
 
     return (
         <div>

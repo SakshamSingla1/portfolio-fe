@@ -16,14 +16,7 @@ import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
 import { useColors } from "../../../utils/types";
 import FormShell from "../Shared/FormShell.template";
-
-export const employmentStatusOptions = [
-    { label: "Current", value: EmploymentStatus.CURRENT },
-    { label: "Previous", value: EmploymentStatus.PREVIOUS },
-    { label: "Internship", value: EmploymentStatus.INTERNSHIP },
-    { label: "Contract", value: EmploymentStatus.CONTRACT },
-    { label: "Freelance", value: EmploymentStatus.FREELANCE },
-];
+import { employmentStatusOptions } from "./ExperienceForm.constants";
 
 const validationSchema = Yup.object().shape({
     companyName: Yup.string()
@@ -100,9 +93,11 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
         },
     });
 
+    const { setFieldValue } = formik;
+
     const handleDescriptionChange = React.useCallback(
-        (value: string) => formik.setFieldValue("description", value),
-        [formik.setFieldValue]
+        (value: string) => setFieldValue("description", value),
+        [setFieldValue]
     );
 
     const loadSkills = React.useCallback(async (searchTerm?: string) => {
@@ -136,7 +131,7 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
 
     useEffect(() => {
         loadSkills();
-    }, []);
+    }, [loadSkills]);
 
     useEffect(() => {
         if (experience?.skills) setSelectedSkillObjects(experience.skills);

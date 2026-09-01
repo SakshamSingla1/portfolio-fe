@@ -38,7 +38,7 @@ const GitHubTab: React.FC = () => {
                 }
             }
         }).finally(() => setLoading(false));
-    }, []);
+    }, [socialService]);
 
     const isConfigured = !!githubLink;
     const isDirty = username !== (githubLink ? extractUsername(githubLink.url) : "");

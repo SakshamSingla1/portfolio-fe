@@ -12,21 +12,20 @@ const ViewBlogPage = () => {
     const { showSnackbar } = useSnackbar();
     const [post, setPost] = useState<BlogPostResponse | null>(null);
 
-    const fetchPost = async () => {
-        if (!id) return;
-        try {
-            const response = await blogPostService.getById(Number(id));
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setPost(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar("error", String(error));
-        }
-    };
-
     useEffect(() => {
+        const fetchPost = async () => {
+            if (!id) return;
+            try {
+                const response = await blogPostService.getById(Number(id));
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setPost(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar("error", String(error));
+            }
+        };
         fetchPost();
-    }, [id]);
+    }, [id, blogPostService, showSnackbar]);
 
     return (
         <BlogPostFormTemplate

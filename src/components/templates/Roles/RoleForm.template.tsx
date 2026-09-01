@@ -65,37 +65,37 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
         enableReinitialize: true
     })
 
-    const loadNavlinks = async () => {
-        try {
-            const response = await navLinkService.getAllNavlinks({
-                page: "0",
-                size: "1000",
-                sortDir: "ASC",
-                sortBy: "name"
-            });
-            if (response.status === HTTP_STATUS.OK) {
-                setNavlinks(response.data.data.content);
-            }
-        } catch {
-            showSnackbar('error', 'Failed to load navlinks');
-        }
-    };
-
-    const loadPermissions = async () => {
-        try {
-            const response = await permissionService.getAllPermissions();
-            if (response.status === HTTP_STATUS.OK) {
-                setPermissions(response.data.data);
-            }
-        } catch {
-            showSnackbar('error', 'Failed to load permissions');
-        }
-    }
-
     useEffect(() => {
+        const loadNavlinks = async () => {
+            try {
+                const response = await navLinkService.getAllNavlinks({
+                    page: "0",
+                    size: "1000",
+                    sortDir: "ASC",
+                    sortBy: "name"
+                });
+                if (response.status === HTTP_STATUS.OK) {
+                    setNavlinks(response.data.data.content);
+                }
+            } catch {
+                showSnackbar('error', 'Failed to load navlinks');
+            }
+        };
+
+        const loadPermissions = async () => {
+            try {
+                const response = await permissionService.getAllPermissions();
+                if (response.status === HTTP_STATUS.OK) {
+                    setPermissions(response.data.data);
+                }
+            } catch {
+                showSnackbar('error', 'Failed to load permissions');
+            }
+        };
+
         loadNavlinks();
         loadPermissions();
-    }, []);
+    }, [navLinkService, permissionService, showSnackbar]);
 
     const handlePermissionToggle = (navLinkId: any, permissionId: any) => {
         const currentPermissions = formik.values.rolePermissions;
@@ -153,10 +153,6 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
         );
     };
 
-    const getSelectedPermissionCount = () => {
-        return formik.values.rolePermissions.length;
-    };
-
     const getTotalPermissionCount = () => {
         return navlinks.length * permissions.length;
     };
@@ -199,6 +195,9 @@ const RoleFormTemplate: React.FC<RoleFormTemplateProps> = ({ roleDetails, mode, 
     };
 
     useEffect(() => {
+        const getSelectedPermissionCount = () => {
+            return formik.values.rolePermissions.length;
+        };
         setSelectedPermissionCount(getSelectedPermissionCount());
     }, [formik.values.rolePermissions]);
 

@@ -15,7 +15,7 @@ const ViewServicePage = () => {
         serviceService.getById(Number(id)).then((res) => {
             if (res?.status === HTTP_STATUS.OK) setService(res.data.data);
         });
-    }, [id]);
+    }, [id, serviceService]);
 
     return <ServiceFormTemplate onSubmit={async () => {}} mode={MODE.VIEW} service={service} />;
 };

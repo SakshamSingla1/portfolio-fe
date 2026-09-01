@@ -55,9 +55,11 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
     onSubmit,
   });
 
+  const { setValues } = formik;
+
   useEffect(() => {
-    if (colorTheme) formik.setValues(colorTheme);
-  }, [colorTheme]);
+    if (colorTheme) setValues(colorTheme);
+  }, [colorTheme, setValues]);
 
   return (
     <div className="mb-8">

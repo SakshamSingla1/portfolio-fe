@@ -84,9 +84,11 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
         },
     });
 
+    const { setFieldValue } = formik;
+
     const handleDescriptionChange = useCallback(
-        (value: string) => formik.setFieldValue("description", value),
-        [formik.setFieldValue]
+        (value: string) => setFieldValue("description", value),
+        [setFieldValue]
     );
 
     const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";

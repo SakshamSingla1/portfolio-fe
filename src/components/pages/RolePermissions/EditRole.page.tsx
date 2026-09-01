@@ -27,22 +27,21 @@ const EditRolePage: React.FC = () => {
         }
     };
 
-    const loadRoleDetails = async (id: number | null) => {
-        try {
-            const response = await roleService.getRolePermissionsByRoleId(id);
-            if(response.status === HTTP_STATUS.OK) {
-                setRoleDetails(response.data.data);
-            }
-        } catch {
-            showSnackbar("error", "Failed to load role details");
-        }
-    }
-
     useEffect(() => {
+        const loadRoleDetails = async (id: number | null) => {
+            try {
+                const response = await roleService.getRolePermissionsByRoleId(id);
+                if(response.status === HTTP_STATUS.OK) {
+                    setRoleDetails(response.data.data);
+                }
+            } catch {
+                showSnackbar("error", "Failed to load role details");
+            }
+        };
         if (id) {
             loadRoleDetails(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, roleService, showSnackbar]);
 
     return (
         <RoleFormTemplate

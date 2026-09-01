@@ -16,21 +16,20 @@ const EditUserPage: React.FC = () => {
     const [user, setUserTo] = useState<UserResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const loadUser = async () => {
-        setIsLoading(true);
-        try {
-            const response = await profileService.getUserById(id ? Number(id) : null);
-            setUserTo(response.data.data);
-        } catch {
-            showSnackbar("error", "Failed to load user details");
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
     useEffect(() => {
+        const loadUser = async () => {
+            setIsLoading(true);
+            try {
+                const response = await profileService.getUserById(id ? Number(id) : null);
+                setUserTo(response.data.data);
+            } catch {
+                showSnackbar("error", "Failed to load user details");
+            } finally {
+                setIsLoading(false);
+            }
+        };
         loadUser();
-    }, [])
+    }, [id, profileService, showSnackbar])
 
     if (isLoading) {
         return <UserFormTemplate mode={MODE.EDIT} user={null} isLoading />;

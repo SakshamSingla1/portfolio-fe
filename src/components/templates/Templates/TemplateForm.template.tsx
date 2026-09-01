@@ -78,7 +78,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
             seed[v] = known ? known.variableName : "";
         });
         setVarValues(seed);
-    }, [isOpen, detectedVars]);
+    }, [isOpen, detectedVars, variables]);
 
     const previewBody = useMemo(() => substituteVars(body, varValues), [body, varValues]);
     const previewSubject = useMemo(() => substituteVars(subject, varValues), [subject, varValues]);
@@ -283,18 +283,6 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
         }
     };
 
-    const loadVariables = async () => {
-        setLoadingVars(true);
-        try {
-            const res = await templateService.getTemplateVariables({ page: 0, size: 200, sort: SORT_ENUM.DESC, search: "" });
-            if (res?.status === HTTP_STATUS.OK) setVariables(res.data.data.content);
-        } catch {
-            setVariables([]);
-        } finally {
-            setLoadingVars(false);
-        }
-    };
-
     const onClose = () => {
         navigate(makeRoute(ADMIN_ROUTES.TEMPLATES, {
             query: {
@@ -305,7 +293,20 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
         }));
     };
 
-    useEffect(() => { loadVariables(); }, []);
+    useEffect(() => {
+        const loadVariables = async () => {
+            setLoadingVars(true);
+            try {
+                const res = await templateService.getTemplateVariables({ page: 0, size: 200, sort: SORT_ENUM.DESC, search: "" });
+                if (res?.status === HTTP_STATUS.OK) setVariables(res.data.data.content);
+            } catch {
+                setVariables([]);
+            } finally {
+                setLoadingVars(false);
+            }
+        };
+        loadVariables();
+    }, [templateService]);
 
     const filteredVars = useMemo(() => {
         if (!varSearch.trim()) return variables;

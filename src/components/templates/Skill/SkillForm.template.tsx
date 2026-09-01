@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Button from "../../atoms/Button/Button";
 import { MODE, SKILL_CATEGORY_OPTIONS, SKILL_LEVEL_OPTIONS } from "../../../utils/constant";
 import { HTTP_STATUS } from "../../../utils/types";
@@ -59,7 +59,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         },
     });
 
-    const loadLogoDropdown = React.useCallback(async (searchTerm?: string) => {
+    const loadLogoDropdown = async (searchTerm?: string) => {
         const params: LogoFilterParams = {
             search: searchTerm || "",
             page: "0",
@@ -73,7 +73,11 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
         } catch {
             setLogos([]);
         }
-    }, []);
+    };
+    // Stable ref to the latest loadLogoDropdown so the mount effect below can
+    // call it without listing it as a dependency (it's redefined every render).
+    const loadLogoDropdownRef = useRef(loadLogoDropdown);
+    loadLogoDropdownRef.current = loadLogoDropdown;
 
     const logoOptions = useMemo(() => logos.map((logo) => ({
         label: (
@@ -87,7 +91,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
     })), [logos]);
 
     useEffect(() => {
-        loadLogoDropdown();
+        loadLogoDropdownRef.current();
     }, []);
 
     useEffect(() => {

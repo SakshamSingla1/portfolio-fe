@@ -20,13 +20,6 @@ const LandingTestimonialsTableTemplate: React.FC<LandingTestimonialsTableProps> 
     onEdit,
     onDelete,
 }) => {
-    const Action = (item: LandingTestimonial) => (
-        <ActionButtons
-            onEdit={() => onEdit(item)}
-            onDelete={() => onDelete(item.id!)}
-        />
-    );
-
     const schema = useMemo(() => ({
         id: 5,
         hover: true,
@@ -47,7 +40,11 @@ const LandingTestimonialsTableTemplate: React.FC<LandingTestimonialsTableProps> 
         t.authorCompany,
         t.sortOrder,
         <StatusPill key={`status-${t.id}`} isActive={t.isActive} />,
-        Action(t),
+        <ActionButtons
+            key={`actions-${t.id}`}
+            onEdit={() => onEdit(t)}
+            onDelete={() => onDelete(t.id!)}
+        />,
     ]), [testimonials, onEdit, onDelete]);
 
     return (

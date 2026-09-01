@@ -77,10 +77,15 @@ const ListingUsersPage: React.FC = () => {
     // silently invalidating UsersTable's `schema` memo (which the table's
     // own useMemo call depended on by object reference) on every unrelated
     // re-render, not just when pagination actually changed.
+    // Intentionally depending on pagination.currentPage/pageSize (not the whole
+    // `pagination` object) per the comment above; IPagination has exactly these
+    // 4 fields and totalRecords/totalPages are already listed explicitly, so
+    // this is exhaustive in practice.
     const paginationWithTotal: IPagination = useMemo(() => ({
         ...pagination,
         totalRecords,
         totalPages,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }), [pagination.currentPage, pagination.pageSize, totalRecords, totalPages]);
 
     const handleFiltersChange = (name: string, value: any) => {
@@ -171,7 +176,7 @@ const ListingUsersPage: React.FC = () => {
             status: filters.status ?? ""
         };
         setSearchParams(params);
-    }, [filters.search, filters.roleId, filters.status, pagination]);
+    }, [filters.search, filters.roleId, filters.status, pagination, setSearchParams]);
 
     return (
         <UserTableTemplate

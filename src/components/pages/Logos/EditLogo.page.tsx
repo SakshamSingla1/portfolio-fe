@@ -28,22 +28,21 @@ const EditLogoPage = () => {
         }
     }
 
-    const getLogo = async (id: number | null) => {
-        try {
-            const response = await logoService.getById(id);
-            if (response?.status === HTTP_STATUS.OK && response.data) {
-                setLogo(response.data.data);
-            }
-        } catch (error) {
-            showSnackbar('error', `${error}`);
-        }
-    };
-
     useEffect(() => {
+        const getLogo = async (id: number | null) => {
+            try {
+                const response = await logoService.getById(id);
+                if (response?.status === HTTP_STATUS.OK && response.data) {
+                    setLogo(response.data.data);
+                }
+            } catch (error) {
+                showSnackbar('error', `${error}`);
+            }
+        };
         if (id) {
             getLogo(id ? Number(id) : null);
         }
-    }, [id]);
+    }, [id, logoService, showSnackbar]);
 
     return (
         <div>

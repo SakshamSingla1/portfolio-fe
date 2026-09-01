@@ -20,13 +20,6 @@ const LandingFaqsTableTemplate: React.FC<LandingFaqsTableProps> = ({
     onEdit,
     onDelete,
 }) => {
-    const Action = (item: LandingFaq) => (
-        <ActionButtons
-            onEdit={() => onEdit(item)}
-            onDelete={() => onDelete(item.id!)}
-        />
-    );
-
     const schema = useMemo(() => ({
         id: 2,
         hover: true,
@@ -43,7 +36,11 @@ const LandingFaqsTableTemplate: React.FC<LandingFaqsTableProps> = ({
         f.question,
         f.sortOrder,
         <StatusPill key={`status-${f.id}`} isActive={f.isActive} />,
-        Action(f),
+        <ActionButtons
+            key={`actions-${f.id}`}
+            onEdit={() => onEdit(f)}
+            onDelete={() => onDelete(f.id!)}
+        />,
     ]), [faqs, onEdit, onDelete]);
 
     return (
