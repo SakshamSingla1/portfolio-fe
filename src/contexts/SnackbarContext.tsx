@@ -107,7 +107,11 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({ children }) 
       <AnimatePresence>
         {snackBar.isActive && snackBar.message && (
           <motion.div
-            className="fixed top-6 right-6 z-50 rounded-lg shadow-lg overflow-hidden"
+            // Highest z-index in the app on purpose: several modals/dialogs use
+            // zIndex 2000 (DeleteConfirmation, OtpPopup, LandingItemModal, etc.),
+            // and a toast triggered while one is open must still be visible on
+            // top of it, not hidden behind it.
+            className="fixed top-6 right-6 z-[9999] rounded-lg shadow-lg overflow-hidden"
             initial="hidden"
             animate="visible"
             exit="exit"
