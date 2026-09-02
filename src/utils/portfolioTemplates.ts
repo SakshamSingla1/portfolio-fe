@@ -13,4 +13,8 @@ export const PORTFOLIO_TEMPLATES: PortfolioTemplateOption[] = [
     { key: "CLASSIC", name: "Classic", description: "The original layout — profile-left hero, clean bordered section cards." },
     { key: "MODERN", name: "Modern", description: "Bold gradient hero, centered layout, pill-shaped accents throughout." },
     { key: "MINIMAL", name: "Minimal", description: "Centered, typography-first hero with tight spacing and flat surfaces." },
+    { key: "BOLD", name: "Bold", description: "Editorial split-screen hero with oversized type and high-contrast panels." },
+    { key: "TERMINAL", name: "Terminal", description: "Developer-themed IDE/terminal window hero with monospace type throughout." },
+    { key: "ELEGANT", name: "Elegant", description: "Refined and understated — narrow column, generous whitespace, muted accents." },
+    { key: "CREATIVE", name: "Creative", description: "Playful and colorful — organic blob shapes, gradient text, rounded everything." },
 ];

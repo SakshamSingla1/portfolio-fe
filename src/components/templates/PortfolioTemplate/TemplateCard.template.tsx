@@ -9,12 +9,19 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useProfileTemplateService } from "../../../services/useProfileTemplateService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import type { PortfolioTemplateOption } from "../../../utils/portfolioTemplates";
-import { ClassicTemplatePreview, ModernTemplatePreview, MinimalTemplatePreview } from "./TemplatePreviews";
+import {
+  ClassicTemplatePreview, ModernTemplatePreview, MinimalTemplatePreview,
+  BoldTemplatePreview, TerminalTemplatePreview, ElegantTemplatePreview, CreativeTemplatePreview,
+} from "./TemplatePreviews";
 
 const PREVIEWS: Record<PortfolioTemplateOption["key"], React.FC> = {
   CLASSIC: ClassicTemplatePreview,
   MODERN: ModernTemplatePreview,
   MINIMAL: MinimalTemplatePreview,
+  BOLD: BoldTemplatePreview,
+  TERMINAL: TerminalTemplatePreview,
+  ELEGANT: ElegantTemplatePreview,
+  CREATIVE: CreativeTemplatePreview,
 };
 
 interface TemplateCardProps {

@@ -9,7 +9,7 @@ export const PROFILE_TEMPLATE_URLS = {
     GET_TEMPLATE_USERS_COUNT_BY_KEY: "profile-templates/template/:templateKey/count",
 };
 
-export type TemplateKey = "CLASSIC" | "MODERN" | "MINIMAL";
+export type TemplateKey = "CLASSIC" | "MODERN" | "MINIMAL" | "BOLD" | "TERMINAL" | "ELEGANT" | "CREATIVE";
 
 export interface ProfileTemplateRequest {
     templateKey: TemplateKey;
