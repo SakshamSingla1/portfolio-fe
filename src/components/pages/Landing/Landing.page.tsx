@@ -771,19 +771,30 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           position: 'relative', zIndex: 1,
         }}
       >
-        {/* Parallax glow */}
-        <motion.div
+        {/* Parallax glow — centering (translate -50%/-50%) lives on this static
+            outer wrapper, and the framer-motion x/y spring lives alone on the
+            inner element. Combining a plain translate% with motion's own x/y
+            in one style object let the very first paint render without the
+            centering transform (until Framer Motion's effect synced it in),
+            producing a real one-time layout shift as it snapped into place. */}
+        <div
           style={{
-            position: 'absolute', borderRadius: '50%', pointerEvents: 'none',
+            position: 'absolute', pointerEvents: 'none',
             width: 800, height: 800,
-            background: `radial-gradient(circle, rgba(20,184,160,0.07) 0%, transparent 62%)`,
-            filter: 'blur(60px)',
-            x: springX,
-            y: springY,
             left: '50%', top: '50%',
-            translateX: '-50%', translateY: '-50%',
+            transform: 'translate(-50%, -50%)',
           }}
-        />
+        >
+          <motion.div
+            style={{
+              width: '100%', height: '100%', borderRadius: '50%',
+              background: `radial-gradient(circle, rgba(20,184,160,0.07) 0%, transparent 62%)`,
+              filter: 'blur(60px)',
+              x: springX,
+              y: springY,
+            }}
+          />
+        </div>
 
         <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }} className="hero-grid">
           <motion.div
@@ -810,7 +821,10 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               {heroEyebrow}
             </motion.div>
 
-            <motion.div variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: CUBIC } } }}>
+            {/* Plain (non-animated) so the LCP-critical headline/description
+                paint immediately instead of waiting on JS + the stagger
+                entrance animation to reach opacity:1. */}
+            <div>
               <h1 style={{ fontWeight: 900, fontSize: 'clamp(44px, 6vw, 80px)', lineHeight: 0.95, letterSpacing: '-0.045em', margin: 0, color: C.text }}>
                 {heroHeadline1}
               </h1>
@@ -827,14 +841,11 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               }}>
                 {heroHeadline2}
               </h1>
-            </motion.div>
+            </div>
 
-            <motion.p
-              variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.1 } } }}
-              style={{ fontSize: 'clamp(14px, 1.5vw, 17px)', lineHeight: 1.8, color: C.textSub, maxWidth: 480, margin: '0 0 36px' }}
-            >
+            <p style={{ fontSize: 'clamp(14px, 1.5vw, 17px)', lineHeight: 1.8, color: C.textSub, maxWidth: 480, margin: '0 0 36px' }}>
               {heroDescription}
-            </motion.p>
+            </p>
 
             <motion.div
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, delay: 0.25 } } }}
