@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useState } from "react";
 import { type ColumnType, type TableSelection } from "../../organisms/Table/TableV1";
 import { type IPagination, Status } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { DateUtils, makeRoute } from "../../../utils/helper";
+import { DateUtils, makeRoute, getOptimizedImageUrl } from "../../../utils/helper";
 import { exportToCsv } from "../../../utils/csvExport";
 import TableV1 from "../../organisms/Table/TableV1";
 import ListingShell, { type BulkAction } from "../Shared/ListingShell.template";
@@ -146,7 +146,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     const records = useMemo(() => users?.map((user: UserResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         <div key={`user-${user.id}`} className={`flex ${isMobile ? 'justify-end' : ''} items-center space-x-2`} title=''>
-            <img src={user.profileImageUrl} alt={user.userName} className='w-10 h-10' loading="lazy" width={40} height={40} />
+            <img src={getOptimizedImageUrl(user.profileImageUrl, { width: 80, height: 80 })} alt={user.userName} className='w-10 h-10' loading="lazy" width={40} height={40} />
             <div className='flex flex-col'>
                 <div className='font-medium'>{user.fullName}</div>
                 <div className='text-sm text-gray-500'>{user.email}</div>

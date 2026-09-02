@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useColors } from "../utils/types";
 import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import { useTheme } from "../contexts/ThemeContext";
-import { getBreadcrumbsFromUrl } from "../utils/helper";
+import { getBreadcrumbsFromUrl, getOptimizedImageUrl } from "../utils/helper";
 import NotificationBell from "../components/molecules/NotificationBell/NotificationBell";
 import SearchPanel from "../components/molecules/SearchPanel/SearchPanel";
 import CommandPalette from "../components/molecules/CommandPalette/CommandPalette";
@@ -474,7 +474,13 @@ const DashboardLayout: React.FC = () => {
               >
                 <div className={classes.userAvatar}>
                   {(user as any)?.profileImageUrl ? (
-                    <img src={(user as any).profileImageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img
+                      src={getOptimizedImageUrl((user as any).profileImageUrl, { width: 80, height: 80 })}
+                      alt=""
+                      width={34}
+                      height={34}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   ) : (
                     <span>{user?.fullName?.split(" ").map((n: string) => n[0]).join("") || "U"}</span>
                   )}

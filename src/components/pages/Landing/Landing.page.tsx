@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motio
 import usePlatformSettingsService from '../../../services/usePlatformSettingsService';
 import useLandingPageService from '../../../services/useLandingPageService';
 import type { LandingPageData } from '../../../services/useLandingPageService';
+import { getOptimizedImageUrl } from '../../../utils/helper';
 import {
   LogIn, BarChart2, Globe, LayoutDashboard, Lock, Palette, CheckCircle,
   Server, Code2, Image, Layers, ChevronDown, ChevronRight,
@@ -1012,8 +1013,10 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               >
                 {profileMaster.profile.profileImageUrl && (
                   <img
-                    src={profileMaster.profile.profileImageUrl}
+                    src={getOptimizedImageUrl(profileMaster.profile.profileImageUrl, { width: 120, height: 120 })}
                     alt={profileMaster.profile.fullName}
+                    width={52}
+                    height={52}
                     style={{ width: 52, height: 52, borderRadius: 12, objectFit: 'cover', border: `2px solid ${C.tealBorder}` }}
                   />
                 )}

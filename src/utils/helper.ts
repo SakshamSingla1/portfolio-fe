@@ -158,8 +158,39 @@ export const isRichTextEmpty = (value?: string) => {
     if (!value) return true;
     const plainText = value
         .replace(/<[^>]*>/g, "")
-        .replace(/&nbsp;/g, "") 
+        .replace(/&nbsp;/g, "")
         .trim();
 
     return plainText.length === 0;
+};
+
+/** Applies a Cloudinary f_auto/q_auto/w_* transform so an image is served at
+ * the size it's actually displayed at, instead of its full original upload
+ * resolution. Mirrors portfolio-main's helper of the same name. */
+export const getOptimizedImageUrl = (
+  url: string | null | undefined,
+  options: { width?: number; height?: number; quality?: string } = {}
+): string => {
+  if (!url) return "";
+  if (!url.includes("res.cloudinary.com") || !url.includes("/image/upload/")) {
+    return url;
+  }
+
+  const parts = url.split("/image/upload/");
+  if (parts.length !== 2) return url;
+
+  const transformations: string[] = ["f_auto"];
+  if (options.width) transformations.push(`w_${options.width}`);
+  if (options.height) transformations.push(`h_${options.height}`);
+  if (options.width || options.height) {
+    transformations.push(options.width && options.height ? "c_fill" : "c_limit");
+  }
+  if (options.quality) {
+    transformations.push(`q_${options.quality}`);
+  } else {
+    transformations.push("q_auto");
+  }
+
+  const transformStr = transformations.join(",");
+  return `${parts[0]}/image/upload/${transformStr}/${parts[1]}`;
 };

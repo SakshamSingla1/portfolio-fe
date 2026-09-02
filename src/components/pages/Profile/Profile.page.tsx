@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
 import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail, FiMapPin, FiSettings, FiCode } from "react-icons/fi";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
+import { getOptimizedImageUrl } from "../../../utils/helper";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
 import { useProfileService, type ProfileRequest } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
@@ -224,8 +225,10 @@ const ProfilePage: React.FC = () => {
               >
                 {profileData.profileImageUrl ? (
                   <img
-                    src={profileData.profileImageUrl}
+                    src={getOptimizedImageUrl(profileData.profileImageUrl, { width: 170, height: 170 })}
                     alt={profileData.fullName}
+                    width={84}
+                    height={84}
                     className="rounded-full object-cover shrink-0"
                     style={{ width: 84, height: 84, border: `1px solid ${colors.neutral200}` }}
                   />
