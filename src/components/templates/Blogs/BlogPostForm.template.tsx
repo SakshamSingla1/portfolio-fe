@@ -530,7 +530,7 @@ const BlogPostFormTemplate: React.FC<BlogPostFormTemplateProps> = ({
                                 )}
                                 {!isView && (
                                     <div className="flex flex-col gap-2">
-                                        <div style={{ display: "flex", alignItems: "center", overflow: "hidden", border: `1.5px solid ${colors.neutral200}`, borderRadius: 8, background: colors.neutral50 }}>
+                                        <div style={{ display: "flex", alignItems: "center", overflow: "hidden", border: `1.5px solid ${colors.neutral200}`, borderRadius: 12, background: colors.neutral50 }}>
                                             <span style={{ display: "flex", alignItems: "center", paddingLeft: 12, color: colors.neutral400, flexShrink: 0 }}>
                                                 <FiHash size={13} />
                                             </span>

@@ -101,7 +101,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
                 <div
                     style={{
                         padding: "10px 14px",
-                        borderRadius: 8,
+                        borderRadius: 16,
                         border: `1.5px solid ${colors.neutral200}`,
                         background: colors.neutral50,
                         color: colors.neutral800,
@@ -120,7 +120,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
             {labelEl}
             <div
                 style={{
-                    borderRadius: 8,
+                    borderRadius: 16,
                     overflow: "hidden",
                     border: `1.5px solid ${error ? colors.error500 : colors.neutral300}`,
                     transition: "border-color 0.15s",

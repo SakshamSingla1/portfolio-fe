@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle } from 'react-icons/fi';
 import Button from '../../atoms/Button/Button';
+import { useColors } from '../../../utils/types';
 
 interface DeleteConfirmPopupProps {
   title: string;
@@ -27,20 +28,20 @@ const useStyles = createUseStyles({
     zIndex: 2000,
     padding: '16px',
   },
-  content: {
-    backgroundColor: 'white',
+  content: (colors: any) => ({
+    backgroundColor: colors.neutral0,
     borderRadius: '16px',
     padding: '24px',
     width: '100%',
     maxWidth: '400px',
     boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
-  },
+  }),
   header: {
     display: 'flex',
     alignItems: 'flex-start',
     gap: '12px',
   },
-  iconBadge: {
+  iconBadge: (colors: any) => ({
     width: '40px',
     height: '40px',
     borderRadius: '12px',
@@ -48,20 +49,20 @@ const useStyles = createUseStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: '#fef2f2',
-    color: '#dc2626',
-  },
-  title: {
+    background: colors.error50,
+    color: colors.error600,
+  }),
+  title: (colors: any) => ({
     fontSize: '16px',
     fontWeight: 700,
-    color: '#0f172a',
+    color: colors.neutral900,
     margin: 0,
-  },
-  description: {
+  }),
+  description: (colors: any) => ({
     fontSize: '14px',
-    color: '#64748b',
+    color: colors.neutral500,
     marginTop: '6px',
-  },
+  }),
   actions: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -77,7 +78,8 @@ const DeleteConfirmPopup: React.FC<DeleteConfirmPopupProps> = ({
   isOpen,
   loading = false,
 }) => {
-  const classes = useStyles();
+  const colors = useColors();
+  const classes = useStyles(colors);
 
   return (
     <AnimatePresence>

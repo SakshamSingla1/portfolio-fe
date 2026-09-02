@@ -2,6 +2,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@
 import { type FC } from 'react';
 import { FiAlertTriangle } from 'react-icons/fi';
 import Button from '../../atoms/Button/Button';
+import { useColors } from '../../../utils/types';
 
 interface DeleteConfirmationProps {
   open: boolean;
@@ -22,6 +23,8 @@ export const DeleteConfirmation: FC<DeleteConfirmationProps> = ({
   deleteButtonText = 'Delete',
   cancelButtonText = 'Cancel',
 }) => {
+  const colors = useColors();
+
   return (
     <Dialog
       open={open}
@@ -32,7 +35,7 @@ export const DeleteConfirmation: FC<DeleteConfirmationProps> = ({
       sx={{ zIndex: 2000 }}
       slotProps={{ backdrop: { sx: { backdropFilter: "blur(20px)", backgroundColor: "rgba(15,23,42,0.6)" } } }}
     >
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: '#fef2f2', color: '#dc2626' }}>
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: colors.error50, color: colors.error600 }}>
         <FiAlertTriangle size={19} />
       </div>
       <DialogTitle className="text-center text-neutral-900 font-bold mb-2 p-0">

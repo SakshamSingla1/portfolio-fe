@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    Switch, TextField as MuiTextField, IconButton, Chip, Box,
+    Switch, IconButton, Chip, Box,
 } from '@mui/material';
 import {
     LuX, LuZap, LuMessageSquare, LuLayers, LuGlobe, LuStar,
@@ -36,22 +36,14 @@ const TagsInput: React.FC<TagsInputProps> = ({ label, value, onChange }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: colors.neutral700 }}>{label}</span>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <MuiTextField
-                    size="small"
-                    value={inputVal}
-                    onChange={e => setInputVal(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type and press Enter or click Add"
-                    sx={{
-                        flex: 1,
-                        '& .MuiOutlinedInput-root': {
-                            background: colors.neutral0,
-                            '& fieldset': { borderColor: colors.neutral300 },
-                            '&:hover fieldset': { borderColor: colors.neutral300 },
-                        },
-                        '& input': { color: colors.neutral900 },
-                    }}
-                />
+                <div style={{ flex: 1 }}>
+                    <TextField
+                        value={inputVal}
+                        onChange={e => setInputVal(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Type and press Enter or click Add"
+                    />
+                </div>
                 <Button variant="secondaryContained" label="Add" onClick={handleAdd} />
             </div>
             {safe.length > 0 && (

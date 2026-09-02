@@ -210,7 +210,7 @@ const Sidebar: React.FC<{
               zIndex: 2
             }}
           >
-            <span style={{ color: "white", fontWeight: 800, fontSize: 22 }}>S</span>
+            <span style={{ color: colors.neutral0, fontWeight: 800, fontSize: 22 }}>S</span>
           </motion.div>
 
           <AnimatePresence>

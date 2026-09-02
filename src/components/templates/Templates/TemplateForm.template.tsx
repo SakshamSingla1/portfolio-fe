@@ -170,12 +170,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, activeTab,
                                                         setVarValues((prev) => ({ ...prev, [v]: e.target.value }))
                                                     }
                                                     placeholder={`Sample ${v}`}
-                                                    className="w-full text-sm px-3 py-1.5 rounded-lg outline-none"
-                                                    style={{
-                                                        background: colors.neutral50,
-                                                        border: `1px solid ${colors.neutral200}`,
-                                                        color: colors.neutral900,
-                                                    }}
+                                                    className="w-full text-sm px-3 py-1.5 rounded-2xl border border-[var(--color-neutral-300)] bg-[var(--color-neutral-50)] text-[var(--color-neutral-900)] outline-none transition-all duration-300 ease-in-out hover:border-[var(--color-primary-400)] focus:border-[var(--color-primary-500)] focus:ring-4 focus:ring-[var(--color-primary-100)]/60"
                                                 />
                                             </div>
                                         ))}
@@ -444,12 +439,7 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                                     value={varSearch}
                                     onChange={(e) => setVarSearch(e.target.value)}
                                     placeholder="Filter variables…"
-                                    className="w-full text-sm pl-8 pr-3 py-2 rounded-lg outline-none"
-                                    style={{
-                                        background: colors.neutral0,
-                                        border: `1px solid ${colors.neutral300}`,
-                                        color: colors.neutral900,
-                                    }}
+                                    className="w-full text-sm pl-8 pr-3 py-2 rounded-2xl border border-[var(--color-neutral-300)] bg-[var(--color-neutral-0)] text-[var(--color-neutral-900)] outline-none transition-all duration-300 ease-in-out hover:border-[var(--color-primary-400)] focus:border-[var(--color-primary-500)] focus:ring-4 focus:ring-[var(--color-primary-100)]/60"
                                 />
                             </div>
                         )}

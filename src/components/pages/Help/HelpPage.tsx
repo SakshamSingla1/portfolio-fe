@@ -10,9 +10,11 @@ import {
 } from "react-icons/fa";
 import { FiZap, FiLayout, FiSettings, FiBook, FiHelpCircle } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { InputAdornment } from "@mui/material";
 import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
+import Checkbox from "../../atoms/Checkbox/Checkbox";
 import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
 import { useColors, HTTP_STATUS } from "../../../utils/types";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
@@ -574,14 +576,11 @@ const FaqEditorForm = ({
           onChange={(e) => onChange({ ...draft, sortOrder: Number(e.target.value) || 0 })}
           style={{ width: 140 }}
         />
-        <label className="flex items-center gap-2 text-sm cursor-pointer select-none" style={{ color: colors.neutral700 }}>
-          <input
-            type="checkbox"
-            checked={draft.isActive}
-            onChange={(e) => onChange({ ...draft, isActive: e.target.checked })}
-          />
-          Active (visible to all users)
-        </label>
+        <Checkbox
+          checked={draft.isActive}
+          onChange={(checked) => onChange({ ...draft, isActive: checked })}
+          label="Active (visible to all users)"
+        />
       </div>
       <div className="flex items-center justify-end gap-2 mt-1">
         <Button label="Cancel" variant="tertiaryContained" size="small" onClick={onCancel} disabled={saving} />
@@ -747,20 +746,19 @@ const FAQ = ({ colors, isSuperAdmin }: { colors: any; isSuperAdmin: boolean }) =
   return (
     <div className="mt-6 space-y-4">
       <div className="flex items-center gap-3">
-        <div className="relative flex-1">
-          <FaSearch
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-            style={{ fontSize: 12, color: colors.neutral400 }}
-          />
-          <input
-            type="text"
+        <div className="flex-1">
+          <TextField
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search questions…"
-            className="w-full text-sm pl-9 pr-4 py-2.5 rounded-xl outline-none"
-            style={{ backgroundColor: colors.neutral0, border: `1.5px solid ${colors.neutral200}`, color: colors.neutral900 }}
-            onFocus={(e) => (e.target.style.borderColor = colors.primary400)}
-            onBlur={(e) => (e.target.style.borderColor = colors.neutral200)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FaSearch style={{ fontSize: 12, color: colors.neutral400 }} />
+                </InputAdornment>
+              ),
+            }}
+            fullWidth
           />
         </div>
         {isSuperAdmin && (

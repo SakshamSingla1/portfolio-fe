@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { createUseStyles } from "react-jss";
-import { FiChevronRight, FiExternalLink } from "react-icons/fi";
+import { FiChevronRight, FiExternalLink, FiLogOut } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { getBreadcrumbsFromUrl } from "../../../utils/helper";
@@ -14,7 +14,7 @@ const useStyles = createUseStyles({
     justifyContent: "space-between",
     padding: "0 16px",
     borderBottom: `1px solid ${c.neutral200}`,
-    background: "#ffffff",
+    background: c.neutral0,
     gap: 12,
     position: "fixed",
     top: 0,
@@ -44,7 +44,7 @@ const useStyles = createUseStyles({
     background: "transparent",
     border: "none",
     padding: "2px 6px",
-    borderRadius: 4,
+    borderRadius: 10,
     cursor: "pointer",
     fontSize: 13,
     color: c.primary500,
@@ -209,7 +209,7 @@ const Topbar: React.FC = () => {
           title="Logout"
           aria-label="Logout"
         >
-          <FiChevronRight size={18} />
+          <FiLogOut size={18} />
         </button>
       </div>
     </header>
