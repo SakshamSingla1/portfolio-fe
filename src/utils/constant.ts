@@ -109,6 +109,11 @@ export const ADMIN_ROUTES = {
     ROLE_EDIT: "/roles-permissions/:id/edit",
     ROLE_VIEW: "/roles-permissions/:id",
 
+    SUBSCRIPTION_PLAN: "/subscription-plans",
+    SUBSCRIPTION_PLAN_ADD: "/subscription-plans/add",
+    SUBSCRIPTION_PLAN_EDIT: "/subscription-plans/:id/edit",
+    SUBSCRIPTION_PLAN_VIEW: "/subscription-plans/:id",
+
     BLOGS: "/blogs",
     BLOGS_ADD: "/blogs/add",
     BLOGS_EDIT: "/blogs/:id/edit",

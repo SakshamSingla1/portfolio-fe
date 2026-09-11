@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Button from "../../atoms/Button/Button";
 import TextField from "../../atoms/TextField/TextField";
+import Select from "../../atoms/Select/Select";
 import CustomRadioGroup, { type RadioOption } from "../../molecules/CustomRadioGroup/CustomRadioGroup";
+import AdvancedCheckbox from "../../atoms/AdvancedCheckbox/AdvancedCheckbox";
 import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
-import { Status, useColors } from "../../../utils/types";
+import { HTTP_STATUS, Status, useColors } from "../../../utils/types";
 import { useProfileService, type UserResponse } from "../../../services/useProfileService";
 import { useRoleService } from "../../../services/useRoleService";
+import { useSubscriptionPlanService, type SubscriptionPlanResponseDTO } from "../../../services/useSubscriptionPlanService";
+import { BillingCycle, useProfileSubscriptionService, type ProfileSubscriptionResponseDTO } from "../../../services/useProfileSubscriptionService";
 import { makeRoute } from "../../../utils/helper";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import * as Yup from "yup";
@@ -38,11 +42,20 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
     const navigate = useNavigate();
     const profileService = useProfileService();
     const roleService = useRoleService();
+    const subscriptionPlanService = useSubscriptionPlanService();
+    const profileSubscriptionService = useProfileSubscriptionService();
     const { showSnackbar } = useSnackbar();
     const colors = useColors();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [roleOptions, setRoleOptions] = useState<RadioOption[]>([]);
     const [confirmOpen, setConfirmOpen] = useState(false);
+
+    const [planOptions, setPlanOptions] = useState<SubscriptionPlanResponseDTO[]>([]);
+    const [subscription, setSubscription] = useState<ProfileSubscriptionResponseDTO | null>(null);
+    const [selectedPlanId, setSelectedPlanId] = useState<number | "">("");
+    const [billingCycle, setBillingCycle] = useState<string>(BillingCycle.MONTHLY);
+    const [autoRenew, setAutoRenew] = useState(false);
+    const [isSavingSubscription, setIsSavingSubscription] = useState(false);
 
     const onClose = () => navigate(makeRoute(ADMIN_ROUTES.USER, {}));
 
@@ -55,6 +68,45 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
         }).catch(() => setRoleOptions([]));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        subscriptionPlanService.getAllPlans({ size: 100, status: Status.ACTIVE }).then((res: any) => {
+            setPlanOptions(res?.data?.data?.content ?? []);
+        }).catch(() => setPlanOptions([]));
+
+        profileSubscriptionService.getSubscriptionByProfileId(user.id).then((res: any) => {
+            const current: ProfileSubscriptionResponseDTO | null = res?.status === HTTP_STATUS.OK ? res?.data?.data : null;
+            setSubscription(current);
+            setSelectedPlanId(current?.planId ?? "");
+            setBillingCycle(current?.billingCycle || BillingCycle.MONTHLY);
+            setAutoRenew(current?.autoRenew ?? false);
+        }).catch(() => setSubscription(null));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id]);
+
+    const handleSaveSubscription = async () => {
+        if (!user?.id || selectedPlanId === "") return;
+        setIsSavingSubscription(true);
+        try {
+            const response = await profileSubscriptionService.assignPlan(user.id, {
+                planId: Number(selectedPlanId),
+                billingCycle,
+                autoRenew,
+            });
+            if (response?.status === HTTP_STATUS.OK) {
+                setSubscription(response.data?.data ?? null);
+                showSnackbar("success", "Subscription updated successfully");
+            } else {
+                showSnackbar("error", "Failed to update subscription");
+            }
+        } catch {
+            showSnackbar("error", "Failed to update subscription");
+        } finally {
+            setIsSavingSubscription(false);
+        }
+    };
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -200,6 +252,62 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
                         </div>
                     </div>
                 </div>
+                {mode !== MODE.ADD && (
+                    <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
+                        <h3 className="text-lg font-semibold flex items-center mb-4" style={sectionTitleStyle}>
+                            <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary500 }} />
+                            Subscription Plan
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <Select
+                                label="Plan"
+                                value={selectedPlanId}
+                                onChange={(value) => setSelectedPlanId(Number(value))}
+                                options={planOptions.map((p) => ({ value: p.id ?? "", label: `${p.name} (${p.code})` }))}
+                                disabled={mode === MODE.VIEW}
+                            />
+                            <CustomRadioGroup
+                                name="billingCycle"
+                                label="Billing Cycle"
+                                options={Object.values(BillingCycle).map((c) => ({ value: c, label: c.charAt(0) + c.slice(1).toLowerCase() }))}
+                                value={billingCycle}
+                                onChange={(e) => setBillingCycle(e.target.value)}
+                                disabled={mode === MODE.VIEW}
+                            />
+                            <div className="flex items-end pb-2">
+                                <label className="flex items-center gap-2 cursor-pointer w-fit">
+                                    <AdvancedCheckbox
+                                        name="autoRenew"
+                                        checked={autoRenew}
+                                        onChange={() => setAutoRenew(!autoRenew)}
+                                        disabled={mode === MODE.VIEW}
+                                        size="small"
+                                        variant="primary"
+                                    />
+                                    <span className="text-sm font-medium" style={{ color: colors.neutral900 }}>
+                                        Auto-renew
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        {subscription?.status && (
+                            <div className="text-xs mt-3" style={{ color: colors.neutral500 }}>
+                                Current status: <strong>{subscription.status}</strong>
+                                {subscription.endDate ? ` · renews/expires ${new Date(subscription.endDate).toLocaleDateString()}` : ""}
+                            </div>
+                        )}
+                        {mode !== MODE.VIEW && (
+                            <div className="flex justify-end mt-4">
+                                <Button
+                                    label={isSavingSubscription ? "Saving..." : "Save Subscription"}
+                                    variant="primaryContained"
+                                    onClick={handleSaveSubscription}
+                                    disabled={isSavingSubscription || selectedPlanId === ""}
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className="flex justify-between gap-3">
                     <Button label="Cancel" variant="tertiaryContained" onClick={onClose} disabled={isSubmitting} />
                     {mode !== MODE.VIEW && (

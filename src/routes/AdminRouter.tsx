@@ -26,6 +26,7 @@ const DashboardRoutes = lazy(() => import('./AdminRoutes/DashboardRoutes'));
 const LogoRoutes = lazy(() => import('./AdminRoutes/LogoRoutes'));
 const UserRoutes = lazy(() => import('./AdminRoutes/UserRoutes'));
 const RoleRoutes = lazy(() => import('./AdminRoutes/RoleRoutes'));
+const SubscriptionPlanRoutes = lazy(() => import('./AdminRoutes/SubscriptionPlanRoutes'));
 const HelpRoutes = lazy(() => import('./AdminRoutes/HelpRoutes'));
 const LandingPage = lazy(() => import('../components/pages/Landing/Landing.page'));
 const LandingRoutes = lazy(() => import('./AdminRoutes/LandingRoutes'));
@@ -101,6 +102,7 @@ export const AdminRouter: React.FC = () => {
           <Route path="logos/*" element={<div><LogoRoutes /></div>} />
           <Route path="users/*" element={<div><UserRoutes /></div>} />
           <Route path="roles-permissions/*" element={<div><RoleRoutes /></div>} />
+          <Route path="subscription-plans/*" element={<div><SubscriptionPlanRoutes /></div>} />
           <Route path="help/*" element={<div><HelpRoutes /></div>} />
           <Route path="landing-management/*" element={<div><LandingRoutes /></div>} />
           <Route path="analytics/*" element={<div><AnalyticsRoutes /></div>} />
