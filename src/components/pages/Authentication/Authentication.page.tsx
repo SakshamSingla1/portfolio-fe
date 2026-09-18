@@ -20,6 +20,7 @@ const Authentication: React.FC = () => {
   const [email, setEmail] = useState<string | null>(null);
   const [isRegisterFlow, setIsRegisterFlow] = useState(false);
   const [pendingToken, setPendingToken] = useState<string>("");
+  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -43,7 +44,14 @@ const Authentication: React.FC = () => {
         );
 
       case AUTH_STATE.LOGIN_WITH_EMAIL:
-        return <LoginWithEmailTemplate setAuthState={setAuthState} setPendingToken={setPendingToken} />;
+        return (
+          <LoginWithEmailTemplate
+            setAuthState={setAuthState}
+            setPendingToken={setPendingToken}
+            initialEmail={verifiedEmail || undefined}
+            justVerified={Boolean(verifiedEmail)}
+          />
+        );
 
       case AUTH_STATE.LOGIN_WITH_PHONE:
         return (
@@ -62,6 +70,7 @@ const Authentication: React.FC = () => {
             setAuthState={setAuthState}
             isRegisterFlow={isRegisterFlow}
             setIsRegisterFlow={setIsRegisterFlow}
+            setVerifiedEmail={setVerifiedEmail}
           />
         );
 

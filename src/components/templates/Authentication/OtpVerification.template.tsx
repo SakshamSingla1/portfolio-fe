@@ -14,10 +14,11 @@ interface OTPVerificationTemplateProps {
     setAuthState: (authState: AUTH_STATE) => void;
     isRegisterFlow?: boolean;
     setIsRegisterFlow: (val: boolean) => void;
+    setVerifiedEmail?: (email: string) => void;
 }
 
 const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
-    phone, email, setAuthState, isRegisterFlow = false, setIsRegisterFlow,
+    phone, email, setAuthState, isRegisterFlow = false, setIsRegisterFlow, setVerifiedEmail,
 }) => {
     const colors = useColors();
     const authService = useAuthService();
@@ -40,11 +41,17 @@ const OTPVerificationTemplate: React.FC<OTPVerificationTemplateProps> = ({
         try {
             setIsLoading(true);
             if (isRegisterFlow) {
+                // The registration OTP-verify endpoint (auth/verify-otp) only ever returns a
+                // plain confirmation message (ResponseModel<String>) — no token/user session
+                // is issued here, so we cannot log the user in directly from this response.
+                // The best we can do is hand them back to the login form with their email
+                // pre-filled and a clear "you're verified, now sign in" message.
                 const response = await authService.verifyOtp({ email: email || "", otp });
                 if (response.status === HTTP_STATUS.OK) {
                     setIsRegisterFlow(false);
+                    setVerifiedEmail?.(email || "");
                     setAuthState(AUTH_STATE.LOGIN_WITH_EMAIL);
-                    showSnackbar("success", "Account verified successfully!");
+                    showSnackbar("success", "Email verified! Please log in to continue.");
                 }
             } else {
                 const response = await authService.login({ phone: phone || "", otp });

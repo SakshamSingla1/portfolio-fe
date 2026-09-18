@@ -19,9 +19,16 @@ const LiveSiteControl: React.FC<LiveSiteControlProps> = ({ portfolioUrl, isMobil
   const [copied, setCopied] = useState(false);
 
   if (!portfolioUrl) {
+    // A published portfolio URL is resolved from a Social Links entry of type PORTFOLIO
+    // (see DashboardServiceImpl#resolvePortfolioUrl on the backend) — routing here to
+    // /social-links is the correct mechanism, not a bug. What trips new users up is that
+    // nothing here explains *why* "social links" is where you go to publish your site,
+    // so the copy below spells that connection out explicitly instead of sending them to
+    // a different destination.
     return (
       <button
         onClick={() => navigate("/social-links")}
+        title="Your live portfolio URL is set up as a Portfolio-type entry on the Social Links page"
         className="flex items-center gap-1.5 rounded-full transition-opacity duration-150 hover:opacity-80 shrink-0"
         style={{
           padding: "6px 12px 6px 10px",
@@ -32,7 +39,7 @@ const LiveSiteControl: React.FC<LiveSiteControlProps> = ({ portfolioUrl, isMobil
       >
         <FiPlus size={11} color={colors.primary600} />
         <span className="text-[11px] font-semibold" style={{ color: colors.primary600 }}>
-          {isMobile ? "Add site link" : "Add your portfolio link"}
+          {isMobile ? "Go live" : "Set up your live portfolio URL"}
         </span>
       </button>
     );

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
-import { FiEye, FiLock, FiMail, FiEyeOff, FiPhone } from "react-icons/fi";
+import { FiEye, FiLock, FiMail, FiEyeOff, FiPhone, FiCheckCircle } from "react-icons/fi";
 import { AUTH_STATE, useColors } from "../../../utils/types";
 import { InputAdornment, IconButton } from "@mui/material";
 import Button from "../../atoms/Button/Button";
@@ -16,6 +16,10 @@ import { motion } from "framer-motion";
 interface LoginWithEmailProps {
     setAuthState: (authState: AUTH_STATE) => void;
     setPendingToken: (token: string) => void;
+    /** Pre-fills the email field, e.g. right after registration OTP verification. */
+    initialEmail?: string;
+    /** Shows a "you're verified, now sign in" banner when arriving from registration OTP verification. */
+    justVerified?: boolean;
 }
 
 const validationSchema = Yup.object({
@@ -23,7 +27,7 @@ const validationSchema = Yup.object({
     password: Yup.string().required("Password is required"),
 });
 
-const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendingToken }) => {
+const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendingToken, initialEmail, justVerified }) => {
     const colors = useColors();
     const authService = useAuthService();
     const navigate = useNavigate();
@@ -33,7 +37,7 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendin
     const { showSnackbar } = useSnackbar();
 
     const formik = useFormik<AuthLoginDTO>({
-        initialValues: { email: "", password: "" },
+        initialValues: { email: initialEmail || "", password: "" },
         validationSchema,
         onSubmit: async (values) => {
             try {
@@ -73,6 +77,21 @@ const LoginWithEmail: React.FC<LoginWithEmailProps> = ({ setAuthState, setPendin
             transition={{ duration: 0.4, ease: "easeOut" }}
         >
             <div className="px-8 py-10">
+                {justVerified && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center gap-2 mb-6 px-3.5 py-2.5 rounded-xl text-sm font-medium"
+                        style={{
+                            background: "rgba(16, 185, 129, 0.1)",
+                            border: "1px solid rgba(16, 185, 129, 0.25)",
+                            color: "#34d399",
+                        }}
+                    >
+                        <FiCheckCircle size={16} />
+                        Verified! Please log in to continue.
+                    </motion.div>
+                )}
                 <div className="mb-8">
                     <motion.div
                         className="inline-flex items-center justify-center p-3 rounded-2xl mb-5 text-white text-2xl"
