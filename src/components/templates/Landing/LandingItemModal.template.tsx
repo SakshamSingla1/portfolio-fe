@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
+import { Switch, Chip } from '@mui/material';
 import {
-    Dialog, DialogTitle, DialogContent, DialogActions,
-    Switch, IconButton, Chip, Box,
-} from '@mui/material';
-import {
-    LuX, LuZap, LuMessageSquare, LuLayers, LuGlobe, LuStar,
+    LuZap, LuMessageSquare, LuLayers, LuGlobe, LuStar,
 } from 'react-icons/lu';
 import Button from '../../atoms/Button/Button';
 import TextField from '../../atoms/TextField/TextField';
+import Modal from '../../atoms/Modal/Modal';
 import { useColors } from '../../../utils/types';
 
 interface TagsInputProps {
@@ -160,35 +158,26 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
     );
 
     return (
-        <Dialog
+        <Modal
             open={open}
             onClose={onClose}
-            maxWidth="sm"
-            fullWidth
-            sx={{ zIndex: 2000 }}
-            slotProps={{ backdrop: { sx: { backdropFilter: "blur(20px)", backgroundColor: "rgba(15,23,42,0.6)" } } }}
-            PaperProps={{
-                sx: {
-                    background: colors.neutral0,
-                    border: `1.5px solid ${colors.neutral300}`,
-                    borderRadius: '16px',
-                    boxShadow: `0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)`,
-                    overflow: 'hidden',
-                }
-            }}
+            title={`${isEdit ? 'Edit' : 'Add'} ${meta.label}`}
+            size="sm"
+            footer={
+                <>
+                    <Button variant="tertiaryContained" label="Cancel" onClick={onClose} />
+                    <Button
+                        variant="primaryContained"
+                        label={isEdit ? 'Update' : 'Create'}
+                        isLoading={saving}
+                        onClick={onSave}
+                    />
+                </>
+            }
         >
-            <Box sx={{ height: 3, background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}28 100%)`, flexShrink: 0 }} />
-
-            <DialogTitle
-                sx={{
-                    display: 'flex', alignItems: 'center', gap: 1.5,
-                    py: 2, px: 3,
-                    background: colors.neutral0,
-                    borderBottom: `1px solid ${colors.neutral100}`,
-                }}
-            >
-                <Box
-                    sx={{
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                <div
+                    style={{
                         width: 32, height: 32, flexShrink: 0,
                         borderRadius: '8px',
                         background: `${accentColor}14`,
@@ -198,37 +187,13 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                     }}
                 >
                     {meta.icon}
-                </Box>
+                </div>
+                <p style={{ fontSize: 12, color: colors.neutral500, lineHeight: 1.3 }}>
+                    {meta.sub}
+                </p>
+            </div>
 
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: colors.neutral900, lineHeight: 1.2 }}>
-                        {isEdit ? 'Edit' : 'Add'} {meta.label}
-                    </p>
-                    <p style={{ fontSize: 11, color: colors.neutral400, marginTop: 2, lineHeight: 1.3 }}>
-                        {meta.sub}
-                    </p>
-                </Box>
-
-                <IconButton
-                    onClick={onClose}
-                    size="small"
-                    sx={{
-                        color: colors.neutral400,
-                        '&:hover': { background: colors.neutral100, color: colors.neutral700 },
-                    }}
-                >
-                    <LuX size={16} />
-                </IconButton>
-            </DialogTitle>
-
-            <DialogContent
-                sx={{
-                    padding: 0,
-                    background: colors.neutral50,
-                    overflowX: 'hidden',
-                }}
-            >
-                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                     {type === 'feature' && (
                         <>
@@ -412,25 +377,8 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                         {sortOrderField}
                         {activeToggle}
                     </div>
-                </div>
-            </DialogContent>
-
-            <DialogActions
-                sx={{
-                    px: 3, py: 2, gap: 1,
-                    background: colors.neutral0,
-                    borderTop: `1px solid ${colors.neutral100}`,
-                }}
-            >
-                <Button variant="tertiaryContained" label="Cancel" onClick={onClose} />
-                <Button
-                    variant="primaryContained"
-                    label={isEdit ? 'Update' : 'Create'}
-                    isLoading={saving}
-                    onClick={onSave}
-                />
-            </DialogActions>
-        </Dialog>
+            </div>
+        </Modal>
     );
 };
 

@@ -1,90 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
-import { createUseStyles } from 'react-jss';
 import { motion } from 'framer-motion';
 import { FiShield } from 'react-icons/fi';
 import Button from '../../atoms/Button/Button';
-
-const useStyles = createUseStyles((theme: any) => ({
-  dialog: {
-    '& .MuiDialog-paper': {
-      borderRadius: '20px',
-      padding: '28px 24px 24px',
-      maxWidth: '400px',
-      width: '100%',
-      boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
-    },
-  },
-  iconBadge: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '14px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 16px',
-    background: `${theme.palette.background.primary.primary600}12`,
-    color: theme.palette.background.primary.primary600,
-  },
-  title: {
-    textAlign: 'center',
-    color: theme.palette.background.neutral.neutral900,
-    marginBottom: '16px',
-    fontWeight: 700,
-    padding: 0,
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: theme.palette.background.neutral.neutral500,
-    marginBottom: '24px',
-  },
-  otpContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '12px',
-    margin: '24px 0',
-  },
-  otpInput: {
-    width: '48px',
-    height: '56px',
-    textAlign: 'center',
-    fontSize: '24px',
-    fontWeight: 700,
-    borderRadius: '12px',
-    border: `1.5px solid ${theme.palette.background.neutral.neutral200}`,
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-    transition: 'border-color 0.15s, box-shadow 0.15s',
-    '&:focus': {
-      outline: 'none',
-      borderColor: theme.palette.background.primary.primary600,
-      boxShadow: `0 0 0 3px ${theme.palette.background.primary.primary600}22`,
-    },
-  },
-  actionButtons: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '24px',
-  },
-  resendText: {
-    textAlign: 'center',
-    marginTop: '16px',
-    color: theme.palette.background.neutral.neutral500,
-    '&.active': {
-      color: theme.palette.background.primary.primary600,
-      fontWeight: 500,
-      cursor: 'pointer',
-      '&:hover': {
-        textDecoration: 'underline',
-      },
-    },
-  },
-  errorText: {
-    color: theme.palette.background.secondary.secondary500,
-    textAlign: 'center',
-    minHeight: '24px',
-    marginTop: '8px',
-  },
-}));
+import Modal from '../../atoms/Modal/Modal';
+import { useColors } from '../../../utils/types';
 
 interface OtpPopupProps {
   open: boolean;
@@ -103,7 +22,7 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   phoneNumber,
   resendOtp,
 }) => {
-  const classes = useStyles();
+  const colors = useColors();
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [error, setError] = useState<string>('');
   const [canResend, setCanResend] = useState<boolean>(false);
@@ -204,30 +123,50 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   const contactType = email ? 'email' : 'phone number';
 
   return (
-    <Dialog
+    <Modal
       open={open}
       onClose={onClose}
-      className={classes.dialog}
-      aria-labelledby="otp-dialog-title"
-      maxWidth="xs"
-      fullWidth
-      sx={{ zIndex: 2000 }}
-      slotProps={{ backdrop: { sx: { backdropFilter: "blur(20px)", backgroundColor: "rgba(15,23,42,0.6)" } } }}
+      size="sm"
+      footer={
+        <>
+          <Button
+            variant="secondaryContained"
+            label="Cancel"
+            color="primary"
+            onClick={onClose}
+          />
+          <Button
+            variant="primaryContained"
+            label="Verify"
+            color="primary"
+            onClick={handleVerify}
+            disabled={otp.join('').length !== 6}
+          />
+        </>
+      }
     >
-      <div className={classes.iconBadge}>
-        <FiShield size={22} />
-      </div>
+      <div className="flex flex-col items-center text-center">
+        <div
+          className="flex items-center justify-center rounded-2xl mb-4"
+          style={{
+            width: 48,
+            height: 48,
+            background: `${colors.primary600}12`,
+            color: colors.primary600,
+          }}
+        >
+          <FiShield size={22} />
+        </div>
 
-      <DialogTitle id="otp-dialog-title" className={classes.title}>
-        Verify Your {contactType}
-      </DialogTitle>
+        <h3 className="text-lg font-bold mb-4" style={{ color: colors.neutral900 }}>
+          Verify Your {contactType}
+        </h3>
 
-      <DialogContent>
-        <Typography variant="body1" className={classes.subtitle}>
+        <p className="text-sm mb-6" style={{ color: colors.neutral500 }}>
           We've sent a 6-digit verification code to {contactInfo}
-        </Typography>
-        
-        <div className={classes.otpContainer}>
+        </p>
+
+        <div className="flex justify-center gap-3 my-6">
           {otp.map((digit, index) => (
             <motion.input
               key={index}
@@ -240,45 +179,37 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
               onChange={(e) => handleOtpChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
-              className={classes.otpInput}
+              className="text-center font-bold outline-none"
+              style={{
+                width: 48,
+                height: 56,
+                fontSize: 24,
+                borderRadius: 12,
+                border: `1.5px solid ${colors.neutral200}`,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}
               autoFocus={index === 0}
               whileTap={{ scale: 0.95 }}
             />
           ))}
         </div>
-        
-        <Typography variant="body2" className={classes.errorText}>
+
+        <p className="text-sm min-h-[24px] mt-2" style={{ color: colors.secondary500 }}>
           {error}
-        </Typography>
-        
-        <Typography 
-          variant="body2" 
-          className={`${classes.resendText} ${canResend ? 'active' : ''}`}
+        </p>
+
+        <p
+          className={`text-sm mt-4 ${canResend ? 'font-medium cursor-pointer hover:underline' : ''}`}
+          style={{ color: canResend ? colors.primary600 : colors.neutral500 }}
           onClick={canResend ? handleResend : undefined}
         >
-          {canResend 
-            ? "Didn't receive the code? Resend" 
+          {canResend
+            ? "Didn't receive the code? Resend"
             : `Resend code in ${countdown}s`
           }
-        </Typography>
-      </DialogContent>
-      
-      <DialogActions className={classes.actionButtons}>
-        <Button 
-          variant="secondaryContained" 
-          label="Cancel"
-          color="primary" 
-          onClick={onClose}
-        />
-        <Button 
-          variant="primaryContained" 
-          label="Verify"
-          color="primary" 
-          onClick={handleVerify}
-          disabled={otp.join('').length !== 6}
-        />
-      </DialogActions>
-    </Dialog>
+        </p>
+      </div>
+    </Modal>
   );
 };
 

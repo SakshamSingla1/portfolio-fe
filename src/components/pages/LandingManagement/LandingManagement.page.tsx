@@ -14,7 +14,7 @@ import { HTTP_STATUS } from '../../../utils/types';
 import FormShell from '../../templates/Shared/FormShell.template';
 import Tabs from '../../atoms/Tabs/Tabs';
 import type { ITabsSchema } from '../../atoms/Tabs/Tabs';
-import DeleteConfirmPopup from '../../organisms/DeleteConfirmPopup/DeleteConfirmPopup';
+import ConfirmDialog from '../../molecules/ConfirmDialog/ConfirmDialog';
 import LandingConfigFormTemplate from '../../templates/Landing/LandingConfigForm.template';
 import LandingFeaturesTableTemplate from '../../templates/Landing/LandingFeaturesTable.template';
 import LandingFaqsTableTemplate from '../../templates/Landing/LandingFaqsTable.template';
@@ -266,12 +266,14 @@ const LandingManagement = () => {
                 onClose={closeModal}
             />
 
-            <DeleteConfirmPopup
-                isOpen={!!deleteTarget}
+            <ConfirmDialog
+                open={!!deleteTarget}
                 title={`Delete this ${deleteTarget?.type ?? 'item'}?`}
-                onDelete={handleDelete}
-                onCancel={() => setDeleteTarget(null)}
+                message="This action cannot be undone."
+                danger
                 loading={deleting}
+                onConfirm={handleDelete}
+                onClose={() => setDeleteTarget(null)}
             />
         </FormShell>
     );

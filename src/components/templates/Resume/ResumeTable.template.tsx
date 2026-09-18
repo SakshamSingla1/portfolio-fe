@@ -13,7 +13,7 @@ import { useSnackbar } from "../../../hooks/useSnackBar";
 import { DateUtils } from "../../../utils/helper";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { FaFileAlt } from "react-icons/fa";
-import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
+import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
 
 interface ResumeTableTemplateProps {
     resumes: DocumentUploadResponse[];
@@ -149,13 +149,14 @@ const ResumeTableTemplate: React.FC<ResumeTableTemplateProps> = ({
             >
                 <TableV1 schema={schema} records={records} isLoading={isLoading} />
             </ListingShell>
-            <DeleteConfirmation
+            <ConfirmDialog
                 open={idPendingDelete != null}
                 title="Delete this resume?"
-                description="This action cannot be undone."
-                onDelete={confirmDeleteResume}
-                onCancel={() => setIdPendingDelete(null)}
-                deleteButtonText={deleting ? "Deleting..." : "Delete"}
+                message="This action cannot be undone."
+                danger
+                loading={deleting}
+                onConfirm={confirmDeleteResume}
+                onClose={() => setIdPendingDelete(null)}
             />
         </>
     )

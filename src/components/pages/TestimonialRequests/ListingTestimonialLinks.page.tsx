@@ -5,7 +5,7 @@ import { useSnackbar } from '../../../hooks/useSnackBar';
 import { useTestimonialLinkService, type TestimonialLink, type CreateTestimonialLinkRequest } from '../../../services/useTestimonialLinkService';
 import TestimonialLinkTableTemplate from '../../templates/TestimonialRequests/TestimonialLinkTable.template';
 import GenerateTestimonialLinkModal from '../../templates/TestimonialRequests/GenerateTestimonialLinkModal.template';
-import { DeleteConfirmation } from '../../molecules/DeleteConfirmation/DeleteConfirmation';
+import ConfirmDialog from '../../molecules/ConfirmDialog/ConfirmDialog';
 
 const DEFAULT_FORM: CreateTestimonialLinkRequest = {
     requesterName: '',
@@ -102,13 +102,15 @@ const ListingTestimonialLinksPage: React.FC = () => {
                 onClose={closeModal}
             />
 
-            <DeleteConfirmation
+            <ConfirmDialog
                 open={!!linkPendingRevoke}
                 title="Revoke this link?"
-                description={`It will no longer be accessible${linkPendingRevoke?.requesterName ? ` to ${linkPendingRevoke.requesterName}` : ''}.`}
-                onDelete={handleRevoke}
-                onCancel={() => setLinkPendingRevoke(null)}
-                deleteButtonText={revoking ? 'Revoking...' : 'Revoke'}
+                message={`It will no longer be accessible${linkPendingRevoke?.requesterName ? ` to ${linkPendingRevoke.requesterName}` : ''}.`}
+                confirmLabel="Revoke"
+                danger
+                loading={revoking}
+                onConfirm={handleRevoke}
+                onClose={() => setLinkPendingRevoke(null)}
             />
         </>
     );

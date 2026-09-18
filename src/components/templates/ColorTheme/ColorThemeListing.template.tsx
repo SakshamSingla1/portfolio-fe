@@ -19,7 +19,7 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import ListingShell from "../Shared/ListingShell.template";
-import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
+import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 
 import { TablePagination, IconButton } from "@mui/material";
@@ -284,13 +284,14 @@ const ColorThemeListingTemplate: React.FC<ColorThemeListingTemplateProps> = ({
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
             />
 
-            <DeleteConfirmation
+            <ConfirmDialog
                 open={idPendingDelete != null}
                 title="Delete this theme?"
-                description="This action cannot be undone."
-                onDelete={confirmDelete}
-                onCancel={() => setIdPendingDelete(null)}
-                deleteButtonText={deleting ? "Deleting..." : "Delete"}
+                message="This action cannot be undone."
+                danger
+                loading={deleting}
+                onConfirm={confirmDelete}
+                onClose={() => setIdPendingDelete(null)}
             />
         </div>
     );

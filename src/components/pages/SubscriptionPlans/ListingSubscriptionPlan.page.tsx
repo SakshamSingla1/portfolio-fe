@@ -8,7 +8,7 @@ import SubscriptionPlanTableTemplate from '../../templates/SubscriptionPlans/Sub
 import AutoCompleteInput from '../../atoms/AutoCompleteInput/AutoCompleteInput';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 import { useSnackbar } from '../../../hooks/useSnackBar';
-import { DeleteConfirmation } from '../../molecules/DeleteConfirmation/DeleteConfirmation';
+import ConfirmDialog from '../../molecules/ConfirmDialog/ConfirmDialog';
 
 const ListingSubscriptionPlanPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -128,13 +128,14 @@ const ListingSubscriptionPlanPage: React.FC = () => {
                     </div>
                 }
             />
-            <DeleteConfirmation
+            <ConfirmDialog
                 open={idPendingDelete != null}
                 title="Delete this subscription plan?"
-                description="Profiles currently on this plan will need to be reassigned. This action cannot be undone."
-                onDelete={handleDelete}
-                onCancel={() => setIdPendingDelete(null)}
-                deleteButtonText={deleting ? "Deleting..." : "Delete"}
+                message="Profiles currently on this plan will need to be reassigned. This action cannot be undone."
+                danger
+                loading={deleting}
+                onConfirm={handleDelete}
+                onClose={() => setIdPendingDelete(null)}
             />
         </>
     )

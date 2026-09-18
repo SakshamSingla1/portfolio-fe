@@ -130,10 +130,7 @@ const TemplateEditPage: React.FC = () => {
     }, [id, templateService, setValues, showSnackbar]);
 
     return (
-        <div className="grid gap-y-4">
-            <div className="text-2xl font-medium my-auto pageTitle">Update Notification Template</div>
-            <TemplateFormTemplate formik={formik} mode={MODE.EDIT} />
-        </div>
+        <TemplateFormTemplate formik={formik} mode={MODE.EDIT} />
     );
 };
 

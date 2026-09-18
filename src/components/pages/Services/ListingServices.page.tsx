@@ -6,7 +6,7 @@ import { initialPaginationValues } from "../../../utils/constant";
 import { useServiceService, type ServiceOffering } from "../../../services/useServiceService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import ServiceTableTemplate from "../../templates/Services/ServiceTable.template";
-import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
+import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
 
 const ListingServicesPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -78,13 +78,14 @@ const ListingServicesPage: React.FC = () => {
                 onDelete={(id) => setIdPendingDelete(id)}
                 isLoading={isLoading}
             />
-            <DeleteConfirmation
+            <ConfirmDialog
                 open={idPendingDelete != null}
                 title="Delete this service?"
-                description="This action cannot be undone."
-                onDelete={handleDelete}
-                onCancel={() => setIdPendingDelete(null)}
-                deleteButtonText={deleting ? "Deleting..." : "Delete"}
+                message="This action cannot be undone."
+                danger
+                loading={deleting}
+                onConfirm={handleDelete}
+                onClose={() => setIdPendingDelete(null)}
             />
         </>
     );

@@ -83,10 +83,7 @@ const TemplateCreatePage: React.FC = () => {
     });
 
     return (
-        <div className="grid gap-y-4">
-            <div className="text-2xl font-medium my-auto pageTitle">Add Notification Template</div>
-            <TemplateFormTemplate formik={formik} mode={MODE.ADD} />
-        </div>
+        <TemplateFormTemplate formik={formik} mode={MODE.ADD} />
     );
 };
 

@@ -15,7 +15,7 @@ import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import TextField from "../../atoms/TextField/TextField";
 import Button from "../../atoms/Button/Button";
 import Checkbox from "../../atoms/Checkbox/Checkbox";
-import { DeleteConfirmation } from "../../molecules/DeleteConfirmation/DeleteConfirmation";
+import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
 import { useColors, HTTP_STATUS } from "../../../utils/types";
 import { useAuthenticatedUser } from "../../../hooks/useAuthenticatedUser";
 import { useSnackbar } from "../../../hooks/useSnackBar";
@@ -832,13 +832,14 @@ const FAQ = ({ colors, isSuperAdmin }: { colors: any; isSuperAdmin: boolean }) =
         </div>
       </Card>
 
-      <DeleteConfirmation
+      <ConfirmDialog
         open={!!deleteTarget}
         title="Delete this FAQ?"
-        description={deleteTarget ? `"${deleteTarget.question}" will be permanently removed.` : ""}
-        onDelete={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
-        deleteButtonText={deleting ? "Deleting…" : "Delete"}
+        message={deleteTarget ? `"${deleteTarget.question}" will be permanently removed.` : ""}
+        danger
+        loading={deleting}
+        onConfirm={handleDelete}
+        onClose={() => setDeleteTarget(null)}
       />
     </div>
   );

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { type ContactUs, useContactUsService } from "../../../services/useContactUsService";
 import { DateUtils, enumToNormalKey } from "../../../utils/helper";
-import { FiX, FiSend, FiCheckCircle } from "react-icons/fi";
+import { FiSend, FiCheckCircle } from "react-icons/fi";
 import TextField from "../../atoms/TextField/TextField";
 import { useColors } from "../../../utils/types";
 import Button from "../Button/Button";
+import Modal from "../Modal/Modal";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -26,14 +27,6 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
     const [replyText, setReplyText] = useState("");
     const [sending, setSending] = useState(false);
     const [replied, setReplied] = useState(!!message.replyMessage);
-
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
-        };
-        window.addEventListener("keydown", handleEsc);
-        return () => window.removeEventListener("keydown", handleEsc);
-    }, [onClose]);
 
     const handleSendReply = async () => {
         if (!replyText.trim() || !message.id) return;
@@ -70,40 +63,35 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
     };
 
     return (
-        <div
-            className="fixed inset-0 flex items-center justify-center z-[2000] bg-black/60 backdrop-blur-xl px-4"
-            onClick={onClose}
+        <Modal
+            open
+            onClose={onClose}
+            title="Message Details"
+            size="md"
+            footer={
+                <>
+                    <Button onClick={onClose} label="Close" variant="tertiaryContained" />
+                    {!replied && !message.replyMessage && (
+                        <Button
+                            label={sending ? "Sending…" : "Send Reply"}
+                            variant="primaryContained"
+                            startIcon={<FiSend size={14} />}
+                            disabled={sending || !replyText.trim()}
+                            onClick={handleSendReply}
+                        />
+                    )}
+                </>
+            }
         >
-            <div
-                className="w-full max-w-3xl rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden"
-                style={{ backgroundColor: colors.neutral50, maxHeight: "92vh" }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div
-                    className="flex items-start justify-between px-8 py-6 border-b"
-                    style={{ borderColor: colors.neutral300, backgroundColor: colors.neutral50 }}
-                >
-                    <div>
-                        <h2 className="text-2xl font-semibold tracking-tight" style={{ color: colors.neutral900 }}>
-                            Message Details
-                        </h2>
-                        <div className="flex items-center gap-4 mt-3">
-                            <p className="text-sm" style={{ color: colors.neutral500 }}>
-                                {DateUtils.formatDateTimeToDateMonthYear(message.createdAt)}
-                            </p>
-                            {renderStatus(message.status)}
-                        </div>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 rounded-xl transition-all duration-200 hover:scale-105"
-                        style={{ color: colors.neutral600, backgroundColor: colors.neutral100 }}
-                    >
-                        <FiX size={20} />
-                    </button>
+            <div className="flex flex-col overflow-hidden">
+                <div className="flex items-center gap-4 -mt-2 mb-4">
+                    <p className="text-sm" style={{ color: colors.neutral500 }}>
+                        {DateUtils.formatDateTimeToDateMonthYear(message.createdAt)}
+                    </p>
+                    {renderStatus(message.status)}
                 </div>
 
-                <div className="px-8 py-8 overflow-y-auto flex-1 space-y-6 custom-scroll">
+                <div className="space-y-6 custom-scroll">
                     <div
                         className="rounded-2xl p-6"
                         style={{ backgroundColor: colors.neutral50, border: `1.5px solid ${colors.neutral300}` }}
@@ -186,24 +174,8 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
                         </div>
                     )}
                 </div>
-
-                <div
-                    className="flex justify-end gap-3 px-8 py-5 border-t"
-                    style={{ borderColor: colors.neutral300, backgroundColor: colors.neutral50 }}
-                >
-                    <Button onClick={onClose} label="Close" variant="tertiaryContained" />
-                    {!replied && !message.replyMessage && (
-                        <Button
-                            label={sending ? "Sending…" : "Send Reply"}
-                            variant="primaryContained"
-                            startIcon={<FiSend size={14} />}
-                            disabled={sending || !replyText.trim()}
-                            onClick={handleSendReply}
-                        />
-                    )}
-                </div>
             </div>
-        </div>
+        </Modal>
     );
 };
 

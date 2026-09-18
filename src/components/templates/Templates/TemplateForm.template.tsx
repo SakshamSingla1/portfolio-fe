@@ -19,6 +19,7 @@ import type { ITabsSchema } from "../../atoms/Tabs/Tabs";
 import EmailNotificationForm from "./EmailNotificationForm.template";
 import SmsNotificationForm from "./SmsNotificationForm.template";
 import WhatsappNotificationForm from "./WhatsappNotificationForm.template";
+import FormShell from "../Shared/FormShell.template";
 
 interface TemplateFormProps {
     formik: FormikProps<INotificationTemplateFormPayload>;
@@ -352,7 +353,12 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                 variables={variables}
             />
 
-            <div className="grid gap-y-6">
+            <FormShell
+                title={mode === MODE.EDIT ? "Update Notification Template" : "Add Notification Template"}
+                subtitle={mode === MODE.EDIT ? "Update an existing notification template" : "Create a new notification template"}
+                onBack={onClose}
+            >
+            <div className="px-3 py-4 sm:p-6 grid gap-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <TextField
                         fullWidth
@@ -505,6 +511,7 @@ const TemplateFormTemplate: React.FC<TemplateFormProps> = ({ formik, mode }) => 
                     />
                 </div>
             </div>
+            </FormShell>
         </>
     );
 };

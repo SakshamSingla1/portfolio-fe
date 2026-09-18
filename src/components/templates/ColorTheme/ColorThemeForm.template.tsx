@@ -11,6 +11,7 @@ import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { makeRoute, capitalizeFirstLetter } from "../../../utils/helper";
 import { type ColorTheme } from "../../../services/useColorThemeService";
 import { DEFAULT_PALETTE } from "../../../utils/themeConstants";
+import FormShell from "../Shared/FormShell.template";
 
 interface ColorThemeFormProps {
   onSubmit: (values: ColorTheme) => void;
@@ -62,17 +63,12 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
   }, [colorTheme, setValues]);
 
   return (
-    <div className="mb-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          {capitalizeFirstLetter(mode)} Color Theme
-        </h2>
-        <p className="text-gray-600">
-          Configure the specific color codes for your fixed theme structure
-        </p>
-      </div>
-
-      <div className="space-y-8">
+    <FormShell
+      title={`${capitalizeFirstLetter(mode)} Color Theme`}
+      subtitle="Configure the specific color codes for your fixed theme structure"
+      onBack={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME, {}))}
+    >
+      <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
@@ -149,7 +145,7 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </FormShell>
   );
 };
 
