@@ -7,15 +7,17 @@ import { exportToCsv } from "../../../utils/csvExport";
 import TableV1 from "../../organisms/Table/TableV1";
 import ListingShell, { type BulkAction } from "../Shared/ListingShell.template";
 import { type UserResponse } from "../../../services/useProfileService";
-import { FiCheck, FiTrash2, FiUserCheck, FiUserX, FiSlash } from "react-icons/fi";
+import { FiCheck, FiTrash2, FiUserCheck, FiUserX, FiSlash, FiMail, FiPhone } from "react-icons/fi";
 import ActionButtons from "../../atoms/TableUtils/ActionButtons";
 import ResourceStatus from "../../organisms/ResourceStatus/ResourceStatus";
 import ConfirmDialog from "../../molecules/ConfirmDialog/ConfirmDialog";
+import SafeImage from "../../atoms/SafeImage/SafeImage";
 import { ADMIN_ROUTES } from "../../../utils/constant";
 import { useProfileService } from "../../../services/useProfileService";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { usePermissionHelper } from "../../../hooks/usePermissionHelper";
+import { useColors } from "../../../utils/types";
 import { FaUsers } from "react-icons/fa";
 
 interface UserTableTemplateProps {
@@ -80,6 +82,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     const { showSnackbar } = useSnackbar();
     const { toggleUserVerification } = useProfileService();
     const { canDelete, canEdit } = usePermissionHelper();
+    const colors = useColors();
 
     const [deleteTarget, setDeleteTarget] = useState<UserResponse | null>(null);
     const [bulkAction, setBulkAction] = useState<null | "delete" | { status: string }>(null);
@@ -146,10 +149,35 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     const records = useMemo(() => users?.map((user: UserResponse, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         <div key={`user-${user.id}`} className={`flex ${isMobile ? 'justify-end' : ''} items-center space-x-2`} title=''>
-            <img src={getOptimizedImageUrl(user.profileImageUrl, { width: 80, height: 80 })} alt={user.userName} className='w-10 h-10' loading="lazy" width={40} height={40} />
+            <SafeImage
+                src={getOptimizedImageUrl(user.profileImageUrl, { width: 80, height: 80 })}
+                alt={user.userName}
+                className='w-10 h-10 rounded-full object-cover'
+                fallbackClassName='w-10 h-10 rounded-full'
+                iconSize={16}
+                loading="lazy"
+                width={40}
+                height={40}
+            />
             <div className='flex flex-col'>
                 <div className='font-medium'>{user.fullName}</div>
                 <div className='text-sm text-gray-500'>{user.email}</div>
+                <div className='flex items-center space-x-2 mt-0.5'>
+                    <span
+                        title={user.emailVerified === 'VERIFIED' ? 'Email verified' : 'Email not verified'}
+                        style={{ color: user.emailVerified === 'VERIFIED' ? colors.success500 : colors.neutral400 }}
+                        className='inline-flex'
+                    >
+                        <FiMail size={12} />
+                    </span>
+                    <span
+                        title={user.phoneVerified === 'VERIFIED' ? 'Phone verified' : 'Phone not verified'}
+                        style={{ color: user.phoneVerified === 'VERIFIED' ? colors.success500 : colors.neutral400 }}
+                        className='inline-flex'
+                    >
+                        <FiPhone size={12} />
+                    </span>
+                </div>
             </div>
         </div>,
         user.userName,
@@ -164,13 +192,40 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             />
             {user.emailVerified !== 'VERIFIED' && user.phoneVerified !== 'VERIFIED' && <button
                 onClick={() => handleVerifyUser(user.id)}
-                className={`w-6 h-6 ${user.emailVerified === 'VERIFIED' ? 'text-green-600' : 'text-blue-600'}`}
                 title={user.emailVerified === 'VERIFIED' ? 'Verified' : 'Verify User'}
+                style={{
+                    width: 30,
+                    height: 30,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 8,
+                    border: `1.5px solid ${colors.neutral300}`,
+                    background: "transparent",
+                    cursor: "pointer",
+                    transition: "all 0.18s ease",
+                    flexShrink: 0,
+                    color: user.emailVerified === 'VERIFIED' ? colors.success500 : colors.primary600,
+                }}
+                onMouseEnter={(e) => {
+                    const b = e.currentTarget;
+                    b.style.background = `${colors.primary500}12`;
+                    b.style.borderColor = colors.primary300;
+                    b.style.transform = "translateY(-1px)";
+                    b.style.boxShadow = `0 4px 8px ${colors.primary500}20`;
+                }}
+                onMouseLeave={(e) => {
+                    const b = e.currentTarget;
+                    b.style.background = "transparent";
+                    b.style.borderColor = colors.neutral200;
+                    b.style.transform = "translateY(0)";
+                    b.style.boxShadow = "none";
+                }}
             >
-                <FiCheck />
+                <FiCheck size={13} />
             </button>}
         </div>
-    ]) ?? [], [users, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView, handleVerifyUser, onDelete]);
+    ]) ?? [], [users, pagination.currentPage, pagination.pageSize, isMobile, handleEdit, handleView, handleVerifyUser, onDelete, colors]);
 
     const schema = useMemo(() => ({
         id: 1,
