@@ -67,6 +67,7 @@ const ColorThemeForm: React.FC<ColorThemeFormProps> = ({
       title={`${capitalizeFirstLetter(mode)} Color Theme`}
       subtitle="Configure the specific color codes for your fixed theme structure"
       onBack={() => navigate(makeRoute(ADMIN_ROUTES.COLOR_THEME, {}))}
+      onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
     >
       <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">

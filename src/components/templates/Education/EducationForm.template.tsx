@@ -99,6 +99,7 @@ const EducationFormTemplate: React.FC<EducationFormProps> = ({ onSubmit, mode, e
             subtitle={mode === MODE.ADD ? "Add your academic achievement to your profile" : mode === MODE.EDIT ? "Update your education information" : "View education details"}
             breadcrumb="Education"
             onBack={onClose}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div

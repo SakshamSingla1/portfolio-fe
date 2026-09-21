@@ -195,6 +195,7 @@ const UserFormTemplate: React.FC<UserFormTemplateProps> = ({
             subtitle={mode === MODE.EDIT ? "Update user role and account status" : "View user details and current permissions"}
             breadcrumb="Users"
             onBack={onClose}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>

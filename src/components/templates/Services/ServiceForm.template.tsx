@@ -140,6 +140,7 @@ const ServiceFormTemplate = ({ onSubmit, mode, service }: ServiceFormProps) => {
                     : "View service details"
             }
             onBack={() => navigate(-1)}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>

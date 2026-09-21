@@ -166,6 +166,7 @@ const AchievementFormTemplate = ({
             title={mode === MODE.ADD ? "Add Achievement" : mode === MODE.EDIT ? "Edit Achievement" : "Achievement Details"}
             subtitle={mode === MODE.ADD ? "Add a professional achievement" : mode === MODE.EDIT ? "Update achievement information" : "View achievement information"}
             onBack={() => navigate(-1)}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>

@@ -264,6 +264,7 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
             title={mode === MODE.ADD ? "Add Project" : mode === MODE.EDIT ? "Edit Project" : "Project Details"}
             subtitle={mode === MODE.ADD ? "Showcase your work and contributions" : mode === MODE.EDIT ? "Update project details" : "View project information"}
             onBack={() => navigate(-1)}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>

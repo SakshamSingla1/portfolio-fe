@@ -158,6 +158,7 @@ const CertificationFormTemplate = ({
             title={mode === MODE.ADD ? "Add Certification" : mode === MODE.EDIT ? "Edit Certification" : "Certification Details"}
             subtitle={mode === MODE.ADD ? "Add a professional certification" : mode === MODE.EDIT ? "Update certification information" : "View certification information"}
             onBack={() => navigate(-1)}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>

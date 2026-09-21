@@ -76,6 +76,7 @@ const PublicationFormTemplate = ({
             title={mode === MODE.ADD ? "Add Publication" : mode === MODE.EDIT ? "Edit Publication" : "Publication Details"}
             subtitle={mode === MODE.ADD ? "Add a publication, talk, or article" : mode === MODE.EDIT ? "Update publication information" : "View publication information"}
             onBack={() => navigate(-1)}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>

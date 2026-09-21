@@ -109,6 +109,7 @@ const SkillFormTemplate = ({ mode, onSubmit, skill }: SkillFormProps) => {
             subtitle={mode === MODE.ADD ? "Add a new skill to your portfolio" : mode === MODE.EDIT ? "Update your skill information" : "View skill details"}
             breadcrumb="Skills"
             onBack={onClose}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div

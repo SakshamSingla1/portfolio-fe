@@ -10,6 +10,7 @@ interface FormShellProps {
   accentColor?: string;
   breadcrumb?: string;
   onBack?: () => void;
+  onSubmit?: () => void;
   children: React.ReactNode;
 }
 
@@ -19,6 +20,7 @@ const FormShell: React.FC<FormShellProps> = ({
   accentColor,
   breadcrumb,
   onBack,
+  onSubmit,
   children,
 }) => {
   const colors = useColors();
@@ -27,6 +29,19 @@ const FormShell: React.FC<FormShellProps> = ({
   const cardShadow = "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
 
   const accent = accentColor ?? colors.primary600;
+
+  // Lets Enter submit the form from any field, without a native <form> (no
+  // button here is type="submit"). Defers to any inner handler that already
+  // consumed Enter itself (radio pills, MUI Autocomplete option selection)
+  // by checking defaultPrevented, since those fire first during bubbling.
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!onSubmit) return;
+    if (e.key !== "Enter" || e.shiftKey || e.defaultPrevented) return;
+    const tag = (e.target as HTMLElement)?.tagName;
+    if (tag === "TEXTAREA" || tag === "BUTTON" || tag === "A") return;
+    e.preventDefault();
+    onSubmit();
+  };
 
   return (
     <motion.div
@@ -96,6 +111,7 @@ const FormShell: React.FC<FormShellProps> = ({
           border: `1.5px solid ${colors.neutral300}`,
           boxShadow: cardShadow,
         }}
+        onKeyDown={handleKeyDown}
       >
         {children}
       </div>

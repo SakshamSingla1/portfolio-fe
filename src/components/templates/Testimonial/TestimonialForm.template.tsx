@@ -165,6 +165,7 @@ const TestimonialFormTemplate = ({
             subtitle={mode === MODE.ADD ? "Add a professional testimonial from a client or colleague" : mode === MODE.EDIT ? "Update testimonial information" : "View testimonial details"}
             breadcrumb="Testimonials"
             onBack={onClose}
+            onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
         >
             <div className="px-3 py-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>

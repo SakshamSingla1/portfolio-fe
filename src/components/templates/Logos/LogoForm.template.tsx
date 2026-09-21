@@ -162,6 +162,7 @@ const LogoFormTemplate: React.FC<LogoFormProps> = ({
       subtitle="Manage your project and skill iconography with automated DevIcon integration."
       breadcrumb="Logos"
       onBack={() => navigate(-1)}
+      onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
     >
       <div className="px-3 py-4 sm:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">

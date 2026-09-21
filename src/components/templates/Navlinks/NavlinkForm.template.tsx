@@ -74,6 +74,7 @@ const NavlinkFormTemplate: React.FC<NavlinkFormTemplateProps> = ({
       subtitle={subtitle}
       breadcrumb="Navlinks"
       onBack={() => navigate(-1)}
+      onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}
     >
       <div className="px-3 py-4 sm:p-6">
         <div className="space-y-6 sm:space-y-8">

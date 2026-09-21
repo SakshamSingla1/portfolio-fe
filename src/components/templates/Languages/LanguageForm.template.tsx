@@ -53,7 +53,7 @@ const LanguageFormTemplate = ({ onSubmit, mode, language }: LanguageFormProps) =
         : "View Language";
 
     return (
-        <FormShell title={title} subtitle="Spoken language with proficiency level" breadcrumb="Languages" onBack={onClose}>
+        <FormShell title={title} subtitle="Spoken language with proficiency level" breadcrumb="Languages" onBack={onClose} onSubmit={!isView ? () => formik.handleSubmit() : undefined}>
             <div className="flex flex-col gap-6 pb-6">
                 <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm" style={cardStyle}>
                     <h3

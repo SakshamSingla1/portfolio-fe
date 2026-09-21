@@ -55,7 +55,7 @@ const SubscriptionPlanFormTemplate: React.FC<SubscriptionPlanFormTemplateProps> 
             description: planDetails?.description || '',
             priceMonthly: planDetails?.priceMonthly ?? 0,
             priceYearly: planDetails?.priceYearly ?? 0,
-            currency: planDetails?.currency || 'USD',
+            currency: planDetails?.currency || 'INR',
             isDefault: planDetails?.isDefault ?? false,
             sortOrder: planDetails?.sortOrder ?? 0,
             status: planDetails?.status || Status.ACTIVE,
@@ -99,7 +99,7 @@ const SubscriptionPlanFormTemplate: React.FC<SubscriptionPlanFormTemplateProps> 
         mode === MODE.VIEW ? 'View plan pricing and included modules' : 'Configure pricing and which modules this plan includes';
 
     return (
-        <FormShell title={title} subtitle={subtitle} breadcrumb="Subscription Plans" onBack={() => navigate(-1)}>
+        <FormShell title={title} subtitle={subtitle} breadcrumb="Subscription Plans" onBack={() => navigate(-1)} onSubmit={mode !== MODE.VIEW ? () => formik.handleSubmit() : undefined}>
             <div className="px-3 py-4 sm:p-6">
                 <div className="space-y-6 sm:space-y-8">
                     <div className="px-3 py-4 sm:p-6 rounded-xl shadow-sm border" style={{ backgroundColor: colors.neutral50, borderColor: colors.neutral300 }}>
@@ -177,7 +177,7 @@ const SubscriptionPlanFormTemplate: React.FC<SubscriptionPlanFormTemplateProps> 
                             />
                             <TextField
                                 label="Currency"
-                                placeholder="USD"
+                                placeholder="INR"
                                 fullWidth
                                 {...formik.getFieldProps('currency')}
                                 disabled={mode === MODE.VIEW}
