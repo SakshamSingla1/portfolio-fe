@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiLock, FiShield, FiSearch, FiGithub, FiImage, FiSettings } from "react-icons/fi";
+import { FiLock, FiShield, FiSearch, FiGithub, FiImage, FiSettings, FiCreditCard } from "react-icons/fi";
 import { motion } from "framer-motion";
 import Tabs, { type ITabsSchema } from "../../atoms/Tabs/Tabs";
 import PasswordTab from "./PasswordTab";
@@ -8,6 +8,7 @@ import TwoFactorTab from "./TwoFactorTab";
 import SeoTab from "./SeoTab";
 import GitHubTab from "./GitHubTab";
 import BannerTab from "./BannerTab";
+import PlanBillingTab from "./PlanBillingTab";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { Card, SectionLabel, PageHeaderBanner } from "../Dashboard/shared/DashboardUI";
 
@@ -51,6 +52,12 @@ const SettingsTemplate: React.FC = () => {
       value: "banner",
       icon: <FiImage />,
       component: <BannerTab />,
+    },
+    {
+      label: "Plan & Billing",
+      value: "plan",
+      icon: <FiCreditCard />,
+      component: <PlanBillingTab />,
     },
   ];
 

@@ -7,6 +7,7 @@ import { type AuditableResponse } from "./useRoleService";
 
 export const PROFILE_SUBSCRIPTION_URLS = {
     ME: "/profile-subscriptions/me",
+    CHANGE_MY_PLAN: "/profile-subscriptions/me",
     BY_PROFILE_ID: "/profile-subscriptions/:profileId",
 };
 
@@ -52,10 +53,15 @@ export const useProfileSubscriptionService = () => {
             return request(API_METHOD.PUT, url, user, data);
         };
 
+        const changeMyPlan = (data: AssignSubscriptionRequestDTO) => {
+            return request(API_METHOD.PUT, PROFILE_SUBSCRIPTION_URLS.CHANGE_MY_PLAN, user, data);
+        };
+
         return {
             getMySubscription,
             getSubscriptionByProfileId,
             assignPlan,
+            changeMyPlan,
         };
     }, [user]);
 };

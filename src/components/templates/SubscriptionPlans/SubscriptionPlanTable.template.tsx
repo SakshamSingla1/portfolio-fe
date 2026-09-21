@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from "react";
 import { type ColumnType } from "../../organisms/Table/TableV1";
 import { type IPagination } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { makeRoute } from "../../../utils/helper";
+import { makeRoute, formatCurrency } from "../../../utils/helper";
 import TableV1 from "../../organisms/Table/TableV1";
 import ListingShell from "../Shared/ListingShell.template";
 import { type SubscriptionPlanResponseDTO } from "../../../services/useSubscriptionPlanService";
@@ -59,17 +59,14 @@ const SubscriptionPlanTableTemplate: React.FC<SubscriptionPlanTableTemplateProps
         navigate(makeRoute(ADMIN_ROUTES.SUBSCRIPTION_PLAN_VIEW, { query, params: { id: String(id) } }));
     }, [navigate, searchParams]);
 
-    const formatPrice = (value: number, currency: string) =>
-        `${currency ?? ""} ${Number(value ?? 0).toFixed(2)}`;
-
     const records = useMemo(() => plans?.map((plan, index) => [
         pagination.currentPage * pagination.pageSize + index + 1,
         <span key={`name-${plan.id}`} className="font-medium">
             {plan.name}{plan.isDefault ? " (default)" : ""}
         </span>,
         plan.code,
-        formatPrice(plan.priceMonthly, plan.currency),
-        formatPrice(plan.priceYearly, plan.currency),
+        formatCurrency(plan.priceMonthly, plan.currency),
+        formatCurrency(plan.priceYearly, plan.currency),
         <ResourceStatus key={`status-${plan.id}`} status={plan.status} />,
         <ActionButtons
             key={plan.id}

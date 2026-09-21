@@ -58,6 +58,25 @@ const RoleChip: React.FC<{ roleName: string }> = ({ roleName }) => {
     );
 };
 
+const PLAN_CHIP_COLORS: Record<string, string> = {
+    FREE: "#64748b",
+    PRO: "#3b82f6",
+    PREMIUM: "#f59e0b",
+};
+
+const PlanChip: React.FC<{ planName?: string | null; planCode?: string | null }> = ({ planName, planCode }) => {
+    if (!planName) return <span className="text-sm text-gray-400">—</span>;
+    const color = (planCode && PLAN_CHIP_COLORS[planCode]) || "#8b5cf6";
+    return (
+        <span
+            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+            style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}
+        >
+            {planName}
+        </span>
+    );
+};
+
 const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
     users,
     pagination,
@@ -182,6 +201,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
         </div>,
         user.userName,
         <RoleChip key={`role-${user.id}`} roleName={user.roleName} />,
+        <PlanChip key={`plan-${user.id}`} planName={user.planName} planCode={user.planCode} />,
         <ResourceStatus key={`status-${user.id}`} status={user.status} />,
         user.createdAt ? DateUtils.formatDateTimeToDateMonthYear(user.createdAt) : "—",
         <div key={user.id} className={`flex ${isMobile ? 'justify-end' : ''} space-x-2`} title=''>
@@ -243,6 +263,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             { label: "User", key: "user", type: "custom" as ColumnType, props: { className: '' }, priority: "high" as const },
             { label: "Username", key: "username", type: "text" as ColumnType, props: { className: '' }, priority: "medium" as const },
             { label: "Role", key: "role", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
+            { label: "Plan", key: "plan", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const, hideOnMobile: true },
             { label: "Status", key: "status", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
             { label: "Created", key: "createdAt", type: "text" as ColumnType, props: { className: '' }, priority: "low" as const, hideOnMobile: true },
             { label: "Action", key: "action", type: "custom" as ColumnType, props: { className: '' }, priority: "medium" as const },
@@ -292,7 +313,7 @@ const UsersTableTemplate: React.FC<UserTableTemplateProps> = ({
             filterContent={filterContent}
             onExport={onToggleSelect ? () => exportToCsv("users", users.map((u) => ({
                 id: u.id, fullName: u.fullName, email: u.email, username: u.userName,
-                role: u.roleName, status: u.status, createdAt: u.createdAt ?? "",
+                role: u.roleName, plan: u.planName ?? "", status: u.status, createdAt: u.createdAt ?? "",
             }))) : undefined}
             selectedCount={selectedIds.length}
             onClearSelection={onClearSelection}

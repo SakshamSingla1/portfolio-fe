@@ -82,6 +82,8 @@ export interface UserResponse {
     updatedBy: string;
     createdByName: string;
     updatedByName: string;
+    planName?: string | null;
+    planCode?: string | null;
 }
 
 export interface StatusUpdateRequest {

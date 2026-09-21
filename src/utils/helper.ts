@@ -153,6 +153,20 @@ export const enumToNormalKey = (enumKey: string): string => {
     .join(' ');
 };
 
+export const formatCurrency = (value: number, currency?: string): string => {
+  const code = currency || 'INR';
+  try {
+    return new Intl.NumberFormat(code === 'INR' ? 'en-IN' : 'en-US', {
+      style: 'currency',
+      currency: code,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(Number(value ?? 0));
+  } catch {
+    return `${code} ${Number(value ?? 0).toFixed(2)}`;
+  }
+};
+
 
 export const isRichTextEmpty = (value?: string) => {
     if (!value) return true;
