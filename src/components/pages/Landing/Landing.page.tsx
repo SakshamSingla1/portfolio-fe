@@ -16,36 +16,44 @@ interface LandingProps {
   onGetStarted?: () => void;
 }
 
+// A light, clean palette. The brand accent hues (teal/blue/purple/amber/…)
+// stay the same family the admin's icon/color picker already writes into
+// content (colorKey), just shifted a shade darker than the old dark-mode
+// palette so they hold contrast on white instead of on near-black.
 const C = {
-  bg: '#060608',
-  surface: '#0C0D10',
-  surfaceAlt: '#101318',
-  surfaceElevated: '#141720',
-  border: 'rgba(255,255,255,0.055)',
-  borderMid: 'rgba(255,255,255,0.09)',
-  borderHigh: 'rgba(255,255,255,0.14)',
-  teal: '#14B8A0',
-  tealLight: '#2DD4BF',
-  tealDim: 'rgba(20, 184, 160, 0.08)',
-  tealBorder: 'rgba(20, 184, 160, 0.22)',
-  tealGlow: 'rgba(20, 184, 160, 0.4)',
-  purple: '#8B5CF6',
-  purpleLight: '#A78BFA',
-  purpleDim: 'rgba(139, 92, 246, 0.08)',
-  blue: '#3B82F6',
-  blueLight: '#60A5FA',
-  blueDim: 'rgba(59, 130, 246, 0.08)',
-  amber: '#F59E0B',
-  red: '#EF4444',
-  green: '#22C55E',
-  text: '#EEEEF0',
-  textSub: '#9CA3AF',
-  muted: '#4B5563',
+  bg: '#FFFFFF',
+  surface: '#F6F8FA',
+  surfaceAlt: '#EEF2F6',
+  surfaceElevated: '#FFFFFF',
+  border: 'rgba(15,23,42,0.07)',
+  borderMid: 'rgba(15,23,42,0.12)',
+  borderHigh: 'rgba(15,23,42,0.18)',
+  teal: '#0D9488',
+  tealLight: '#14B8A6',
+  tealDim: 'rgba(13,148,136,0.08)',
+  tealBorder: 'rgba(13,148,136,0.24)',
+  tealGlow: 'rgba(13,148,136,0.32)',
+  purple: '#7C3AED',
+  purpleLight: '#8B5CF6',
+  purpleDim: 'rgba(124,58,237,0.08)',
+  blue: '#2563EB',
+  blueLight: '#3B82F6',
+  blueDim: 'rgba(37,99,235,0.08)',
+  amber: '#D97706',
+  red: '#DC2626',
+  green: '#16A34A',
+  text: '#0F172A',
+  textSub: '#475569',
+  muted: '#94A3B8',
 };
 
 const CUBIC: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 // ── Icon + color resolution maps ─────────────────────────────────────────────
+// Kept broad on purpose — the admin's Landing Management screen lets a
+// SUPER_ADMIN type any of these icon/color names into a feature, step, or
+// audience card, so every key here must keep working even if the current
+// fallback copy below doesn't use all of them.
 
 const ICON_MAP: Record<string, React.ElementType> = {
   LayoutDashboard, Globe, Palette, BarChart2, Cloud, Lock, Shield, Database,
@@ -55,18 +63,27 @@ const ICON_MAP: Record<string, React.ElementType> = {
 };
 
 const COLOR_MAP: Record<string, string> = {
-  teal: '#14B8A0', tealLight: '#2DD4BF',
-  blue: '#3B82F6', blueLight: '#60A5FA',
-  purple: '#8B5CF6', purpleLight: '#A78BFA',
-  amber: '#F59E0B', red: '#EF4444', green: '#22C55E',
-  cyan: '#06B6D4', orange: '#F97316', pink: '#EC4899',
+  teal: '#0D9488', tealLight: '#14B8A6',
+  blue: '#2563EB', blueLight: '#3B82F6',
+  purple: '#7C3AED', purpleLight: '#8B5CF6',
+  amber: '#D97706', red: '#DC2626', green: '#16A34A',
+  cyan: '#0891B2', orange: '#EA580C', pink: '#DB2777',
 };
 
-const resolveIcon = (name: string): React.ElementType =>
-  ICON_MAP[name] ?? CheckCircle;
+// Accepts either a bare lucide-react name ("Edit3") or the "Lu"-prefixed
+// react-icons convention some admins type out of habit ("LuEdit3") — the
+// Landing Management form's hint text has shown the latter, but this map
+// only ever held the former, so those entries silently fell back to
+// CheckCircle. Stripping the prefix before falling back fixes that without
+// having to police what admins type.
+const resolveIcon = (name: string): React.ElementType => {
+  if (ICON_MAP[name]) return ICON_MAP[name];
+  const stripped = name?.replace(/^Lu/, '');
+  return (stripped && ICON_MAP[stripped]) || CheckCircle;
+};
 
 const resolveColor = (key: string): string =>
-  COLOR_MAP[key] ?? '#14B8A0';
+  COLOR_MAP[key] ?? '#0D9488';
 
 const fadeUp = (delay = 0, dur = 0.55) => ({
   initial: { opacity: 0, y: 22 },
@@ -75,237 +92,236 @@ const fadeUp = (delay = 0, dur = 0.55) => ({
   transition: { duration: dur, ease: CUBIC, delay },
 });
 
-// ── Data ─────────────────────────────────────────────────────────────────────
-
-const TERMINAL_LINES = [
-  { t: 0, text: '$ ./portfolios-builder start', color: C.tealLight },
-  { t: 600, text: '✓ Spring Boot API running on :8080', color: C.green },
-  { t: 1100, text: '✓ Admin dashboard running on :5174', color: C.green },
-  { t: 1600, text: '✓ Public portfolio running on :5173', color: C.green },
-  { t: 2100, text: '✓ MongoDB connected', color: C.green },
-  { t: 2600, text: '✓ Cloudinary CDN configured', color: C.green },
-  { t: 3100, text: '✓ JWT auth active', color: C.green },
-  { t: 3600, text: '→ All systems operational', color: C.tealLight },
-];
+// ── Fallback copy ────────────────────────────────────────────────────────────
+// Shown only when the corresponding section has no active rows in the CMS
+// (Landing Management, SUPER_ADMIN-only). Deliberately describes what a
+// visitor gets to do and see — not what the platform is built with.
 
 const FEATURES = [
   {
     icon: LayoutDashboard, color: C.teal,
-    title: 'Full-Featured CMS',
-    desc: 'Manage experience, skills, projects, certifications, education, and testimonials — all from one clean admin panel without touching a line of code.',
+    title: 'Easy-to-Use Dashboard',
+    desc: 'Add your experience, skills, projects, and more through a simple, guided dashboard — no coding or design skills needed.',
   },
   {
     icon: Globe, color: C.blue,
-    title: 'Production Portfolio',
-    desc: 'Your public site is generated from dashboard data. Beautifully animated, fully responsive, SEO-optimised — you never write HTML or CSS.',
+    title: 'A Polished Public Portfolio',
+    desc: 'Your portfolio is generated automatically from your details — professionally designed, mobile-friendly, and ready to share.',
   },
   {
     icon: Palette, color: C.purple,
-    title: 'Dynamic Theme Engine',
-    desc: '10+ colour palettes switchable from the dashboard. Switch from indigo to emerald in one click and the public site updates instantly.',
+    title: 'Dynamic Themes',
+    desc: 'Choose from a range of colour themes. Switch your look anytime with a single click — your portfolio updates instantly.',
   },
   {
     icon: BarChart2, color: C.amber,
-    title: 'Real-Time Analytics',
-    desc: 'Track profile views, visitor sessions, device breakdown, and resume downloads. Know exactly when a recruiter is browsing your work.',
+    title: 'Visitor Insights',
+    desc: 'See who is viewing your portfolio — visits, popular sections, and resume downloads — so you know when a recruiter takes notice.',
   },
   {
-    icon: Cloud, color: '#06B6D4',
-    title: 'Cloudinary CDN',
-    desc: 'All images are stored on Cloudinary and served via global CDN with on-the-fly optimisation — fast everywhere, always.',
+    icon: Cloud, color: '#0891B2',
+    title: 'Fast, Optimised Images',
+    desc: 'Your photos and project images load quickly everywhere, automatically optimised for every device.',
   },
   {
     icon: Lock, color: C.red,
-    title: 'JWT Auth + RBAC',
-    desc: 'Secure login with signed JWT tokens. Role-based access control keeps the admin private while your portfolio stays fully public.',
+    title: 'Private & Secure',
+    desc: 'Your dashboard is protected behind a secure login, while your portfolio stays public and easy to share with anyone.',
   },
 ];
 
 const CONTENT_SECTIONS = [
-  { icon: Briefcase, label: 'Experience', desc: 'Role, company, dates, location, employment type, tech stack' },
+  { icon: Briefcase, label: 'Experience', desc: 'Role, company, dates, location, employment type, technologies used' },
   { icon: Code2, label: 'Skills', desc: 'Categorised with logo, proficiency level, and progress bars' },
   { icon: Monitor, label: 'Projects', desc: 'Images, live demo, GitHub links, descriptions, skill tags' },
   { icon: Award, label: 'Achievements', desc: 'Proof images, issuer, date, and description' },
   { icon: CheckCircle, label: 'Certifications', desc: 'Credential ID, verification URL, and expiry tracking' },
   { icon: GraduationCap, label: 'Education', desc: 'Degree, field of study, institution, grade, years' },
   { icon: Star, label: 'Testimonials', desc: 'Reviews with name, role, company, avatar, and LinkedIn' },
-  { icon: MessageSquare, label: 'Contact', desc: 'Submissions land in your admin inbox — no third-party forms' },
-];
-
-const TECH_STACK = [
-  { cat: 'Backend', color: C.teal, items: ['Spring Boot 3', 'Java 21', 'MongoDB', 'JWT Auth', 'Cloudinary SDK', 'REST APIs'] },
-  { cat: 'Admin Frontend', color: C.purple, items: ['React 18', 'TypeScript', 'Vite 5', 'Tailwind CSS 4', 'Framer Motion', 'MUI v6'] },
-  { cat: 'Public Portfolio', color: C.blue, items: ['React 18', 'TypeScript', 'Vite 5', 'Tailwind CSS 4', 'Framer Motion', 'React Router v7'] },
+  { icon: MessageSquare, label: 'Contact', desc: 'Submissions land straight in your dashboard inbox' },
 ];
 
 const STATS = [
-  { value: '3', label: 'Applications', sub: 'Admin · API · Portfolio', icon: Layers, color: C.teal },
-  { value: '9+', label: 'Content Sections', sub: 'Fully CMS-driven', icon: Database, color: C.purple },
-  { value: '10+', label: 'Theme Palettes', sub: 'Live switchable', icon: Palette, color: C.blue },
-  { value: '< 1s', label: 'Load Time', sub: 'Vite + Cloudinary CDN', icon: Zap, color: C.amber },
-];
-
-const ARCHITECTURE_STEPS = [
-  {
-    n: '01', icon: Terminal, color: C.purple,
-    title: 'Admin Dashboard',
-    label: 'portfolio-fe · :5174',
-    desc: 'You log in here. Add content, upload images, configure your theme, manage roles, and publish everything — no code required.',
-  },
-  {
-    n: '02', icon: Server, color: C.teal,
-    title: 'REST API',
-    label: 'portfolio-be · :8080',
-    desc: 'Spring Boot 3 handles authentication, persists data to MongoDB, manages Cloudinary uploads, and serves structured JSON to both frontends.',
-  },
-  {
-    n: '03', icon: Globe, color: C.blue,
-    title: 'Public Portfolio',
-    label: 'portfolio-main · :5173',
-    desc: 'Anyone with the link sees this. Reads from the same API and renders your portfolio beautifully — no login required.',
-  },
+  { value: '9+', label: 'Portfolio Sections', sub: 'Experience, skills, projects & more', icon: Layers, color: C.teal },
+  { value: '10+', label: 'Colour Themes', sub: 'Switch anytime, instantly', icon: Palette, color: C.purple },
+  { value: '100%', label: 'No Code', sub: 'No design skills required', icon: CheckCircle, color: C.blue },
+  { value: 'Free', label: 'To Start', sub: 'No credit card required', icon: Zap, color: C.amber },
 ];
 
 const HOW_TO_USE_STEPS = [
   {
     step: '01', color: C.purple, icon: Shield,
-    title: 'Login to your admin dashboard',
+    title: 'Create your account',
     bullets: [
-      'Navigate to your portfolio-fe deployment URL',
-      'Enter credentials to receive a signed JWT token',
-      'Session stays active until you sign out',
+      'Sign up and log in to your personal dashboard',
+      'Your session stays active until you log out',
+      'Start on the Free plan, or upgrade anytime',
     ],
   },
   {
     step: '02', color: C.teal, icon: Database,
     title: 'Build your profile',
     bullets: [
-      'Fill in About, skills, work experience, and education',
-      'Upload profile photo and project images — all stored on Cloudinary',
-      'Add projects with live demo links, GitHub URLs, and tech tags',
-      'Create certifications with credential IDs and verification links',
+      'Fill in your experience, skills, and education',
+      'Upload a profile photo and project images',
+      'Add projects with live demo links and descriptions',
+      'List certifications with credentials and verification links',
     ],
   },
   {
     step: '03', color: C.blue, icon: Palette,
-    title: 'Customise your theme',
+    title: 'Customise your look',
     bullets: [
-      'Choose from 10+ colour palettes in the Theme settings',
-      'The public portfolio reflects the change on next page load',
-      'No CSS knowledge or rebuild required',
+      'Choose from a range of colour themes',
+      'See your changes reflected instantly on your public page',
+      'No design or coding experience needed',
     ],
   },
   {
     step: '04', color: C.amber, icon: Eye,
-    title: 'Share your live portfolio',
+    title: 'Share your portfolio',
     bullets: [
-      "Your public portfolio is already live at portfolio-main's URL",
-      'Paste the link in job applications, LinkedIn, or your email signature',
-      'Watch visitor analytics in the dashboard Overview panel',
+      'Get a live link the moment your portfolio is ready',
+      'Share it in job applications, on LinkedIn, or in your email signature',
+      'Track visits and engagement right from your dashboard',
     ],
   },
 ];
 
 const FAQS = [
   {
-    q: 'Is this SaaS or self-hosted?',
-    a: 'Self-hosted. You deploy the Spring Boot backend, the admin frontend, and the public frontend wherever you like — VPS, cloud VM, Vercel/Railway combo. You own all data and infrastructure.',
+    q: 'Do I need to know how to code?',
+    a: 'Not at all. Everything is managed through a simple dashboard — fill in your details, upload images, and click save. Your public portfolio reflects the change immediately.',
   },
   {
-    q: 'Do I need to write code to update my portfolio?',
-    a: 'No. The admin dashboard is a full no-code CMS. Fill in forms, upload images, click Save. The public portfolio reflects every change immediately.',
-  },
-  {
-    q: 'How is the dashboard protected?',
-    a: 'JWT tokens are issued on login and validated on every admin API request. Role-based permissions control which sections each user can access. Password resets flow through email verification.',
+    q: 'Is my data safe?',
+    a: 'Yes. Your account is protected behind a secure login, and your data is stored securely with regular backups. Only you can edit your portfolio’s content.',
   },
   {
     q: 'Can I use my own domain?',
-    a: 'Yes. Point your domain\'s DNS to your deployment and configure the frontend build with your domain. Standard static hosting setup — no special configuration needed.',
+    a: 'Yes — you can connect your own custom domain so your portfolio lives at an address that’s uniquely yours.',
   },
   {
-    q: 'What database does it use?',
-    a: 'MongoDB. The Spring Boot backend uses Spring Data MongoDB for persistence. Any MongoDB-compatible host works — MongoDB Atlas is the simplest cloud option.',
+    q: 'Can I change my portfolio’s look later?',
+    a: 'Absolutely. Switch between colour themes anytime from your dashboard — your live portfolio updates instantly, with no downtime.',
   },
   {
-    q: 'How does theme switching work?',
-    a: 'The public portfolio fetches the active colour palette from the API on load. Change the theme in the dashboard and the public site picks it up on next load — no rebuild required.',
+    q: 'What does it cost?',
+    a: 'You can get started for free. Paid plans unlock extra features like deeper analytics and more customisation, so you can pick what fits.',
+  },
+  {
+    q: 'Who can see my portfolio?',
+    a: 'Your portfolio is public by default, so you can share it anywhere — with recruiters, on LinkedIn, or on your résumé. Your dashboard stays private to you.',
   },
 ];
 
-// ── Terminal Animation ────────────────────────────────────────────────────────
+// ── Portfolio preview visual ──────────────────────────────────────────────────
+// Replaces a prior "boot log" style visual that named backend/infra pieces.
+// This shows the actual thing a visitor is being sold: a finished, live
+// portfolio — not how the product itself is built.
 
-const AnimatedTerminal = () => {
-  const [visible, setVisible] = useState<number[]>([]);
-
-  useEffect(() => {
-    const timers = TERMINAL_LINES.map(({ t }, i) =>
-      window.setTimeout(() => setVisible(v => [...v, i]), t)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, []);
+const PortfolioPreviewCard = () => {
+  const chips = [
+    { icon: Briefcase, label: '12 Projects' },
+    { icon: Code2, label: '18 Skills' },
+    { icon: Award, label: '6 Certifications' },
+  ];
 
   return (
     <div
       style={{
-        borderRadius: 14,
+        borderRadius: 18,
         overflow: 'hidden',
         border: `1px solid ${C.borderMid}`,
-        background: C.surface,
-        boxShadow: `0 32px 64px rgba(0,0,0,0.7), 0 0 0 1px ${C.teal}12`,
-        fontFamily: '"SF Mono", "Fira Code", Consolas, monospace',
+        background: C.surfaceElevated,
+        boxShadow: '0 32px 64px rgba(15,23,42,0.12), 0 2px 8px rgba(15,23,42,0.06)',
       }}
     >
       <div style={{
-        background: '#0A0B0E',
+        background: C.surface,
         padding: '11px 16px',
         display: 'flex',
         alignItems: 'center',
         gap: 8,
         borderBottom: `1px solid ${C.border}`,
       }}>
-        {[C.red, C.amber, C.green].map((c, i) => (
-          <div key={i} style={{ width: 11, height: 11, borderRadius: '50%', background: c, opacity: 0.85 }} />
+        {[C.red, C.amber, C.green].map((c) => (
+          <div key={c} style={{ width: 11, height: 11, borderRadius: '50%', background: c, opacity: 0.7 }} />
         ))}
         <div style={{ flex: 1, textAlign: 'center', fontSize: 11, color: C.muted }}>
-          terminal — portfolios-builder
+          yourname.portfoliosbuilder.com
         </div>
       </div>
-      <div style={{ padding: '18px 20px', minHeight: 180 }}>
-        {TERMINAL_LINES.map(({ text, color }, i) => (
-          <AnimatePresence key={i}>
-            {visible.includes(i) && (
-              <motion.div
-                initial={{ opacity: 0, x: -6 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.25 }}
+
+      <div style={{ padding: '32px 30px 28px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22 }}>
+          <div style={{
+            width: 60, height: 60, borderRadius: '50%',
+            background: `linear-gradient(135deg, ${C.teal}, ${C.blue})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 800, fontSize: 20, flexShrink: 0,
+          }}>
+            YN
+          </div>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 18, color: C.text }}>Your Name</div>
+            <div style={{ fontSize: 13, color: C.textSub, marginTop: 2 }}>Your Professional Title</div>
+          </div>
+          <motion.div
+            animate={{ opacity: [1, 0.4, 1] }}
+            transition={{ duration: 2.2, repeat: Infinity }}
+            style={{
+              marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
+              fontSize: 10.5, fontWeight: 700, color: C.teal,
+              background: C.tealDim, border: `1px solid ${C.tealBorder}`,
+              padding: '4px 10px', borderRadius: 99, flexShrink: 0,
+            }}
+          >
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.teal, display: 'inline-block' }} />
+            Live
+          </motion.div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 22 }}>
+          {chips.map(({ icon: Icon, label }) => (
+            <div key={label} style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 12px', borderRadius: 10,
+              background: C.surface, border: `1px solid ${C.border}`,
+              fontSize: 12, fontWeight: 600, color: C.text,
+            }}>
+              <Icon size={13} style={{ color: C.teal }} /> {label}
+            </div>
+          ))}
+        </div>
+
+        <div style={{
+          borderRadius: 12, border: `1px solid ${C.border}`,
+          background: C.surface, padding: '14px 16px',
+        }}>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: C.muted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+            Visitor activity
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 44 }}>
+            {[28, 45, 36, 60, 52, 78, 90].map((h, i) => (
+              <div
+                key={i}
                 style={{
-                  fontSize: 12.5,
-                  color,
-                  lineHeight: 1.9,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
+                  flex: 1,
+                  height: `${h}%`,
+                  borderRadius: '4px 4px 0 0',
+                  background: i === 6 ? C.teal : `${C.teal}30`,
                 }}
-              >
-                {text}
-                {i === TERMINAL_LINES.length - 1 && visible.includes(i) && (
-                  <motion.span
-                    animate={{ opacity: [1, 0] }}
-                    transition={{ duration: 0.8, repeat: Infinity }}
-                    style={{ display: 'inline-block', width: 7, height: 13, background: C.tealLight, borderRadius: 2 }}
-                  />
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        ))}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-// ── Dashboard Mockup ──────────────────────────────────────────────────────────
+// ── Dashboard mockup ──────────────────────────────────────────────────────────
 
 const MiniChart = ({ color }: { color: string }) => {
   const pts = [28, 45, 36, 60, 52, 78, 65, 82, 74, 91];
@@ -347,32 +363,32 @@ const DashboardMockup = () => (
       borderRadius: 18,
       overflow: 'hidden',
       border: `1px solid ${C.borderMid}`,
-      background: C.surface,
-      boxShadow: `0 48px 96px rgba(0,0,0,0.65), 0 0 0 1px ${C.teal}10`,
+      background: C.surfaceElevated,
+      boxShadow: '0 48px 96px rgba(15,23,42,0.14), 0 2px 8px rgba(15,23,42,0.06)',
     }}
   >
     <div style={{
-      background: '#0A0B0E',
+      background: C.surface,
       padding: '11px 18px',
       display: 'flex',
       alignItems: 'center',
       gap: 8,
       borderBottom: `1px solid ${C.border}`,
     }}>
-      {[C.red, C.amber, C.green].map((c, i) => (
-        <div key={i} style={{ width: 11, height: 11, borderRadius: '50%', background: c, opacity: 0.85 }} />
+      {[C.red, C.amber, C.green].map((c) => (
+        <div key={c} style={{ width: 11, height: 11, borderRadius: '50%', background: c, opacity: 0.7 }} />
       ))}
-      <div style={{ flex: 1, textAlign: 'center', fontSize: 11, color: C.muted, fontFamily: 'monospace' }}>
-        Portfolios Builder Admin — Dashboard
+      <div style={{ flex: 1, textAlign: 'center', fontSize: 11, color: C.muted }}>
+        Portfolios Builder — Dashboard
       </div>
       <div style={{
         fontSize: 10,
-        fontFamily: 'monospace',
         color: C.teal,
-        background: `${C.teal}12`,
+        background: C.tealDim,
         border: `1px solid ${C.tealBorder}`,
         padding: '2px 8px',
         borderRadius: 6,
+        fontWeight: 700,
       }}>
         ● Live
       </div>
@@ -381,7 +397,7 @@ const DashboardMockup = () => (
     <div style={{ display: 'flex', height: 360 }}>
       <div style={{
         width: 165,
-        background: '#080A0C',
+        background: C.surface,
         borderRight: `1px solid ${C.border}`,
         padding: '14px 0',
         flexShrink: 0,
@@ -389,15 +405,15 @@ const DashboardMockup = () => (
         <div style={{
           padding: '0 14px 10px',
           fontSize: 9,
-          fontFamily: 'monospace',
           color: C.muted,
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
+          fontWeight: 700,
         }}>
           Navigation
         </div>
         {[
-          { label: 'Dashboard', active: true, icon: '◉' },
+          { label: 'Dashboard', active: true, icon: '●' },
           { label: 'Experience', active: false, icon: '○' },
           { label: 'Projects', active: false, icon: '○' },
           { label: 'Skills', active: false, icon: '○' },
@@ -412,10 +428,10 @@ const DashboardMockup = () => (
             style={{
               padding: '7px 14px',
               fontSize: 11.5,
-              color: active ? C.tealLight : C.muted,
-              background: active ? `${C.teal}10` : 'transparent',
+              fontWeight: active ? 700 : 500,
+              color: active ? C.teal : C.textSub,
+              background: active ? C.tealDim : 'transparent',
               borderLeft: active ? `2px solid ${C.teal}` : '2px solid transparent',
-              fontFamily: 'monospace',
               display: 'flex',
               alignItems: 'center',
               gap: 7,
@@ -430,19 +446,19 @@ const DashboardMockup = () => (
       <div style={{ flex: 1, padding: '18px 20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Good morning, Admin</div>
-            <div style={{ fontSize: 10, color: C.muted, fontFamily: 'monospace', marginTop: 2 }}>
-              portfolio.dashboard · All systems operational
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Good morning 👋</div>
+            <div style={{ fontSize: 10.5, color: C.muted, marginTop: 2 }}>
+              Here's how your portfolio is doing
             </div>
           </div>
           <div style={{
             fontSize: 10,
-            fontFamily: 'monospace',
             color: C.green,
-            background: `${C.green}10`,
-            border: `1px solid ${C.green}25`,
+            background: 'rgba(22,163,74,0.08)',
+            border: '1px solid rgba(22,163,74,0.22)',
             padding: '3px 8px',
             borderRadius: 6,
+            fontWeight: 700,
           }}>
             100% complete
           </div>
@@ -458,7 +474,7 @@ const DashboardMockup = () => (
             <div
               key={label}
               style={{
-                background: C.surfaceAlt,
+                background: C.surface,
                 borderRadius: 10,
                 padding: '10px 12px',
                 border: `1px solid ${C.border}`,
@@ -466,22 +482,22 @@ const DashboardMockup = () => (
                 overflow: 'hidden',
               }}
             >
-              <div style={{ fontSize: 16, fontWeight: 800, color, fontFamily: 'monospace' }}>{val}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color }}>{val}</div>
               <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>{label}</div>
               <div style={{
                 fontSize: 9,
-                color: color,
+                color,
                 marginTop: 3,
-                fontFamily: 'monospace',
-                background: `${color}10`,
+                background: `${color}12`,
                 display: 'inline-block',
                 padding: '1px 5px',
                 borderRadius: 4,
+                fontWeight: 700,
               }}>
                 {delta}
               </div>
               {ChartPts && (
-                <div style={{ position: 'absolute', bottom: 6, right: 8, opacity: 0.6 }}>
+                <div style={{ position: 'absolute', bottom: 6, right: 8, opacity: 0.7 }}>
                   <MiniChart color={color} />
                 </div>
               )}
@@ -490,12 +506,12 @@ const DashboardMockup = () => (
         </div>
 
         <div style={{
-          background: C.surfaceAlt,
+          background: C.surface,
           borderRadius: 10,
           padding: '12px 14px',
           border: `1px solid ${C.border}`,
         }}>
-          <div style={{ fontSize: 10, color: C.textSub, marginBottom: 10, fontFamily: 'monospace', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 10, color: C.textSub, marginBottom: 10, display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
             <span>Weekly Views</span>
             <span style={{ color: C.teal }}>+18% this week</span>
           </div>
@@ -507,23 +523,20 @@ const DashboardMockup = () => (
                   flex: 1,
                   height: `${h}%`,
                   borderRadius: '3px 3px 0 0',
-                  background: i === 5
-                    ? C.teal
-                    : `${C.teal}25`,
-                  border: i === 5 ? `1px solid ${C.tealBorder}` : 'none',
+                  background: i === 5 ? C.teal : `${C.teal}25`,
                 }}
               />
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-              <span key={i} style={{ flex: 1, textAlign: 'center', fontSize: 8, color: C.muted, fontFamily: 'monospace' }}>{d}</span>
+              <span key={i} style={{ flex: 1, textAlign: 'center', fontSize: 8, color: C.muted }}>{d}</span>
             ))}
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: 10, color: C.textSub, marginBottom: 7, fontFamily: 'monospace' }}>Recent Activity</div>
+          <div style={{ fontSize: 10, color: C.textSub, marginBottom: 7, fontWeight: 600 }}>Recent Activity</div>
           {[
             { dot: C.teal, text: 'Profile updated · 2m ago' },
             { dot: C.amber, text: 'New contact message · 14m ago' },
@@ -533,10 +546,10 @@ const DashboardMockup = () => (
             <div key={text} style={{
               padding: '5px 10px',
               borderRadius: 6,
-              background: C.surfaceAlt,
+              background: C.surface,
               marginBottom: 4,
               fontSize: 10,
-              color: C.muted,
+              color: C.textSub,
               border: `1px solid ${C.border}`,
               display: 'flex',
               alignItems: 'center',
@@ -557,7 +570,7 @@ const DashboardMockup = () => (
 const SectionLabel = ({ children }: { children: React.ReactNode }) => (
   <p style={{
     fontSize: 10.5,
-    fontFamily: 'monospace',
+    fontWeight: 700,
     textTransform: 'uppercase',
     letterSpacing: '0.2em',
     color: C.teal,
@@ -575,6 +588,7 @@ const SectionTitle = ({ children, center = true }: { children: React.ReactNode; 
     lineHeight: 1.12,
     margin: '0 0 16px',
     textAlign: center ? 'center' : 'left',
+    color: C.text,
   }}>
     {children}
   </h2>
@@ -587,7 +601,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
   const [bannerUrl, setBannerUrl] = useState<string | null>(null);
   const [profileMaster, setProfileMaster] = useState<any>(null);
-  const [apiStatus, setApiStatus] = useState<'loading' | 'ok' | 'down'>('loading');
   const [landingData, setLandingData] = useState<LandingPageData | null>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -604,10 +617,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
     landingService.getPage().then((res: any) => {
       if (res?.data?.data) setLandingData(res.data.data);
     }).catch(() => {});
-
-    fetch('/api/v1/health')
-      .then((r) => setApiStatus(r.ok ? 'ok' : 'down'))
-      .catch(() => setApiStatus('down'));
 
     fetch('/api/v1/public/profile-master')
       .then((r) => r.ok ? r.json() : null)
@@ -629,18 +638,18 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
   // ── Backend-driven config + derived display arrays ────────────────────────
   const cfg = landingData?.config;
 
-  const heroEyebrow = cfg?.heroEyebrow || 'Full-Stack Portfolio Platform';
-  const heroHeadline1 = cfg?.heroHeadline1 || 'Your portfolio,';
-  const heroHeadline2 = cfg?.heroHeadline2 || 'fully managed.';
-  const heroDescription = cfg?.heroDescription || 'A three-app system — admin dashboard, REST API, and public portfolio — that lets you manage your entire professional story from one place, without ever editing code.';
-  const heroPrimaryCtaText = cfg?.heroPrimaryCtaText || 'Open Dashboard';
-  const heroSecondaryCtaText = cfg?.heroSecondaryCtaText || 'How it works';
-  const heroTrustBadges = cfg?.heroTrustBadges?.length ? cfg.heroTrustBadges : ['Self-hosted', 'No vendor lock-in', 'JWT secured', 'Cloudinary CDN'];
+  const heroEyebrow = cfg?.heroEyebrow || 'Build Your Professional Portfolio';
+  const heroHeadline1 = cfg?.heroHeadline1 || 'Your career story,';
+  const heroHeadline2 = cfg?.heroHeadline2 || 'beautifully told.';
+  const heroDescription = cfg?.heroDescription || 'Create a polished, professional portfolio in minutes. Add your experience, projects, and skills — we take care of the design, hosting, and updates.';
+  const heroPrimaryCtaText = cfg?.heroPrimaryCtaText || 'Get Started Free';
+  const heroSecondaryCtaText = cfg?.heroSecondaryCtaText || 'See how it works';
+  const heroTrustBadges = cfg?.heroTrustBadges?.length ? cfg.heroTrustBadges : ['Free to start', 'No code required', 'Live in minutes', 'Fully customisable'];
   const ctaBadgeText = cfg?.ctaBadgeText || 'Ready to get started?';
   const ctaHeadline = cfg?.ctaHeadline || 'Your professional story deserves a great home';
-  const ctaDescription = cfg?.ctaDescription || 'Log in to your admin dashboard and start building. Add your first experience entry, upload a project screenshot, and watch your public portfolio come to life — in minutes.';
-  const ctaButtonText = cfg?.ctaButtonText || 'Open Dashboard';
-  const ctaTrustPoints = cfg?.ctaTrustPoints?.length ? cfg.ctaTrustPoints : ['No credit card required', 'Fully self-hosted', 'Open source'];
+  const ctaDescription = cfg?.ctaDescription || 'Sign up for free and start building. Add your first experience entry, upload a project screenshot, and watch your portfolio come to life — in minutes.';
+  const ctaButtonText = cfg?.ctaButtonText || 'Get Started Free';
+  const ctaTrustPoints = cfg?.ctaTrustPoints?.length ? cfg.ctaTrustPoints : ['Free to start', 'No credit card required', 'Cancel anytime'];
 
   const activeFeatures = landingData?.features?.filter(f => f.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
   const displayFeatures = activeFeatures.length > 0
@@ -655,7 +664,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
   const activeSteps = landingData?.steps?.filter(s => s.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
   const displaySteps = activeSteps.length > 0
     ? activeSteps.map(s => ({ step: s.stepNumber, color: resolveColor(s.colorKey), icon: resolveIcon(s.iconName), title: s.title, bullets: s.bullets }))
-    : null;
+    : HOW_TO_USE_STEPS;
 
   const activeAudience = landingData?.audienceCards?.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
   const activeTestimonials = landingData?.testimonials?.filter(t => t.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
@@ -692,7 +701,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 clamp(20px, 5vw, 72px)', height: 62,
-          background: `${C.bg}E0`,
+          background: `${C.bg}E6`,
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           borderBottom: `1px solid ${C.border}`,
@@ -703,40 +712,22 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             width: 30, height: 30, borderRadius: 9,
             background: `linear-gradient(135deg, ${C.teal}, ${C.blue})`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: `0 0 16px ${C.tealGlow}50`,
+            boxShadow: `0 4px 14px ${C.tealGlow}`,
           }}>
             <Layers size={14} color="#fff" />
           </div>
-          <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.025em' }}>
+          <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.025em', color: C.text }}>
             Portfolio<span style={{ color: C.teal }}>OS</span>
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '4px 10px', borderRadius: 99,
-            fontSize: 10.5, fontFamily: 'monospace', fontWeight: 600,
-            background: apiStatus === 'ok' ? 'rgba(34,197,94,0.1)' : apiStatus === 'down' ? 'rgba(239,68,68,0.1)' : 'rgba(156,163,175,0.1)',
-            color: apiStatus === 'ok' ? C.green : apiStatus === 'down' ? C.red : C.textSub,
-            border: `1px solid ${apiStatus === 'ok' ? 'rgba(34,197,94,0.25)' : apiStatus === 'down' ? 'rgba(239,68,68,0.25)' : 'rgba(156,163,175,0.15)'}`,
-          }} className="hidden-mobile">
-            {apiStatus !== 'loading' && (
-              <motion.span
-                animate={apiStatus === 'ok' ? { opacity: [1, 0.3, 1] } : {}}
-                transition={{ duration: 2.5, repeat: Infinity }}
-                style={{ width: 5, height: 5, borderRadius: '50%', background: 'currentColor', display: 'inline-block', flexShrink: 0 }}
-              />
-            )}
-            API {apiStatus === 'loading' ? '…' : apiStatus === 'ok' ? 'online' : 'offline'}
-          </div>
-
           <nav style={{ display: 'flex', gap: 24, alignItems: 'center' }} className="hidden-mobile">
-            {['Features', 'How It Works', 'Tech Stack', 'FAQ'].map((item) => (
+            {['Features', 'How It Works', 'FAQ'].map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                style={{ fontSize: 13, color: C.textSub, textDecoration: 'none', transition: 'color 0.2s' }}
+                style={{ fontSize: 13, color: C.textSub, textDecoration: 'none', transition: 'color 0.2s', fontWeight: 500 }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = C.text; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = C.textSub; }}
               >
@@ -747,14 +738,14 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
 
           <motion.button
             onClick={onGetStarted}
-            whileHover={{ scale: 1.04, boxShadow: `0 0 28px ${C.tealGlow}` }}
+            whileHover={{ scale: 1.04, boxShadow: `0 6px 22px ${C.tealGlow}` }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '9px 22px',
               borderRadius: 10,
-              background: `linear-gradient(135deg, ${C.teal}, ${C.blue}80)`,
+              background: `linear-gradient(135deg, ${C.teal}, ${C.blue})`,
               color: '#fff', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
-              boxShadow: `0 0 20px rgba(20,184,160,0.28)`,
+              boxShadow: '0 4px 16px rgba(13,148,136,0.28)',
             }}
           >
             <LogIn size={14} /> Login
@@ -789,7 +780,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           <motion.div
             style={{
               width: '100%', height: '100%', borderRadius: '50%',
-              background: `radial-gradient(circle, rgba(20,184,160,0.07) 0%, transparent 62%)`,
+              background: 'radial-gradient(circle, rgba(13,148,136,0.09) 0%, transparent 62%)',
               filter: 'blur(60px)',
               x: springX,
               y: springY,
@@ -809,7 +800,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '5px 14px', borderRadius: 99,
-                fontSize: 10.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em',
+                fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em',
                 color: C.teal, background: C.tealDim, border: `1px solid ${C.tealBorder}`,
                 marginBottom: 28,
               }}
@@ -835,7 +826,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 lineHeight: 1.1,
                 letterSpacing: '-0.045em',
                 margin: '0 0 24px',
-                background: `linear-gradient(120deg, ${C.tealLight}, ${C.blue})`,
+                background: `linear-gradient(120deg, ${C.teal}, ${C.blue})`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -854,14 +845,14 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             >
               <motion.button
                 onClick={onGetStarted}
-                whileHover={{ scale: 1.04, boxShadow: `0 0 48px rgba(20,184,160,0.6)` }}
+                whileHover={{ scale: 1.04, boxShadow: '0 10px 32px rgba(13,148,136,0.4)' }}
                 transition={{ type: 'spring', stiffness: 380, damping: 18 }}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 10,
                   padding: '14px 32px', borderRadius: 14,
-                  background: `linear-gradient(135deg, ${C.teal}, ${C.blue}90)`,
+                  background: `linear-gradient(135deg, ${C.teal}, ${C.blue})`,
                   color: '#fff', fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
-                  boxShadow: `0 0 28px rgba(20,184,160,0.38)`,
+                  boxShadow: '0 8px 24px rgba(13,148,136,0.3)',
                 }}
               >
                 <LogIn size={16} /> {heroPrimaryCtaText}
@@ -888,7 +879,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
               style={{ display: 'flex', gap: 22, marginTop: 28, flexWrap: 'wrap' }}
             >
               {heroTrustBadges.map((t) => (
-                <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: C.muted, fontFamily: 'monospace' }}>
+                <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: C.textSub, fontWeight: 600 }}>
                   <CheckCircle size={12} style={{ color: C.teal, flexShrink: 0 }} /> {t}
                 </span>
               ))}
@@ -900,7 +891,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: CUBIC, delay: 0.3 }}
           >
-            <AnimatedTerminal />
+            <PortfolioPreviewCard />
           </motion.div>
         </div>
       </section>
@@ -920,7 +911,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             <div
               key={label}
               style={{
-                background: C.surface,
+                background: C.surfaceElevated,
                 padding: '26px 28px',
                 textAlign: 'center',
                 position: 'relative',
@@ -929,7 +920,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             >
               <div style={{
                 position: 'absolute', top: 10, right: 12,
-                opacity: 0.06,
+                opacity: 0.08,
               }}>
                 <Icon size={36} color={color} />
               </div>
@@ -938,12 +929,11 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 fontSize: 'clamp(26px, 3.5vw, 42px)',
                 color,
                 letterSpacing: '-0.04em',
-                fontFamily: 'monospace',
               }}>
                 {value}
               </div>
               <div style={{ fontWeight: 700, fontSize: 13, color: C.text, marginTop: 4 }}>{label}</div>
-              <div style={{ fontSize: 10.5, color: C.muted, marginTop: 3, fontFamily: 'monospace' }}>{sub}</div>
+              <div style={{ fontSize: 10.5, color: C.muted, marginTop: 3 }}>{sub}</div>
             </div>
           ))}
         </motion.div>
@@ -954,10 +944,10 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         <section style={{ padding: '0 clamp(20px, 5vw, 72px) 80px', position: 'relative', zIndex: 1 }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 36 }}>
-              <SectionLabel>Live profile data</SectionLabel>
-              <SectionTitle>Your portfolio, right now</SectionTitle>
+              <SectionLabel>Live example</SectionLabel>
+              <SectionTitle>A real portfolio, right now</SectionTitle>
               <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 460, margin: '0 auto' }}>
-                Content counts pulled live from the API — reflecting exactly what visitors see on your public portfolio.
+                Real content counts — exactly what a visitor sees on this portfolio's public page.
               </p>
             </motion.div>
 
@@ -984,16 +974,16 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                   {...fadeUp(i * 0.05)}
                   style={{
                     padding: '20px 18px', borderRadius: 14,
-                    background: C.surface, border: `1px solid ${C.border}`,
+                    background: C.surfaceElevated, border: `1px solid ${C.border}`,
                     textAlign: 'center', position: 'relative', overflow: 'hidden',
                   }}
                 >
-                  <div style={{ position: 'absolute', top: 8, right: 10, opacity: 0.06 }}>
+                  <div style={{ position: 'absolute', top: 8, right: 10, opacity: 0.08 }}>
                     <Icon size={32} color={color} />
                   </div>
                   <div style={{
                     fontWeight: 900, fontSize: 'clamp(22px, 2.8vw, 34px)',
-                    color, letterSpacing: '-0.04em', fontFamily: 'monospace',
+                    color, letterSpacing: '-0.04em',
                   }}>
                     {value}
                   </div>
@@ -1007,7 +997,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 {...fadeUp(0.2)}
                 style={{
                   marginTop: 20, padding: '20px 24px', borderRadius: 14,
-                  background: C.surface, border: `1px solid ${C.tealBorder}`,
+                  background: C.surfaceElevated, border: `1px solid ${C.tealBorder}`,
                   display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
                 }}
               >
@@ -1026,14 +1016,14 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                     <div style={{ fontSize: 12.5, color: C.textSub, marginTop: 2 }}>{profileMaster.profile.headline}</div>
                   )}
                   {profileMaster.profile.location && (
-                    <div style={{ fontSize: 11, color: C.muted, marginTop: 3, fontFamily: 'monospace' }}>{profileMaster.profile.location}</div>
+                    <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>{profileMaster.profile.location}</div>
                   )}
                 </div>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '5px 12px', borderRadius: 99,
                   background: C.tealDim, border: `1px solid ${C.tealBorder}`,
-                  fontSize: 11, fontFamily: 'monospace', color: C.teal, fontWeight: 600,
+                  fontSize: 11, color: C.teal, fontWeight: 700,
                 }}>
                   <motion.span
                     animate={{ opacity: [1, 0.3, 1] }}
@@ -1052,10 +1042,10 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
       <section style={{ padding: '20px clamp(20px, 5vw, 72px) 100px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
-            <SectionLabel>Admin Dashboard Preview</SectionLabel>
+            <SectionLabel>See it in action</SectionLabel>
             <SectionTitle>Manage everything from one place</SectionTitle>
             <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 500, margin: '0 auto' }}>
-              A structured CMS for every section of your portfolio. Real-time analytics, activity feeds, and quick actions — all in one panel.
+              A simple, organised dashboard for every part of your portfolio — real-time insights and quick actions, all in one panel.
             </p>
           </motion.div>
           <motion.div {...fadeUp(0.15)}>
@@ -1064,7 +1054,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 borderRadius: 18,
                 overflow: 'hidden',
                 border: `1px solid ${C.borderMid}`,
-                boxShadow: `0 48px 96px rgba(0,0,0,0.65), 0 0 0 1px ${C.teal}10`,
+                boxShadow: '0 48px 96px rgba(15,23,42,0.14), 0 2px 8px rgba(15,23,42,0.06)',
               }}>
                 <img
                   src={bannerUrl}
@@ -1079,94 +1069,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         </div>
       </section>
 
-      {/* ── Architecture ──────────────────────────────────────── */}
-      <section id="how-it-works" style={{ padding: '80px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 60 }}>
-            <SectionLabel>System architecture</SectionLabel>
-            <SectionTitle>Three apps, one seamless system</SectionTitle>
-            <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 540, margin: '0 auto' }}>
-              Portfolios Builder is three distinct, independently deployable apps that work together to give you full control over your public presence.
-            </p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
-            {ARCHITECTURE_STEPS.map(({ n, icon: Icon, color, title, label, desc }, i) => (
-              <motion.div key={n} {...fadeUp(i * 0.12)}>
-                <div style={{
-                  padding: '30px 26px', borderRadius: 18,
-                  background: C.surface, border: `1px solid ${C.border}`,
-                  height: '100%', position: 'relative', overflow: 'hidden',
-                  transition: 'border-color 0.25s',
-                }}>
-                  <div style={{
-                    position: 'absolute', top: 14, right: 18,
-                    fontFamily: 'monospace', fontWeight: 900, fontSize: 52,
-                    color: `${color}07`, lineHeight: 1,
-                  }}>{n}</div>
-
-                  <div style={{
-                    width: 46, height: 46, borderRadius: 12,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `${color}10`, border: `1px solid ${color}22`, color,
-                    marginBottom: 18,
-                  }}>
-                    <Icon size={21} />
-                  </div>
-
-                  <div style={{ fontFamily: 'monospace', fontSize: 9.5, color, letterSpacing: '0.1em', marginBottom: 4, textTransform: 'uppercase' }}>
-                    Step {n}
-                  </div>
-                  <h3 style={{ fontWeight: 700, fontSize: 17, color: C.text, marginBottom: 4 }}>{title}</h3>
-                  <div style={{
-                    display: 'inline-flex',
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                    color: C.muted,
-                    background: C.surfaceAlt,
-                    border: `1px solid ${C.border}`,
-                    padding: '2px 8px',
-                    borderRadius: 5,
-                    marginBottom: 12,
-                  }}>
-                    {label}
-                  </div>
-                  <p style={{ fontSize: 13, lineHeight: 1.75, color: C.textSub, margin: 0 }}>{desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div {...fadeUp(0.3)} style={{
-            marginTop: 32, padding: '20px 24px', borderRadius: 14,
-            background: C.surface, border: `1px solid ${C.border}`,
-          }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 10.5, color: C.muted, marginBottom: 10 }}>data flow</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontFamily: 'monospace', fontSize: 11 }}>
-              {[
-                { label: 'You (Admin)', color: C.purple },
-                { sep: '→ login →' },
-                { label: 'portfolio-fe', color: C.purple },
-                { sep: '→ HTTPS →' },
-                { label: 'portfolio-be API', color: C.teal },
-                { sep: '→ JSON →' },
-                { label: 'portfolio-main', color: C.blue },
-                { sep: '→ public' },
-              ].map((item, i) =>
-                'sep' in item ? (
-                  <span key={i} style={{ color: C.muted }}>{item.sep}</span>
-                ) : (
-                  <span key={i} style={{
-                    padding: '3px 10px', borderRadius: 6, fontSize: 10.5,
-                    background: `${item.color}10`, border: `1px solid ${item.color}22`, color: item.color,
-                  }}>{item.label}</span>
-                )
-              )}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* ── Features ──────────────────────────────────────────── */}
       <section id="features" style={{
         padding: '80px clamp(20px, 5vw, 72px)',
@@ -1175,10 +1077,10 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
       }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
-            <SectionLabel>Platform capabilities</SectionLabel>
+            <SectionLabel>What you get</SectionLabel>
             <SectionTitle>Everything your portfolio needs</SectionTitle>
             <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 480, margin: '0 auto' }}>
-              From authentication to CDN-optimised images, every production concern is handled out of the box.
+              From a guided dashboard to fast, polished pages, every detail is handled for you.
             </p>
           </motion.div>
 
@@ -1193,28 +1095,20 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 style={{
                   padding: '26px 24px 28px',
                   borderRadius: 18,
-                  background: C.bg,
-                  border: `1px solid ${hoveredFeature === i ? `${color}35` : C.border}`,
+                  background: C.surfaceElevated,
+                  border: `1px solid ${hoveredFeature === i ? `${color}45` : C.border}`,
                   cursor: 'default',
                   transition: 'border-color 0.25s, box-shadow 0.25s',
-                  boxShadow: hoveredFeature === i ? `0 8px 32px ${color}0E, inset 0 0 0 1px ${color}15` : 'none',
+                  boxShadow: hoveredFeature === i ? `0 8px 32px ${color}14` : 'none',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
               >
-                {hoveredFeature === i && (
-                  <div style={{
-                    position: 'absolute', inset: 0, pointerEvents: 'none',
-                    background: `radial-gradient(ellipse at 20% 20%, ${color}06 0%, transparent 60%)`,
-                  }} />
-                )}
                 <div style={{
                   width: 44, height: 44, borderRadius: 12,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: `${color}10`, border: `1px solid ${color}22`, color,
+                  background: `${color}12`, border: `1px solid ${color}28`, color,
                   marginBottom: 18,
-                  transition: 'box-shadow 0.25s',
-                  boxShadow: hoveredFeature === i ? `0 0 18px ${color}30` : 'none',
                 }}>
                   <Icon size={20} />
                 </div>
@@ -1226,101 +1120,8 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         </div>
       </section>
 
-      {/* ── Content sections ──────────────────────────────────── */}
-      <section style={{ padding: '80px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
-            <SectionLabel>What you can manage</SectionLabel>
-            <SectionTitle>9 portfolio sections, fully CMS-driven</SectionTitle>
-            <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 500, margin: '0 auto' }}>
-              Every section of your public portfolio is powered by data you enter in the dashboard — no hard-coded content anywhere.
-            </p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
-            {CONTENT_SECTIONS.map(({ icon: Icon, label, desc }, i) => (
-              <motion.div key={label} {...fadeUp(i * 0.06)}>
-                <motion.div
-                  whileHover={{ borderColor: C.tealBorder, y: -3, background: C.surfaceAlt }}
-                  style={{
-                    padding: '18px 20px 20px',
-                    borderRadius: 14,
-                    background: C.surface,
-                    border: `1px solid ${C.border}`,
-                    transition: 'background 0.2s, border-color 0.2s',
-                    height: '100%',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 9 }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 8,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: C.tealDim, border: `1px solid ${C.tealBorder}`, color: C.teal,
-                    }}>
-                      <Icon size={15} />
-                    </div>
-                    <span style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{label}</span>
-                  </div>
-                  <p style={{ fontSize: 11.5, lineHeight: 1.65, color: C.muted, margin: 0 }}>{desc}</p>
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Tech stack ────────────────────────────────────────── */}
-      <section id="tech-stack" style={{
-        padding: '80px clamp(20px, 5vw, 72px)',
-        background: C.surface,
-        position: 'relative', zIndex: 1,
-      }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
-            <SectionLabel>Technology</SectionLabel>
-            <SectionTitle>Built on a modern, proven stack</SectionTitle>
-            <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 480, margin: '0 auto' }}>
-              No experimental frameworks. Battle-tested technologies with large communities and long-term support.
-            </p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-            {TECH_STACK.map(({ cat, color, items }, gi) => (
-              <motion.div key={cat} {...fadeUp(gi * 0.1)}>
-                <div style={{
-                  borderRadius: 16, overflow: 'hidden',
-                  border: `1px solid ${color}18`,
-                  background: C.bg,
-                }}>
-                  <div style={{
-                    padding: '14px 20px',
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    background: `${color}07`,
-                    borderBottom: `1px solid ${color}12`,
-                  }}>
-                    <div style={{
-                      width: 8, height: 8, borderRadius: '50%',
-                      background: color, boxShadow: `0 0 10px ${color}80`,
-                    }} />
-                    <span style={{ fontWeight: 700, fontSize: 13, color }}>{cat}</span>
-                  </div>
-                  <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 9 }}>
-                    {items.map((item) => (
-                      <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13, color: C.textSub }}>
-                        <div style={{ width: 4, height: 4, borderRadius: '50%', background: `${color}55`, flexShrink: 0 }} />
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── How to use ────────────────────────────────────────── */}
-      <section style={{ padding: '80px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>
+      {/* ── How it works ──────────────────────────────────────── */}
+      <section id="how-it-works" style={{ padding: '80px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 60 }}>
             <SectionLabel>Simple process</SectionLabel>
@@ -1328,7 +1129,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {(displaySteps ?? HOW_TO_USE_STEPS).map(({ step, color, icon: Icon, title, bullets }, i, arr) => (
+            {displaySteps.map(({ step, color, icon: Icon, title, bullets }, i, arr) => (
               <motion.div key={step} {...fadeUp(i * 0.1)}>
                 <div style={{
                   display: 'flex', gap: 32, padding: '40px 0',
@@ -1338,17 +1139,16 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                     <div style={{
                       width: 52, height: 52, borderRadius: 16,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: `${color}10`, border: `1px solid ${color}22`, color,
-                      boxShadow: `0 0 20px ${color}15`,
+                      background: `${color}12`, border: `1px solid ${color}28`, color,
                     }}>
                       <Icon size={22} />
                     </div>
                     {i < arr.length - 1 && (
-                      <div style={{ width: 1, flex: 1, minHeight: 24, background: `linear-gradient(to bottom, ${color}35, transparent)` }} />
+                      <div style={{ width: 1, flex: 1, minHeight: 24, background: `linear-gradient(to bottom, ${color}40, transparent)` }} />
                     )}
                   </div>
                   <div style={{ flex: 1, paddingTop: 6 }}>
-                    <div style={{ fontFamily: 'monospace', fontSize: 10.5, color, marginBottom: 5, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Step {step}</div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color, marginBottom: 5, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Step {step}</div>
                     <h3 style={{ fontWeight: 700, fontSize: 18, color: C.text, marginBottom: 14 }}>{title}</h3>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {bullets.map((b) => (
@@ -1366,53 +1166,47 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         </div>
       </section>
 
-      {/* ── Platform metrics strip ─────────────────────────────── */}
-      <section style={{
-        padding: '0 clamp(20px, 5vw, 72px) 80px',
-        position: 'relative', zIndex: 1,
-      }}>
-        <motion.div
-          {...fadeUp()}
-          style={{
-            maxWidth: 1100, margin: '0 auto',
-            padding: '28px 36px',
-            borderRadius: 18,
-            background: C.surface,
-            border: `1px solid ${C.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 24,
-          }}
-        >
-          <div>
-            <div style={{ fontFamily: 'monospace', fontSize: 10, color: C.muted, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>Platform at a glance</div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: C.text }}>Portfolios Builder is production-ready, end to end</div>
-          </div>
-          <div style={{ display: 'flex', gap: 36, flexWrap: 'wrap' }}>
-            {[
-              { icon: Activity, label: 'Uptime', val: '99.9%', color: C.green },
-              { icon: GitBranch, label: 'Apps', val: '3', color: C.teal },
-              { icon: TrendingUp, label: 'Load', val: '< 1s', color: C.blue },
-              { icon: Users, label: 'Roles', val: 'RBAC', color: C.purple },
-            ].map(({ icon: Icon, label, val, color }) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 9,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: `${color}10`, border: `1px solid ${color}20`, color,
-                }}>
-                  <Icon size={16} />
-                </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color, fontFamily: 'monospace' }}>{val}</div>
-                  <div style={{ fontSize: 10.5, color: C.muted }}>{label}</div>
-                </div>
-              </div>
+      {/* ── Content sections ──────────────────────────────────── */}
+      <section style={{ padding: '80px clamp(20px, 5vw, 72px)', background: C.surface, position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
+            <SectionLabel>What you can manage</SectionLabel>
+            <SectionTitle>9 portfolio sections, fully yours to edit</SectionTitle>
+            <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 500, margin: '0 auto' }}>
+              Every section of your public portfolio is powered by what you enter in the dashboard.
+            </p>
+          </motion.div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+            {CONTENT_SECTIONS.map(({ icon: Icon, label, desc }, i) => (
+              <motion.div key={label} {...fadeUp(i * 0.06)}>
+                <motion.div
+                  whileHover={{ borderColor: C.tealBorder, y: -3 }}
+                  style={{
+                    padding: '18px 20px 20px',
+                    borderRadius: 14,
+                    background: C.surfaceElevated,
+                    border: `1px solid ${C.border}`,
+                    transition: 'border-color 0.2s',
+                    height: '100%',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 9 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: C.tealDim, border: `1px solid ${C.tealBorder}`, color: C.teal,
+                    }}>
+                      <Icon size={15} />
+                    </div>
+                    <span style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{label}</span>
+                  </div>
+                  <p style={{ fontSize: 11.5, lineHeight: 1.65, color: C.textSub, margin: 0 }}>{desc}</p>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ── Audience cards (dynamic) ──────────────────────────── */}
@@ -1431,13 +1225,13 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                   <motion.div key={aud.id ?? i} {...fadeUp(i * 0.07)}>
                     <div style={{
                       padding: '26px 24px', borderRadius: 18,
-                      background: C.surface, border: `1px solid ${C.border}`,
+                      background: C.surfaceElevated, border: `1px solid ${C.border}`,
                       height: '100%',
                     }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: 12,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: `${audColor}10`, border: `1px solid ${audColor}22`, color: audColor,
+                        background: `${audColor}12`, border: `1px solid ${audColor}28`, color: audColor,
                         marginBottom: 16,
                       }}>
                         <AudIcon size={20} />
@@ -1459,17 +1253,17 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
               <SectionLabel>What people say</SectionLabel>
-              <SectionTitle>Trusted by developers</SectionTitle>
+              <SectionTitle>Trusted by professionals</SectionTitle>
             </motion.div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
               {activeTestimonials.map((t, i) => (
                 <motion.div key={t.id ?? i} {...fadeUp(i * 0.08)}>
                   <div style={{
                     padding: '28px 26px', borderRadius: 18,
-                    background: C.bg, border: `1px solid ${C.border}`,
+                    background: C.surfaceElevated, border: `1px solid ${C.border}`,
                     height: '100%', display: 'flex', flexDirection: 'column', gap: 16,
                   }}>
-                    <div style={{ fontSize: 36, lineHeight: 1, color: `${C.teal}35`, fontFamily: 'Georgia, serif' }}>"</div>
+                    <div style={{ fontSize: 36, lineHeight: 1, color: `${C.teal}45`, fontFamily: 'Georgia, serif' }}>"</div>
                     <p style={{ fontSize: 13.5, lineHeight: 1.8, color: C.textSub, margin: 0, flex: 1 }}>{t.content}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       {t.avatarUrl ? (
@@ -1480,7 +1274,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                       ) : (
                         <div style={{
                           width: 40, height: 40, borderRadius: '50%',
-                          background: `${C.teal}20`, border: `2px solid ${C.tealBorder}`,
+                          background: C.tealDim, border: `2px solid ${C.tealBorder}`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: 16, color: C.teal, fontWeight: 700, flexShrink: 0,
                         }}>
@@ -1519,7 +1313,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
       )}
 
       {/* ── FAQ ───────────────────────────────────────────────── */}
-      <section id="faq" style={{ padding: '80px clamp(20px, 5vw, 72px)', background: C.surface, position: 'relative', zIndex: 1 }}>
+      <section id="faq" style={{ padding: '80px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 52 }}>
             <SectionLabel>Common questions</SectionLabel>
@@ -1530,11 +1324,11 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             {displayFaqs.map(({ q, a }, i) => (
               <motion.div key={i} {...fadeUp(i * 0.05)}>
                 <div style={{
-                  borderRadius: 12, background: C.bg,
+                  borderRadius: 12, background: C.surfaceElevated,
                   border: `1px solid ${openFaq === i ? C.tealBorder : C.border}`,
                   overflow: 'hidden',
                   transition: 'border-color 0.2s',
-                  boxShadow: openFaq === i ? `0 4px 20px ${C.teal}0A` : 'none',
+                  boxShadow: openFaq === i ? `0 4px 20px ${C.teal}12` : 'none',
                 }}>
                   <button
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -1585,17 +1379,17 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
         >
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: `radial-gradient(ellipse at 50% 0%, ${C.teal}0A 0%, transparent 65%)`,
+            background: `radial-gradient(ellipse at 50% 0%, ${C.teal}10 0%, transparent 65%)`,
           }} />
           <div style={{
             position: 'absolute', top: 0, left: '20%', right: '20%', height: 1,
-            background: `linear-gradient(90deg, transparent, ${C.teal}55, transparent)`,
+            background: `linear-gradient(90deg, transparent, ${C.teal}70, transparent)`,
           }} />
 
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '5px 14px', borderRadius: 99, marginBottom: 24,
-            fontSize: 10.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.12em',
+            fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em',
             color: C.teal, background: C.tealDim, border: `1px solid ${C.tealBorder}`,
           }}>
             {ctaBadgeText}
@@ -1603,7 +1397,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
 
           <h2 style={{
             fontWeight: 800, fontSize: 'clamp(26px, 4vw, 42px)', letterSpacing: '-0.03em',
-            lineHeight: 1.15, marginBottom: 14, position: 'relative',
+            lineHeight: 1.15, marginBottom: 14, position: 'relative', color: C.text,
           }}>
             {ctaHeadline}
           </h2>
@@ -1613,14 +1407,14 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
 
           <motion.button
             onClick={onGetStarted}
-            whileHover={{ scale: 1.05, boxShadow: `0 0 56px rgba(20,184,160,0.65)` }}
+            whileHover={{ scale: 1.05, boxShadow: '0 12px 36px rgba(13,148,136,0.4)' }}
             transition={{ type: 'spring', stiffness: 380, damping: 18 }}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
               padding: '16px 40px', borderRadius: 14,
-              background: `linear-gradient(135deg, ${C.teal}, ${C.blue}90)`,
+              background: `linear-gradient(135deg, ${C.teal}, ${C.blue})`,
               color: '#fff', fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
-              boxShadow: `0 0 32px rgba(20,184,160,0.38)`, position: 'relative',
+              boxShadow: '0 10px 28px rgba(13,148,136,0.3)', position: 'relative',
             }}
           >
             <LogIn size={17} /> {ctaButtonText}
@@ -1628,7 +1422,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 24, flexWrap: 'wrap' }}>
             {ctaTrustPoints.map((t) => (
-              <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: C.muted, fontFamily: 'monospace' }}>
+              <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: C.textSub, fontWeight: 600 }}>
                 <CheckCircle size={12} style={{ color: C.teal }} /> {t}
               </span>
             ))}
@@ -1651,25 +1445,12 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
             }}>
               <Layers size={12} color="#fff" />
             </div>
-            <div style={{ fontWeight: 800, fontSize: 14, letterSpacing: '-0.02em' }}>
+            <div style={{ fontWeight: 800, fontSize: 14, letterSpacing: '-0.02em', color: C.text }}>
               Portfolio<span style={{ color: C.teal }}>OS</span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 22, alignItems: 'center', flexWrap: 'wrap' }}>
-            {[
-              { icon: Server, label: 'Spring Boot 3' },
-              { icon: Code2, label: 'React + Vite' },
-              { icon: Image, label: 'Cloudinary CDN' },
-              { icon: Database, label: 'MongoDB' },
-            ].map(({ icon: Icon, label }) => (
-              <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.muted, fontFamily: 'monospace' }}>
-                <Icon size={11} style={{ color: `${C.teal}60` }} /> {label}
-              </span>
-            ))}
-          </div>
-
-          <p style={{ fontFamily: 'monospace', fontSize: 11, color: C.muted, margin: 0 }}>
+          <p style={{ fontSize: 11, color: C.muted, margin: 0 }}>
             Your professional story, delivered.
           </p>
         </div>

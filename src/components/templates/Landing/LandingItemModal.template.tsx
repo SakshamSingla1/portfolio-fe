@@ -210,7 +210,7 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                                         value={formData.iconName ?? ''}
                                         onChange={e => onFieldChange('iconName', e.target.value)}
                                     />
-                                    <HintText text='e.g. "LuEdit3"' colors={colors} />
+                                    <HintText text='e.g. "Globe", "Award" (lucide-react icon name)' colors={colors} />
                                 </div>
                                 <div>
                                     <TextField
@@ -276,7 +276,7 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                                         value={formData.iconName ?? ''}
                                         onChange={e => onFieldChange('iconName', e.target.value)}
                                     />
-                                    <HintText text='e.g. "LuEdit3"' colors={colors} />
+                                    <HintText text='e.g. "Globe", "Award" (lucide-react icon name)' colors={colors} />
                                 </div>
                                 <div>
                                     <TextField
@@ -310,7 +310,7 @@ const LandingItemModalTemplate: React.FC<LandingItemModalProps> = ({
                                         value={formData.iconName ?? ''}
                                         onChange={e => onFieldChange('iconName', e.target.value)}
                                     />
-                                    <HintText text='e.g. "LuEdit3"' colors={colors} />
+                                    <HintText text='e.g. "Globe", "Award" (lucide-react icon name)' colors={colors} />
                                 </div>
                                 <div>
                                     <TextField
