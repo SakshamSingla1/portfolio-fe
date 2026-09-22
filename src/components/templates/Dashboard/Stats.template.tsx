@@ -6,6 +6,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
 import { FiCode, FiZap, FiBriefcase, FiMail, FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 
 interface StatsProps {
@@ -63,6 +64,7 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
   label, value, accent, icon: Icon, route, index, unreadCount, delta, isMobile,
 }) => {
   const colors = useColors();
+  const { isDark } = useTheme();
   const animatedValue = useCountUp(value, index * 80 + 100);
   const navigate = useNavigate();
 
@@ -84,11 +86,15 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
     >
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        style={{ background: `linear-gradient(135deg, ${accent}0a, ${accent}04)` }}
+        style={{ background: `linear-gradient(135deg, ${accent}14, ${accent}05)` }}
+      />
+      <div
+        className="absolute rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{ width: 100, height: 100, top: -30, right: -30, background: `radial-gradient(circle, ${accent}35 0%, transparent 70%)`, filter: "blur(16px)" }}
       />
       <div
         className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ height: 2, background: accent }}
+        style={{ height: 2, background: accent, boxShadow: `0 0 8px ${accent}` }}
       />
 
       <div
@@ -96,8 +102,9 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
         style={{
           width: isMobile ? 36 : 42,
           height: isMobile ? 36 : 42,
-          background: `${accent}18`,
+          background: `linear-gradient(135deg, ${accent}2A, ${accent}12)`,
           color: accent,
+          boxShadow: `0 0 0 1px ${accent}25 inset, 0 4px 12px -4px ${accent}50`,
         }}
       >
         <Icon size={isMobile ? 15 : 18} />
@@ -110,6 +117,7 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
             fontSize: isMobile ? "clamp(24px, 5vw, 32px)" : "clamp(28px, 2.8vw, 40px)",
             color: colors.neutral900,
             letterSpacing: "-0.04em",
+            textShadow: glowTextShadow(accent, isDark),
           }}
         >
           {animatedValue}
@@ -192,16 +200,12 @@ const SecondaryStatCell: React.FC<SecondaryStatCellProps> = ({
 const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
   const isMobile = useIsMobile();
   const colors = useColors();
-  const { isDark } = useTheme();
+  const glass = useGlassSurface();
 
-  const containerStyle = {
-    background: colors.neutral0,
-    border: `1.5px solid ${colors.neutral300}`,
+  const containerStyle: React.CSSProperties = {
+    ...glass,
     borderRadius: "20px",
     overflow: "hidden",
-    boxShadow: isDark
-      ? "0 2px 8px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.03)"
-      : "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.03)",
   };
 
   return (
@@ -209,6 +213,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
       <div style={{
         height: 2,
         background: `linear-gradient(90deg, ${colors.primary600} 0%, ${colors.primary400} 55%, ${colors.primary600}00 100%)`,
+        boxShadow: `0 0 10px ${colors.primary500}90`,
       }} />
 
       <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"}`}>

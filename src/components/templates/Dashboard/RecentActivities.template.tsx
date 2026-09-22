@@ -7,7 +7,7 @@ import {
   FiUser, FiBook, FiBriefcase, FiZap, FiCode,
   FiMessageSquare, FiStar, FiAward, FiTrendingUp,
 } from "react-icons/fi";
-import { EmptyState } from "./shared/DashboardUI";
+import { EmptyState, glowTextShadow } from "./shared/DashboardUI";
 
 interface IActivity {
   type: string;
@@ -73,13 +73,24 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
         const { dot, label, route, icon: Icon } = getTypeMeta(activity.type);
         const isLast = i === activities.length - 1;
 
+        const hoverGlow = isDark
+          ? `0 10px 26px -14px ${dot}88, 0 0 22px -6px ${dot}70`
+          : `0 10px 22px -14px ${dot}55, 0 0 16px -6px ${dot}40`;
+        const hoverBg = isDark ? `${dot}16` : `${dot}0D`;
+
         return (
           <motion.div
             key={i}
             initial={{ opacity: 0, x: -6 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            className="flex gap-3 relative cursor-pointer group"
+            whileHover={{
+              backgroundColor: hoverBg,
+              boxShadow: hoverGlow,
+              x: 2,
+              transition: { duration: 0.2, ease: "easeOut" },
+            }}
+            className="flex gap-3 relative cursor-pointer group rounded-xl px-2.5 -mx-2.5"
             style={{ paddingBottom: isLast ? 0 : 18 }}
             onClick={() => navigate(route)}
           >
@@ -88,8 +99,9 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
                 className="absolute left-[14px] top-8 bottom-0 w-px"
                 style={{
                   background: isDark
-                    ? `linear-gradient(to bottom, ${colors.neutral700}, transparent)`
-                    : `linear-gradient(to bottom, ${colors.neutral200}, transparent)`,
+                    ? `linear-gradient(to bottom, ${dot}66 0%, ${colors.neutral700} 40%, transparent 100%)`
+                    : `linear-gradient(to bottom, ${dot}4D 0%, ${colors.neutral200} 40%, transparent 100%)`,
+                  boxShadow: `0 0 6px ${dot}33`,
                 }}
               />
             )}
@@ -99,7 +111,10 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
               style={{
                 width: 28,
                 height: 28,
-                background: `${dot}18`,
+                background: `radial-gradient(circle at 32% 28%, ${dot}4D 0%, ${dot}1F 62%, transparent 100%)`,
+                boxShadow: isDark
+                  ? `0 0 0 1px ${dot}40 inset, 0 0 14px -2px ${dot}80`
+                  : `0 0 0 1px ${dot}33 inset, 0 0 10px -2px ${dot}55`,
                 color: dot,
               }}
             >
@@ -110,7 +125,7 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span
                   className="text-[10px] font-black uppercase tracking-wider"
-                  style={{ color: dot }}
+                  style={{ color: dot, textShadow: glowTextShadow(dot, isDark) }}
                 >
                   {label}
                 </span>

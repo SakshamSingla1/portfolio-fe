@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
+import { useTheme } from "../../../contexts/ThemeContext";
+import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
 import type { IDashboardSummary } from "../../../services/useDashboardService";
 
 const VIEW_MILESTONES = [50, 100, 250, 500, 1000, 2500, 5000, 10_000, 25_000, 50_000, 100_000];
@@ -88,6 +90,8 @@ const ConfettiBurst: React.FC = () => {
 
 const MilestoneCelebration: React.FC<{ dashboardData: IDashboardSummary | null }> = ({ dashboardData }) => {
   const colors = useColors();
+  const { isDark } = useTheme();
+  const glass = useGlassSurface(colors.primary500);
   const { milestone, dismiss } = useMilestoneCelebration(dashboardData);
 
   useEffect(() => {
@@ -106,22 +110,26 @@ const MilestoneCelebration: React.FC<{ dashboardData: IDashboardSummary | null }
           exit={{ opacity: 0, y: -8, scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
           className="fixed top-5 right-5 z-[1200] flex items-center gap-3 rounded-2xl px-4 py-3.5 overflow-hidden"
-          style={{
-            background: colors.neutral0,
-            border: `1.5px solid ${colors.neutral300}`,
-            boxShadow: "0 20px 40px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.02)",
-            maxWidth: 320,
-          }}
+          style={{ ...glass, maxWidth: 320 }}
         >
           <ConfettiBurst />
-          <div
+          <motion.div
             className="relative flex items-center justify-center rounded-xl shrink-0"
-            style={{ width: 40, height: 40, fontSize: 20, background: `${colors.primary500}14` }}
+            style={{
+              width: 42, height: 42, fontSize: 21,
+              background: `radial-gradient(circle, ${colors.primary500}30 0%, ${colors.primary500}10 70%)`,
+              boxShadow: `0 0 24px -4px ${colors.primary500}80`,
+            }}
+            animate={{ scale: [1, 1.12, 1] }}
+            transition={{ duration: 1.4, repeat: 2, ease: "easeInOut" }}
           >
             {milestone.emoji}
-          </div>
+          </motion.div>
           <div className="relative flex-1 min-w-0">
-            <div className="text-[13px] font-bold" style={{ color: colors.neutral900 }}>
+            <div
+              className="text-[13.5px] font-black"
+              style={{ color: colors.neutral900, textShadow: glowTextShadow(colors.primary500, isDark) }}
+            >
               {milestone.message}
             </div>
             <div className="text-[10px] mt-0.5" style={{ color: colors.neutral400 }}>

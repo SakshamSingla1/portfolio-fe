@@ -12,6 +12,7 @@ import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { motion } from "framer-motion";
+import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
 
 const QUICK_ACTIONS = [
   { label: "Project",       subLabel: "Add to portfolio",  icon: FaCode,          route: "/projects",       dot: "#8b5cf6", matchKey: "project" },
@@ -24,6 +25,8 @@ const QUICK_ACTIONS = [
   { label: "Testimonial",   subLabel: "Recommendations",   icon: BsPersonVcard,   route: "/testimonials",   dot: "#f43f5e", matchKey: "testimonial" },
 ] as const;
 
+type QuickAction = (typeof QUICK_ACTIONS)[number];
+
 interface QuickActionsProps {
   /** Profile-completion "missing" descriptions (e.g. "Add at least one project") — when
    * provided, the matching quick actions are surfaced first and flagged as recommended,
@@ -31,10 +34,109 @@ interface QuickActionsProps {
   missingSections?: string[];
 }
 
-const QuickActionsTemplate: React.FC<QuickActionsProps> = ({ missingSections }) => {
-  const navigate = useNavigate();
+interface QuickActionTileProps {
+  action: QuickAction;
+  missing: boolean;
+  index: number;
+  onNavigate: (route: string) => void;
+}
+
+/** A single quick-action chip. Pulled into its own component (rather than rendered
+ * inline in a .map) so it can call `useGlassSurface` per-item — each tile gets its
+ * own accent-tinted frosted glass + ambient glow instead of one flat shared color. */
+const QuickActionTile: React.FC<QuickActionTileProps> = ({ action, missing, index, onNavigate }) => {
   const colors = useColors();
   const { isDark } = useTheme();
+  const glass = useGlassSurface(action.dot);
+  const iconGlow = glowTextShadow(action.dot, isDark);
+  const Icon = action.icon;
+
+  return (
+    <motion.button
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ y: -3 }}
+      onClick={() => onNavigate(action.route)}
+      className="group flex flex-col w-full text-left relative overflow-hidden"
+      style={{
+        padding: "16px 14px 14px",
+        background: glass.background,
+        backdropFilter: glass.backdropFilter,
+        WebkitBackdropFilter: glass.WebkitBackdropFilter,
+        boxShadow: glass.boxShadow,
+        border: missing ? `1.5px solid ${action.dot}40` : `1.5px solid ${colors.neutral300}`,
+        borderRadius: 14,
+        cursor: "pointer",
+        outline: "none",
+        transition: "border-color 0.2s, box-shadow 0.2s",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLButtonElement;
+        el.style.borderColor = `${action.dot}60`;
+        el.style.boxShadow = `${glass.boxShadow as string}, 0 10px 28px -8px ${action.dot}55, 0 0 26px -4px ${action.dot}40`;
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLButtonElement;
+        el.style.borderColor = missing ? `${action.dot}40` : colors.neutral300;
+        el.style.boxShadow = glass.boxShadow as string;
+      }}
+    >
+      {missing && (
+        <div
+          className="absolute top-2.5 right-2.5 flex items-center justify-center rounded-full"
+          style={{ width: 16, height: 16, background: `${action.dot}18`, color: action.dot }}
+          title="Missing from your portfolio"
+        >
+          <FiAlertCircle size={9} />
+        </div>
+      )}
+
+      <div className="relative flex items-center justify-center" style={{ width: 44, height: 44 }}>
+        <div
+          className="absolute inset-0 rounded-xl opacity-60 group-hover:opacity-100 transition-opacity duration-300 group-hover:scale-110"
+          style={{
+            background: `radial-gradient(circle at 32% 28%, ${action.dot}3D 0%, ${action.dot}16 60%, transparent 100%)`,
+            boxShadow: iconGlow,
+          }}
+        />
+        <Icon size={18} style={{ color: action.dot, position: "relative" }} className="transition-transform duration-200 group-hover:scale-110" />
+      </div>
+
+      <div className="mt-3 flex-1">
+        <div
+          className="font-black uppercase"
+          style={{ fontSize: "8.5px", color: missing ? action.dot : colors.neutral400, letterSpacing: "0.1em" }}
+        >
+          {missing ? "Missing" : "Add"}
+        </div>
+        <div
+          className="font-bold mt-0.5 leading-tight"
+          style={{ fontSize: 13, color: colors.neutral800 }}
+        >
+          {action.label}
+        </div>
+        <div className="mt-0.5" style={{ fontSize: "10px", color: colors.neutral400 }}>
+          {action.subLabel}
+        </div>
+      </div>
+
+      <div className="mt-2.5 flex items-center">
+        <div
+          className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+          style={{ color: action.dot }}
+        >
+          <span style={{ fontSize: "10px", fontWeight: 700 }}>Go</span>
+          <FiArrowRight size={10} />
+        </div>
+      </div>
+    </motion.button>
+  );
+};
+
+const QuickActionsTemplate: React.FC<QuickActionsProps> = ({ missingSections }) => {
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
 
   const missingKeys = (missingSections ?? []).map((m) => m.toLowerCase());
@@ -48,86 +150,15 @@ const QuickActionsTemplate: React.FC<QuickActionsProps> = ({ missingSections }) 
 
   return (
     <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"} gap-2.5`}>
-      {orderedActions.map((action, i) => {
-        const Icon = action.icon;
-        const missing = isMissing(action.matchKey);
-        return (
-          <motion.button
-            key={action.label}
-            layout
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-            whileHover={{ y: -2 }}
-            onClick={() => navigate(action.route)}
-            className="group flex flex-col w-full text-left relative overflow-hidden"
-            style={{
-              padding: "16px 14px 14px",
-              background: missing ? `${action.dot}08` : isDark ? colors.neutral100 : colors.neutral0,
-              border: missing ? `1.5px solid ${action.dot}40` : `1.5px solid ${colors.neutral300}`,
-              borderRadius: 14,
-              cursor: "pointer",
-              outline: "none",
-              transition: "border-color 0.2s, box-shadow 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLButtonElement;
-              el.style.borderColor = `${action.dot}55`;
-              el.style.boxShadow = `0 6px 20px ${action.dot}22`;
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLButtonElement;
-              el.style.borderColor = missing ? `${action.dot}40` : colors.neutral300;
-              el.style.boxShadow = "none";
-            }}
-          >
-            {missing && (
-              <div
-                className="absolute top-2.5 right-2.5 flex items-center justify-center rounded-full"
-                style={{ width: 16, height: 16, background: `${action.dot}18`, color: action.dot }}
-                title="Missing from your portfolio"
-              >
-                <FiAlertCircle size={9} />
-              </div>
-            )}
-
-            <div
-              className="flex items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110"
-              style={{ width: 44, height: 44, background: `${action.dot}18`, color: action.dot }}
-            >
-              <Icon size={18} />
-            </div>
-
-            <div className="mt-3 flex-1">
-              <div
-                className="font-black uppercase"
-                style={{ fontSize: "8.5px", color: missing ? action.dot : colors.neutral400, letterSpacing: "0.1em" }}
-              >
-                {missing ? "Missing" : "Add"}
-              </div>
-              <div
-                className="font-bold mt-0.5 leading-tight"
-                style={{ fontSize: 13, color: colors.neutral800 }}
-              >
-                {action.label}
-              </div>
-              <div className="mt-0.5" style={{ fontSize: "10px", color: colors.neutral400 }}>
-                {action.subLabel}
-              </div>
-            </div>
-
-            <div className="mt-2.5 flex items-center">
-              <div
-                className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                style={{ color: action.dot }}
-              >
-                <span style={{ fontSize: "10px", fontWeight: 700 }}>Go</span>
-                <FiArrowRight size={10} />
-              </div>
-            </div>
-          </motion.button>
-        );
-      })}
+      {orderedActions.map((action, i) => (
+        <QuickActionTile
+          key={action.label}
+          action={action}
+          missing={isMissing(action.matchKey)}
+          index={i}
+          onNavigate={navigate}
+        />
+      ))}
     </div>
   );
 };

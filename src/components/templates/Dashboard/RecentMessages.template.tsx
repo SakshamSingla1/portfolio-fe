@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
-import { EmptyState } from "./shared/DashboardUI";
+import { EmptyState, useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
 
 interface RecentMessagesProps {
   messages: ContactUs[];
@@ -85,6 +85,12 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
 
   const [selectedMessage, setSelectedMessage] = useState<ContactUs | null>(null);
 
+  // Fixed, unconditional hook calls (rules-of-hooks) — one glass surface per
+  // possible "lit up" accent, picked per-row below instead of calling the
+  // hook inside the .map().
+  const unreadGlass = useGlassSurface(colors.primary500);
+  const staleGlass = useGlassSurface("#f59e0b");
+
   const updateMessageLocally = useCallback((id: number | null | undefined, patch: Partial<ContactUs>) => {
     queryClient.setQueryData(["dashboard"], (old: any) => {
       if (!old?.recentMessages) return old;
@@ -135,6 +141,10 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
           : isUnread
           ? (isDark ? colors.primary900 : colors.primary50)
           : (isDark ? colors.neutral50 : colors.neutral50);
+        const glass = stale ? staleGlass : unreadGlass;
+        const hoverGlow = isUnread
+          ? `0 16px 34px -14px ${accentColor}66, 0 0 26px -6px ${accentColor}59`
+          : `0 10px 22px -14px ${colors.primary500}40`;
 
         return (
           <motion.div
@@ -142,34 +152,47 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            whileHover={{ y: -1 }}
+            whileHover={{ y: -3, boxShadow: hoverGlow, transition: { duration: 0.2, ease: "easeOut" } }}
             onClick={() => setSelectedMessage(msg)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === "Enter") setSelectedMessage(msg); }}
-            className="flex items-start gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden cursor-pointer transition-shadow duration-150 hover:shadow-sm"
-            style={{
-              background: bgColor,
-              border: `1px solid ${borderColor}`,
-            }}
+            className="flex items-start gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden cursor-pointer"
+            style={
+              isUnread
+                ? { ...glass }
+                : { background: bgColor, border: `1px solid ${borderColor}` }
+            }
           >
             {isUnread && (
               <div
                 className="absolute left-0 top-0 bottom-0 rounded-l-xl"
-                style={{ width: 3, background: accentColor }}
+                style={{ width: 3, background: accentColor, boxShadow: `2px 0 10px ${accentColor}99` }}
               />
             )}
 
             <div
               className="shrink-0 rounded-full flex items-center justify-center font-bold text-xs"
-              style={{ width: 34, height: 34, background: bg, color: fg }}
+              style={{
+                width: 34,
+                height: 34,
+                background: bg,
+                color: fg,
+                boxShadow: isUnread ? `0 0 0 2px ${accentColor}40, 0 0 14px 1px ${accentColor}66` : "none",
+              }}
             >
               {initials}
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
-                <div className="font-semibold text-xs truncate" style={{ color: colors.neutral800 }}>
+                <div
+                  className="font-semibold text-xs truncate"
+                  style={{
+                    color: colors.neutral800,
+                    textShadow: isUnread ? glowTextShadow(accentColor, isDark) : undefined,
+                  }}
+                >
                   {msg.name}
                 </div>
                 <div className="text-[10px] shrink-0" style={{ color: colors.neutral400 }}>
@@ -208,7 +231,11 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             {isUnread && (
               <div
                 className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full self-start mt-0.5"
-                style={{ background: accentColor, color: "#fff" }}
+                style={{
+                  background: accentColor,
+                  color: "#fff",
+                  boxShadow: `0 0 10px 1px ${accentColor}99, 0 2px 8px -2px ${accentColor}80`,
+                }}
               >
                 {stale ? "48h+" : "New"}
               </div>

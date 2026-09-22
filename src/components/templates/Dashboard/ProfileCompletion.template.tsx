@@ -9,6 +9,7 @@ import type { IProfileCompletion, ICompletionSnapshot } from "../../../services/
 import { useProfileTemplateService } from "../../../services/useProfileTemplateService";
 import { useCountUp } from "../../../hooks/useCountUp";
 import { FiCheck, FiMinus, FiArrowRight, FiArrowUpRight, FiTrendingUp } from "react-icons/fi";
+import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
 
 const SECTION_ROUTES: Record<string, string> = {
   "Profile Basics":  "/profile",
@@ -197,6 +198,11 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
 
   const centerSize = (r * 2) - strokeW + 2;
 
+  // Hero accent used for the glowing percentage text + the center glass card —
+  // shifts to the hovered slice's color, falling back to green when fully done.
+  const heroAccent = hoveredSeg ? hoveredSeg.colors[0] : isComplete ? "#10b981" : colors.primary500;
+  const centerGlass = useGlassSurface(heroAccent);
+
   return (
     <div className="flex flex-col items-center">
       {/* High-Contrast Glassmorphic Pie/Donut Chart */}
@@ -262,8 +268,14 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                 stroke={seg.complete ? `url(#grad-${seg.key.replace(/\s+/g, "-")})` : (isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)")}
                 strokeWidth={isHovered ? strokeW + 4 : strokeW}
                 strokeLinecap="round"
-                filter={isHovered ? "url(#active-glow)" : undefined}
-                style={{ cursor: isClickable ? "pointer" : "default" }}
+                style={{
+                  cursor: isClickable ? "pointer" : "default",
+                  filter: isHovered
+                    ? "url(#active-glow)"
+                    : seg.complete
+                    ? `drop-shadow(0 0 5px ${seg.colors[0]}66)`
+                    : undefined,
+                }}
                 onMouseEnter={() => setHoveredKey(seg.key)}
                 onMouseLeave={() => setHoveredKey(null)}
                 onClick={() => isClickable && navigate(route)}
@@ -284,13 +296,8 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
             width: centerSize,
             height: centerSize,
             borderRadius: "50%",
-            background: isDark ? "rgba(28, 28, 30, 0.5)" : "rgba(255, 255, 255, 0.8)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            border: `1.5px solid ${isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.7)"}`,
-            boxShadow: isDark 
-              ? "inset 0 1px 2px rgba(255,255,255,0.15), 0 12px 30px rgba(0, 0, 0, 0.4)" 
-              : "inset 0 1px 3px rgba(255,255,255,0.8), 0 12px 30px rgba(35, 71, 255, 0.08)",
+            ...centerGlass,
+            transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -326,7 +333,8 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                     fontSize: isMobile ? 22 : 28,
                     color: colors.neutral900,
                     letterSpacing: "-0.04em",
-                    lineHeight: 1
+                    lineHeight: 1,
+                    textShadow: glowTextShadow(hoveredSeg.colors[0], isDark),
                   }}
                 >
                   +{hoveredSeg.weight}%
@@ -364,6 +372,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                     fontSize: isMobile ? 32 : 40,
                     color: colors.neutral900,
                     letterSpacing: "-0.05em",
+                    textShadow: glowTextShadow(heroAccent, isDark),
                   }}
                 >
                   {animatedPct}
@@ -443,6 +452,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                   color: seg.complete
                     ? primaryColor
                     : isDark ? colors.neutral500 : colors.neutral400,
+                  boxShadow: seg.complete ? `0 0 6px ${primaryColor}55` : undefined,
                 }}
               >
                 {seg.complete
@@ -477,39 +487,51 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
             </>
           );
 
-          const baseStyle = {
+          // Glass-lite: a translucent tint + a touch of backdrop-blur so these read as
+          // small elevated panes floating over the aurora wash, not flat neutral chips.
+          const baseStyle: React.CSSProperties = {
             background: seg.complete
-              ? isDark ? `${primaryColor}16` : `${primaryColor}08`
-              : isDark ? colors.neutral100 : colors.neutral50,
+              ? isDark ? `${primaryColor}1F` : `${primaryColor}0D`
+              : isDark ? `${colors.neutral100}CC` : `${colors.neutral50}CC`,
             border: isHighlighted
               ? `1.5px solid ${primaryColor}`
               : `1.5px solid ${isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"}`,
-            transform: isHighlighted ? "scale(1.04) translateY(-1px)" : "scale(1)",
-            boxShadow: isHighlighted ? `0 6px 14px ${primaryColor}22` : "none",
-            transition: "all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)"
+            backdropFilter: "blur(10px) saturate(160%)",
+            WebkitBackdropFilter: "blur(10px) saturate(160%)",
+            cursor: isClickable ? "pointer" : "default",
+          };
+
+          const motionProps = {
+            onMouseEnter: () => setHoveredKey(seg.key),
+            onMouseLeave: () => setHoveredKey(null),
+            className: "flex items-center gap-1.5 rounded-xl px-2.5 py-2 w-full text-left",
+            style: baseStyle,
+            animate: {
+              scale: isHighlighted ? 1.04 : 1,
+              y: isHighlighted ? -1 : 0,
+              boxShadow: isHighlighted ? `0 6px 14px ${primaryColor}22` : "0 0 0 rgba(0,0,0,0)",
+            },
+            whileHover: {
+              scale: 1.06,
+              y: -2,
+              boxShadow: `0 10px 24px ${primaryColor}33`,
+            },
+            transition: { type: "spring" as const, stiffness: 380, damping: 26 },
           };
 
           return isClickable ? (
-            <button
+            <motion.button
               key={seg.key}
               onClick={() => navigate(route)}
-              onMouseEnter={() => setHoveredKey(seg.key)}
-              onMouseLeave={() => setHoveredKey(null)}
-              className="flex items-center gap-1.5 rounded-xl px-2.5 py-2 w-full text-left"
-              style={{ ...baseStyle, cursor: "pointer" }}
+              whileTap={{ scale: 0.97 }}
+              {...motionProps}
             >
               {pill}
-            </button>
+            </motion.button>
           ) : (
-            <div
-              key={seg.key}
-              onMouseEnter={() => setHoveredKey(seg.key)}
-              onMouseLeave={() => setHoveredKey(null)}
-              className="flex items-center gap-1.5 rounded-xl px-2.5 py-2"
-              style={baseStyle}
-            >
+            <motion.div key={seg.key} {...motionProps}>
               {pill}
-            </div>
+            </motion.div>
           );
         })}
       </div>

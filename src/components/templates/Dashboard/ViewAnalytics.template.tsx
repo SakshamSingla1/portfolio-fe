@@ -7,7 +7,7 @@ import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
 import { FaChrome, FaFirefoxBrowser, FaSafari, FaEdge, FaOpera, FaGoogle, FaLinkedin, FaGithub, FaTwitter, FaFacebook, FaInstagram, FaYoutube, FaRedditAlien } from "react-icons/fa";
-import { EmptyState } from "./shared/DashboardUI";
+import { EmptyState, useGlassSurface } from "./shared/DashboardUI";
 import { TrendAreaChart, DeviceDonutChart, DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./AnalyticsCharts";
 import ViewsHeatmap from "./ViewsHeatmap";
 
@@ -789,22 +789,20 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       : null;
 
   const ACCENT = colors.primary600;
+  const glass = useGlassSurface(ACCENT);
 
   const cardStyle: React.CSSProperties = {
-    background: isDark
-      ? `linear-gradient(135deg, ${colors.neutral50} 0%, ${colors.neutral0} 100%)`
-      : `linear-gradient(135deg, #fafbff 0%, #ffffff 100%)`,
-    border: `1.5px solid ${colors.neutral300}`,
+    ...glass,
     borderRadius: 20,
     overflow: "hidden",
-    boxShadow: isDark
-      ? "0 2px 8px rgba(0,0,0,0.4)"
-      : `0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)`,
   };
 
   const panelStyle: React.CSSProperties = {
-    background: isDark ? colors.neutral100 : colors.neutral50,
-    border: `1.5px solid ${colors.neutral300}`,
+    background: isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.55)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    border: isDark ? `1px solid ${colors.neutral300}` : "1px solid rgba(255,255,255,0.65)",
+    boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.04)" : "inset 0 1px 0 rgba(255,255,255,0.75), 0 2px 10px rgba(15,23,42,0.03)",
     borderRadius: 12,
     padding: 16,
   };
@@ -835,7 +833,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         style={cardStyle}
       >
-        <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})` }} />
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})`, boxShadow: `0 0 12px ${ACCENT}80` }} />
         <div className="p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-4 sm:mb-5">
             <LivePulse active={false} />
@@ -861,7 +859,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       style={cardStyle}
     >
       {}
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})` }} />
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})`, boxShadow: `0 0 12px ${ACCENT}80` }} />
 
       <div className="p-4 sm:p-5">
 
