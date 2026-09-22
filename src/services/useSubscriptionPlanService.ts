@@ -12,6 +12,7 @@ export const SUBSCRIPTION_PLAN_URLS = {
     GET_ALL: "/subscription-plans",
     UPDATE_NAV_LINKS: "/subscription-plans/:id/nav-links",
     DELETE: "/subscription-plans/:id",
+    PUBLIC_PLANS: "/public/subscription-plans",
 };
 
 export interface IncludedNavLink {
@@ -43,6 +44,18 @@ export interface SubscriptionPlanRequestDTO {
     isDefault: boolean;
     sortOrder: number;
     status: string;
+}
+
+export interface SubscriptionPlanPublicDTO {
+    id: number;
+    name: string;
+    code: string;
+    description?: string;
+    priceMonthly: number;
+    priceYearly: number;
+    currency: string;
+    isDefault: boolean;
+    highlights: string[];
 }
 
 export interface GetAllSubscriptionPlansParams {
@@ -92,6 +105,10 @@ export const useSubscriptionPlanService = () => {
             return request(API_METHOD.DELETE, url, user);
         };
 
+        const getPublicPlans = () => {
+            return request(API_METHOD.GET, SUBSCRIPTION_PLAN_URLS.PUBLIC_PLANS, null);
+        };
+
         return {
             createPlan,
             updatePlan,
@@ -99,6 +116,7 @@ export const useSubscriptionPlanService = () => {
             getAllPlans,
             updatePlanNavLinks,
             deletePlan,
+            getPublicPlans,
         };
     }, [user]);
 };

@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motio
 import usePlatformSettingsService from '../../../services/usePlatformSettingsService';
 import useLandingPageService from '../../../services/useLandingPageService';
 import type { LandingPageData } from '../../../services/useLandingPageService';
+import { useSubscriptionPlanService, type SubscriptionPlanPublicDTO } from '../../../services/useSubscriptionPlanService';
 import { getOptimizedImageUrl } from '../../../utils/helper';
 import {
   LogIn, BarChart2, Globe, LayoutDashboard, Lock, Palette, CheckCircle,
@@ -130,9 +131,13 @@ const FEATURES = [
   },
 ];
 
+// Ordered to match the actual flow of a generated public portfolio (see the
+// portfolio-templates: About → Skills → Experience → Projects → …) rather
+// than alphabetically or by data-model order, so this preview reads the same
+// way a visitor's real portfolio will.
 const CONTENT_SECTIONS = [
-  { icon: Briefcase, label: 'Experience', desc: 'Role, company, dates, location, employment type, technologies used' },
   { icon: Code2, label: 'Skills', desc: 'Categorised with logo, proficiency level, and progress bars' },
+  { icon: Briefcase, label: 'Experience', desc: 'Role, company, dates, location, employment type, technologies used' },
   { icon: Monitor, label: 'Projects', desc: 'Images, live demo, GitHub links, descriptions, skill tags' },
   { icon: Award, label: 'Achievements', desc: 'Proof images, issuer, date, and description' },
   { icon: CheckCircle, label: 'Certifications', desc: 'Credential ID, verification URL, and expiry tracking' },
@@ -212,6 +217,27 @@ const FAQS = [
   {
     q: 'Who can see my portfolio?',
     a: 'Your portfolio is public by default, so you can share it anywhere — with recruiters, on LinkedIn, or on your résumé. Your dashboard stays private to you.',
+  },
+];
+
+// Shown only if the public plans API returns nothing (e.g. no active plans
+// configured yet) — mirrors the real seeded Free/Pro/Premium tiers so the
+// section never renders empty.
+const PLANS = [
+  {
+    name: 'Free', priceMonthly: 0, priceYearly: 0, currency: 'USD', isDefault: true,
+    description: 'Everything needed to get a portfolio live.',
+    highlights: ['Dashboard', 'Profile', 'Experience', 'Education', 'Skills', 'Project', 'Resumes', 'Social Links'],
+  },
+  {
+    name: 'Pro', priceMonthly: 9, priceYearly: 90, currency: 'USD', isDefault: false,
+    description: 'Adds credibility and content depth to a portfolio.',
+    highlights: ['Everything in Free', 'Certifications', 'Testimonials', 'Achievements', 'Custom Themes', 'Messages'],
+  },
+  {
+    name: 'Premium', priceMonthly: 29, priceYearly: 290, currency: 'USD', isDefault: false,
+    description: 'Adds growth, marketing, and integration features.',
+    highlights: ['Everything in Pro', 'Visitor Analytics', 'GitHub Integration', 'Testimonial Requests', 'Notifications'],
   },
 ];
 
@@ -602,11 +628,14 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
   const [bannerUrl, setBannerUrl] = useState<string | null>(null);
   const [profileMaster, setProfileMaster] = useState<any>(null);
   const [landingData, setLandingData] = useState<LandingPageData | null>(null);
+  const [plans, setPlans] = useState<SubscriptionPlanPublicDTO[] | null>(null);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const heroRef = useRef<HTMLDivElement>(null);
   const platformSettingsService = usePlatformSettingsService();
   const landingService = useLandingPageService();
+  const subscriptionPlanService = useSubscriptionPlanService();
 
   useEffect(() => {
     platformSettingsService.getSettings().then((res: any) => {
@@ -618,11 +647,15 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
       if (res?.data?.data) setLandingData(res.data.data);
     }).catch(() => {});
 
+    subscriptionPlanService.getPublicPlans().then((res: any) => {
+      if (res?.data?.data) setPlans(res.data.data);
+    }).catch(() => {});
+
     fetch('/api/v1/public/profile-master')
       .then((r) => r.ok ? r.json() : null)
       .then((json) => { if (json?.data) setProfileMaster(json.data); })
       .catch(() => {});
-  }, [platformSettingsService, landingService]);
+  }, [platformSettingsService, landingService, subscriptionPlanService]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = heroRef.current?.getBoundingClientRect();
@@ -668,6 +701,8 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
 
   const activeAudience = landingData?.audienceCards?.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
   const activeTestimonials = landingData?.testimonials?.filter(t => t.isActive).sort((a, b) => a.sortOrder - b.sortOrder) ?? [];
+
+  const displayPlans = (plans && plans.length > 0 ? plans : PLANS);
 
   return (
     <div style={{
@@ -723,7 +758,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <nav style={{ display: 'flex', gap: 24, alignItems: 'center' }} className="hidden-mobile">
-            {['Features', 'How It Works', 'FAQ'].map((item) => (
+            {['Features', 'How It Works', 'Pricing', 'FAQ'].map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
@@ -1205,6 +1240,114 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted = () => {} }) => {
                 </motion.div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pricing ───────────────────────────────────────────── */}
+      <section id="pricing" style={{ padding: '80px clamp(20px, 5vw, 72px)', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <motion.div {...fadeUp()} style={{ textAlign: 'center', marginBottom: 40 }}>
+            <SectionLabel>Simple pricing</SectionLabel>
+            <SectionTitle>Start free, upgrade when you're ready</SectionTitle>
+            <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', color: C.textSub, maxWidth: 480, margin: '0 auto' }}>
+              Every plan includes a live, hosted portfolio. Paid tiers unlock more sections and deeper insights.
+            </p>
+          </motion.div>
+
+          <motion.div {...fadeUp(0.05)} style={{ display: 'flex', justifyContent: 'center', marginBottom: 44 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4, padding: 4,
+              borderRadius: 12, background: C.surface, border: `1px solid ${C.border}`,
+            }}>
+              {(['monthly', 'yearly'] as const).map((cycle) => (
+                <button
+                  key={cycle}
+                  onClick={() => setBillingCycle(cycle)}
+                  style={{
+                    padding: '8px 20px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                    fontSize: 12.5, fontWeight: 700, textTransform: 'capitalize',
+                    color: billingCycle === cycle ? '#fff' : C.textSub,
+                    background: billingCycle === cycle ? `linear-gradient(135deg, ${C.teal}, ${C.blue})` : 'transparent',
+                    transition: 'background 0.2s, color 0.2s',
+                  }}
+                >
+                  {cycle === 'yearly' ? 'Yearly · save ~17%' : 'Monthly'}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+            {displayPlans.map((plan, i) => {
+              const price = billingCycle === 'monthly' ? plan.priceMonthly : plan.priceYearly;
+              const suffix = billingCycle === 'monthly' ? '/month' : '/year';
+              const currencySymbol = plan.currency === 'USD' ? '$' : `${plan.currency} `;
+              const featured = plan.isDefault === false && i === 1;
+              return (
+                <motion.div
+                  key={plan.name}
+                  {...fadeUp(i * 0.08)}
+                  whileHover={{ y: -4 }}
+                  style={{
+                    padding: '30px 26px', borderRadius: 20,
+                    background: C.surfaceElevated,
+                    border: `1px solid ${featured ? C.tealBorder : C.border}`,
+                    boxShadow: featured ? `0 12px 40px ${C.teal}18` : 'none',
+                    position: 'relative', display: 'flex', flexDirection: 'column',
+                  }}
+                >
+                  {featured && (
+                    <div style={{
+                      position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
+                      padding: '4px 14px', borderRadius: 99,
+                      background: `linear-gradient(135deg, ${C.teal}, ${C.blue})`,
+                      color: '#fff', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em',
+                      boxShadow: `0 4px 14px ${C.tealGlow}`,
+                    }}>
+                      MOST POPULAR
+                    </div>
+                  )}
+
+                  <h3 style={{ fontWeight: 800, fontSize: 18, color: C.text, marginBottom: 6 }}>{plan.name}</h3>
+                  <p style={{ fontSize: 12.5, color: C.textSub, lineHeight: 1.6, marginBottom: 20, minHeight: 38 }}>
+                    {plan.description}
+                  </p>
+
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 24 }}>
+                    <span style={{ fontWeight: 900, fontSize: 38, color: C.text, letterSpacing: '-0.03em' }}>
+                      {price > 0 ? `${currencySymbol}${price}` : 'Free'}
+                    </span>
+                    {price > 0 && (
+                      <span style={{ fontSize: 12.5, color: C.muted, fontWeight: 600 }}>{suffix}</span>
+                    )}
+                  </div>
+
+                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 26px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                    {plan.highlights.map((h) => (
+                      <li key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: C.textSub }}>
+                        <CheckCircle size={14} style={{ color: C.teal, flexShrink: 0, marginTop: 2 }} />
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <motion.button
+                    onClick={onGetStarted}
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+                    style={{
+                      padding: '12px 20px', borderRadius: 12, border: featured ? 'none' : `1px solid ${C.borderMid}`,
+                      background: featured ? `linear-gradient(135deg, ${C.teal}, ${C.blue})` : 'transparent',
+                      color: featured ? '#fff' : C.text,
+                      fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                    }}
+                  >
+                    {price > 0 ? `Choose ${plan.name}` : 'Get Started Free'}
+                  </motion.button>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
