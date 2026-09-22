@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-    PieChart, Pie, Cell, Legend,
+    PieChart, Pie, Cell,
 } from "recharts";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -11,16 +11,17 @@ import type { IDailyView } from "../../../services/useDashboardService";
 // categorical order (see dataviz skill palette.md, slots 1/2/3) — the
 // previous ad-hoc blue/purple/amber trio failed the colorblind-separation
 // check (deutan ΔE 1.3, normal-vision ΔE 12 — below the 15 floor).
-const DEVICE_HUES_LIGHT: Record<string, string> = {
+export const DEVICE_HUES_LIGHT: Record<string, string> = {
     DESKTOP: "#2a78d6",
     MOBILE: "#eb6834",
     TABLET: "#1baf7a",
 };
-const DEVICE_HUES_DARK: Record<string, string> = {
+export const DEVICE_HUES_DARK: Record<string, string> = {
     DESKTOP: "#3987e5",
     MOBILE: "#d95926",
     TABLET: "#199e70",
 };
+export const DEVICE_LABEL: Record<string, string> = { DESKTOP: "Desktop", MOBILE: "Mobile", TABLET: "Tablet" };
 
 interface TooltipBoxProps {
     active?: boolean;
@@ -115,11 +116,13 @@ export const TrendAreaChart: React.FC<TrendAreaChartProps> = ({ data, color, hei
 interface DeviceDonutChartProps {
     breakdown: Record<string, number>;
     height?: number;
+    /** Synced with an external breakdown list so hovering a row (or the chart
+     * itself) highlights the same device in both places. */
+    activeKey?: string | null;
+    onSliceHover?: (key: string | null) => void;
 }
 
-const DEVICE_LABEL: Record<string, string> = { DESKTOP: "Desktop", MOBILE: "Mobile", TABLET: "Tablet" };
-
-export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, height = 180 }) => {
+export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, height = 150, activeKey, onSliceHover }) => {
     const colors = useColors();
     const { isDark } = useTheme();
     const hues = isDark ? DEVICE_HUES_DARK : DEVICE_HUES_LIGHT;
@@ -154,7 +157,16 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                         isAnimationActive
                         animationDuration={800}
                     >
-                        {slices.map((s) => <Cell key={s.key} fill={s.color} />)}
+                        {slices.map((s) => (
+                            <Cell
+                                key={s.key}
+                                fill={s.color}
+                                opacity={activeKey && activeKey !== s.key ? 0.3 : 1}
+                                onMouseEnter={() => onSliceHover?.(s.key)}
+                                onMouseLeave={() => onSliceHover?.(null)}
+                                style={{ cursor: onSliceHover ? "pointer" : "default", transition: "opacity 0.15s" }}
+                            />
+                        ))}
                     </Pie>
                     <Tooltip
                         content={({ active, payload }) => {
@@ -166,18 +178,11 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                             );
                         }}
                     />
-                    <Legend
-                        verticalAlign="bottom"
-                        height={28}
-                        iconType="circle"
-                        iconSize={8}
-                        formatter={(value) => <span style={{ color: colors.neutral600, fontSize: 11, fontWeight: 600 }}>{value}</span>}
-                    />
                 </PieChart>
             </ResponsiveContainer>
             <div
                 className="absolute flex flex-col items-center justify-center pointer-events-none"
-                style={{ top: 0, left: 0, right: 0, height: height - 28 }}
+                style={{ top: 0, left: 0, right: 0, height }}
             >
                 <span className="font-black tabular-nums" style={{ fontSize: 22, color: colors.neutral900, letterSpacing: "-0.03em" }}>
                     {total.toLocaleString()}

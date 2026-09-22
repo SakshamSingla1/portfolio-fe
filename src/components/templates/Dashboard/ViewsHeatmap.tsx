@@ -9,17 +9,45 @@ interface ViewsHeatmapProps {
 
 const WEEKDAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 const WEEKDAY_ROW_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+const RANGES = [30, 90] as const;
+type Range = (typeof RANGES)[number];
 
 type Cell = IDailyView | null;
+
+const computeStreaks = (list: IDailyView[]): { current: number; longest: number } => {
+  let longest = 0;
+  let running = 0;
+  for (const d of list) {
+    if (d.count > 0) {
+      running++;
+      longest = Math.max(longest, running);
+    } else {
+      running = 0;
+    }
+  }
+  let current = 0;
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (list[i].count > 0) current++;
+    else break;
+  }
+  return { current, longest };
+};
 
 /** GitHub-style contribution calendar for the last ~90 days of portfolio views.
  * Sequential magnitude data gets ONE hue ramped light→dark (per the dataviz
  * skill) — reuses the app's own primary ramp rather than inventing a new hue,
  * so it stays visually consistent with every other primary-tinted chart here. */
-const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data }) => {
+const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data: fullData }) => {
   const colors = useColors();
   const { isDark } = useTheme();
-  const [hovered, setHovered] = useState<{ weekIdx: number; dayIdx: number } | null>(null);
+  const [focused, setFocused] = useState<{ weekIdx: number; dayIdx: number } | null>(null);
+  const [range, setRange] = useState<Range>(90);
+
+  const canToggleRange = fullData.length > 30;
+  const data = useMemo(
+    () => (canToggleRange ? fullData.slice(-range) : fullData),
+    [fullData, range, canToggleRange]
+  );
 
   const weeks = useMemo(() => {
     if (!data.length) return [];
@@ -36,6 +64,8 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data }) => {
 
   const maxCount = Math.max(1, ...data.map((d) => d.count));
   const totalViews = data.reduce((sum, d) => sum + d.count, 0);
+  const activeDays = data.filter((d) => d.count > 0).length;
+  const { current: currentStreak, longest: longestStreak } = useMemo(() => computeStreaks(data), [data]);
 
   const levelFor = (count: number): number => {
     if (count <= 0) return 0;
@@ -61,12 +91,50 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data }) => {
     return month !== prevMonth ? month : null;
   };
 
-  const hoveredCell = hovered ? weeks[hovered.weekIdx]?.[hovered.dayIdx] : null;
+  const focusedCell = focused ? weeks[focused.weekIdx]?.[focused.dayIdx] : null;
 
-  if (!data.length) return null;
+  if (!fullData.length) return null;
 
   return (
     <div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          {currentStreak > 0 && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold" style={{ color: colors.neutral600 }}>
+              🔥 <strong style={{ color: colors.neutral800 }}>{currentStreak}</strong>-day streak
+            </span>
+          )}
+          {longestStreak > currentStreak && (
+            <span className="text-[10px] font-medium" style={{ color: colors.neutral400 }}>
+              best: {longestStreak}d
+            </span>
+          )}
+          <span className="text-[10px] font-medium" style={{ color: colors.neutral400 }}>
+            active {activeDays}/{data.length}d
+          </span>
+        </div>
+
+        {canToggleRange && (
+          <div className="inline-flex rounded-lg overflow-hidden shrink-0" style={{ border: `1px solid ${colors.neutral300}` }}>
+            {RANGES.map((r) => (
+              <button
+                key={r}
+                onClick={() => { setRange(r); setFocused(null); }}
+                className="px-2 py-0.5 text-[9.5px] font-bold"
+                style={{
+                  background: range === r ? colors.primary600 : "transparent",
+                  color: range === r ? colors.neutral0 : colors.neutral400,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                {r}D
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: "thin" }}>
         <div className="inline-flex flex-col gap-1" style={{ minWidth: weeks.length * 13 + 24 }}>
           {/* Month labels */}
@@ -93,22 +161,28 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data }) => {
 
             {weeks.map((week, weekIdx) => (
               <div key={weekIdx} className="flex flex-col gap-[3px]">
-                {week.map((cell, dayIdx) => (
-                  <div
-                    key={dayIdx}
-                    onMouseEnter={() => cell && setHovered({ weekIdx, dayIdx })}
-                    onMouseLeave={() => setHovered(null)}
-                    className="rounded-[2px] transition-transform duration-100"
-                    style={{
-                      width: 10,
-                      height: 10,
-                      background: cell ? levelColors[levelFor(cell.count)] : "transparent",
-                      cursor: cell ? "pointer" : "default",
-                      transform: hovered?.weekIdx === weekIdx && hovered?.dayIdx === dayIdx ? "scale(1.35)" : "scale(1)",
-                      boxShadow: hovered?.weekIdx === weekIdx && hovered?.dayIdx === dayIdx ? `0 0 0 1px ${colors.primary600}60` : "none",
-                    }}
-                  />
-                ))}
+                {week.map((cell, dayIdx) => {
+                  const isFocused = focused?.weekIdx === weekIdx && focused?.dayIdx === dayIdx;
+                  return (
+                    <div
+                      key={dayIdx}
+                      onMouseEnter={() => cell && setFocused({ weekIdx, dayIdx })}
+                      onMouseLeave={() => setFocused(null)}
+                      onClick={() => cell && setFocused(isFocused ? null : { weekIdx, dayIdx })}
+                      role={cell ? "button" : undefined}
+                      aria-label={cell ? `${cell.count} view${cell.count !== 1 ? "s" : ""} on ${cell.date}` : undefined}
+                      className="rounded-[2px] transition-transform duration-100"
+                      style={{
+                        width: 10,
+                        height: 10,
+                        background: cell ? levelColors[levelFor(cell.count)] : "transparent",
+                        cursor: cell ? "pointer" : "default",
+                        transform: isFocused ? "scale(1.35)" : "scale(1)",
+                        boxShadow: isFocused ? `0 0 0 1px ${colors.primary600}60` : "none",
+                      }}
+                    />
+                  );
+                })}
               </div>
             ))}
           </div>
@@ -117,14 +191,14 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data }) => {
 
       <div className="flex items-center justify-between mt-3">
         <div className="text-[10px]" style={{ color: colors.neutral400 }}>
-          {hoveredCell ? (
+          {focusedCell ? (
             <span>
-              <strong style={{ color: colors.neutral700 }}>{hoveredCell.count}</strong>{" "}
-              view{hoveredCell.count !== 1 ? "s" : ""} · {hoveredCell.date}
+              <strong style={{ color: colors.neutral700 }}>{focusedCell.count}</strong>{" "}
+              view{focusedCell.count !== 1 ? "s" : ""} · {focusedCell.date}
             </span>
           ) : (
             <span>
-              <strong style={{ color: colors.neutral700 }}>{totalViews.toLocaleString()}</strong> views in the last 90 days
+              <strong style={{ color: colors.neutral700 }}>{totalViews.toLocaleString()}</strong> views in the last {data.length} days
             </span>
           )}
         </div>

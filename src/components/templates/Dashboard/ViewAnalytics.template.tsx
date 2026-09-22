@@ -8,7 +8,7 @@ import type { IViewStats, IPortfolioView } from "../../../services/useDashboardS
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
 import { FaChrome, FaFirefoxBrowser, FaSafari, FaEdge, FaOpera, FaGoogle, FaLinkedin, FaGithub, FaTwitter, FaFacebook, FaInstagram, FaYoutube, FaRedditAlien } from "react-icons/fa";
 import { EmptyState } from "./shared/DashboardUI";
-import { TrendAreaChart, DeviceDonutChart } from "./AnalyticsCharts";
+import { TrendAreaChart, DeviceDonutChart, DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./AnalyticsCharts";
 import ViewsHeatmap from "./ViewsHeatmap";
 
 interface ViewAnalyticsProps {
@@ -535,10 +535,66 @@ const DEVICE_ICON: Record<string, React.ReactNode> = {
   MOBILE:  <FiSmartphone size={12} />,
   TABLET:  <FiTablet size={12} />,
 };
-const DEVICE_COLOR: Record<string, string> = {
-  DESKTOP: "#3b82f6",
-  MOBILE:  "#8b5cf6",
-  TABLET:  "#f59e0b",
+// Single source of truth for device colors (also used by the Devices donut
+// chart) so the same device always reads as the same color everywhere on
+// this card — previously this list had its own arbitrary blue/purple/amber
+// trio that didn't match the donut's colorblind-validated hues.
+const deviceColorFor = (device: string, isDark: boolean): string =>
+  (isDark ? DEVICE_HUES_DARK : DEVICE_HUES_LIGHT)[device] ?? "#94a3b8";
+
+const DeviceBreakdownList: React.FC<{ breakdown: Record<string, number>; activeKey: string | null; onHover: (key: string | null) => void }> = ({
+  breakdown, activeKey, onHover,
+}) => {
+  const colors = useColors();
+  const { isDark } = useTheme();
+  const sorted = Object.entries(breakdown).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
+  if (!sorted.length) return null;
+
+  const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
+  const [topKey, topCount] = sorted[0];
+  const topPct = Math.round((topCount / total) * 100);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
+        {sorted.map(([key, count]) => {
+          const pct = Math.round((count / total) * 100);
+          const color = deviceColorFor(key, isDark);
+          const dimmed = activeKey !== null && activeKey !== key;
+          return (
+            <div
+              key={key}
+              onMouseEnter={() => onHover(key)}
+              onMouseLeave={() => onHover(null)}
+              className="flex items-center gap-2 rounded-lg px-1.5 py-1 -mx-1.5 transition-opacity duration-150"
+              style={{ opacity: dimmed ? 0.45 : 1, cursor: "default" }}
+            >
+              <span
+                className="shrink-0 rounded-md flex items-center justify-center"
+                style={{ width: 20, height: 20, background: `${color}18`, color }}
+              >
+                {DEVICE_ICON[key] ?? <FiMonitor size={12} />}
+              </span>
+              <span className="text-[11px] font-semibold flex-1" style={{ color: colors.neutral600 }}>
+                {DEVICE_LABEL[key] ?? key}
+              </span>
+              <span className="text-[11px] font-black tabular-nums" style={{ color }}>
+                {pct}%
+              </span>
+              <span className="text-[9px] w-8 text-right" style={{ color: colors.neutral400 }}>
+                ({count})
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      {sorted.length > 1 && (
+        <div className="text-[10px] pt-1" style={{ color: colors.neutral500, borderTop: `1px solid ${colors.neutral100}` }}>
+          <strong style={{ color: colors.neutral700 }}>{DEVICE_LABEL[topKey] ?? topKey}</strong> leads with {topPct}% of sessions
+        </div>
+      )}
+    </div>
+  );
 };
 
 const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
@@ -585,7 +641,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
       {expanded && (
         <div className="overflow-y-auto" style={{ maxHeight: 360, background: colors.neutral0 }}>
           {shown.map((v, i) => {
-            const devColor = DEVICE_COLOR[v.device] ?? "#94a3b8";
+            const devColor = deviceColorFor(v.device, isDark);
             const devIcon  = DEVICE_ICON[v.device] ?? <FiMonitor size={12} />;
             const flag     = countryFlag(v.countryCode);
             const location = v.city && v.country
@@ -765,6 +821,9 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
   const hasBrowserData   = Object.keys(browserBreakdown).length > 0;
   const hasLocationData  = Object.keys(locationBreakdown).length > 0;
   const hasReferrerData  = Object.keys(referrerBreakdown).length > 0;
+  const hasDeviceData    = Object.values(deviceBreakdown).some((c) => c > 0);
+
+  const [activeDeviceKey, setActiveDeviceKey] = React.useState<string | null>(null);
 
   const hasAnyData = totalViews > 0 || recentViews.length > 0;
 
@@ -915,10 +974,15 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
             )}
 
             {}
-            <div style={panelStyle}>
-              {panelLabel("Devices")}
-              <DeviceDonutChart breakdown={deviceBreakdown} />
-            </div>
+            {hasDeviceData && (
+              <div style={panelStyle}>
+                {panelLabel("Devices")}
+                <div className="flex flex-col gap-3">
+                  <DeviceDonutChart breakdown={deviceBreakdown} activeKey={activeDeviceKey} onSliceHover={setActiveDeviceKey} />
+                  <DeviceBreakdownList breakdown={deviceBreakdown} activeKey={activeDeviceKey} onHover={setActiveDeviceKey} />
+                </div>
+              </div>
+            )}
 
             {}
             {isMobile && hasBrowserData && (
