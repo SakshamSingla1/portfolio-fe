@@ -157,7 +157,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             role="button"
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === "Enter") setSelectedMessage(msg); }}
-            className="flex items-start gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden cursor-pointer"
+            className="flex items-start gap-3 rounded-xl px-3.5 py-3 relative overflow-hidden cursor-pointer"
             style={
               isUnread
                 ? { ...glass }

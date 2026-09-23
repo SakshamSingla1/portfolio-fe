@@ -171,7 +171,7 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {items.map(({ label, pct, detail, color }, i) => (
         <motion.div
           key={label}
@@ -179,7 +179,7 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: i * 0.05 }}
           whileHover={{ y: -2, boxShadow: `0 12px 32px -10px ${color}60` }}
-          className="relative rounded-xl p-3 flex items-center justify-between gap-3 overflow-hidden"
+          className="relative rounded-xl p-4 flex items-center justify-between gap-3 overflow-hidden"
           style={{
             background: isDark
               ? `linear-gradient(135deg, ${color}22 0%, ${color}0A 100%)`
@@ -236,7 +236,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   // Mirrors the real layout (stat grid, engagement strip, two-column cards) rather
   // than arbitrary gray blocks, so the loading state doesn't jump/reflow once data lands.
   const Skeleton = () => (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"} gap-px rounded-2xl overflow-hidden`} style={{ background: colors.neutral300 }}>
         {Array.from({ length: isMobile ? 4 : 4 }).map((_, i) => (
           <div key={i} style={{ background: colors.neutral0, padding: isMobile ? "18px 14px" : "22px 20px" }}>
@@ -247,7 +247,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[0, 1, 2].map((i) => (
           <SkeletonBlock key={i} height={72} />
         ))}
@@ -255,13 +255,13 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
 
       <SkeletonBlock height={260} />
 
-      <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
-        <div className={isMobile ? "space-y-4" : "col-span-7 space-y-4"}>
+      <div className={`grid gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
+        <div className={isMobile ? "space-y-5" : "col-span-7 space-y-5"}>
           {[220, 180].map((h, i) => (
             <SkeletonBlock key={i} height={h} />
           ))}
         </div>
-        <div className={isMobile ? "space-y-4" : "col-span-5 space-y-4"}>
+        <div className={isMobile ? "space-y-5" : "col-span-5 space-y-5"}>
           {[180, 200].map((h, i) => (
             <SkeletonBlock key={i} height={h} />
           ))}
@@ -316,7 +316,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="mb-4"
+        className="mb-5"
       >
         <Card hero>
           <div className="flex items-center justify-between">
@@ -400,7 +400,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
       {!dashboardData ? (
         <Skeleton />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
 
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -457,10 +457,10 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             <ViewAnalyticsTemplate viewStats={dashboardData.viewStats ?? EMPTY_VIEW_STATS} />
           </motion.div>
 
-          <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
+          <div className={`grid gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
 
             {/* Left column */}
-            <div className={`space-y-4 ${isMobile ? "" : "col-span-7"}`}>
+            <div className={`space-y-5 ${isMobile ? "" : "col-span-7"}`}>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -487,7 +487,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             </div>
 
             {/* Right column */}
-            <div className={`space-y-4 ${isMobile ? "" : "col-span-5"}`}>
+            <div className={`space-y-5 ${isMobile ? "" : "col-span-5"}`}>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

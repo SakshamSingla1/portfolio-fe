@@ -133,7 +133,7 @@ export const Card: React.FC<CardProps> = ({ children, className = "", hero = fal
           }}
         />
       )}
-      <div className={noPadding ? "" : "p-4 sm:p-5"}>{children}</div>
+      <div className={noPadding ? "" : "p-5 sm:p-6"}>{children}</div>
     </div>
   );
 };

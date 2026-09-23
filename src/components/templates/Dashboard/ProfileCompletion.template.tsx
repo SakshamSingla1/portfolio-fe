@@ -431,7 +431,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
       )}
 
       {/* Section grid — 3 columns of glassmorphic status pills */}
-      <div className="mt-6 w-full grid grid-cols-3 gap-2.5">
+      <div className="mt-6 w-full grid grid-cols-3 gap-3">
         {segments.map((seg) => {
           const route = SECTION_ROUTES[seg.key];
           const isClickable = !seg.complete && !!route;
@@ -504,7 +504,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
           const motionProps = {
             onMouseEnter: () => setHoveredKey(seg.key),
             onMouseLeave: () => setHoveredKey(null),
-            className: "flex items-center gap-1.5 rounded-xl px-2.5 py-2 w-full text-left",
+            className: "flex items-center gap-1.5 rounded-xl px-3 py-2.5 w-full text-left",
             style: baseStyle,
             animate: {
               scale: isHighlighted ? 1.04 : 1,

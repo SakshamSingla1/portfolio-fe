@@ -608,7 +608,7 @@ const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) =>
 
   return (
     <div
-      className="mt-4 rounded-xl overflow-hidden"
+      className="mt-5 rounded-xl overflow-hidden"
       style={{ border: `1.5px solid ${colors.neutral300}` }}
     >
       <button
@@ -804,7 +804,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     border: isDark ? `1px solid ${colors.neutral300}` : "1px solid rgba(255,255,255,0.65)",
     boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.04)" : "inset 0 1px 0 rgba(255,255,255,0.75), 0 2px 10px rgba(15,23,42,0.03)",
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
   };
 
   const panelLabel = (text: string, icon?: React.ReactNode) => (
@@ -834,8 +834,8 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
         style={cardStyle}
       >
         <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})`, boxShadow: `0 0 12px ${ACCENT}80` }} />
-        <div className="p-4 sm:p-5">
-          <div className="flex items-center gap-2 mb-4 sm:mb-5">
+        <div className="p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5 sm:mb-6">
             <LivePulse active={false} />
             <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: colors.primary700 }}>
               Analytics · Portfolio Views
@@ -861,10 +861,10 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       {}
       <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})`, boxShadow: `0 0 12px ${ACCENT}80` }} />
 
-      <div className="p-4 sm:p-5">
+      <div className="p-5 sm:p-6">
 
         {}
-        <div className="flex items-center justify-between mb-4 sm:mb-5">
+        <div className="flex items-center justify-between mb-5 sm:mb-6">
           <div className="flex items-center gap-2">
             <LivePulse active={viewsToday > 0} />
             <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: colors.primary700 }}>
@@ -882,15 +882,15 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
         </div>
 
         {}
-        <div className={`grid gap-4 sm:gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
+        <div className={`grid gap-5 sm:gap-6 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
 
           {}
           <div className={isMobile ? "" : "col-span-7"}>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-5">
 
               {}
               <div
-                className="rounded-2xl p-4 flex items-center justify-between gap-4"
+                className="rounded-2xl p-5 flex items-center justify-between gap-4"
                 style={{ background: isDark ? `${ACCENT}15` : `${ACCENT}08`, border: `1px solid ${ACCENT}20` }}
               >
                 <MetricCell label="Views Today" value={viewsToday} delay={0} accent={ACCENT} hero />
@@ -905,7 +905,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
               </div>
 
               {}
-              <div className="grid gap-3 grid-cols-3">
+              <div className="grid gap-4 grid-cols-3">
                 {}
                 <div className="rounded-xl p-3" style={panelStyle}>
                   <div className="flex items-start justify-between gap-1">
@@ -935,7 +935,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
               {}
               {!isMobile && (hasBrowserData || hasLocationData) && (
-                <div className={`grid gap-4 items-start ${hasBrowserData && hasLocationData ? "grid-cols-2" : "grid-cols-1"}`}>
+                <div className={`grid gap-5 items-start ${hasBrowserData && hasLocationData ? "grid-cols-2" : "grid-cols-1"}`}>
                   {hasBrowserData && (
                     <div style={panelStyle}>
                       {panelLabel("Browsers")}
@@ -954,7 +954,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
           </div>
 
           {}
-          <div className={`flex flex-col gap-4 ${isMobile ? "" : "col-span-5"}`}>
+          <div className={`flex flex-col gap-5 ${isMobile ? "" : "col-span-5"}`}>
 
             {}
             {!isMobile && weeklyTrend.length > 0 && (
@@ -1000,7 +1000,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
         {}
         {(hasReferrerData || recentViews.length > 0) && (
-          <div className={`mt-4 grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
+          <div className={`mt-5 grid gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
             {hasReferrerData && (
               <div style={panelStyle}>
                 {panelLabel("Traffic Sources", <FiLink size={10} style={{ color: colors.neutral400 }} />)}
@@ -1018,7 +1018,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
         {}
         {viewsHeatmap.length > 0 && (
-          <div className="mt-4" style={panelStyle}>
+          <div className="mt-5" style={panelStyle}>
             {panelLabel("90-Day Activity", <FiEye size={10} style={{ color: colors.neutral400 }} />)}
             <ViewsHeatmap data={viewsHeatmap} />
           </div>
@@ -1026,7 +1026,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
         {}
         <div
-          className="flex items-center justify-between mt-4 pt-4"
+          className="flex items-center justify-between mt-5 pt-5"
           style={{ borderTop: `1.5px solid ${colors.neutral300}` }}
         >
           <div className="flex items-center gap-4">

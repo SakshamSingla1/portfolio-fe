@@ -1,10 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useId, useMemo } from "react";
+import { motion } from "framer-motion";
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-    PieChart, Pie, Cell,
 } from "recharts";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { glowTextShadow } from "./shared/DashboardUI";
 import type { IDailyView } from "../../../services/useDashboardService";
 
 // Device-mix hues below are picked from the design system's validated
@@ -122,14 +123,23 @@ interface DeviceDonutChartProps {
     onSliceHover?: (key: string | null) => void;
 }
 
-export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, height = 150, activeKey, onSliceHover }) => {
+/** A segmented, glowing radial gauge — one arc band per device, rounded caps,
+ * a soft SVG glow filter per segment, and a faint full-circle track behind
+ * them (the "dial" a gauge reads against). Built from plain SVG circles with
+ * stroke-dasharray/rotate (the same ring technique as MiniRing/ProfileCompletion's
+ * gauge elsewhere in this file's siblings) rather than a recharts Pie, so the
+ * glow filters and gap/cap styling are fully under our control. */
+export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, height = 170, activeKey, onSliceHover }) => {
     const colors = useColors();
     const { isDark } = useTheme();
     const hues = isDark ? DEVICE_HUES_DARK : DEVICE_HUES_LIGHT;
+    const uid = useId();
+    const [hovered, setHovered] = React.useState<string | null>(null);
 
     const slices = useMemo(() => {
         return Object.entries(breakdown)
             .filter(([, count]) => count > 0)
+            .sort((a, b) => b[1] - a[1])
             .map(([key, count]) => ({
                 key,
                 name: DEVICE_LABEL[key] ?? key,
@@ -139,57 +149,129 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
     }, [breakdown, hues, colors.neutral400]);
 
     const total = slices.reduce((sum, s) => sum + s.value, 0);
+
+    const SIZE = 200;
+    const CENTER = SIZE / 2;
+    const R = 76;
+    const STROKE = 26;
+    const CIRC = 2 * Math.PI * R;
+    const GAP_DEG = slices.length > 1 ? 7 : 0;
+
+    const segments = useMemo(() => {
+        let cursor = 0;
+        return slices.map((s) => {
+            const pct = total > 0 ? s.value / total : 0;
+            const rawDeg = pct * 360;
+            const arcDeg = Math.max(rawDeg - GAP_DEG, rawDeg > 0 ? 3 : 0);
+            const arcLen = (arcDeg / 360) * CIRC;
+            const startDeg = cursor;
+            cursor += rawDeg;
+            return { ...s, pct, startDeg, arcLen };
+        });
+    }, [slices, total, GAP_DEG, CIRC]);
+
     if (!slices.length) return null;
+    const effectiveActive = activeKey ?? hovered;
+    const activeSeg = segments.find((s) => s.key === effectiveActive);
 
     return (
-        <div className="relative">
-            <ResponsiveContainer width="100%" height={height}>
-                <PieChart>
-                    <Pie
-                        data={slices}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius="62%"
-                        outerRadius="90%"
-                        paddingAngle={2}
-                        stroke={colors.neutral0}
+        <div className="relative" style={{ width: "100%", maxWidth: height, margin: "0 auto" }}>
+            <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" height={height} style={{ overflow: "visible" }}>
+                <defs>
+                    {segments.map((s) => (
+                        <filter key={s.key} id={`${uid}-glow-${s.key}`} x="-60%" y="-60%" width="220%" height="220%">
+                            <feGaussianBlur stdDeviation={effectiveActive === s.key ? 6 : 3.2} result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    ))}
+                </defs>
+
+                {/* Base dial track */}
+                <circle
+                    cx={CENTER}
+                    cy={CENTER}
+                    r={R}
+                    fill="none"
+                    stroke={isDark ? colors.neutral200 : colors.neutral200}
+                    strokeWidth={STROKE}
+                    opacity={isDark ? 0.35 : 0.5}
+                />
+
+                {/* Quarter tick marks for the gauge-dial feel */}
+                {[0, 90, 180, 270].map((deg) => (
+                    <line
+                        key={deg}
+                        x1={CENTER}
+                        y1={CENTER - R - STROKE / 2 - 3}
+                        x2={CENTER}
+                        y2={CENTER - R - STROKE / 2 + 4}
+                        stroke={colors.neutral300}
                         strokeWidth={2}
-                        isAnimationActive
-                        animationDuration={800}
-                    >
-                        {slices.map((s) => (
-                            <Cell
-                                key={s.key}
-                                fill={s.color}
-                                opacity={activeKey && activeKey !== s.key ? 0.3 : 1}
-                                onMouseEnter={() => onSliceHover?.(s.key)}
-                                onMouseLeave={() => onSliceHover?.(null)}
-                                style={{ cursor: onSliceHover ? "pointer" : "default", transition: "opacity 0.15s" }}
-                            />
-                        ))}
-                    </Pie>
-                    <Tooltip
-                        content={({ active, payload }) => {
-                            const p = payload?.[0];
-                            if (!active || !p) return null;
-                            const pct = Math.round((Number(p.value) / total) * 100);
-                            return (
-                                <TooltipBox active={active} label={String(p.name)} value={`${p.value} · ${pct}%`} accent={p.payload?.color} />
-                            );
-                        }}
+                        strokeLinecap="round"
+                        transform={`rotate(${deg - 90} ${CENTER} ${CENTER})`}
+                        opacity={0.6}
                     />
-                </PieChart>
-            </ResponsiveContainer>
+                ))}
+
+                {segments.map((s) => {
+                    const dimmed = effectiveActive !== null && effectiveActive !== s.key;
+                    return (
+                        <motion.circle
+                            key={s.key}
+                            cx={CENTER}
+                            cy={CENTER}
+                            r={R}
+                            fill="none"
+                            stroke={s.color}
+                            strokeWidth={effectiveActive === s.key ? STROKE + 4 : STROKE}
+                            strokeLinecap="round"
+                            strokeDasharray={`${s.arcLen} ${CIRC}`}
+                            transform={`rotate(${s.startDeg - 90} ${CENTER} ${CENTER})`}
+                            filter={`url(#${uid}-glow-${s.key})`}
+                            style={{
+                                cursor: onSliceHover ? "pointer" : "default",
+                                opacity: dimmed ? 0.32 : 1,
+                                transition: "opacity 0.2s, stroke-width 0.2s",
+                            }}
+                            initial={{ strokeDashoffset: s.arcLen }}
+                            animate={{ strokeDashoffset: 0 }}
+                            transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            onMouseEnter={() => { setHovered(s.key); onSliceHover?.(s.key); }}
+                            onMouseLeave={() => { setHovered(null); onSliceHover?.(null); }}
+                        />
+                    );
+                })}
+            </svg>
+
             <div
                 className="absolute flex flex-col items-center justify-center pointer-events-none"
-                style={{ top: 0, left: 0, right: 0, height }}
+                style={{ inset: 0 }}
             >
-                <span className="font-black tabular-nums" style={{ fontSize: 22, color: colors.neutral900, letterSpacing: "-0.03em" }}>
-                    {total.toLocaleString()}
-                </span>
-                <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: colors.neutral400 }}>
-                    Sessions
-                </span>
+                {activeSeg ? (
+                    <>
+                        <span
+                            className="font-black tabular-nums"
+                            style={{ fontSize: 26, color: activeSeg.color, letterSpacing: "-0.03em", textShadow: glowTextShadow(activeSeg.color, isDark) }}
+                        >
+                            {Math.round(activeSeg.pct * 100)}%
+                        </span>
+                        <span className="text-[9.5px] font-black uppercase tracking-widest" style={{ color: colors.neutral500 }}>
+                            {activeSeg.name}
+                        </span>
+                    </>
+                ) : (
+                    <>
+                        <span className="font-black tabular-nums" style={{ fontSize: 24, color: colors.neutral900, letterSpacing: "-0.03em" }}>
+                            {total.toLocaleString()}
+                        </span>
+                        <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: colors.neutral400 }}>
+                            Sessions
+                        </span>
+                    </>
+                )}
             </div>
         </div>
     );

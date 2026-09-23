@@ -61,7 +61,7 @@ const QuickActionTile: React.FC<QuickActionTileProps> = ({ action, missing, inde
       onClick={() => onNavigate(action.route)}
       className="group flex flex-col w-full text-left relative overflow-hidden"
       style={{
-        padding: "16px 14px 14px",
+        padding: "18px 16px 16px",
         background: glass.background,
         backdropFilter: glass.backdropFilter,
         WebkitBackdropFilter: glass.WebkitBackdropFilter,
@@ -149,7 +149,7 @@ const QuickActionsTemplate: React.FC<QuickActionsProps> = ({ missingSections }) 
   });
 
   return (
-    <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"} gap-2.5`}>
+    <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"} gap-3`}>
       {orderedActions.map((action, i) => (
         <QuickActionTile
           key={action.label}

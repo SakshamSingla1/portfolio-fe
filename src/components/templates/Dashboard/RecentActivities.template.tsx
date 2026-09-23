@@ -90,8 +90,8 @@ const RecentActivitiesTemplate: React.FC<RecentActivitiesProps> = ({ activities 
               x: 2,
               transition: { duration: 0.2, ease: "easeOut" },
             }}
-            className="flex gap-3 relative cursor-pointer group rounded-xl px-2.5 -mx-2.5"
-            style={{ paddingBottom: isLast ? 0 : 18 }}
+            className="flex gap-3 relative cursor-pointer group rounded-xl px-3 -mx-3"
+            style={{ paddingBottom: isLast ? 0 : 22 }}
             onClick={() => navigate(route)}
           >
             {!isLast && (

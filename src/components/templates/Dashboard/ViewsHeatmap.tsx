@@ -97,8 +97,8 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data: fullData }) => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div className="flex items-center gap-3.5 flex-wrap">
           {currentStreak > 0 && (
             <span className="inline-flex items-center gap-1 text-[10px] font-bold" style={{ color: colors.neutral600 }}>
               🔥 <strong style={{ color: colors.neutral800 }}>{currentStreak}</strong>-day streak
@@ -135,32 +135,32 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data: fullData }) => {
         )}
       </div>
 
-      <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: "thin" }}>
-        <div className="inline-flex flex-col gap-1" style={{ minWidth: weeks.length * 13 + 24 }}>
+      <div className="overflow-x-auto pb-2" style={{ scrollbarWidth: "thin" }}>
+        <div className="inline-flex flex-col gap-2" style={{ minWidth: weeks.length * 17 + 30 }}>
           {/* Month labels */}
-          <div className="flex gap-[3px] pl-[22px]">
+          <div className="flex gap-[5px] pl-[26px]">
             {weeks.map((_, weekIdx) => {
               const label = monthLabelFor(weekIdx);
               return (
-                <div key={weekIdx} className="text-[8px] font-semibold" style={{ width: 10, color: colors.neutral400 }}>
+                <div key={weekIdx} className="text-[8.5px] font-semibold" style={{ width: 12, color: colors.neutral400 }}>
                   {label ?? ""}
                 </div>
               );
             })}
           </div>
 
-          <div className="flex gap-[3px]">
+          <div className="flex gap-[5px]">
             {/* Weekday row labels */}
-            <div className="flex flex-col gap-[3px] shrink-0" style={{ width: 20 }}>
+            <div className="flex flex-col gap-[5px] shrink-0" style={{ width: 22 }}>
               {WEEKDAY_ROW_LABELS.map((lbl, i) => (
-                <div key={i} className="text-[7.5px] font-medium flex items-center" style={{ height: 10, color: colors.neutral400 }}>
+                <div key={i} className="text-[8px] font-medium flex items-center" style={{ height: 12, color: colors.neutral400 }}>
                   {lbl}
                 </div>
               ))}
             </div>
 
             {weeks.map((week, weekIdx) => (
-              <div key={weekIdx} className="flex flex-col gap-[3px]">
+              <div key={weekIdx} className="flex flex-col gap-[5px]">
                 {week.map((cell, dayIdx) => {
                   const isFocused = focused?.weekIdx === weekIdx && focused?.dayIdx === dayIdx;
                   return (
@@ -171,14 +171,18 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data: fullData }) => {
                       onClick={() => cell && setFocused(isFocused ? null : { weekIdx, dayIdx })}
                       role={cell ? "button" : undefined}
                       aria-label={cell ? `${cell.count} view${cell.count !== 1 ? "s" : ""} on ${cell.date}` : undefined}
-                      className="rounded-[2px] transition-transform duration-100"
+                      className="rounded-[3px] transition-transform duration-100"
                       style={{
-                        width: 10,
-                        height: 10,
+                        width: 12,
+                        height: 12,
                         background: cell ? levelColors[levelFor(cell.count)] : "transparent",
                         cursor: cell ? "pointer" : "default",
                         transform: isFocused ? "scale(1.35)" : "scale(1)",
-                        boxShadow: isFocused ? `0 0 0 1px ${colors.primary600}60` : "none",
+                        boxShadow: isFocused
+                          ? `0 0 0 1px ${colors.primary600}60`
+                          : cell && cell.count > 0
+                          ? `0 0 6px -1px ${levelColors[levelFor(cell.count)]}90`
+                          : "none",
                       }}
                     />
                   );
@@ -189,8 +193,8 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data: fullData }) => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-3">
-        <div className="text-[10px]" style={{ color: colors.neutral400 }}>
+      <div className="flex items-center justify-between mt-4 pt-3.5" style={{ borderTop: `1px solid ${colors.neutral100}` }}>
+        <div className="text-[10.5px]" style={{ color: colors.neutral400 }}>
           {focusedCell ? (
             <span>
               <strong style={{ color: colors.neutral700 }}>{focusedCell.count}</strong>{" "}
@@ -202,10 +206,10 @@ const ViewsHeatmap: React.FC<ViewsHeatmapProps> = ({ data: fullData }) => {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <span className="text-[8px]" style={{ color: colors.neutral400 }}>Less</span>
           {levelColors.map((c, i) => (
-            <div key={i} className="rounded-[2px]" style={{ width: 9, height: 9, background: c }} />
+            <div key={i} className="rounded-[3px]" style={{ width: 10, height: 10, background: c }} />
           ))}
           <span className="text-[8px]" style={{ color: colors.neutral400 }}>More</span>
         </div>

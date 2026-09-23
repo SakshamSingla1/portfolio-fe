@@ -77,7 +77,7 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
       onClick={() => navigate(route)}
       className="group relative flex flex-col w-full text-left overflow-hidden"
       style={{
-        padding: isMobile ? "18px 14px 16px" : "22px 20px 18px",
+        padding: isMobile ? "20px 16px 18px" : "26px 24px 22px",
         background: "transparent",
         border: "none",
         cursor: "pointer",
@@ -169,7 +169,7 @@ const SecondaryStatCell: React.FC<SecondaryStatCellProps> = ({
       onClick={() => navigate(route)}
       className="group flex flex-col items-center justify-center w-full transition-colors duration-150"
       style={{
-        padding: "12px 8px 10px",
+        padding: "14px 10px 12px",
         background: "transparent",
         border: "none",
         cursor: "pointer",
