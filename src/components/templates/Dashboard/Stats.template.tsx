@@ -97,18 +97,26 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
         style={{ height: 2, background: accent, boxShadow: `0 0 8px ${accent}` }}
       />
 
-      <div
-        className="relative flex items-center justify-center rounded-xl mb-4 transition-transform duration-200 group-hover:scale-110"
+      <motion.div
+        className="relative flex items-center justify-center rounded-xl mb-4 group-hover:scale-110"
         style={{
           width: isMobile ? 36 : 42,
           height: isMobile ? 36 : 42,
           background: `linear-gradient(135deg, ${accent}2A, ${accent}12)`,
           color: accent,
-          boxShadow: `0 0 0 1px ${accent}25 inset, 0 4px 12px -4px ${accent}50`,
+          transition: "transform 0.2s",
         }}
+        animate={{
+          boxShadow: [
+            `0 0 0 1px ${accent}25 inset, 0 4px 12px -4px ${accent}50`,
+            `0 0 0 1px ${accent}45 inset, 0 6px 20px -4px ${accent}90`,
+            `0 0 0 1px ${accent}25 inset, 0 4px 12px -4px ${accent}50`,
+          ],
+        }}
+        transition={{ duration: 2.6 + index * 0.3, repeat: Infinity, ease: "easeInOut" }}
       >
         <Icon size={isMobile ? 15 : 18} />
-      </div>
+      </motion.div>
 
       <div className="relative flex items-end gap-1.5 mb-2">
         <span

@@ -7,7 +7,7 @@ import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
 import { FaChrome, FaFirefoxBrowser, FaSafari, FaEdge, FaOpera, FaGoogle, FaLinkedin, FaGithub, FaTwitter, FaFacebook, FaInstagram, FaYoutube, FaRedditAlien } from "react-icons/fa";
-import { EmptyState, useGlassSurface } from "./shared/DashboardUI";
+import { EmptyState, useGlassSurface, ShimmerTopline } from "./shared/DashboardUI";
 import { TrendAreaChart, DeviceDonutChart, DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./AnalyticsCharts";
 import ViewsHeatmap from "./ViewsHeatmap";
 
@@ -833,7 +833,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         style={cardStyle}
       >
-        <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})`, boxShadow: `0 0 12px ${ACCENT}80` }} />
+        <ShimmerTopline color={ACCENT} color2={colors.primary400} />
         <div className="p-5 sm:p-6">
           <div className="flex items-center gap-2 mb-5 sm:mb-6">
             <LivePulse active={false} />
@@ -859,7 +859,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       style={cardStyle}
     >
       {}
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${ACCENT}, ${colors.primary400})`, boxShadow: `0 0 12px ${ACCENT}80` }} />
+      <ShimmerTopline color={ACCENT} color2={colors.primary400} />
 
       <div className="p-5 sm:p-6">
 

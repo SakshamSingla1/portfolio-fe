@@ -179,9 +179,10 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
             <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" height={height} style={{ overflow: "visible" }}>
                 <defs>
                     {segments.map((s) => (
-                        <filter key={s.key} id={`${uid}-glow-${s.key}`} x="-60%" y="-60%" width="220%" height="220%">
-                            <feGaussianBlur stdDeviation={effectiveActive === s.key ? 6 : 3.2} result="blur" />
+                        <filter key={s.key} id={`${uid}-glow-${s.key}`} x="-80%" y="-80%" width="260%" height="260%">
+                            <feGaussianBlur stdDeviation={effectiveActive === s.key ? 9 : 4.6} result="blur" />
                             <feMerge>
+                                <feMergeNode in="blur" />
                                 <feMergeNode in="blur" />
                                 <feMergeNode in="SourceGraphic" />
                             </feMerge>
@@ -216,8 +217,9 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                     />
                 ))}
 
-                {segments.map((s) => {
+                {segments.map((s, i) => {
                     const dimmed = effectiveActive !== null && effectiveActive !== s.key;
+                    const active = effectiveActive === s.key;
                     return (
                         <motion.circle
                             key={s.key}
@@ -226,7 +228,6 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                             r={R}
                             fill="none"
                             stroke={s.color}
-                            strokeWidth={effectiveActive === s.key ? STROKE + 4 : STROKE}
                             strokeLinecap="round"
                             strokeDasharray={`${s.arcLen} ${CIRC}`}
                             transform={`rotate(${s.startDeg - 90} ${CENTER} ${CENTER})`}
@@ -234,11 +235,19 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                             style={{
                                 cursor: onSliceHover ? "pointer" : "default",
                                 opacity: dimmed ? 0.32 : 1,
-                                transition: "opacity 0.2s, stroke-width 0.2s",
+                                transition: "opacity 0.2s",
                             }}
-                            initial={{ strokeDashoffset: s.arcLen }}
-                            animate={{ strokeDashoffset: 0 }}
-                            transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            initial={{ strokeDashoffset: s.arcLen, strokeWidth: STROKE }}
+                            animate={{
+                                strokeDashoffset: 0,
+                                strokeWidth: active ? STROKE + 6 : dimmed ? STROKE : [STROKE, STROKE + 3, STROKE],
+                            }}
+                            transition={{
+                                strokeDashoffset: { duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] },
+                                strokeWidth: (active || dimmed)
+                                    ? { duration: 0.25 }
+                                    : { duration: 3.2 + i * 0.5, repeat: Infinity, ease: "easeInOut" },
+                            }}
                             onMouseEnter={() => { setHovered(s.key); onSliceHover?.(s.key); }}
                             onMouseLeave={() => { setHovered(null); onSliceHover?.(null); }}
                         />

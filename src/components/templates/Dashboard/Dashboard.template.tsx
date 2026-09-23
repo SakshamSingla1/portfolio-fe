@@ -361,8 +361,8 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             {fullName && (
               <motion.div
                 className="ml-4 shrink-0 rounded-full"
-                animate={{ boxShadow: [`0 0 0 3px ${colors.primary400}30`, `0 0 0 6px ${colors.primary400}00`] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" }}
+                animate={{ boxShadow: [`0 0 0 3px ${colors.primary400}50`, `0 0 0 10px ${colors.primary400}00`] }}
+                transition={{ duration: 1.9, repeat: Infinity, ease: "easeOut" }}
               >
                 {profileImg ? (
                   <img
@@ -373,7 +373,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                       width: isMobile ? 40 : 48,
                       height: isMobile ? 40 : 48,
                       border: `2px solid ${colors.primary300}`,
-                      boxShadow: `0 0 16px -2px ${colors.primary400}80`,
+                      boxShadow: `0 0 24px -1px ${colors.primary400}A0`,
                     }}
                   />
                 ) : (
@@ -385,7 +385,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                       fontSize: isMobile ? 14 : 16,
                       ...avatarPalette(fullName, isDark),
                       border: `2px solid ${colors.primary300}`,
-                      boxShadow: `0 0 16px -2px ${colors.primary400}80`,
+                      boxShadow: `0 0 24px -1px ${colors.primary400}A0`,
                     }}
                   >
                     {getInitials(fullName)}

@@ -27,10 +27,10 @@ export const useGlassSurface = (accent?: string): React.CSSProperties => {
       : `linear-gradient(135deg, rgba(255,255,255,0.46) 0%, rgba(250,251,255,0.30) 100%)`,
     backdropFilter: "blur(28px) saturate(190%)",
     WebkitBackdropFilter: "blur(28px) saturate(190%)",
-    border: isDark ? `1px solid ${glow}45` : `1px solid ${glow}35`,
+    border: isDark ? `1px solid ${glow}5A` : `1px solid ${glow}48`,
     boxShadow: isDark
-      ? `0 1px 0 rgba(255,255,255,0.06) inset, 0 28px 56px -18px rgba(0,0,0,0.6), 0 0 56px -10px ${glow}70`
-      : `0 1px 0 rgba(255,255,255,0.95) inset, 0 24px 52px -16px ${glow}55, 0 0 32px -6px ${glow}30, 0 4px 14px rgba(15,23,42,0.06)`,
+      ? `0 1px 0 rgba(255,255,255,0.08) inset, 0 32px 64px -18px rgba(0,0,0,0.65), 0 0 72px -8px ${glow}90`
+      : `0 1px 0 rgba(255,255,255,0.95) inset, 0 28px 60px -16px ${glow}70, 0 0 44px -4px ${glow}45, 0 4px 14px rgba(15,23,42,0.07)`,
   }), [isDark, glow, colors.neutral100, colors.neutral50]);
 };
 
@@ -38,8 +38,8 @@ export const useGlassSurface = (accent?: string): React.CSSProperties => {
  * KPI reads as luminous rather than flat black-on-white text. */
 export const glowTextShadow = (accent: string, isDark: boolean): string =>
   isDark
-    ? `0 0 32px ${accent}B0, 0 0 12px ${accent}90`
-    : `0 0 28px ${accent}70, 0 0 10px ${accent}50`;
+    ? `0 0 40px ${accent}D0, 0 0 18px ${accent}B0, 0 0 6px ${accent}90`
+    : `0 0 34px ${accent}90, 0 0 14px ${accent}70, 0 0 4px ${accent}50`;
 
 /** Slow-drifting blurred color blobs meant to sit behind a page's glass cards
  * (absolute, inset:0, z-index 0) — the vivid "aurora" a frosted panel needs
@@ -52,7 +52,7 @@ export const glowTextShadow = (accent: string, isDark: boolean): string =>
 export const AmbientAurora: React.FC<{ className?: string }> = ({ className = "" }) => {
   const colors = useColors();
   const { isDark } = useTheme();
-  const a = isDark ? "52" : "3D";
+  const a = isDark ? "68" : "52";
 
   interface Blob {
     color: string;
@@ -91,15 +91,43 @@ export const AmbientAurora: React.FC<{ className?: string }> = ({ className = ""
             height: b.size,
             borderRadius: "50%",
             background: `radial-gradient(circle, ${b.color}${a} 0%, transparent 70%)`,
-            filter: "blur(80px)",
+            filter: "blur(75px)",
           }}
-          animate={{ x: b.dx, y: b.dy }}
+          animate={{ x: b.dx, y: b.dy, scale: [1, 1.18, 0.94, 1] }}
           transition={{ duration: b.dur, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
     </div>
   );
 };
+
+/** A gradient accent bar with a continuously sweeping light streak — the
+ * "premium loading bar" topline used by every hero card, factored out so
+ * ViewAnalytics's own hand-rolled card (it predates the shared Card
+ * component) can use the exact same shimmer instead of a static bar. */
+export const ShimmerTopline: React.FC<{ color: string; color2?: string }> = ({ color, color2 }) => (
+  <div style={{ position: "relative", height: 3, overflow: "hidden", background: `${color}25` }}>
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: `linear-gradient(90deg, ${color}, ${color2 ?? color})`,
+        boxShadow: `0 0 16px ${color}A0`,
+      }}
+    />
+    <motion.div
+      style={{
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        width: "40%",
+        background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)`,
+      }}
+      animate={{ left: ["-40%", "140%"] }}
+      transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.4 }}
+    />
+  </div>
+);
 
 interface CardProps {
   children: React.ReactNode;
@@ -124,15 +152,7 @@ export const Card: React.FC<CardProps> = ({ children, className = "", hero = fal
       className={`rounded-2xl overflow-hidden relative ${className}`}
       style={hero ? glass : { background: colors.neutral0, border: `1.5px solid ${colors.neutral300}`, boxShadow: shadow }}
     >
-      {hero && (
-        <div
-          style={{
-            height: 3,
-            background: `linear-gradient(90deg, ${topline}, ${accent ?? colors.primary400})`,
-            boxShadow: `0 0 12px ${topline}80`,
-          }}
-        />
-      )}
+      {hero && <ShimmerTopline color={topline} color2={accent ?? colors.primary400} />}
       <div className={noPadding ? "" : "p-5 sm:p-6"}>{children}</div>
     </div>
   );
