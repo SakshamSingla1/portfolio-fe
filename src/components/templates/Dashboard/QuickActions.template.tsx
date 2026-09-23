@@ -12,7 +12,7 @@ import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { motion } from "framer-motion";
-import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
+import { useGlassSurface, glowTextShadow, useTilt, useMagnetic } from "./shared/DashboardUI";
 
 const QUICK_ACTIONS = [
   { label: "Project",       subLabel: "Add to portfolio",  icon: FaCode,          route: "/projects",       dot: "#8b5cf6", matchKey: "project" },
@@ -50,6 +50,8 @@ const QuickActionTile: React.FC<QuickActionTileProps> = ({ action, missing, inde
   const glass = useGlassSurface(action.dot);
   const iconGlow = glowTextShadow(action.dot, isDark);
   const Icon = action.icon;
+  const tilt = useTilt(6);
+  const magnet = useMagnetic(0.22, 7);
 
   return (
     <motion.button
@@ -71,7 +73,11 @@ const QuickActionTile: React.FC<QuickActionTileProps> = ({ action, missing, inde
         cursor: "pointer",
         outline: "none",
         transition: "border-color 0.2s, box-shadow 0.2s",
+        rotateX: tilt.rotateX,
+        rotateY: tilt.rotateY,
+        transformPerspective: 600,
       }}
+      onMouseMove={(e) => { tilt.onMouseMove(e); magnet.onMouseMove(e); }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLButtonElement;
         el.style.borderColor = `${action.dot}60`;
@@ -81,6 +87,8 @@ const QuickActionTile: React.FC<QuickActionTileProps> = ({ action, missing, inde
         const el = e.currentTarget as HTMLButtonElement;
         el.style.borderColor = missing ? `${action.dot}40` : colors.neutral300;
         el.style.boxShadow = glass.boxShadow as string;
+        tilt.onMouseLeave();
+        magnet.onMouseLeave();
       }}
     >
       {missing && (
@@ -93,7 +101,10 @@ const QuickActionTile: React.FC<QuickActionTileProps> = ({ action, missing, inde
         </div>
       )}
 
-      <div className="relative flex items-center justify-center" style={{ width: 44, height: 44 }}>
+      <motion.div
+        className="relative flex items-center justify-center"
+        style={{ width: 44, height: 44, x: magnet.x, y: magnet.y }}
+      >
         <div
           className="absolute inset-0 rounded-xl opacity-60 group-hover:opacity-100 transition-opacity duration-300 group-hover:scale-110"
           style={{
@@ -102,7 +113,7 @@ const QuickActionTile: React.FC<QuickActionTileProps> = ({ action, missing, inde
           }}
         />
         <Icon size={18} style={{ color: action.dot, position: "relative" }} className="transition-transform duration-200 group-hover:scale-110" />
-      </div>
+      </motion.div>
 
       <div className="mt-3 flex-1">
         <div

@@ -7,7 +7,7 @@ import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
 import { FaChrome, FaFirefoxBrowser, FaSafari, FaEdge, FaOpera, FaGoogle, FaLinkedin, FaGithub, FaTwitter, FaFacebook, FaInstagram, FaYoutube, FaRedditAlien } from "react-icons/fa";
-import { EmptyState, useGlassSurface, ShimmerTopline } from "./shared/DashboardUI";
+import { EmptyState, useGlassSurface, ShimmerTopline, useTilt } from "./shared/DashboardUI";
 import { TrendAreaChart, DeviceDonutChart, DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./AnalyticsCharts";
 import ViewsHeatmap from "./ViewsHeatmap";
 
@@ -822,6 +822,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
   const hasDeviceData    = Object.values(deviceBreakdown).some((c) => c > 0);
 
   const [activeDeviceKey, setActiveDeviceKey] = React.useState<string | null>(null);
+  const deviceTilt = useTilt(4);
 
   const hasAnyData = totalViews > 0 || recentViews.length > 0;
 
@@ -973,13 +974,17 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
             {}
             {hasDeviceData && (
-              <div style={panelStyle}>
+              <motion.div
+                style={{ ...panelStyle, rotateX: deviceTilt.rotateX, rotateY: deviceTilt.rotateY, transformPerspective: 800 }}
+                onMouseMove={deviceTilt.onMouseMove}
+                onMouseLeave={deviceTilt.onMouseLeave}
+              >
                 {panelLabel("Devices")}
                 <div className="flex flex-col gap-3">
                   <DeviceDonutChart breakdown={deviceBreakdown} activeKey={activeDeviceKey} onSliceHover={setActiveDeviceKey} />
                   <DeviceBreakdownList breakdown={deviceBreakdown} activeKey={activeDeviceKey} onHover={setActiveDeviceKey} />
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {}

@@ -6,7 +6,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
+import { useGlassSurface, glowTextShadow, useTilt } from "./shared/DashboardUI";
 import { FiCode, FiZap, FiBriefcase, FiMail, FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 
 interface StatsProps {
@@ -67,6 +67,7 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
   const { isDark } = useTheme();
   const animatedValue = useCountUp(value, index * 80 + 100);
   const navigate = useNavigate();
+  const tilt = useTilt(5);
 
   return (
     <motion.button
@@ -75,6 +76,8 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
       transition={{ delay: index * 0.07, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={{ y: -1 }}
       onClick={() => navigate(route)}
+      onMouseMove={tilt.onMouseMove}
+      onMouseLeave={tilt.onMouseLeave}
       className="group relative flex flex-col w-full text-left overflow-hidden"
       style={{
         padding: isMobile ? "20px 16px 18px" : "26px 24px 22px",
@@ -82,6 +85,9 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
         border: "none",
         cursor: "pointer",
         outline: "none",
+        rotateX: tilt.rotateX,
+        rotateY: tilt.rotateY,
+        transformPerspective: 700,
       }}
     >
       <div

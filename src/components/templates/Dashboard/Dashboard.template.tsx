@@ -15,7 +15,7 @@ import RecentMessagesTemplate from "./RecentMessages.template";
 import RecentActivitiesTemplate from "./RecentActivities.template";
 import QuickActionsTemplate from "./QuickActions.template";
 import MilestoneCelebration from "./MilestoneCelebration";
-import { Card, SectionLabel, SkeletonBlock, AmbientAurora, glowTextShadow } from "./shared/DashboardUI";
+import { Card, SectionLabel, SkeletonBlock, AmbientAurora, glowTextShadow, useTilt } from "./shared/DashboardUI";
 import LiveSiteControl from "../../molecules/LiveSiteControl/LiveSiteControl";
 
 interface DashboardTemplateProps {
@@ -36,6 +36,20 @@ const EMPTY_VIEW_STATS: IViewStats = {
   browserBreakdown: {},
   locationBreakdown: {},
   referrerBreakdown: {}
+};
+
+// Orchestrated page-load choreography: each section used to fade in on its
+// own hardcoded delay (independently timed, easy to drift out of sync as
+// sections were added/removed). A parent stagger container reads as one
+// continuous wave instead — add/remove a section and the rest re-times
+// itself automatically.
+const WAVE_CONTAINER = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
+};
+const WAVE_ITEM = {
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
 const getGreeting = (): string => {
@@ -226,6 +240,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   const isMobile = useIsMobile();
   const { user } = useContext(AuthenticatedUserContext);
   const navigate = useNavigate();
+  const headerTilt = useTilt(4);
 
   const fullName = dashboardData?.profileSummary?.fullName || user?.fullName || "";
   const profileTitle = dashboardData?.profileSummary?.title || "";
@@ -317,6 +332,9 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
         className="mb-5"
+        onMouseMove={headerTilt.onMouseMove}
+        onMouseLeave={headerTilt.onMouseLeave}
+        style={{ rotateX: headerTilt.rotateX, rotateY: headerTilt.rotateY, transformPerspective: 900 }}
       >
         <Card hero>
           <div className="flex items-center justify-between">
@@ -400,13 +418,9 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
       {!dashboardData ? (
         <Skeleton />
       ) : (
-        <div className="space-y-5">
+        <motion.div className="space-y-5" variants={WAVE_CONTAINER} initial="hidden" animate="visible">
 
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.05 }}
-          >
+          <motion.div variants={WAVE_ITEM}>
             <StatsTemplate stats={dashboardData.stats} />
           </motion.div>
 
@@ -415,9 +429,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             if (chips.length === 0) return null;
             return (
               <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.07 }}
+                variants={WAVE_ITEM}
                 className="flex items-center gap-2 flex-wrap"
               >
                 <span
@@ -438,26 +450,18 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             );
           })()}
 
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.08 }}
-          >
+          <motion.div variants={WAVE_ITEM}>
             <EngagementStrip
               viewStats={dashboardData.viewStats ?? EMPTY_VIEW_STATS}
               stats={dashboardData.stats}
             />
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.1 }}
-          >
+          <motion.div variants={WAVE_ITEM}>
             <ViewAnalyticsTemplate viewStats={dashboardData.viewStats ?? EMPTY_VIEW_STATS} />
           </motion.div>
 
-          <div className={`grid gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
+          <motion.div variants={WAVE_ITEM} className={`grid gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
 
             {/* Left column */}
             <div className={`space-y-5 ${isMobile ? "" : "col-span-7"}`}>
@@ -512,8 +516,8 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 </Card>
               </motion.div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
       </div>
     </div>
