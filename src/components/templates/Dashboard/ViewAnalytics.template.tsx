@@ -6,10 +6,11 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
-import { FaChrome, FaFirefoxBrowser, FaSafari, FaEdge, FaOpera, FaGoogle, FaLinkedin, FaGithub, FaTwitter, FaFacebook, FaInstagram, FaYoutube, FaRedditAlien } from "react-icons/fa";
 import { EmptyState, useGlassSurface, ShimmerTopline, useTilt } from "./shared/DashboardUI";
 import { TrendAreaChart, DeviceDonutChart, DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./AnalyticsCharts";
 import ViewsHeatmap from "./ViewsHeatmap";
+import { countryFlag, relTime, exactTime, COUNTRY_TO_CODE } from "../../../utils/analyticsFormat";
+import { BROWSER_COLORS, BROWSER_ICONS, LOC_PALETTE, getSourceColor, getSourceIcon } from "../Analytics/shared/breakdownPalette";
 
 interface ViewAnalyticsProps {
   viewStats: IViewStats | null | undefined;
@@ -30,38 +31,6 @@ const EMPTY_VIEW_STATS: IViewStats = {
   referrerBreakdown: {},
   recentViews: [],
 };
-
-
-const countryFlag = (cc?: string): string => {
-  if (!cc || cc.length !== 2) return "🌐";
-  return cc.toUpperCase().replace(/./g, (c) =>
-    String.fromCodePoint(c.charCodeAt(0) + 127397)
-  );
-};
-
-
-
-const relTime = (iso: string): string => {
-  const diff = Date.now() - new Date(iso).getTime();
-  const s = Math.floor(diff / 1000);
-  const m = Math.floor(s / 60);
-  const h = Math.floor(m / 60);
-  const d = Math.floor(h / 24);
-  if (s < 60)  return "just now";
-  if (m < 60)  return `${m}m ago`;
-  if (h < 24)  return `${h}h ago`;
-  if (d === 1) return "yesterday";
-  if (d < 30)  return `${d}d ago`;
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-};
-
-const exactTime = (iso: string): string => {
-  const d = new Date(iso);
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) +
-    "  " + d.toLocaleDateString([], { month: "short", day: "numeric" });
-};
-
-
 
 
 /** Bare-bones inline sparkline (no axes/grid) for filling the wide, otherwise-empty
@@ -243,23 +212,6 @@ const BreakdownBars: React.FC<{
 
 
 
-const BROWSER_COLORS: Record<string, string> = {
-  Chrome:  "#4285f4",
-  Firefox: "#ff6611",
-  Safari:  "#0070c9",
-  Edge:    "#0078d7",
-  Opera:   "#ff1b2d",
-  Other:   "#94a3b8",
-};
-
-const BROWSER_ICONS: Record<string, React.ReactNode> = {
-  Chrome:  <FaChrome size={11} />,
-  Firefox: <FaFirefoxBrowser size={11} />,
-  Safari:  <FaSafari size={11} />,
-  Edge:    <FaEdge size={11} />,
-  Opera:   <FaOpera size={11} />,
-};
-
 const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
   const sorted = Object.entries(breakdown)
     .sort((a, b) => b[1] - a[1])
@@ -279,19 +231,6 @@ const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ bre
   );
 };
 
-
-const COUNTRY_TO_CODE: Record<string, string> = {
-  "United States":"US","United Kingdom":"GB","India":"IN","Germany":"DE","France":"FR",
-  "Canada":"CA","Australia":"AU","Pakistan":"PK","Brazil":"BR","Japan":"JP","China":"CN",
-  "Russia":"RU","South Korea":"KR","Netherlands":"NL","Italy":"IT","Spain":"ES","Mexico":"MX",
-  "Indonesia":"ID","Turkey":"TR","Saudi Arabia":"SA","Poland":"PL","Sweden":"SE","Switzerland":"CH",
-  "Singapore":"SG","UAE":"AE","South Africa":"ZA","Nigeria":"NG","Egypt":"EG","Argentina":"AR",
-  "Colombia":"CO","Malaysia":"MY","Thailand":"TH","Vietnam":"VN","Philippines":"PH","Bangladesh":"BD",
-  "Ukraine":"UA","Portugal":"PT","Belgium":"BE","Austria":"AT","Denmark":"DK","New Zealand":"NZ",
-  "Ireland":"IE","Romania":"RO","Chile":"CL","Norway":"NO","Finland":"FI","Czech Republic":"CZ",
-  "Israel":"IL","Iran":"IR","Morocco":"MA","Ghana":"GH","Kenya":"KE",
-};
-const LOC_PALETTE = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444"];
 
 const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
   const colors = useColors();
@@ -342,48 +281,6 @@ const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ br
   );
 };
 
-
-const SOURCE_COLORS: Record<string, string> = {
-  Direct:    "#94a3b8",
-  google:    "#4285f4",
-  linkedin:  "#0a66c2",
-  github:    "#24292e",
-  twitter:   "#1d9bf0",
-  facebook:  "#1877f2",
-  instagram: "#e1306c",
-  youtube:   "#ff0000",
-  reddit:    "#ff4500",
-  bing:      "#00809d",
-};
-
-const getSourceColor = (src: string): string => {
-  if (src === "Direct") return SOURCE_COLORS.Direct;
-  const lower = src.toLowerCase();
-  for (const [key, color] of Object.entries(SOURCE_COLORS)) {
-    if (lower.includes(key)) return color;
-  }
-  return "#8b5cf6";
-};
-
-const SOURCE_ICONS: Record<string, React.ReactNode> = {
-  google:    <FaGoogle size={10} />,
-  linkedin:  <FaLinkedin size={11} />,
-  github:    <FaGithub size={11} />,
-  twitter:   <FaTwitter size={11} />,
-  facebook:  <FaFacebook size={11} />,
-  instagram: <FaInstagram size={11} />,
-  youtube:   <FaYoutube size={11} />,
-  reddit:    <FaRedditAlien size={11} />,
-};
-
-const getSourceIcon = (src: string): React.ReactNode | null => {
-  if (src === "Direct") return null;
-  const lower = src.toLowerCase();
-  for (const [key, icon] of Object.entries(SOURCE_ICONS)) {
-    if (lower.includes(key)) return icon;
-  }
-  return null;
-};
 
 const ReferrerBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
   const colors = useColors();
