@@ -5,7 +5,8 @@ import { useAuthenticatedUser } from "../hooks/useAuthenticatedUser";
 import type { ContactUs } from "./useContactUsService";
 
 export const DASHBOARD_URLS = {
-    DASHBOARD_SUMMARY: "/dashboard"
+    DASHBOARD_SUMMARY: "/dashboard",
+    VIEW_STATS: "/dashboard/view-stats"
 }
 
 export interface IProfileSummary {
@@ -96,6 +97,50 @@ export interface IDashboardSummary {
     recentActivities: IActivity[];
 }
 
+// ── Analytics Dashboard (dedicated /analytics page): date-range + comparison ──
+// Separate from IViewStats/IDashboardSummary above (which still power the home
+// Dashboard's fixed-window widget, unchanged) so the two can evolve independently.
+
+export type IAnalyticsRangeKey = "7d" | "30d" | "90d" | "custom";
+
+export interface IAnalyticsRangeParams {
+    range: IAnalyticsRangeKey;
+    startDate?: string; // yyyy-MM-dd, only used when range === "custom"
+    endDate?: string;
+}
+
+export interface IAnalyticsRange {
+    key: IAnalyticsRangeKey;
+    startDate: string;
+    endDate: string;
+    label: string;
+}
+
+export interface IMetricComparison {
+    current: number;
+    previous: number;
+    percentChange: number | null;
+}
+
+export interface IAnalyticsComparison {
+    views: IMetricComparison;
+    uniqueVisitors: IMetricComparison;
+    resumeDownloads: IMetricComparison;
+}
+
+export interface IAnalyticsOverview {
+    range: IAnalyticsRange;
+    comparison: IAnalyticsComparison;
+    trend: IDailyView[];
+    deviceBreakdown: Record<string, number>;
+    browserBreakdown: Record<string, number>;
+    locationBreakdown: Record<string, number>;
+    referrerBreakdown: Record<string, number>;
+    recentViews: IPortfolioView[];
+    // Always the trailing 90 days, independent of the selected range.
+    viewsHeatmap: IDailyView[];
+}
+
 export const useDashboardService = () => {
     const { user } = useAuthenticatedUser();
 
@@ -105,8 +150,14 @@ export const useDashboardService = () => {
             return request(API_METHOD.GET, url, user, null);
         };
 
+        const getViewStats = (params: IAnalyticsRangeParams) => {
+            const url = DASHBOARD_URLS.VIEW_STATS;
+            return request(API_METHOD.GET, url, user, null, { params });
+        };
+
         return {
             getByProfile,
+            getViewStats,
         };
     }, [user]);
 }
