@@ -66,6 +66,7 @@ const ProfilePage: React.FC = () => {
   const [digestEnabled, setDigestEnabled] = useState<boolean>(true);
   const [settingsSaving, setSettingsSaving] = useState<boolean>(false);
   const [embedCopied, setEmbedCopied] = useState<boolean>(false);
+  const [isExportingPdf, setIsExportingPdf] = useState<boolean>(false);
   const [emailCopyState, setEmailCopyState] = useState<"idle" | "copying" | "copied" | "error">("idle");
 
   const { data: profileData, isLoading } = useQuery({
@@ -133,15 +134,23 @@ const ProfilePage: React.FC = () => {
     document.body.removeChild(a);
   };
 
+  // The export endpoint renders a fresh PDF server-side on every hit (no XHR here to await, since
+  // this triggers a plain browser download via an anchor tag) -- that render is the single most
+  // memory-expensive thing the backend does, so a quick double-click used to be enough to stack two
+  // of those renders concurrently and OOM the instance. This cooldown keeps repeat clicks from
+  // firing overlapping requests; the backend also now rejects/serves-from-cache its own overlaps
+  // independently, this is just the first line of defense.
   const downloadPortfolioPdf = () => {
     const userName = profileData?.userName;
-    if (!userName) return;
+    if (!userName || isExportingPdf) return;
+    setIsExportingPdf(true);
     const a = document.createElement("a");
     a.href = `${API_BASE}/public/portfolio-export/${userName}`;
     a.download = `portfolio-${userName}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    setTimeout(() => setIsExportingPdf(false), 10000);
   };
 
   const embedSnippet = profileData?.userName
@@ -396,14 +405,16 @@ const ProfilePage: React.FC = () => {
 
                 <button
                   onClick={downloadPortfolioPdf}
+                  disabled={isExportingPdf}
                   style={{
                     width: "100%", padding: "8px 16px", borderRadius: 10,
                     background: colors.primary50, border: `1px solid ${colors.primary200}`,
                     color: colors.primary600, fontSize: 13, fontWeight: 600,
-                    cursor: "pointer",
+                    cursor: isExportingPdf ? "not-allowed" : "pointer",
+                    opacity: isExportingPdf ? 0.6 : 1,
                   }}
                 >
-                  Download PDF
+                  {isExportingPdf ? "Preparing PDF…" : "Download PDF"}
                 </button>
               </SectionCard>
 
