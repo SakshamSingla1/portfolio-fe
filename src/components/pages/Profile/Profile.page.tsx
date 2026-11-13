@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
-import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail, FiMapPin, FiSettings, FiCode } from "react-icons/fi";
+import { FiEdit, FiDownload, FiFile, FiGlobe, FiMail, FiMapPin, FiSettings, FiCode, FiLock } from "react-icons/fi";
 import { ADMIN_ROUTES, MODE } from "../../../utils/constant";
 import { getOptimizedImageUrl } from "../../../utils/helper";
 import { HTTP_STATUS, useColors } from "../../../utils/types";
@@ -65,6 +65,11 @@ const ProfilePage: React.FC = () => {
   const [isDiscoverable, setIsDiscoverable] = useState<boolean>(true);
   const [digestEnabled, setDigestEnabled] = useState<boolean>(true);
   const [settingsSaving, setSettingsSaving] = useState<boolean>(false);
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [hasAccessCode, setHasAccessCode] = useState<boolean>(false);
+  const [showAccessCodeForm, setShowAccessCodeForm] = useState<boolean>(false);
+  const [accessCodeInput, setAccessCodeInput] = useState<string>("");
+  const [accessCodeSaving, setAccessCodeSaving] = useState<boolean>(false);
   const [embedCopied, setEmbedCopied] = useState<boolean>(false);
   const [isExportingPdf, setIsExportingPdf] = useState<boolean>(false);
   const [emailCopyState, setEmailCopyState] = useState<"idle" | "copying" | "copied" | "error">("idle");
@@ -106,6 +111,8 @@ const ProfilePage: React.FC = () => {
     if (profileData) {
       setIsDiscoverable((profileData as any).isDiscoverable ?? true);
       setDigestEnabled((profileData as any).digestEmailEnabled ?? true);
+      setIsPrivate((profileData as any).visibility === "PRIVATE");
+      setHasAccessCode((profileData as any).hasAccessCode ?? false);
     }
   }, [profileData]);
 
@@ -120,6 +127,52 @@ const ProfilePage: React.FC = () => {
       showSnackbar("error", "Failed to update setting");
     } finally {
       setSettingsSaving(false);
+    }
+  };
+
+  // Turning PRIVATE on requires an access code to already exist (the backend rejects it
+  // otherwise, since there'd be no way for anyone -- including the owner -- to get past the
+  // gate). If none is set yet, this opens the access-code form instead of saving immediately;
+  // the form's own submit handler flips visibility to PRIVATE once the code is saved.
+  const handlePrivacyToggle = async (nextPrivate: boolean) => {
+    if (nextPrivate && !hasAccessCode) {
+      setShowAccessCodeForm(true);
+      return;
+    }
+    setSettingsSaving(true);
+    try {
+      await profileService.updateSettings({ visibility: nextPrivate ? "PRIVATE" : "PUBLIC" });
+      setIsPrivate(nextPrivate);
+      showSnackbar("success", nextPrivate ? "Portfolio is now private" : "Portfolio is now public");
+    } catch {
+      showSnackbar("error", "Failed to update visibility");
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const handleSaveAccessCode = async () => {
+    if (accessCodeInput.trim().length < 4) {
+      showSnackbar("error", "Access code must be at least 4 characters");
+      return;
+    }
+    setAccessCodeSaving(true);
+    try {
+      await profileService.setAccessCode({ accessCode: accessCodeInput.trim() });
+      setHasAccessCode(true);
+      setAccessCodeInput("");
+      setShowAccessCodeForm(false);
+      // First-time setup (opened from the privacy toggle, visibility still PUBLIC) also
+      // turns privacy on right away so the owner doesn't have to flip the toggle a second time.
+      if (!isPrivate) {
+        await profileService.updateSettings({ visibility: "PRIVATE" });
+        setIsPrivate(true);
+      }
+      showSnackbar("success", "Access code saved");
+    } catch {
+      showSnackbar("error", "Failed to save access code");
+    } finally {
+      setAccessCodeSaving(false);
     }
   };
 
@@ -345,6 +398,79 @@ const ProfilePage: React.FC = () => {
                       background: "#fff", transition: "left 0.2s",
                     }} />
                   </button>
+                </div>
+
+                <div className="py-3" style={{ borderBottom: `1px solid ${colors.neutral100}` }}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FiLock style={{ color: colors.primary500 }} />
+                      <div>
+                        <p className="text-sm font-medium" style={{ color: colors.neutral800 }}>Private Portfolio</p>
+                        <p className="text-xs" style={{ color: colors.neutral500 }}>Require an access code before anyone can view your public portfolio</p>
+                      </div>
+                    </div>
+                    <button
+                      disabled={settingsSaving}
+                      onClick={() => handlePrivacyToggle(!isPrivate)}
+                      role="switch"
+                      aria-checked={isPrivate}
+                      aria-label="Private Portfolio"
+                      style={{
+                        width: 44, height: 24, borderRadius: 12,
+                        background: isPrivate ? colors.primary500 : colors.neutral300,
+                        border: "none", cursor: "pointer", position: "relative",
+                        transition: "background 0.2s", flexShrink: 0,
+                      }}
+                    >
+                      <span style={{
+                        position: "absolute", top: 3,
+                        left: isPrivate ? 22 : 3,
+                        width: 18, height: 18, borderRadius: "50%",
+                        background: "#fff", transition: "left 0.2s",
+                      }} />
+                    </button>
+                  </div>
+
+                  {hasAccessCode && !showAccessCodeForm && (
+                    <button
+                      onClick={() => setShowAccessCodeForm(true)}
+                      className="mt-2 text-xs font-medium"
+                      style={{ color: colors.primary600, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                    >
+                      Change access code
+                    </button>
+                  )}
+
+                  {showAccessCodeForm && (
+                    <div className="mt-3 flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="text"
+                        value={accessCodeInput}
+                        onChange={(e) => setAccessCodeInput(e.target.value)}
+                        placeholder="New access code (min. 4 characters)"
+                        className="flex-1 text-sm rounded-lg px-3 py-2"
+                        style={{ border: `1px solid ${colors.neutral200}`, color: colors.neutral800 }}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          disabled={accessCodeSaving}
+                          onClick={handleSaveAccessCode}
+                          className="text-xs font-semibold rounded-lg px-4 py-2"
+                          style={{ background: colors.primary500, color: "#fff", border: "none", cursor: "pointer", opacity: accessCodeSaving ? 0.6 : 1 }}
+                        >
+                          {accessCodeSaving ? "Saving…" : "Save code"}
+                        </button>
+                        <button
+                          disabled={accessCodeSaving}
+                          onClick={() => { setShowAccessCodeForm(false); setAccessCodeInput(""); }}
+                          className="text-xs font-semibold rounded-lg px-4 py-2"
+                          style={{ background: colors.neutral100, color: colors.neutral600, border: "none", cursor: "pointer" }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-3">

@@ -9,6 +9,7 @@ export const PROFILE_URLS = {
     GET_BY_ID: "/profile",
     GET_ALL: "/profile",
     PATCH_SETTINGS: "/profile/settings",
+    PUT_ACCESS_CODE: "/profile/access-code",
 
     // Uploads (kept for reference — upload functions use useFileService directly)
     UPLOAD_PROFILE_IMAGE: "/profile/upload/profile-image",
@@ -118,6 +119,11 @@ export interface BulkUserIdsRequest {
 export interface ProfileSettingsRequest {
     isDiscoverable?: boolean;
     digestEmailEnabled?: boolean;
+    visibility?: "PUBLIC" | "PRIVATE";
+}
+
+export interface ProfileAccessCodeRequest {
+    accessCode: string;
 }
 
 export interface GetProfilesParams {
@@ -145,6 +151,10 @@ export const useProfileService = () => {
 
         const updateSettings = (settings: ProfileSettingsRequest) => {
             return request(API_METHOD.PATCH, PROFILE_URLS.PATCH_SETTINGS, user, settings);
+        };
+
+        const setAccessCode = (body: ProfileAccessCodeRequest) => {
+            return request(API_METHOD.PUT, PROFILE_URLS.PUT_ACCESS_CODE, user, body);
         };
 
         const uploadProfileImage = (file: File) =>
@@ -218,6 +228,7 @@ export const useProfileService = () => {
             get,
             update,
             updateSettings,
+            setAccessCode,
             uploadProfileImage,
             uploadLogo,
             uploadAboutMeImage,
