@@ -10,6 +10,7 @@ import AutoCompleteInput from "../../atoms/AutoCompleteInput/AutoCompleteInput";
 import Chip from "../../atoms/Chip/Chip";
 import ImageUpload from "../../atoms/ImageUpload/ImageUpload";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+import AiAssistButton from "../../molecules/AiAssistButton/AiAssistButton";
 import { MODE, ADMIN_ROUTES } from "../../../utils/constant";
 import { isRichTextEmpty, titleModification } from "../../../utils/helper";
 import { HTTP_STATUS } from "../../../utils/types";
@@ -518,6 +519,16 @@ const ProjectFormTemplate = ({ onSubmit, mode, projects }: ProjectFormProps) => 
                         <div className="w-2 h-2 bg-pink-500 rounded-full mr-3" />
                         Project Description
                     </h3>
+
+                    {mode !== MODE.VIEW && (
+                        <div className="flex justify-end mb-2">
+                            <AiAssistButton
+                                contentType="PROJECT_DESCRIPTION"
+                                promptPlaceholder="e.g. a React + Node.js dashboard for tracking team OKRs, real-time updates via websockets, used by 50+ people internally"
+                                onInsert={(draft) => formik.setFieldValue("projectDescription", `<p>${draft}</p>`)}
+                            />
+                        </div>
+                    )}
 
                     <RichTextEditor
                         label="Project Description"

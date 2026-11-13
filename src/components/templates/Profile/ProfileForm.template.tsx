@@ -14,6 +14,7 @@ import DocumentUpload from "../../atoms/DocumentUpload/DocumentUpload";
 import { useResumeService, type DocumentUploadResponse, type ResumeSearchParams } from "../../../services/useResumeService";
 import { usePublicResumeService } from "../../../services/usePublicResumeService";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+import AiAssistButton from "../../molecules/AiAssistButton/AiAssistButton";
 
 export const SectionCard = ({ title, subtitle, icon: Icon, actions, children, }: {
   title: string;
@@ -445,6 +446,15 @@ const ProfileFormTemplate: React.FC<ProfileFormProps> = ({
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
+            {isEditMode && (
+              <div className="flex justify-end mb-2">
+                <AiAssistButton
+                  contentType="BIO"
+                  promptPlaceholder="e.g. backend engineer, 5 years experience with Java and Spring, led a team of 3, passionate about clean architecture"
+                  onInsert={(draft) => setFieldValue("aboutMe", `<p>${draft}</p>`)}
+                />
+              </div>
+            )}
             <RichTextEditor
               label="About Me"
               placeholder="Tell about yourself"

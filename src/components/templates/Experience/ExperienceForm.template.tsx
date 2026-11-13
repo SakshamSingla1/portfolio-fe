@@ -14,6 +14,7 @@ import { HTTP_STATUS } from "../../../utils/types";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import RichTextEditor from "../../molecules/RichTextEditor/RichTextEditor";
+import AiAssistButton from "../../molecules/AiAssistButton/AiAssistButton";
 import { useColors } from "../../../utils/types";
 import FormShell from "../Shared/FormShell.template";
 import { employmentStatusOptions } from "./ExperienceForm.constants";
@@ -298,6 +299,15 @@ const ExperienceFormTemplate: React.FC<ExperienceFormProps> = ({ onSubmit, mode,
                             <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.warning500 }} />
                             Job Description
                         </h3>
+                        {mode !== MODE.VIEW && (
+                            <div className="flex justify-end mb-2">
+                                <AiAssistButton
+                                    contentType="EXPERIENCE_DESCRIPTION"
+                                    promptPlaceholder="e.g. led backend development for a payments platform, migrated monolith to microservices, mentored 2 junior engineers"
+                                    onInsert={(draft) => setFieldValue("description", `<p>${draft.replace(/\n/g, "</p><p>")}</p>`)}
+                                />
+                            </div>
+                        )}
                         <RichTextEditor
                             value={formik.values.description}
                             onChange={handleDescriptionChange}
