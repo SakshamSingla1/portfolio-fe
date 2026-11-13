@@ -4,7 +4,7 @@ import { LuGraduationCap, LuFolderKanban, LuAward, LuShieldCheck } from "react-i
 import {
     TbCode, TbUser, TbMessageChatbot, TbBell, TbSettings, TbLink, TbShare, TbLayoutDashboard,
     TbUsers, TbHelp, TbIcons, TbBrowser, TbChartBar, TbArticle, TbLanguage, TbBriefcase,
-    TbBrandGithub, TbFileText, TbLayoutGrid,
+    TbBrandGithub, TbFileText, TbLayoutGrid, TbNotebook,
 } from "react-icons/tb";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { CgFileDocument } from "react-icons/cg";
@@ -42,6 +42,7 @@ const NAV_ICON_MAP: Record<string, React.ReactElement> = {
     PUBLICATIONS: <TbFileText />,
     TESTIMONIAL_REQUESTS: <TbLink />,
     LANDING_MANAGEMENT: <TbBrowser />,
+    GUESTBOOK: <TbNotebook />,
 };
 
 export const getIconForNavItem = (itemName: string): React.ReactElement =>

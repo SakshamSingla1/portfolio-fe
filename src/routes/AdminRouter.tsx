@@ -37,6 +37,7 @@ const ServiceRoutes = lazy(() => import('./AdminRoutes/ServiceRoutes'));
 const GithubIntegrationRoutes = lazy(() => import('./AdminRoutes/GithubIntegrationRoutes'));
 const TestimonialRequestRoutes = lazy(() => import('./AdminRoutes/TestimonialRequestRoutes'));
 const PublicationRoutes = lazy(() => import('./AdminRoutes/PublicationRoutes'));
+const GuestbookRoutes = lazy(() => import('./AdminRoutes/GuestbookRoutes'));
 
 export const AdminRouter: React.FC = () => {
   const { showSnackbar } = useSnackbar();
@@ -88,6 +89,7 @@ export const AdminRouter: React.FC = () => {
           <Route path="projects/*" element={<div><ProjectRoutes /></div>} />
           <Route path="skills/*" element={<div><SkillRoutes /></div>} />
           <Route path="messages/*" element={<div><ContactUsRoutes /></div>} />
+          <Route path="guestbook/*" element={<div><GuestbookRoutes /></div>} />
           <Route path="settings/*" element={<div><SettingRoutes /></div>} />
           <Route path="navlinks/*" element={<div><NavLinkRoutes /></div>} />
           <Route path="themes/*" element={<div><ColorThemeRoutes /></div>} />
