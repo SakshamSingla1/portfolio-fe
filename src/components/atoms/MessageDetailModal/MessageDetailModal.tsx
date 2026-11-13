@@ -1,13 +1,12 @@
-import React, { useState } from "react";
-import { type ContactUs, useContactUsService } from "../../../services/useContactUsService";
+import React, { useEffect, useState } from "react";
+import { type ContactMessage, type ContactThread, type ContactUs, useContactUsService } from "../../../services/useContactUsService";
 import { DateUtils, enumToNormalKey } from "../../../utils/helper";
-import { FiSend, FiCheckCircle } from "react-icons/fi";
+import { FiSend } from "react-icons/fi";
 import TextField from "../../atoms/TextField/TextField";
 import { useColors } from "../../../utils/types";
 import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
 import { useSnackbar } from "../../../hooks/useSnackBar";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface MessageDetailModalProps {
     message: ContactUs;
@@ -26,7 +25,28 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
 
     const [replyText, setReplyText] = useState("");
     const [sending, setSending] = useState(false);
-    const [replied, setReplied] = useState(!!message.replyMessage);
+    const [thread, setThread] = useState<ContactThread | null>(null);
+    const [threadLoading, setThreadLoading] = useState(true);
+
+    // The thread view replaces the old single-reply layout: previously, once the owner sent one
+    // reply, the reply box disappeared for good (no way to send a second one, and no way to see
+    // a visitor's follow-up). Fetching the full thread here shows every message, in order, and
+    // always keeps the reply box available.
+    useEffect(() => {
+        if (!message.id) {
+            setThreadLoading(false);
+            return;
+        }
+        let cancelled = false;
+        contactService.getThread(message.id).then((res) => {
+            if (cancelled) return;
+            setThread(res?.data?.data ?? null);
+            setThreadLoading(false);
+        }).catch(() => {
+            if (!cancelled) setThreadLoading(false);
+        });
+        return () => { cancelled = true; };
+    }, [message.id, contactService]);
 
     const handleSendReply = async () => {
         if (!replyText.trim() || !message.id) return;
@@ -34,7 +54,15 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
             setSending(true);
             const res = await contactService.reply(message.id, replyText.trim());
             const updated: ContactUs = res?.data?.data ?? { ...message, replyMessage: replyText, status: "REPLIED" };
-            setReplied(true);
+            setThread((prev) => prev && {
+                ...prev,
+                messages: [...prev.messages, {
+                    id: Date.now(),
+                    senderType: "OWNER",
+                    message: replyText.trim(),
+                    createdAt: new Date().toISOString(),
+                }],
+            });
             setReplyText("");
             showSnackbar("success", "Reply sent successfully");
             onReplied?.(updated);
@@ -71,15 +99,13 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
             footer={
                 <>
                     <Button onClick={onClose} label="Close" variant="tertiaryContained" />
-                    {!replied && !message.replyMessage && (
-                        <Button
-                            label={sending ? "Sending…" : "Send Reply"}
-                            variant="primaryContained"
-                            startIcon={<FiSend size={14} />}
-                            disabled={sending || !replyText.trim()}
-                            onClick={handleSendReply}
-                        />
-                    )}
+                    <Button
+                        label={sending ? "Sending…" : "Send Reply"}
+                        variant="primaryContained"
+                        startIcon={<FiSend size={14} />}
+                        disabled={sending || !replyText.trim()}
+                        onClick={handleSendReply}
+                    />
                 </>
             }
         >
@@ -109,70 +135,51 @@ const MessageDetailModal: React.FC<MessageDetailModalProps> = ({
 
                     <div>
                         <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: colors.neutral600 }}>
-                            Message
+                            Conversation
                         </p>
-                        <div
-                            className="rounded-2xl p-6 text-sm leading-relaxed whitespace-pre-wrap"
-                            style={{
-                                backgroundColor: colors.neutral50,
-                                border: `1.5px solid ${colors.neutral300}`,
-                                color: colors.neutral800,
-                                boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)",
-                            }}
-                        >
-                            {message.message}
-                        </div>
+                        {threadLoading && (
+                            <p className="text-sm" style={{ color: colors.neutral500 }}>Loading…</p>
+                        )}
+                        {!threadLoading && (
+                            <div className="flex flex-col gap-3">
+                                {(thread?.messages ?? []).map((m: ContactMessage) => {
+                                    const isOwner = m.senderType === "OWNER";
+                                    return (
+                                        <div key={m.id} className="flex" style={{ justifyContent: isOwner ? "flex-end" : "flex-start" }}>
+                                            <div
+                                                className="max-w-[80%] rounded-2xl px-5 py-3 text-sm leading-relaxed whitespace-pre-wrap"
+                                                style={{
+                                                    backgroundColor: isOwner ? `${colors.primary500}12` : colors.neutral50,
+                                                    border: `1.5px solid ${isOwner ? `${colors.primary500}30` : colors.neutral300}`,
+                                                    color: colors.neutral800,
+                                                }}
+                                            >
+                                                {m.message}
+                                                <p className="text-[11px] mt-1" style={{ color: colors.neutral400 }}>
+                                                    {isOwner ? "You" : message.name} · {DateUtils.formatDateTimeToDateMonthYear(m.createdAt)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
-                    <AnimatePresence>
-                        {(replied || message.replyMessage) && (
-                            <motion.div
-                                key="previous-reply"
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.25 }}
-                            >
-                                <div className="flex items-center gap-2 mb-3">
-                                    <FiCheckCircle size={14} style={{ color: colors.success600 }} />
-                                    <p className="text-sm font-semibold tracking-wide uppercase" style={{ color: colors.success600 }}>
-                                        Reply Sent
-                                    </p>
-                                    {message.repliedAt && (
-                                        <span className="text-xs" style={{ color: colors.neutral400 }}>
-                                            · {DateUtils.formatDateTimeToDateMonthYear(message.repliedAt)}
-                                        </span>
-                                    )}
-                                </div>
-                                <div
-                                    className="rounded-2xl p-5 text-sm leading-relaxed whitespace-pre-wrap"
-                                    style={{
-                                        backgroundColor: `${colors.success600}08`,
-                                        border: `1.5px solid ${colors.success600}20`,
-                                        color: colors.neutral800,
-                                    }}
-                                >
-                                    {message.replyMessage}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {!replied && !message.replyMessage && (
-                        <div>
-                            <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: colors.neutral600 }}>
-                                Send Reply
-                            </p>
-                            <TextField
-                                label={`Reply to ${message.name}`}
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                multiline
-                                rows={4}
-                                fullWidth
-                                disabled={sending}
-                            />
-                        </div>
-                    )}
+                    <div>
+                        <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: colors.neutral600 }}>
+                            Send Reply
+                        </p>
+                        <TextField
+                            label={`Reply to ${message.name}`}
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            multiline
+                            rows={4}
+                            fullWidth
+                            disabled={sending}
+                        />
+                    </div>
                 </div>
             </div>
         </Modal>

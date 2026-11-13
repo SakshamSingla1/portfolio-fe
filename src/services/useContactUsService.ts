@@ -9,7 +9,22 @@ export const CONTACT_US_URLS = {
     MARK_AS_READ: "/contact-us/:id/mark-read",
     MARK_AS_READ_BULK: "/contact-us/mark-read-bulk",
     REPLY: "/contact-us/:id/reply",
+    THREAD: "/contact-us/:id/thread",
 };
+
+export interface ContactMessage {
+    id: number;
+    senderType: "VISITOR" | "OWNER";
+    message: string;
+    createdAt: string;
+}
+
+export interface ContactThread {
+    contactUsId: number;
+    visitorName: string;
+    profileName: string;
+    messages: ContactMessage[];
+}
 
 export interface ContactUs {
     id?: number | null;
@@ -62,11 +77,17 @@ export const useContactUsService = () => {
             return request(API_METHOD.POST, url, user, { message });
         };
 
+        const getThread = (id: number) => {
+            const url = replaceUrlParams(CONTACT_US_URLS.THREAD, { id });
+            return request(API_METHOD.GET, url, user);
+        };
+
         return {
             getByProfile,
             markAsRead,
             markAsReadBulk,
             reply,
+            getThread,
         };
     }, [user]);
 };
