@@ -425,8 +425,9 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
         </div>
       )}
 
-      {/* Section grid — 3 columns of glassmorphic status pills */}
-      <div className="mt-6 w-full grid grid-cols-3 gap-3">
+      {/* Section grid — 2 columns so the 10 sections fill 5 even rows (3 columns
+          left an orphaned last row with a lone, truncated "Choose a Template" pill) */}
+      <div className="mt-6 w-full grid grid-cols-2 gap-3">
         {segments.map((seg) => {
           const route = SECTION_ROUTES[seg.key];
           const isClickable = !seg.complete && !!route;

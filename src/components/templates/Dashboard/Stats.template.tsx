@@ -253,18 +253,15 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
           })}
         </div>
       ) : (
+        // No vertical dividers here (unlike the 4-up hero row above): 4 and 5
+        // columns can't share divider positions, so lines would visibly fail
+        // to line up. Even spacing alone keeps each stat legible without implying
+        // a grid that doesn't match the row above it.
         <div className="grid grid-cols-5">
           {SECONDARY_STATS.map((s, i) => {
             const { key: statKey, ...statProps } = s;
             const value = (stats as any)?.[statKey] ?? 0;
-            return (
-              <div
-                key={s.label}
-                style={{ borderRight: i < SECONDARY_STATS.length - 1 ? `1.5px solid ${colors.neutral300}` : "none" }}
-              >
-                <SecondaryStatCell {...statProps} value={value} index={i} />
-              </div>
-            );
+            return <SecondaryStatCell key={s.label} {...statProps} value={value} index={i} />;
           })}
         </div>
       )}
