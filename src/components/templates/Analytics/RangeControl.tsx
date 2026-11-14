@@ -1,5 +1,6 @@
 import React from "react";
 import dayjs, { type Dayjs } from "dayjs";
+import { FiCalendar } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import DatePicker from "../../atoms/DatePicker/DatePicker";
@@ -30,6 +31,7 @@ const RangeControl: React.FC<RangeControlProps> = ({ value, onChange }) => {
 
   return (
     <div className={`flex items-center gap-2 ${isMobile ? "flex-wrap" : ""}`}>
+      <FiCalendar size={13} className="shrink-0" style={{ color: colors.neutral400 }} />
       <div className="inline-flex rounded-lg overflow-hidden shrink-0" style={{ border: `1px solid ${colors.neutral300}` }}>
         {PRESETS.map((p) => (
           <button

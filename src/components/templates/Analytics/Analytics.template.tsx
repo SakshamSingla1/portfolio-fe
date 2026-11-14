@@ -32,13 +32,54 @@ const AnalyticsTemplate: React.FC<AnalyticsTemplateProps> = ({
   const colors = useColors();
   const isMobile = useIsMobile();
 
-  const schema: ITabsSchema[] = overview
-    ? [
-        { value: "overview", label: "Overview", component: <OverviewPanel overview={overview} /> },
-        { value: "visitors", label: "Visitors", component: <VisitorsPanel overview={overview} /> },
-        { value: "activity", label: "Activity", component: <ActivityPanel viewsHeatmap={overview.viewsHeatmap} /> },
-      ]
-    : [];
+  const showSkeleton = isLoading || !overview;
+
+  // The tab strip itself doesn't depend on data -- keeping it visible and
+  // swapping only the inner content avoids the whole page (nav included)
+  // popping in abruptly once the fetch resolves.
+  const overviewSkeleton = (
+    <div className="flex flex-col gap-4">
+      <SkeletonBlock height={120} />
+      <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
+        <div className={isMobile ? "" : "col-span-8"}><SkeletonBlock height={280} /></div>
+        <div className={isMobile ? "" : "col-span-4"}><SkeletonBlock height={280} /></div>
+      </div>
+    </div>
+  );
+  const visitorsSkeleton = (
+    <div className="flex flex-col gap-4">
+      <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
+        <SkeletonBlock height={180} />
+        <SkeletonBlock height={180} />
+      </div>
+      <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
+        <SkeletonBlock height={160} />
+        <SkeletonBlock height={160} />
+      </div>
+      <SkeletonBlock height={300} />
+    </div>
+  );
+  const activitySkeleton = (
+    <div className="flex flex-col gap-4">
+      <SkeletonBlock height={100} />
+      <SkeletonBlock height={420} />
+    </div>
+  );
+
+  const schema: ITabsSchema[] = [
+    {
+      value: "overview", label: "Overview",
+      component: showSkeleton ? overviewSkeleton : <OverviewPanel overview={overview as IAnalyticsOverview} />,
+    },
+    {
+      value: "visitors", label: "Visitors",
+      component: showSkeleton ? visitorsSkeleton : <VisitorsPanel overview={overview as IAnalyticsOverview} />,
+    },
+    {
+      value: "activity", label: "Activity",
+      component: showSkeleton ? activitySkeleton : <ActivityPanel viewsHeatmap={(overview as IAnalyticsOverview).viewsHeatmap} />,
+    },
+  ];
 
   return (
     <div style={{ padding: isMobile ? "12px 10px 24px" : "16px 16px 24px" }}>
@@ -71,17 +112,7 @@ const AnalyticsTemplate: React.FC<AnalyticsTemplateProps> = ({
         </div>
       </div>
 
-      {isLoading || !overview ? (
-        <div className="flex flex-col gap-4">
-          <SkeletonBlock height={100} />
-          <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
-            <div className={isMobile ? "" : "col-span-8"}><SkeletonBlock height={280} /></div>
-            <div className={isMobile ? "" : "col-span-4"}><SkeletonBlock height={280} /></div>
-          </div>
-        </div>
-      ) : (
-        <Tabs schema={schema} value={activeTab} setValue={onTabChange} />
-      )}
+      <Tabs schema={schema} value={activeTab} setValue={onTabChange} />
     </div>
   );
 };

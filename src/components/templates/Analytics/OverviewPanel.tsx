@@ -1,9 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FiEye, FiUsers, FiDownload, FiBarChart2 } from "react-icons/fi";
+import { FiEye, FiUsers, FiDownload, FiBarChart2, FiTrendingUp, FiTrendingDown, FiMinus } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 import { useIsMobile } from "../../../hooks/useIsMobile";
-import type { IAnalyticsOverview } from "../../../services/useDashboardService";
+import type { IAnalyticsOverview, IMetricComparison } from "../../../services/useDashboardService";
 import { Panel, MetricTile } from "./shared/AnalyticsSurface";
 import { FlatTrendChart, FlatDeviceBreakdown } from "./FlatCharts";
 import { DeviceDonutChart } from "../Dashboard/AnalyticsCharts";
@@ -12,6 +12,32 @@ import { EmptyState } from "../Dashboard/shared/DashboardUI";
 interface OverviewPanelProps {
   overview: IAnalyticsOverview;
 }
+
+// Turns the three comparison numbers into one plain-language takeaway instead
+// of leaving the reader to mentally combine three separate delta chips.
+const buildInsight = (
+  comparison: { views: IMetricComparison; uniqueVisitors: IMetricComparison; resumeDownloads: IMetricComparison },
+  rangeLabel: string
+): { text: string; tone: "up" | "down" | "flat" | "none" } => {
+  const { views, uniqueVisitors, resumeDownloads } = comparison;
+  if (views.percentChange === null) {
+    return { text: `No prior period to compare against yet for ${rangeLabel.toLowerCase()}.`, tone: "none" };
+  }
+  const deltas = [views.percentChange, uniqueVisitors.percentChange, resumeDownloads.percentChange].filter(
+    (d): d is number => d !== null
+  );
+  const allUp = deltas.every((d) => d > 0);
+  const allDown = deltas.every((d) => d < 0);
+
+  if (allUp) {
+    return { text: `Every metric improved vs. the prior period — views led at +${views.percentChange}%.`, tone: "up" };
+  }
+  if (allDown) {
+    return { text: `Views, visitors, and downloads all dipped vs. the prior period.`, tone: "down" };
+  }
+  const sign = views.percentChange >= 0 ? "up" : "down";
+  return { text: `Views are ${sign} ${Math.abs(views.percentChange)}% vs. the prior period, a mixed picture across metrics.`, tone: "flat" };
+};
 
 const WAVE_CONTAINER = {
   hidden: {},
@@ -27,6 +53,9 @@ const OverviewPanel: React.FC<OverviewPanelProps> = ({ overview }) => {
   const colors = useColors();
   const { comparison, trend, deviceBreakdown, range } = overview;
   const hasDeviceData = Object.values(deviceBreakdown).some((c) => c > 0);
+  const insight = buildInsight(comparison, range.label);
+  const insightColor = insight.tone === "up" ? colors.success600 : insight.tone === "down" ? colors.error600 : colors.neutral500;
+  const InsightIcon = insight.tone === "up" ? FiTrendingUp : insight.tone === "down" ? FiTrendingDown : FiMinus;
 
   return (
     <motion.div className="flex flex-col gap-4" variants={WAVE_CONTAINER} initial="hidden" animate="visible">
@@ -54,6 +83,15 @@ const OverviewPanel: React.FC<OverviewPanelProps> = ({ overview }) => {
               current={comparison.resumeDownloads.current}
               percentChange={comparison.resumeDownloads.percentChange}
             />
+          </div>
+          <div
+            className="flex items-center gap-1.5 px-4 py-2.5"
+            style={{ borderTop: `1px solid ${colors.neutral100}` }}
+          >
+            <InsightIcon size={11} style={{ color: insightColor, flexShrink: 0 }} />
+            <span className="text-[11px] font-medium" style={{ color: colors.neutral500 }}>
+              {insight.text}
+            </span>
           </div>
         </Panel>
       </motion.div>

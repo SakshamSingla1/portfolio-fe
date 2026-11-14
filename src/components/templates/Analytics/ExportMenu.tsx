@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiDownload, FiChevronDown } from "react-icons/fi";
+import { FiDownload, FiChevronDown, FiFileText, FiCode } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 import { exportToCsv } from "../../../utils/csvExport";
 import { exportToJson } from "../../../utils/jsonExport";
@@ -68,14 +68,14 @@ const ExportMenu: React.FC<ExportMenuProps> = ({ recentViews, rangeLabel }) => {
         >
           <button
             onClick={() => { exportToCsv(filenameBase, flattenViews(recentViews)); setOpen(false); }}
-            className="w-full text-left px-3 py-2 text-[11px] font-semibold"
+            className="w-full flex items-center gap-2 text-left px-3 py-2 text-[11px] font-semibold"
             style={{ background: "transparent", border: "none", color: colors.neutral700, cursor: "pointer" }}
           >
-            Export as CSV
+            <FiFileText size={12} style={{ color: colors.neutral400 }} /> Export as CSV
           </button>
           <button
             onClick={() => { exportToJson(filenameBase, flattenViews(recentViews)); setOpen(false); }}
-            className="w-full text-left px-3 py-2 text-[11px] font-semibold"
+            className="w-full flex items-center gap-2 text-left px-3 py-2 text-[11px] font-semibold"
             style={{
               background: "transparent",
               border: "none",
@@ -84,7 +84,7 @@ const ExportMenu: React.FC<ExportMenuProps> = ({ recentViews, rangeLabel }) => {
               cursor: "pointer",
             }}
           >
-            Export as JSON
+            <FiCode size={12} style={{ color: colors.neutral400 }} /> Export as JSON
           </button>
         </div>
       )}
