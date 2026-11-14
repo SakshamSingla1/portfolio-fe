@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { FiGlobe, FiLink, FiClock, FiChevronDown, FiChevronUp, FiMonitor, FiSmartphone, FiTablet } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -34,6 +35,19 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
   const peakHour = hours.indexOf(Math.max(...hours));
   const fmt = (h: number) => (h === 0 ? "12AM" : h === 12 ? "12PM" : h < 12 ? `${h}AM` : `${h - 12}PM`);
 
+  // Top-3 busiest hours step down in opacity so the single peak actually reads
+  // as a peak, instead of every non-zero bar looking equally important.
+  const top3 = [...hours.map((c, h) => [h, c] as [number, number])]
+    .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([h]) => h);
+  const barOpacity = (h: number, count: number): number => {
+    if (count === 0) return 1;
+    const rank = top3.indexOf(h);
+    if (rank === 0) return 1;
+    if (rank === 1) return 0.7;
+    if (rank === 2) return 0.5;
+    return 0.3;
+  };
+
   return (
     <div>
       <div className="flex items-end gap-[2px]" style={{ height: 56 }}>
@@ -44,6 +58,7 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
             style={{
               height: `${Math.max((count / max) * 100, count > 0 ? 5 : 2)}%`,
               background: count > 0 ? accent : colors.neutral100,
+              opacity: barOpacity(h, count),
             }}
           />
         ))}
@@ -153,8 +168,16 @@ const VisitorsPanel: React.FC<VisitorsPanelProps> = ({ overview }) => {
     .map(([key]) => ({ key, label: key, color: getSourceColor(key), icon: getSourceIcon(key) ?? undefined }));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
+    <motion.div
+      className="flex flex-col gap-4"
+      variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}
+        className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}
+      >
         {hasBrowser && (
           <Panel title="Browsers">
             <FlatBreakdownBars items={browserItems} breakdown={browserBreakdown} />
@@ -165,9 +188,12 @@ const VisitorsPanel: React.FC<VisitorsPanelProps> = ({ overview }) => {
             <FlatBreakdownBars items={locationItems} breakdown={locationBreakdown} />
           </Panel>
         )}
-      </div>
+      </motion.div>
 
-      <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}
+        className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}
+      >
         {hasReferrer && (
           <Panel title="Traffic sources" icon={<FiLink size={11} />}>
             <FlatBreakdownBars items={referrerItems} breakdown={referrerBreakdown} />
@@ -176,22 +202,24 @@ const VisitorsPanel: React.FC<VisitorsPanelProps> = ({ overview }) => {
         <Panel title="Peak hours" icon={<FiClock size={11} />}>
           <PeakHours views={recentViews} />
         </Panel>
-      </div>
+      </motion.div>
 
-      <Panel
-        title="Visitor history"
-        right={
-          <span
-            className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-            style={{ background: colors.neutral100, color: colors.neutral600 }}
-          >
-            {recentViews.length}
-          </span>
-        }
-      >
-        <VisitorHistory views={recentViews} />
-      </Panel>
-    </div>
+      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
+        <Panel
+          title="Visitor history"
+          right={
+            <span
+              className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+              style={{ background: colors.neutral100, color: colors.neutral600 }}
+            >
+              {recentViews.length}
+            </span>
+          }
+        >
+          <VisitorHistory views={recentViews} />
+        </Panel>
+      </motion.div>
+    </motion.div>
   );
 };
 

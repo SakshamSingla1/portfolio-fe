@@ -77,9 +77,12 @@ export const FlatTrendChart: React.FC<FlatTrendChartProps> = ({ data, color, hei
 
 interface FlatDeviceBreakdownProps {
   breakdown: Record<string, number>;
+  /** The segmented bar is redundant next to a donut chart showing the same
+   * split — set false when this is paired with DeviceDonutChart. */
+  showBar?: boolean;
 }
 
-export const FlatDeviceBreakdown: React.FC<FlatDeviceBreakdownProps> = ({ breakdown }) => {
+export const FlatDeviceBreakdown: React.FC<FlatDeviceBreakdownProps> = ({ breakdown, showBar = true }) => {
   const colors = useColors();
   const { isDark } = useTheme();
   const hues = isDark ? DEVICE_HUES_DARK : DEVICE_HUES_LIGHT;
@@ -94,11 +97,13 @@ export const FlatDeviceBreakdown: React.FC<FlatDeviceBreakdownProps> = ({ breakd
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
-        {sorted.map(([key, count]) => (
-          <div key={key} style={{ width: `${(count / total) * 100}%`, background: hues[key] ?? colors.neutral400 }} />
-        ))}
-      </div>
+      {showBar && (
+        <div className="flex rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
+          {sorted.map(([key, count]) => (
+            <div key={key} style={{ width: `${(count / total) * 100}%`, background: hues[key] ?? colors.neutral400 }} />
+          ))}
+        </div>
+      )}
       <div className="flex flex-col gap-2">
         {sorted.map(([key, count]) => {
           const pct = Math.round((count / total) * 100);
