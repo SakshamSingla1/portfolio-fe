@@ -187,23 +187,42 @@ const ProfilePage: React.FC = () => {
     document.body.removeChild(a);
   };
 
-  // The export endpoint renders a fresh PDF server-side on every hit (no XHR here to await, since
-  // this triggers a plain browser download via an anchor tag) -- that render is the single most
-  // memory-expensive thing the backend does, so a quick double-click used to be enough to stack two
-  // of those renders concurrently and OOM the instance. This cooldown keeps repeat clicks from
-  // firing overlapping requests; the backend also now rejects/serves-from-cache its own overlaps
-  // independently, this is just the first line of defense.
-  const downloadPortfolioPdf = () => {
+  // Uses fetch (not a plain <a> + click) so this shows up as a real request in the Network tab
+  // like every other API call, and so the "disabled while exporting" state is tied to the actual
+  // request lifecycle instead of a guessed cooldown. The export endpoint renders a fresh PDF
+  // server-side on every (uncached) hit -- the single most memory-expensive thing the backend
+  // does -- so a quick double-click used to be enough to stack two of those renders concurrently
+  // and OOM the instance; the backend also independently rejects/serves-from-cache its own
+  // overlaps, this disabled state is just the first line of defense.
+  const downloadPortfolioPdf = async () => {
     const userName = profileData?.userName;
     if (!userName || isExportingPdf) return;
     setIsExportingPdf(true);
-    const a = document.createElement("a");
-    a.href = `${API_BASE}/public/portfolio-export/${userName}`;
-    a.download = `portfolio-${userName}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => setIsExportingPdf(false), 10000);
+    try {
+      const res = await fetch(`${API_BASE}/public/portfolio-export/${userName}`);
+      if (!res.ok) {
+        showSnackbar(
+          "error",
+          res.status === 503
+            ? "Another export is already in progress -- please try again in a moment"
+            : "Failed to download resume"
+        );
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `portfolio-${userName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      showSnackbar("error", "Failed to download resume");
+    } finally {
+      setIsExportingPdf(false);
+    }
   };
 
   const embedSnippet = profileData?.userName
