@@ -1,18 +1,16 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useCountUp } from "../../../hooks/useCountUp";
-import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
-import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
+import type { IViewStats } from "../../../services/useDashboardService";
+import { FiArrowUpRight, FiArrowDownRight, FiArrowRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiClock, FiBarChart2, FiCalendar } from "react-icons/fi";
 import { EmptyState, ShimmerTopline } from "./shared/DashboardUI";
 import { useGlassSurface } from "./shared/dashboardMotion";
 import { TrendAreaChart, DeviceDonutChart } from "./AnalyticsCharts";
 import { DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./deviceColors";
-import ViewsHeatmap from "./ViewsHeatmap";
-import { countryFlag, relTime, exactTime, COUNTRY_TO_CODE } from "../../../utils/analyticsFormat";
-import { BROWSER_COLORS, BROWSER_ICONS, LOC_PALETTE, getSourceColor, getSourceIcon } from "../Analytics/shared/breakdownPalette";
 
 interface ViewAnalyticsProps {
   viewStats: IViewStats | null | undefined;
@@ -152,271 +150,6 @@ const MetricCell: React.FC<{
 };
 
 
-const BreakdownBars: React.FC<{
-  items: { key: string; label: string; color: string; icon?: React.ReactNode }[];
-  breakdown: Record<string, number>;
-}> = ({ items, breakdown }) => {
-  const colors = useColors();
-  const total = Object.values(breakdown).reduce((a, b) => a + b, 0) || 1;
-
-  return (
-    <div className="flex flex-col gap-3">
-      {items.map(({ key, label, color, icon }, idx) => {
-        const count = breakdown[key] ?? 0;
-        const pct = Math.round((count / total) * 100);
-        return (
-          <div key={key}>
-            {}
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5">
-                {icon
-                  ? <span style={{ color, flexShrink: 0, fontSize: 12 }}>{icon}</span>
-                  : <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-                }
-                <span className="text-[10px] font-semibold" style={{ color: colors.neutral600 }}>
-                  {label}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[12px] font-black tabular-nums" style={{ color }}>
-                  {pct}%
-                </span>
-                {count > 0 && (
-                  <span className="text-[9px]" style={{ color: colors.neutral400 }}>
-                    ({count})
-                  </span>
-                )}
-              </div>
-            </div>
-            {}
-            <div
-              className="relative rounded-full overflow-hidden"
-              style={{ height: 8, background: colors.neutral100 }}
-            >
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)` }}
-                initial={{ width: 0 }}
-                animate={{ width: `${pct}%` }}
-                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: idx * 0.06 + 0.2 }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-
-
-
-const BrowserBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
-  const sorted = Object.entries(breakdown)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-  if (!sorted.length) return null;
-
-  return (
-    <BreakdownBars
-      breakdown={breakdown}
-      items={sorted.map(([key]) => ({
-        key,
-        label: key,
-        color: BROWSER_COLORS[key] ?? BROWSER_COLORS.Other,
-        icon: BROWSER_ICONS[key],
-      }))}
-    />
-  );
-};
-
-
-const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
-  const colors = useColors();
-  const sorted = Object.entries(breakdown).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  if (!sorted.length) return null;
-
-  const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
-
-  return (
-    <div className="flex flex-col gap-3">
-      {sorted.map(([country, count], i) => {
-        const pct = Math.round((count / total) * 100);
-        const color = LOC_PALETTE[i];
-        const cc = COUNTRY_TO_CODE[country];
-        const flag = cc ? countryFlag(cc) : "🌐";
-        return (
-          <div key={country}>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[13px] leading-none shrink-0">{flag}</span>
-                <span className="text-[10px] font-semibold truncate max-w-[80px]" style={{ color: colors.neutral600 }}>
-                  {country}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[12px] font-black tabular-nums" style={{ color }}>
-                  {pct}%
-                </span>
-                <span className="text-[9px]" style={{ color: colors.neutral400 }}>({count})</span>
-              </div>
-            </div>
-            <div className="rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)` }}
-                initial={{ width: 0 }}
-                animate={{ width: `${pct}%` }}
-                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.07 + 0.2 }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-
-const ReferrerBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ breakdown }) => {
-  const colors = useColors();
-  const sorted = Object.entries(breakdown).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  if (!sorted.length) return null;
-
-  const total = sorted.reduce((s, [, v]) => s + v, 0) || 1;
-
-  return (
-    <div className="flex flex-col gap-3">
-      {sorted.map(([src, count], i) => {
-        const pct = Math.round((count / total) * 100);
-        const color = getSourceColor(src);
-        const icon = getSourceIcon(src);
-        return (
-          <div key={src}>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5">
-                {icon
-                  ? <span style={{ color, flexShrink: 0 }}>{icon}</span>
-                  : <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-                }
-                <span className="text-[10px] font-semibold truncate max-w-[90px]" style={{ color: colors.neutral600 }}>
-                  {src}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[12px] font-black tabular-nums" style={{ color }}>
-                  {pct}%
-                </span>
-                <span className="text-[9px]" style={{ color: colors.neutral400 }}>({count})</span>
-              </div>
-            </div>
-            <div className="rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)` }}
-                initial={{ width: 0 }}
-                animate={{ width: `${pct}%` }}
-                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.07 + 0.2 }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-
-const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
-  const colors = useColors();
-  const ACCENT = colors.primary600;
-
-  const hours = new Array(24).fill(0) as number[];
-  views?.forEach((v) => {
-    if (v.timestamp) {
-      const h = new Date(v.timestamp).getHours();
-      if (h >= 0 && h < 24) hours[h]++;
-    }
-  });
-
-  const max = Math.max(...hours, 1);
-  const peakHour = hours.indexOf(Math.max(...hours));
-
-  const fmt = (h: number): string => {
-    if (h === 0) return "12AM";
-    if (h === 12) return "12PM";
-    return h < 12 ? `${h}AM` : `${h - 12}PM`;
-  };
-
-  
-  const top3 = [...hours.map((c, h) => [h, c] as [number, number])]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([h]) => h);
-
-  const barBg = (h: number, count: number): string => {
-    if (count === 0) return colors.neutral100;
-    const rank = top3.indexOf(h);
-    if (rank === 0) return `linear-gradient(180deg, ${ACCENT} 0%, ${ACCENT}25 100%)`;
-    if (rank === 1) return `linear-gradient(180deg, ${ACCENT}bb 0%, ${ACCENT}18 100%)`;
-    if (rank === 2) return `linear-gradient(180deg, ${ACCENT}80 0%, ${ACCENT}10 100%)`;
-    return `linear-gradient(180deg, ${ACCENT}45 0%, ${ACCENT}08 100%)`;
-  };
-
-  return (
-    <div>
-      <div className="flex items-end gap-[2px]" style={{ height: 64 }}>
-        {hours.map((count, h) => {
-          const hp = (count / max) * 100;
-          return (
-            <motion.div
-              key={h}
-              className="flex-1 rounded-t-[2px]"
-              style={{
-                height: `${Math.max(hp, count > 0 ? 5 : 2)}%`,
-                background: barBg(h, count),
-                transformOrigin: "bottom",
-              }}
-              initial={{ scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              transition={{ duration: 0.4, delay: h * 0.015, ease: [0.34, 1.2, 0.64, 1] }}
-            />
-          );
-        })}
-      </div>
-      {}
-      <div className="flex justify-between mt-1.5 px-0.5">
-        {["12AM", "6AM", "12PM", "6PM", "11PM"].map((lbl) => (
-          <span key={lbl} className="text-[8px] font-medium" style={{ color: colors.neutral400 }}>
-            {lbl}
-          </span>
-        ))}
-      </div>
-      {}
-      {max > 1 && (
-        <div className="mt-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: ACCENT }} />
-            <span className="text-[10px]" style={{ color: colors.neutral500 }}>
-              Peak at{" "}
-              <strong style={{ color: colors.neutral700 }}>{fmt(peakHour)}</strong>
-              {" · "}{hours[peakHour]} visit{hours[peakHour] !== 1 ? "s" : ""}
-            </span>
-          </div>
-          {top3[1] !== undefined && hours[top3[1]] > 0 && (
-            <span className="text-[9px]" style={{ color: colors.neutral400 }}>
-              2nd: {fmt(top3[1])}
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-
-
-
 const DEVICE_ICON: Record<string, React.ReactNode> = {
   DESKTOP: <FiMonitor size={12} />,
   MOBILE:  <FiSmartphone size={12} />,
@@ -484,163 +217,6 @@ const DeviceBreakdownList: React.FC<{ breakdown: Record<string, number>; activeK
   );
 };
 
-const ViewHistorySection: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
-  const colors = useColors();
-  const { isDark } = useTheme();
-  const [expanded, setExpanded] = React.useState(false);
-
-  if (!views?.length) return null;
-
-  const shown = expanded ? views : views.slice(0, 8);
-
-  return (
-    <div
-      className="mt-5 rounded-xl overflow-hidden"
-      style={{ border: `1.5px solid ${colors.neutral300}` }}
-    >
-      <button
-        onClick={() => setExpanded((p) => !p)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left"
-        style={{
-          background: isDark ? colors.neutral100 : colors.neutral50,
-          border: "none",
-          cursor: "pointer",
-          outline: "none",
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <FiClock size={11} style={{ color: colors.neutral400 }} />
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]" style={{ color: colors.neutral500 }}>
-            Visitor History
-          </span>
-          <span
-            className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-            style={{ background: colors.neutral200, color: colors.neutral600 }}
-          >
-            {views.length}
-          </span>
-        </div>
-        {expanded
-          ? <FiChevronUp size={13} style={{ color: colors.neutral400 }} />
-          : <FiChevronDown size={13} style={{ color: colors.neutral400 }} />}
-      </button>
-
-      {expanded && (
-        <div className="overflow-y-auto" style={{ maxHeight: 360, background: colors.neutral0 }}>
-          {shown.map((v, i) => {
-            const devColor = deviceColorFor(v.device, isDark);
-            const devIcon  = DEVICE_ICON[v.device] ?? <FiMonitor size={12} />;
-            const flag     = countryFlag(v.countryCode);
-            const location = v.city && v.country
-              ? `${v.city}, ${v.country}`
-              : v.country ?? null;
-
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -4 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.03, duration: 0.2 }}
-                className="flex items-start gap-3 px-4 py-3"
-                style={{ borderTop: i > 0 ? `1px solid ${colors.neutral100}` : "none" }}
-              >
-                {}
-                <div
-                  className="shrink-0 rounded-lg flex items-center justify-center mt-0.5"
-                  style={{ width: 28, height: 28, background: `${devColor}14`, color: devColor }}
-                >
-                  {devIcon}
-                </div>
-
-                {}
-                <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                  {}
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[11px] font-semibold" style={{ color: colors.neutral700 }}>
-                      {v.device.charAt(0) + v.device.slice(1).toLowerCase()}
-                    </span>
-                    {v.browser && (
-                      <>
-                        <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
-                        <span className="text-[10px]" style={{ color: colors.neutral500 }}>{v.browser}</span>
-                      </>
-                    )}
-                    {v.os && (
-                      <>
-                        <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
-                        <span className="text-[10px]" style={{ color: colors.neutral500 }}>{v.os}</span>
-                      </>
-                    )}
-                  </div>
-
-                  {}
-                  {location && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-[11px]">{flag}</span>
-                      <span className="text-[10px]" style={{ color: colors.neutral500 }}>{location}</span>
-                      {v.language && (
-                        <>
-                          <span style={{ color: colors.neutral300, fontSize: 10 }}>·</span>
-                          <span className="text-[10px]" style={{ color: colors.neutral400 }}>{v.language}</span>
-                        </>
-                      )}
-                    </div>
-                  )}
-
-                  {}
-                  {v.referrer && v.referrer !== "Direct" ? (
-                    <div className="flex items-center gap-0.5">
-                      <FiLink size={9} style={{ color: colors.neutral400 }} />
-                      <span className="text-[10px] truncate max-w-[160px]" style={{ color: colors.neutral400 }}>
-                        {v.referrer}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-[10px]" style={{ color: colors.neutral400 }}>Direct</span>
-                  )}
-                </div>
-
-                {}
-                <div className="shrink-0 flex flex-col items-end gap-0.5">
-                  <span className="text-[10px] font-medium" style={{ color: colors.neutral500 }}>
-                    {relTime(v.timestamp)}
-                  </span>
-                  <span className="text-[9px]" style={{ color: colors.neutral400 }}>
-                    {exactTime(v.timestamp)}
-                  </span>
-                  {v.sessionId && (
-                    <span
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded"
-                      style={{ background: colors.neutral100, color: colors.neutral500 }}
-                    >
-                      {v.sessionId}
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-
-          {views.length > 8 && (
-            <button
-              onClick={() => setExpanded((p) => !p)}
-              className="w-full py-2.5 text-[11px] font-semibold text-center"
-              style={{
-                background: colors.neutral50,
-                color: colors.neutral500,
-                border: "none",
-                borderTop: `1px solid ${colors.neutral100}`,
-                cursor: "pointer",
-              }}
-            >
-              {expanded ? "Show less" : `Show all ${views.length} visits`}
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
 
 
 const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawStats }) => {
@@ -659,11 +235,7 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     uniqueVisitors,
     resumeDownloads,
     weeklyTrend = [],
-    viewsHeatmap = [],
     deviceBreakdown = {},
-    browserBreakdown = {},
-    locationBreakdown = {},
-    referrerBreakdown = {},
     recentViews = [],
   } = viewStats;
 
@@ -703,12 +275,10 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     </div>
   );
 
-  const hasBrowserData   = Object.keys(browserBreakdown).length > 0;
-  const hasLocationData  = Object.keys(locationBreakdown).length > 0;
-  const hasReferrerData  = Object.keys(referrerBreakdown).length > 0;
-  const hasDeviceData    = Object.values(deviceBreakdown).some((c) => c > 0);
+  const hasDeviceData = Object.values(deviceBreakdown).some((c) => c > 0);
 
   const [activeDeviceKey, setActiveDeviceKey] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
   const hasAnyData = totalViews > 0 || recentViews.length > 0;
 
@@ -765,14 +335,21 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
             <span className="flex items-center gap-1 text-[10px] font-medium" style={{ color: colors.neutral400 }}>
               <FiDownload size={10} /> {resumeDownloads} CV
             </span>
+            <button
+              onClick={() => navigate("/analytics")}
+              className="flex items-center gap-1 text-[10px] font-bold"
+              style={{ color: ACCENT, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
+            >
+              Full analytics <FiArrowRight size={10} />
+            </button>
           </div>
         </div>
 
         {}
-        <div className={`grid gap-5 sm:gap-6 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}>
+        <div className={`grid gap-5 sm:gap-6 ${isMobile || !hasDeviceData ? "grid-cols-1" : "grid-cols-12"}`}>
 
           {}
-          <div className={isMobile ? "" : "col-span-7"}>
+          <div className={isMobile || !hasDeviceData ? "" : "col-span-7"}>
             <div className="flex flex-col gap-5">
 
               {}
@@ -811,55 +388,23 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
               </div>
 
               {}
-              {isMobile && weeklyTrend.length > 0 && (
-                <div className="rounded-xl p-3" style={panelStyle}>
-                  <span className="text-[9px] font-black uppercase tracking-widest block mb-2" style={{ color: colors.neutral400 }}>
-                    7-Day Trend
-                  </span>
-                  <TrendAreaChart data={weeklyTrend} color={ACCENT} height={140} />
-                </div>
-              )}
-
-              {}
-              {!isMobile && (hasBrowserData || hasLocationData) && (
-                <div className={`grid gap-5 items-start ${hasBrowserData && hasLocationData ? "grid-cols-2" : "grid-cols-1"}`}>
-                  {hasBrowserData && (
-                    <div style={panelStyle}>
-                      {panelLabel("Browsers")}
-                      <BrowserBreakdown breakdown={browserBreakdown} />
-                    </div>
-                  )}
-                  {hasLocationData && (
-                    <div style={panelStyle}>
-                      {panelLabel("Top Countries", <FiGlobe size={10} style={{ color: colors.neutral400 }} />)}
-                      <LocationBreakdown breakdown={locationBreakdown} />
-                    </div>
-                  )}
+              {weeklyTrend.length > 0 && (
+                <div className="rounded-xl p-4" style={panelStyle}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: colors.neutral400 }}>
+                      7-Day Trend
+                    </span>
+                    <FiEye size={11} style={{ color: colors.neutral400 }} />
+                  </div>
+                  <TrendAreaChart data={weeklyTrend} color={ACCENT} height={isMobile ? 140 : 180} />
                 </div>
               )}
             </div>
           </div>
 
           {}
-          <div className={`flex flex-col gap-5 ${isMobile ? "" : "col-span-5"}`}>
-
-            {}
-            {!isMobile && weeklyTrend.length > 0 && (
-              <div className="rounded-xl p-4 flex flex-col" style={{ ...panelStyle, flex: 1 }}>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: colors.neutral400 }}>
-                    7-Day Trend
-                  </span>
-                  <FiEye size={11} style={{ color: colors.neutral400 }} />
-                </div>
-                <div className="flex-1 flex flex-col justify-end">
-                  <TrendAreaChart data={weeklyTrend} color={ACCENT} height={180} />
-                </div>
-              </div>
-            )}
-
-            {}
-            {hasDeviceData && (
+          {hasDeviceData && (
+            <div className={isMobile ? "" : "col-span-5"}>
               <div style={panelStyle}>
                 {panelLabel("Devices")}
                 <div className="flex flex-col gap-3">
@@ -867,82 +412,9 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
                   <DeviceBreakdownList breakdown={deviceBreakdown} activeKey={activeDeviceKey} onHover={setActiveDeviceKey} />
                 </div>
               </div>
-            )}
-
-            {}
-            {isMobile && hasBrowserData && (
-              <div style={panelStyle}>
-                {panelLabel("Browsers")}
-                <BrowserBreakdown breakdown={browserBreakdown} />
-              </div>
-            )}
-            {isMobile && hasLocationData && (
-              <div style={panelStyle}>
-                {panelLabel("Top Countries", <FiGlobe size={10} style={{ color: colors.neutral400 }} />)}
-                <LocationBreakdown breakdown={locationBreakdown} />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {}
-        {(hasReferrerData || recentViews.length > 0) && (
-          <div className={`mt-5 grid gap-5 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
-            {hasReferrerData && (
-              <div style={panelStyle}>
-                {panelLabel("Traffic Sources", <FiLink size={10} style={{ color: colors.neutral400 }} />)}
-                <ReferrerBreakdown breakdown={referrerBreakdown} />
-              </div>
-            )}
-            {recentViews.length > 0 && (
-              <div style={panelStyle}>
-                {panelLabel("Peak Hours", <FiClock size={10} style={{ color: colors.neutral400 }} />)}
-                <PeakHours views={recentViews} />
-              </div>
-            )}
-          </div>
-        )}
-
-        {}
-        {viewsHeatmap.length > 0 && (
-          <div className="mt-5" style={panelStyle}>
-            {panelLabel("90-Day Activity", <FiEye size={10} style={{ color: colors.neutral400 }} />)}
-            <ViewsHeatmap data={viewsHeatmap} />
-          </div>
-        )}
-
-        {}
-        <div
-          className="flex items-center justify-between mt-5 pt-5"
-          style={{ borderTop: `1.5px solid ${colors.neutral300}` }}
-        >
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-              <FiUsers size={11} style={{ color: colors.neutral400 }} />
-              <span className="text-[11px] font-semibold" style={{ color: colors.neutral600 }}>
-                <span className="font-black" style={{ color: colors.neutral800 }}>
-                  {uniqueVisitors.toLocaleString()}
-                </span>{" "}
-                unique visitors
-              </span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <FiDownload size={11} style={{ color: colors.neutral400 }} />
-              <span className="text-[11px] font-semibold" style={{ color: colors.neutral600 }}>
-                <span className="font-black" style={{ color: colors.neutral800 }}>
-                  {resumeDownloads}
-                </span>{" "}
-                CV downloads
-              </span>
-            </div>
-          </div>
-          <span className="text-[10px]" style={{ color: colors.neutral400 }}>
-            Updates every 30s
-          </span>
+          )}
         </div>
-
-        {}
-        <ViewHistorySection views={recentViews} />
       </div>
     </motion.div>
   );
