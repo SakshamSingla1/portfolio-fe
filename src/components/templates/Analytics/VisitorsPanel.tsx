@@ -8,7 +8,7 @@ import { Panel } from "./shared/AnalyticsSurface";
 import { FlatBreakdownBars } from "./FlatCharts";
 import { BROWSER_COLORS, BROWSER_ICONS, LOC_PALETTE, getSourceColor, getSourceIcon } from "./shared/breakdownPalette";
 import { countryFlag, relTime, exactTime, COUNTRY_TO_CODE } from "../../../utils/analyticsFormat";
-import { DEVICE_HUES_LIGHT, DEVICE_HUES_DARK } from "../Dashboard/AnalyticsCharts";
+import { DEVICE_HUES_LIGHT, DEVICE_HUES_DARK } from "../Dashboard/deviceColors";
 
 interface VisitorsPanelProps {
   overview: IAnalyticsOverview;

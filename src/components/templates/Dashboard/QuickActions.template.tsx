@@ -12,7 +12,7 @@ import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { motion } from "framer-motion";
-import { useGlassSurface, glowTextShadow, useTilt, useMagnetic } from "./shared/DashboardUI";
+import { useGlassSurface, glowTextShadow, useTilt, useMagnetic } from "./shared/dashboardMotion";
 
 const QUICK_ACTIONS = [
   { label: "Project",       subLabel: "Add to portfolio",  icon: FaCode,          route: "/projects",       dot: "#8b5cf6", matchKey: "project" },

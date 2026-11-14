@@ -9,7 +9,7 @@ import type { IProfileCompletion, ICompletionSnapshot } from "../../../services/
 import { useProfileTemplateService } from "../../../services/useProfileTemplateService";
 import { useCountUp } from "../../../hooks/useCountUp";
 import { FiCheck, FiMinus, FiArrowRight, FiArrowUpRight, FiTrendingUp } from "react-icons/fi";
-import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
+import { useGlassSurface, glowTextShadow } from "./shared/dashboardMotion";
 
 const SECTION_ROUTES: Record<string, string> = {
   "Profile Basics":  "/profile",

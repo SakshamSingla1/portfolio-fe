@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
-import { useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
+import { useGlassSurface, glowTextShadow } from "./shared/dashboardMotion";
 import type { IDashboardSummary } from "../../../services/useDashboardService";
 
 const VIEW_MILESTONES = [50, 100, 250, 500, 1000, 2500, 5000, 10_000, 25_000, 50_000, 100_000];

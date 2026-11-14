@@ -6,7 +6,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { useGlassSurface, glowTextShadow, useTilt } from "./shared/DashboardUI";
+import { useGlassSurface, glowTextShadow, useTilt } from "./shared/dashboardMotion";
 import { FiCode, FiZap, FiBriefcase, FiMail, FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 
 interface StatsProps {

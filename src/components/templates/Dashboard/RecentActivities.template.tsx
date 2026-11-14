@@ -7,7 +7,8 @@ import {
   FiUser, FiBook, FiBriefcase, FiZap, FiCode,
   FiMessageSquare, FiStar, FiAward, FiTrendingUp,
 } from "react-icons/fi";
-import { EmptyState, glowTextShadow } from "./shared/DashboardUI";
+import { EmptyState } from "./shared/DashboardUI";
+import { glowTextShadow } from "./shared/dashboardMotion";
 
 interface IActivity {
   type: string;

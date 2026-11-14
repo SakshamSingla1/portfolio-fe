@@ -15,7 +15,8 @@ import RecentMessagesTemplate from "./RecentMessages.template";
 import RecentActivitiesTemplate from "./RecentActivities.template";
 import QuickActionsTemplate from "./QuickActions.template";
 import MilestoneCelebration from "./MilestoneCelebration";
-import { Card, SectionLabel, SkeletonBlock, AmbientAurora, glowTextShadow, useTilt } from "./shared/DashboardUI";
+import { Card, SectionLabel, SkeletonBlock, AmbientAurora } from "./shared/DashboardUI";
+import { glowTextShadow, useTilt } from "./shared/dashboardMotion";
 import LiveSiteControl from "../../molecules/LiveSiteControl/LiveSiteControl";
 
 interface DashboardTemplateProps {

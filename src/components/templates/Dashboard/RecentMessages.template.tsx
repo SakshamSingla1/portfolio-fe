@@ -8,7 +8,8 @@ import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
-import { EmptyState, useGlassSurface, glowTextShadow } from "./shared/DashboardUI";
+import { EmptyState } from "./shared/DashboardUI";
+import { useGlassSurface, glowTextShadow } from "./shared/dashboardMotion";
 
 interface RecentMessagesProps {
   messages: ContactUs[];

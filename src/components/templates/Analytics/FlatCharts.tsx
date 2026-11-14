@@ -4,7 +4,7 @@ import {
 } from "recharts";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
-import { DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "../Dashboard/AnalyticsCharts";
+import { DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "../Dashboard/deviceColors";
 import type { IDailyView } from "../../../services/useDashboardService";
 
 // Flat restyle of Dashboard/AnalyticsCharts.tsx's TrendAreaChart/DeviceDonutChart for the
