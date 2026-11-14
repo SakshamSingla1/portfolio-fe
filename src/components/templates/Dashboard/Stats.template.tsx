@@ -234,23 +234,30 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
       <div style={{ height: 1, background: colors.neutral200 }} />
 
       {isMobile ? (
-        <div className="flex overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-          {SECONDARY_STATS.map((s, i) => {
-            const { key: statKey, ...statProps } = s;
-            const value = (stats as any)?.[statKey] ?? 0;
-            return (
-              <div
-                key={s.label}
-                style={{
-                  borderRight: i < SECONDARY_STATS.length - 1 ? `1.5px solid ${colors.neutral300}` : "none",
-                  minWidth: 74,
-                  flexShrink: 0,
-                }}
-              >
-                <SecondaryStatCell {...statProps} value={value} index={i} />
-              </div>
-            );
-          })}
+        <div className="relative">
+          <div className="flex overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            {SECONDARY_STATS.map((s, i) => {
+              const { key: statKey, ...statProps } = s;
+              const value = (stats as any)?.[statKey] ?? 0;
+              return (
+                <div
+                  key={s.label}
+                  style={{
+                    borderRight: i < SECONDARY_STATS.length - 1 ? `1.5px solid ${colors.neutral300}` : "none",
+                    minWidth: 74,
+                    flexShrink: 0,
+                  }}
+                >
+                  <SecondaryStatCell {...statProps} value={value} index={i} />
+                </div>
+              );
+            })}
+          </div>
+          {/* Hints there's more to the right (hidden scrollbar gives no other clue) */}
+          <div
+            className="absolute top-0 right-0 bottom-0 pointer-events-none"
+            style={{ width: 24, background: `linear-gradient(to right, transparent, ${colors.neutral0})` }}
+          />
         </div>
       ) : (
         // No vertical dividers here (unlike the 4-up hero row above): 4 and 5

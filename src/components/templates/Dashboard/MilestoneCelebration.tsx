@@ -107,8 +107,8 @@ const MilestoneCelebration: React.FC<{ dashboardData: IDashboardSummary | null }
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className="fixed top-5 right-5 z-[1200] flex items-center gap-3 rounded-2xl px-4 py-3.5 overflow-hidden"
-          style={{ ...glass, maxWidth: 320 }}
+          className="fixed top-20 left-4 right-4 sm:left-auto sm:top-28 sm:right-5 sm:w-80 z-[1200] flex items-center gap-3 rounded-2xl px-4 py-3.5 overflow-hidden"
+          style={glass}
         >
           <ConfettiBurst />
           <motion.div

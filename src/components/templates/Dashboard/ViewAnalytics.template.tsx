@@ -321,23 +321,23 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
       <div className="p-5 sm:p-6">
 
         {}
-        <div className="flex items-center justify-between mb-5 sm:mb-6">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between flex-wrap gap-y-2 mb-5 sm:mb-6">
+          <div className="flex items-center gap-2 shrink-0">
             <LivePulse active={viewsToday > 0} />
-            <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: colors.primary700 }}>
+            <span className="text-[10px] font-black uppercase tracking-[0.12em] whitespace-nowrap" style={{ color: colors.primary700 }}>
               {viewsToday > 0 ? "Live" : "Analytics"} · Portfolio Views
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden sm:flex items-center gap-1 text-[10px] font-medium" style={{ color: colors.neutral400 }}>
+            <span className="hidden sm:flex items-center gap-1 text-[10px] font-medium whitespace-nowrap" style={{ color: colors.neutral400 }}>
               <FiUsers size={10} /> {uniqueVisitors.toLocaleString()} unique
             </span>
-            <span className="flex items-center gap-1 text-[10px] font-medium" style={{ color: colors.neutral400 }}>
+            <span className="hidden sm:flex items-center gap-1 text-[10px] font-medium whitespace-nowrap" style={{ color: colors.neutral400 }}>
               <FiDownload size={10} /> {resumeDownloads} CV
             </span>
             <button
               onClick={() => navigate("/analytics")}
-              className="flex items-center gap-1 text-[10px] font-bold"
+              className="flex items-center gap-1 text-[10px] font-bold whitespace-nowrap shrink-0"
               style={{ color: ACCENT, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
             >
               Full analytics <FiArrowRight size={10} />
@@ -372,7 +372,9 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
               <div className="grid gap-4 grid-cols-3">
                 {}
                 <div className="rounded-xl p-3" style={panelStyle}>
-                  <div className="flex items-start justify-between gap-1">
+                  {/* Stacked on mobile: a narrow 3-up cell has no spare width for
+                      the chip beside the number without it overflowing the card. */}
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
                     <MetricCell label="This Week" value={viewsThisWeek} delay={80} icon={<FiCalendar />} />
                     {wowDelta !== null && <TrendChip value={wowDelta} />}
                   </div>
