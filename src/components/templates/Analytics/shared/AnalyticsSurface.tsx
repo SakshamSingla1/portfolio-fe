@@ -2,10 +2,16 @@ import React from "react";
 import { FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 import { useColors } from "../../../../utils/types";
 import { useCountUp } from "../../../../hooks/useCountUp";
+import { useGlassSurface } from "../../Dashboard/shared/dashboardMotion";
 
-// Minimal, flat surface primitives scoped to the redesigned Analytics page only — the
-// app's shared "glass" design system (templates/Dashboard/shared/DashboardUI.tsx) is
-// used elsewhere and stays untouched.
+// Flat surface primitives for the Analytics page. These used to intentionally
+// diverge from Dashboard's card system (rounded-xl + 1px border + no shadow,
+// vs. Dashboard's rounded-2xl + 1.5px border + soft shadow) back when the
+// Dashboard still had its old "premium glass" look and this page deliberately
+// avoided matching it. Now that the Dashboard has moved to the same calm, flat
+// language (see shared/dashboardMotion.ts), reusing its exact surface here
+// closes the gap instead of leaving two still-slightly-different card shapes
+// across the same portal.
 
 interface PanelProps {
   title?: string;
@@ -21,17 +27,18 @@ interface PanelProps {
 
 export const Panel: React.FC<PanelProps> = ({ title, icon, right, children, noPadding = false, className = "", accent }) => {
   const colors = useColors();
+  const surface = useGlassSurface();
   return (
-    <div
-      className={`rounded-xl overflow-hidden ${className}`}
-      style={{ background: colors.neutral0, border: `1px solid ${colors.neutral200}` }}
-    >
+    <div className={`rounded-2xl overflow-hidden ${className}`} style={surface}>
       {accent && <div style={{ height: 2, background: accent }} />}
       {title && (
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-1.5">
             {icon && <span style={{ color: colors.neutral400, display: "inline-flex" }}>{icon}</span>}
-            <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: colors.neutral500 }}>
+            {/* Matches Dashboard's SectionLabel exactly (10px/black/0.1em/primary700) --
+                this previously used its own slightly different size/weight/color, a small
+                but real typographic mismatch for the same "section heading" role. */}
+            <span className="text-[10px] font-black uppercase tracking-[0.1em]" style={{ color: colors.primary700 }}>
               {title}
             </span>
           </div>
