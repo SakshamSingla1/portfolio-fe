@@ -1,11 +1,10 @@
-import React, { useId, useMemo } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { useColors } from "../../../utils/types";
 import { useTheme } from "../../../contexts/ThemeContext";
-import { glowTextShadow } from "./shared/dashboardMotion";
 import type { IDailyView } from "../../../services/useDashboardService";
 import { DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./deviceColors";
 
@@ -108,17 +107,16 @@ interface DeviceDonutChartProps {
     onSliceHover?: (key: string | null) => void;
 }
 
-/** A segmented, glowing radial gauge — one arc band per device, rounded caps,
- * a soft SVG glow filter per segment, and a faint full-circle track behind
- * them (the "dial" a gauge reads against). Built from plain SVG circles with
- * stroke-dasharray/rotate (the same ring technique as MiniRing/ProfileCompletion's
- * gauge elsewhere in this file's siblings) rather than a recharts Pie, so the
- * glow filters and gap/cap styling are fully under our control. */
+/** A segmented radial gauge — one arc band per device, rounded caps, and a
+ * faint full-circle track behind them (the "dial" a gauge reads against).
+ * Built from plain SVG circles with stroke-dasharray/rotate (the same ring
+ * technique as MiniRing/ProfileCompletion's gauge elsewhere in this file's
+ * siblings) rather than a recharts Pie, so the gap/cap styling is fully
+ * under our control. */
 export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, height = 170, activeKey, onSliceHover }) => {
     const colors = useColors();
     const { isDark } = useTheme();
     const hues = isDark ? DEVICE_HUES_DARK : DEVICE_HUES_LIGHT;
-    const uid = useId();
     const [hovered, setHovered] = React.useState<string | null>(null);
 
     const slices = useMemo(() => {
@@ -162,19 +160,6 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
     return (
         <div className="relative" style={{ width: "100%", maxWidth: height, margin: "0 auto" }}>
             <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" height={height} style={{ overflow: "visible" }}>
-                <defs>
-                    {segments.map((s) => (
-                        <filter key={s.key} id={`${uid}-glow-${s.key}`} x="-80%" y="-80%" width="260%" height="260%">
-                            <feGaussianBlur stdDeviation={effectiveActive === s.key ? 9 : 4.6} result="blur" />
-                            <feMerge>
-                                <feMergeNode in="blur" />
-                                <feMergeNode in="blur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
-                    ))}
-                </defs>
-
                 {/* Base dial track */}
                 <circle
                     cx={CENTER}
@@ -202,7 +187,7 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                     />
                 ))}
 
-                {segments.map((s, i) => {
+                {segments.map((s) => {
                     const dimmed = effectiveActive !== null && effectiveActive !== s.key;
                     const active = effectiveActive === s.key;
                     return (
@@ -216,7 +201,6 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                             strokeLinecap="round"
                             strokeDasharray={`${s.arcLen} ${CIRC}`}
                             transform={`rotate(${s.startDeg - 90} ${CENTER} ${CENTER})`}
-                            filter={`url(#${uid}-glow-${s.key})`}
                             style={{
                                 cursor: onSliceHover ? "pointer" : "default",
                                 opacity: dimmed ? 0.32 : 1,
@@ -225,13 +209,11 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                             initial={{ strokeDashoffset: s.arcLen, strokeWidth: STROKE }}
                             animate={{
                                 strokeDashoffset: 0,
-                                strokeWidth: active ? STROKE + 6 : dimmed ? STROKE : [STROKE, STROKE + 3, STROKE],
+                                strokeWidth: active ? STROKE + 4 : STROKE,
                             }}
                             transition={{
                                 strokeDashoffset: { duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] },
-                                strokeWidth: (active || dimmed)
-                                    ? { duration: 0.25 }
-                                    : { duration: 3.2 + i * 0.5, repeat: Infinity, ease: "easeInOut" },
+                                strokeWidth: { duration: 0.2 },
                             }}
                             onMouseEnter={() => { setHovered(s.key); onSliceHover?.(s.key); }}
                             onMouseLeave={() => { setHovered(null); onSliceHover?.(null); }}
@@ -248,7 +230,7 @@ export const DeviceDonutChart: React.FC<DeviceDonutChartProps> = ({ breakdown, h
                     <>
                         <span
                             className="font-black tabular-nums"
-                            style={{ fontSize: 26, color: activeSeg.color, letterSpacing: "-0.03em", textShadow: glowTextShadow(activeSeg.color, isDark) }}
+                            style={{ fontSize: 26, color: activeSeg.color, letterSpacing: "-0.03em" }}
                         >
                             {Math.round(activeSeg.pct * 100)}%
                         </span>

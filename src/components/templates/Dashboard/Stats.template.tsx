@@ -4,9 +4,8 @@ import type { IStats } from "../../../services/useDashboardService";
 import { useCountUp } from "../../../hooks/useCountUp";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { useGlassSurface, glowTextShadow, useTilt } from "./shared/dashboardMotion";
+import { useGlassSurface } from "./shared/dashboardMotion";
 import { FiCode, FiZap, FiBriefcase, FiMail, FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 
 interface StatsProps {
@@ -64,65 +63,43 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
   label, value, accent, icon: Icon, route, index, unreadCount, delta, isMobile,
 }) => {
   const colors = useColors();
-  const { isDark } = useTheme();
   const animatedValue = useCountUp(value, index * 80 + 100);
   const navigate = useNavigate();
-  const tilt = useTilt(5);
 
   return (
     <motion.button
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      transition={{ delay: index * 0.07, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={{ y: -1 }}
       onClick={() => navigate(route)}
-      onMouseMove={tilt.onMouseMove}
-      onMouseLeave={tilt.onMouseLeave}
-      className="group relative flex flex-col w-full text-left overflow-hidden"
+      className="group relative flex flex-col w-full text-left"
       style={{
         padding: isMobile ? "20px 16px 18px" : "26px 24px 22px",
         background: "transparent",
         border: "none",
         cursor: "pointer",
         outline: "none",
-        rotateX: tilt.rotateX,
-        rotateY: tilt.rotateY,
-        transformPerspective: 700,
       }}
     >
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         style={{ background: `linear-gradient(135deg, ${accent}14, ${accent}05)` }}
       />
-      <div
-        className="absolute rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-        style={{ width: 100, height: 100, top: -30, right: -30, background: `radial-gradient(circle, ${accent}35 0%, transparent 70%)`, filter: "blur(16px)" }}
-      />
-      <div
-        className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ height: 2, background: accent, boxShadow: `0 0 8px ${accent}` }}
-      />
 
-      <motion.div
+      <div
         className="relative flex items-center justify-center rounded-xl mb-4 group-hover:scale-110"
         style={{
           width: isMobile ? 36 : 42,
           height: isMobile ? 36 : 42,
-          background: `linear-gradient(135deg, ${accent}2A, ${accent}12)`,
+          background: `${accent}14`,
+          border: `1.5px solid ${accent}25`,
           color: accent,
           transition: "transform 0.2s",
         }}
-        animate={{
-          boxShadow: [
-            `0 0 0 1px ${accent}25 inset, 0 4px 12px -4px ${accent}50`,
-            `0 0 0 1px ${accent}45 inset, 0 6px 20px -4px ${accent}90`,
-            `0 0 0 1px ${accent}25 inset, 0 4px 12px -4px ${accent}50`,
-          ],
-        }}
-        transition={{ duration: 2.6 + index * 0.3, repeat: Infinity, ease: "easeInOut" }}
       >
         <Icon size={isMobile ? 15 : 18} />
-      </motion.div>
+      </div>
 
       <div className="relative flex items-end gap-1.5 mb-2">
         <span
@@ -131,7 +108,6 @@ const HeroStatCell: React.FC<HeroStatCellProps> = ({
             fontSize: isMobile ? "clamp(24px, 5vw, 32px)" : "clamp(28px, 2.8vw, 40px)",
             color: colors.neutral900,
             letterSpacing: "-0.04em",
-            textShadow: glowTextShadow(accent, isDark),
           }}
         >
           {animatedValue}
@@ -224,11 +200,7 @@ const StatsTemplate: React.FC<StatsProps> = ({ stats }) => {
 
   return (
     <div style={containerStyle}>
-      <div style={{
-        height: 2,
-        background: `linear-gradient(90deg, ${colors.primary600} 0%, ${colors.primary400} 55%, ${colors.primary600}00 100%)`,
-        boxShadow: `0 0 10px ${colors.primary500}90`,
-      }} />
+      <div style={{ height: 2, background: `linear-gradient(90deg, ${colors.primary600} 0%, ${colors.primary400} 100%)` }} />
 
       <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"}`}>
         {HERO_STATS.map((s, i) => {

@@ -9,7 +9,7 @@ import type { IProfileCompletion, ICompletionSnapshot } from "../../../services/
 import { useProfileTemplateService } from "../../../services/useProfileTemplateService";
 import { useCountUp } from "../../../hooks/useCountUp";
 import { FiCheck, FiMinus, FiArrowRight, FiArrowUpRight, FiTrendingUp } from "react-icons/fi";
-import { useGlassSurface, glowTextShadow } from "./shared/dashboardMotion";
+import { useGlassSurface } from "./shared/dashboardMotion";
 
 const SECTION_ROUTES: Record<string, string> = {
   "Profile Basics":  "/profile",
@@ -215,17 +215,18 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
       >
         <svg width={size} height={size} style={{ overflow: "visible", zIndex: 5 }}>
           <defs>
-            {/* Active glow shadow for highlighted slice */}
+            {/* Plain elevation shadow for the hovered slice -- neutral (floodColor "#000"
+                regardless of the slice's own color), not a colored glow. */}
             <filter id="active-glow" x="-45%" y="-45%" width="190%" height="190%">
-              <feDropShadow 
-                dx="0" 
-                dy="8" 
-                stdDeviation="8" 
-                floodColor={hoveredSeg ? hoveredSeg.colors[0] : "#000"} 
-                floodOpacity={isDark ? 0.45 : 0.25} 
+              <feDropShadow
+                dx="0"
+                dy="4"
+                stdDeviation="4"
+                floodColor="#000"
+                floodOpacity={isDark ? 0.35 : 0.18}
               />
             </filter>
-            
+
             {COMPLETION_SECTIONS.map((sec) => (
               <linearGradient id={`grad-${sec.key.replace(/\s+/g, "-")}`} key={sec.key} x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor={sec.colors[0]} />
@@ -270,11 +271,7 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                 strokeLinecap="round"
                 style={{
                   cursor: isClickable ? "pointer" : "default",
-                  filter: isHovered
-                    ? "url(#active-glow)"
-                    : seg.complete
-                    ? `drop-shadow(0 0 5px ${seg.colors[0]}66)`
-                    : undefined,
+                  filter: isHovered ? "url(#active-glow)" : undefined,
                 }}
                 onMouseEnter={() => setHoveredKey(seg.key)}
                 onMouseLeave={() => setHoveredKey(null)}
@@ -334,7 +331,6 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                     color: colors.neutral900,
                     letterSpacing: "-0.04em",
                     lineHeight: 1,
-                    textShadow: glowTextShadow(hoveredSeg.colors[0], isDark),
                   }}
                 >
                   +{hoveredSeg.weight}%
@@ -372,7 +368,6 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                     fontSize: isMobile ? 32 : 40,
                     color: colors.neutral900,
                     letterSpacing: "-0.05em",
-                    textShadow: glowTextShadow(heroAccent, isDark),
                   }}
                 >
                   {animatedPct}
@@ -399,11 +394,11 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.9, type: "spring", stiffness: 300 }}
             className="absolute -bottom-1 -right-1 flex items-center justify-center rounded-full"
-            style={{ 
-              width: 34, 
-              height: 34, 
-              background: "#10b981", 
-              boxShadow: "0 6px 16px rgba(16, 185, 129, 0.4)",
+            style={{
+              width: 34,
+              height: 34,
+              background: "#10b981",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               zIndex: 15
             }}
           >
@@ -452,7 +447,6 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
                   color: seg.complete
                     ? primaryColor
                     : isDark ? colors.neutral500 : colors.neutral400,
-                  boxShadow: seg.complete ? `0 0 6px ${primaryColor}55` : undefined,
                 }}
               >
                 {seg.complete
@@ -487,17 +481,16 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
             </>
           );
 
-          // Glass-lite: a translucent tint + a touch of backdrop-blur so these read as
-          // small elevated panes floating over the aurora wash, not flat neutral chips.
+          // Same soft-tint language as StatChip/QuickActions tiles: a plain tinted
+          // background when complete, a plain neutral chip otherwise, a border color
+          // swap on highlight -- no blur, no colored glow.
           const baseStyle: React.CSSProperties = {
             background: seg.complete
               ? isDark ? `${primaryColor}1F` : `${primaryColor}0D`
-              : isDark ? `${colors.neutral100}CC` : `${colors.neutral50}CC`,
+              : isDark ? colors.neutral100 : colors.neutral50,
             border: isHighlighted
               ? `1.5px solid ${primaryColor}`
-              : `1.5px solid ${isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"}`,
-            backdropFilter: "blur(10px) saturate(160%)",
-            WebkitBackdropFilter: "blur(10px) saturate(160%)",
+              : `1.5px solid ${colors.neutral200}`,
             cursor: isClickable ? "pointer" : "default",
           };
 
@@ -506,16 +499,8 @@ const ProfileCompletionTemplate: React.FC<ProfileCompletionProps> = ({ profileCo
             onMouseLeave: () => setHoveredKey(null),
             className: "flex items-center gap-1.5 rounded-xl px-3 py-2.5 w-full text-left",
             style: baseStyle,
-            animate: {
-              scale: isHighlighted ? 1.04 : 1,
-              y: isHighlighted ? -1 : 0,
-              boxShadow: isHighlighted ? `0 6px 14px ${primaryColor}22` : "0 0 0 rgba(0,0,0,0)",
-            },
-            whileHover: {
-              scale: 1.06,
-              y: -2,
-              boxShadow: `0 10px 24px ${primaryColor}33`,
-            },
+            animate: { y: isHighlighted ? -1 : 0 },
+            whileHover: { y: -1 },
             transition: { type: "spring" as const, stiffness: 380, damping: 26 },
           };
 

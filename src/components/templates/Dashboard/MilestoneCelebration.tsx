@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import { useColors } from "../../../utils/types";
-import { useTheme } from "../../../contexts/ThemeContext";
-import { useGlassSurface, glowTextShadow } from "./shared/dashboardMotion";
+import { useGlassSurface } from "./shared/dashboardMotion";
 import type { IDashboardSummary } from "../../../services/useDashboardService";
 
 const VIEW_MILESTONES = [50, 100, 250, 500, 1000, 2500, 5000, 10_000, 25_000, 50_000, 100_000];
@@ -90,8 +89,7 @@ const ConfettiBurst: React.FC = () => {
 
 const MilestoneCelebration: React.FC<{ dashboardData: IDashboardSummary | null }> = ({ dashboardData }) => {
   const colors = useColors();
-  const { isDark } = useTheme();
-  const glass = useGlassSurface(colors.primary500);
+  const glass = useGlassSurface();
   const { milestone, dismiss } = useMilestoneCelebration(dashboardData);
 
   useEffect(() => {
@@ -117,8 +115,8 @@ const MilestoneCelebration: React.FC<{ dashboardData: IDashboardSummary | null }
             className="relative flex items-center justify-center rounded-xl shrink-0"
             style={{
               width: 42, height: 42, fontSize: 21,
-              background: `radial-gradient(circle, ${colors.primary500}30 0%, ${colors.primary500}10 70%)`,
-              boxShadow: `0 0 24px -4px ${colors.primary500}80`,
+              background: `${colors.primary500}14`,
+              border: `1.5px solid ${colors.primary500}25`,
             }}
             animate={{ scale: [1, 1.12, 1] }}
             transition={{ duration: 1.4, repeat: 2, ease: "easeInOut" }}
@@ -126,10 +124,7 @@ const MilestoneCelebration: React.FC<{ dashboardData: IDashboardSummary | null }
             {milestone.emoji}
           </motion.div>
           <div className="relative flex-1 min-w-0">
-            <div
-              className="text-[13.5px] font-black"
-              style={{ color: colors.neutral900, textShadow: glowTextShadow(colors.primary500, isDark) }}
-            >
+            <div className="text-[13.5px] font-black" style={{ color: colors.neutral900 }}>
               {milestone.message}
             </div>
             <div className="text-[10px] mt-0.5" style={{ color: colors.neutral400 }}>

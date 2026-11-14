@@ -9,7 +9,7 @@ import { FiArrowRight } from "react-icons/fi";
 import { useSnackbar } from "../../../hooks/useSnackBar";
 import MessageDetailModal from "../../atoms/MessageDetailModal/MessageDetailModal";
 import { EmptyState } from "./shared/DashboardUI";
-import { useGlassSurface, glowTextShadow } from "./shared/dashboardMotion";
+import { useGlassSurface } from "./shared/dashboardMotion";
 
 interface RecentMessagesProps {
   messages: ContactUs[];
@@ -143,9 +143,6 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
           ? (isDark ? colors.primary900 : colors.primary50)
           : (isDark ? colors.neutral50 : colors.neutral50);
         const glass = stale ? staleGlass : unreadGlass;
-        const hoverGlow = isUnread
-          ? `0 16px 34px -14px ${accentColor}66, 0 0 26px -6px ${accentColor}59`
-          : `0 10px 22px -14px ${colors.primary500}40`;
 
         return (
           <motion.div
@@ -153,12 +150,12 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            whileHover={{ y: -3, boxShadow: hoverGlow, transition: { duration: 0.2, ease: "easeOut" } }}
+            whileHover={{ y: -1 }}
             onClick={() => setSelectedMessage(msg)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === "Enter") setSelectedMessage(msg); }}
-            className="flex items-start gap-3 rounded-xl px-3.5 py-3 relative overflow-hidden cursor-pointer"
+            className="flex items-start gap-3 rounded-xl px-3.5 py-3 relative cursor-pointer"
             style={
               isUnread
                 ? { ...glass }
@@ -168,7 +165,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             {isUnread && (
               <div
                 className="absolute left-0 top-0 bottom-0 rounded-l-xl"
-                style={{ width: 3, background: accentColor, boxShadow: `2px 0 10px ${accentColor}99` }}
+                style={{ width: 3, background: accentColor }}
               />
             )}
 
@@ -179,7 +176,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
                 height: 34,
                 background: bg,
                 color: fg,
-                boxShadow: isUnread ? `0 0 0 2px ${accentColor}40, 0 0 14px 1px ${accentColor}66` : "none",
+                boxShadow: isUnread ? `0 0 0 2px ${accentColor}40` : "none",
               }}
             >
               {initials}
@@ -187,13 +184,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
 
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
-                <div
-                  className="font-semibold text-xs truncate"
-                  style={{
-                    color: colors.neutral800,
-                    textShadow: isUnread ? glowTextShadow(accentColor, isDark) : undefined,
-                  }}
-                >
+                <div className="font-semibold text-xs truncate" style={{ color: colors.neutral800 }}>
                   {msg.name}
                 </div>
                 <div className="text-[10px] shrink-0" style={{ color: colors.neutral400 }}>
@@ -232,11 +223,7 @@ const RecentMessagesTemplate: React.FC<RecentMessagesProps> = ({ messages }) => 
             {isUnread && (
               <div
                 className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full self-start mt-0.5"
-                style={{
-                  background: accentColor,
-                  color: "#fff",
-                  boxShadow: `0 0 10px 1px ${accentColor}99, 0 2px 8px -2px ${accentColor}80`,
-                }}
+                style={{ background: accentColor, color: "#fff" }}
               >
                 {stale ? "48h+" : "New"}
               </div>

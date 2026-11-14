@@ -7,7 +7,7 @@ import { useCountUp } from "../../../hooks/useCountUp";
 import type { IViewStats, IPortfolioView } from "../../../services/useDashboardService";
 import { FiArrowUpRight, FiArrowDownRight, FiDownload, FiUsers, FiEye, FiMonitor, FiSmartphone, FiTablet, FiChevronDown, FiChevronUp, FiClock, FiLink, FiGlobe, FiBarChart2, FiCalendar } from "react-icons/fi";
 import { EmptyState, ShimmerTopline } from "./shared/DashboardUI";
-import { useGlassSurface, useTilt } from "./shared/dashboardMotion";
+import { useGlassSurface } from "./shared/dashboardMotion";
 import { TrendAreaChart, DeviceDonutChart } from "./AnalyticsCharts";
 import { DEVICE_HUES_LIGHT, DEVICE_HUES_DARK, DEVICE_LABEL } from "./deviceColors";
 import ViewsHeatmap from "./ViewsHeatmap";
@@ -195,10 +195,7 @@ const BreakdownBars: React.FC<{
             >
               <motion.div
                 className="h-full rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)`,
-                  boxShadow: pct > 0 ? `0 0 6px ${color}55` : "none",
-                }}
+                style={{ background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)` }}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
                 transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: idx * 0.06 + 0.2 }}
@@ -267,10 +264,7 @@ const LocationBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ br
             <div className="rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)`,
-                  boxShadow: `0 0 6px ${color}55`,
-                }}
+                style={{ background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)` }}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
                 transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.07 + 0.2 }}
@@ -319,10 +313,7 @@ const ReferrerBreakdown: React.FC<{ breakdown: Record<string, number> }> = ({ br
             <div className="rounded-full overflow-hidden" style={{ height: 8, background: colors.neutral100 }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)`,
-                  boxShadow: `0 0 6px ${color}55`,
-                }}
+                style={{ background: `linear-gradient(90deg, ${color}55 0%, ${color} 100%)` }}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
                 transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.07 + 0.2 }}
@@ -385,9 +376,6 @@ const PeakHours: React.FC<{ views: IPortfolioView[] }> = ({ views }) => {
                 height: `${Math.max(hp, count > 0 ? 5 : 2)}%`,
                 background: barBg(h, count),
                 transformOrigin: "bottom",
-                boxShadow: top3[0] === h && count > 0
-                  ? `0 -2px 8px ${ACCENT}55`
-                  : "none",
               }}
               initial={{ scaleY: 0 }}
               animate={{ scaleY: 1 }}
@@ -696,12 +684,12 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
     overflow: "hidden",
   };
 
+  // A plain nested panel (no blur/translucency): the outer card is already an
+  // opaque, calm surface, so a "glass" inner panel had nothing colorful behind
+  // it to blur -- it just looked like a slightly different flat panel anyway.
   const panelStyle: React.CSSProperties = {
-    background: isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.55)",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    border: isDark ? `1px solid ${colors.neutral300}` : "1px solid rgba(255,255,255,0.65)",
-    boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.04)" : "inset 0 1px 0 rgba(255,255,255,0.75), 0 2px 10px rgba(15,23,42,0.03)",
+    background: colors.neutral50,
+    border: `1px solid ${colors.neutral200}`,
     borderRadius: 12,
     padding: 20,
   };
@@ -721,7 +709,6 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
   const hasDeviceData    = Object.values(deviceBreakdown).some((c) => c > 0);
 
   const [activeDeviceKey, setActiveDeviceKey] = React.useState<string | null>(null);
-  const deviceTilt = useTilt(4);
 
   const hasAnyData = totalViews > 0 || recentViews.length > 0;
 
@@ -873,17 +860,13 @@ const ViewAnalyticsTemplate: React.FC<ViewAnalyticsProps> = ({ viewStats: rawSta
 
             {}
             {hasDeviceData && (
-              <motion.div
-                style={{ ...panelStyle, rotateX: deviceTilt.rotateX, rotateY: deviceTilt.rotateY, transformPerspective: 800 }}
-                onMouseMove={deviceTilt.onMouseMove}
-                onMouseLeave={deviceTilt.onMouseLeave}
-              >
+              <div style={panelStyle}>
                 {panelLabel("Devices")}
                 <div className="flex flex-col gap-3">
                   <DeviceDonutChart breakdown={deviceBreakdown} activeKey={activeDeviceKey} onSliceHover={setActiveDeviceKey} />
                   <DeviceBreakdownList breakdown={deviceBreakdown} activeKey={activeDeviceKey} onHover={setActiveDeviceKey} />
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {}

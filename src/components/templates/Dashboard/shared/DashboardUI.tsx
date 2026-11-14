@@ -2,133 +2,86 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useColors } from "../../../../utils/types";
 import { useTheme } from "../../../../contexts/ThemeContext";
-import { useCardShadow } from "../../../../hooks/useCardShadow";
 import { useGlassSurface } from "./dashboardMotion";
 
-/* ─── Glass design system ────────────────────────────────────────────────
- * One shared surface language for the "premium glass + glow" dashboard
- * look: frosted, translucent panels floating over the AmbientAurora wash
- * below, with a soft colored glow instead of a flat drop shadow. Every
- * widget on the dashboard pulls from these same few primitives so the
- * whole page reads as one coherent design rather than each panel
- * reinventing its own blur/glow values.
+/* ─── Shared surface language ────────────────────────────────────────────
+ * Matches the rest of the portal (see ListingShell.template.tsx's card):
+ * a plain neutral surface, a neutral border, a soft colorless two-layer
+ * shadow, and -- at most -- one or two very faint, static ambient blobs
+ * behind the page. Previously this was a "premium glass + glow" look
+ * (frosted blur, saturated colored shadows, a continuously animated
+ * shimmer sweep, neon text); none of that matched how every other admin
+ * page already looks, so the Dashboard read as a different product.
  *
  * useGlassSurface/useTilt/useMagnetic/glowTextShadow live in ./dashboardMotion
  * (not here) so this file exports only components -- react-refresh/only-export-
  * components flags a file mixing component and non-component exports since
  * Fast Refresh can't hot-reload it reliably. */
 
-/** Slow-drifting blurred color blobs meant to sit behind a page's glass cards
- * (absolute, inset:0, z-index 0) — the vivid "aurora" a frosted panel needs
- * behind it to actually read as glass instead of a plain translucent card.
- * Spread across percentages of the full container height so a long,
- * data-heavy page (this one can run 3000px+) stays colorful top to bottom
- * instead of only near its very top/bottom edges. Parent must be
- * `position: relative` (and ideally `overflow: hidden`) so the blobs stay
- * clipped to that section instead of bleeding into the rest of the app shell. */
-export const AmbientAurora: React.FC<{ className?: string }> = ({ className = "" }) => {
+/** Two faint, static color washes behind a page's cards -- the same
+ * treatment ListingShell.template.tsx already uses (so this page reads as
+ * the same product as every other admin page), just reused here instead of
+ * each page hand-rolling its own pair of divs. Deliberately not animated
+ * and capped at a very low opacity: a barely-there ambient tint, not a
+ * decoration you're meant to notice. Parent must be `position: relative`
+ * (and ideally `overflow: hidden`) so the blobs stay clipped to that
+ * section instead of bleeding into the rest of the app shell. */
+export const AmbientAurora: React.FC<{ className?: string; accent?: string }> = ({ className = "", accent }) => {
   const colors = useColors();
-  const { isDark } = useTheme();
-  const a = isDark ? "68" : "52";
-
-  interface Blob {
-    color: string;
-    top?: string;
-    left?: string;
-    right?: string;
-    bottom?: string;
-    size: number;
-    dur: number;
-    dx: number[];
-    dy: number[];
-  }
-
-  const blobs: Blob[] = [
-    { color: colors.primary500, top: "-6%", left: "-10%", size: 620, dur: 26, dx: [0, 40, -20, 0], dy: [0, 28, -22, 0] },
-    { color: "#8b5cf6", top: "2%", right: "-14%", size: 520, dur: 32, dx: [0, -34, 20, 0], dy: [0, 28, -18, 0] },
-    { color: "#ec4899", top: "22%", left: "35%", size: 460, dur: 29, dx: [0, -24, 30, 0], dy: [0, 20, -24, 0] },
-    { color: "#14b8a6", top: "42%", left: "-8%", size: 540, dur: 24, dx: [0, 30, -20, 0], dy: [0, -22, 26, 0] },
-    { color: "#f59e0b", top: "58%", right: "-10%", size: 480, dur: 30, dx: [0, -26, 22, 0], dy: [0, 24, -20, 0] },
-    { color: "#6366f1", top: "78%", left: "18%", size: 560, dur: 27, dx: [0, 26, -30, 0], dy: [0, -20, 24, 0] },
-    { color: "#14b8a6", bottom: "-8%", right: "8%", size: 500, dur: 23, dx: [0, 22, -30, 0], dy: [0, -18, 22, 0] },
-  ];
+  const tint = accent ?? colors.primary600;
 
   return (
     <div className={`absolute inset-0 pointer-events-none ${className}`} style={{ zIndex: 0 }}>
-      {blobs.map((b, i) => (
-        <motion.div
-          key={i}
-          style={{
-            position: "absolute",
-            top: b.top,
-            left: b.left,
-            right: b.right,
-            bottom: b.bottom,
-            width: b.size,
-            height: b.size,
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${b.color}${a} 0%, transparent 70%)`,
-            filter: "blur(75px)",
-          }}
-          animate={{ x: b.dx, y: b.dy, scale: [1, 1.18, 0.94, 1] }}
-          transition={{ duration: b.dur, repeat: Infinity, ease: "easeInOut" }}
-        />
-      ))}
+      <div
+        className="absolute rounded-full"
+        style={{
+          top: "-20%", right: "-8%",
+          width: "45vw", height: "45vw",
+          background: `radial-gradient(circle, ${tint}, transparent)`,
+          filter: "blur(120px)",
+          opacity: 0.05,
+        }}
+      />
+      <div
+        className="absolute rounded-full"
+        style={{
+          bottom: "-10%", left: "-5%",
+          width: "30vw", height: "30vw",
+          background: `radial-gradient(circle, ${colors.neutral400}, transparent)`,
+          filter: "blur(100px)",
+          opacity: 0.04,
+        }}
+      />
     </div>
   );
 };
 
-/** A gradient accent bar with a continuously sweeping light streak — the
- * "premium loading bar" topline used by every hero card, factored out so
- * ViewAnalytics's own hand-rolled card (it predates the shared Card
- * component) can use the exact same shimmer instead of a static bar. */
+/** A flat, static gradient accent bar -- the same topline ListingShell's
+ * header card uses. No longer animated (it used to carry a continuously
+ * sweeping light streak); a calm admin dashboard doesn't need a looping
+ * animation on every card, all the time, whether or not anything changed. */
 export const ShimmerTopline: React.FC<{ color: string; color2?: string }> = ({ color, color2 }) => (
-  <div style={{ position: "relative", height: 3, overflow: "hidden", background: `${color}25` }}>
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background: `linear-gradient(90deg, ${color}, ${color2 ?? color})`,
-        boxShadow: `0 0 16px ${color}A0`,
-      }}
-    />
-    <motion.div
-      style={{
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        width: "40%",
-        background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)`,
-      }}
-      animate={{ left: ["-40%", "140%"] }}
-      transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.4 }}
-    />
-  </div>
+  <div style={{ height: 3, background: `linear-gradient(90deg, ${color} 0%, ${color2 ?? `${color}28`} 100%)` }} />
 );
 
 interface CardProps {
   children: React.ReactNode;
   className?: string;
-  /** Adds the gradient accent topline + frosted-glass surface used by the
-   * analytics-style "hero" panels, so any section can opt into the same premium
-   * surface treatment instead of a flat card. */
+  /** Adds the flat accent topline used by section header panels, so any
+   * section can opt into the same "this is a header/primary panel" cue. */
   hero?: boolean;
   noPadding?: boolean;
-  /** Tints the glass glow + accent topline; defaults to the theme's primary hue. */
+  /** Tints the topline when hero is set; defaults to the theme's primary hue. */
   accent?: string;
 }
 
 export const Card: React.FC<CardProps> = ({ children, className = "", hero = false, noPadding = false, accent }) => {
   const colors = useColors();
-  const shadow = useCardShadow();
-  const glass = useGlassSurface(accent);
+  const surface = useGlassSurface();
   const topline = accent ?? colors.primary600;
 
   return (
-    <div
-      className={`rounded-2xl overflow-hidden relative ${className}`}
-      style={hero ? glass : { background: colors.neutral0, border: `1.5px solid ${colors.neutral300}`, boxShadow: shadow }}
-    >
+    <div className={`rounded-2xl overflow-hidden relative ${className}`} style={surface}>
       {hero && <ShimmerTopline color={topline} color2={accent ?? colors.primary400} />}
       <div className={noPadding ? "" : "p-5 sm:p-6"}>{children}</div>
     </div>

@@ -16,7 +16,6 @@ import RecentActivitiesTemplate from "./RecentActivities.template";
 import QuickActionsTemplate from "./QuickActions.template";
 import MilestoneCelebration from "./MilestoneCelebration";
 import { Card, SectionLabel, SkeletonBlock, AmbientAurora } from "./shared/DashboardUI";
-import { glowTextShadow, useTilt } from "./shared/dashboardMotion";
 import LiveSiteControl from "../../molecules/LiveSiteControl/LiveSiteControl";
 
 interface DashboardTemplateProps {
@@ -96,28 +95,26 @@ interface FocusChipProps {
   color: string;
   onClick?: () => void;
 }
+// Same soft-tint pill language as ListingShell's StatChip (${accent}10 fill,
+// ${accent}25 border) -- no glow, no hover shadow-lift, just a plain color
+// dot for quick visual grouping.
 const FocusChip: React.FC<FocusChipProps> = ({ label, color, onClick }) => (
-  <motion.button
+  <button
     onClick={onClick}
-    whileHover={{ y: -1, boxShadow: `0 6px 18px -4px ${color}70` }}
-    className="flex items-center gap-1.5 rounded-full transition-colors duration-150"
+    className="flex items-center gap-1.5 rounded-full"
     style={{
       padding: "5px 10px 5px 8px",
-      background: `${color}14`,
-      border: `1px solid ${color}30`,
+      background: `${color}10`,
+      border: `1px solid ${color}25`,
       cursor: onClick ? "pointer" : "default",
-      boxShadow: `0 2px 8px -3px ${color}50`,
     }}
   >
-    <div
-      className="rounded-full shrink-0"
-      style={{ width: 6, height: 6, background: color, boxShadow: `0 0 6px 1.5px ${color}90` }}
-    />
+    <div className="rounded-full shrink-0" style={{ width: 6, height: 6, background: color }} />
     <span className="text-[11px] font-semibold" style={{ color }}>
       {label}
     </span>
     {onClick && <FiArrowRight size={9} color={color} />}
-  </motion.button>
+  </button>
 );
 
 /** Small circular gauge for the engagement-rate cards — fills the wide empty
@@ -156,7 +153,6 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
   stats,
 }) => {
   const colors = useColors();
-  const { isDark } = useTheme();
 
   const { totalViews, resumeDownloads, uniqueVisitors } = viewStats;
   const { totalMessages } = stats;
@@ -192,26 +188,16 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
           key={label}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: i * 0.05 }}
-          whileHover={{ y: -2, boxShadow: `0 12px 32px -10px ${color}60` }}
-          className="relative rounded-xl p-4 flex items-center justify-between gap-3 overflow-hidden"
+          transition={{ duration: 0.3, delay: i * 0.05 }}
+          className="rounded-xl p-4 flex items-center justify-between gap-3"
           style={{
-            background: isDark
-              ? `linear-gradient(135deg, ${color}22 0%, ${color}0A 100%)`
-              : `linear-gradient(135deg, ${color}14 0%, ${color}05 100%)`,
-            border: `1px solid ${color}2E`,
-            boxShadow: `0 4px 16px -8px ${color}40`,
+            background: colors.neutral0,
+            border: `1.5px solid ${colors.neutral300}`,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)",
           }}
         >
-          <div
-            className="absolute rounded-full pointer-events-none"
-            style={{ width: 90, height: 90, top: -30, right: -30, background: `radial-gradient(circle, ${color}30 0%, transparent 70%)`, filter: "blur(12px)" }}
-          />
-          <div className="relative min-w-0">
-            <div
-              className="font-black tabular-nums"
-              style={{ fontSize: 17, color, letterSpacing: "-0.03em", lineHeight: 1, textShadow: glowTextShadow(color, isDark) }}
-            >
+          <div className="min-w-0">
+            <div className="font-black tabular-nums" style={{ fontSize: 17, color, letterSpacing: "-0.03em", lineHeight: 1 }}>
               {fmt(pct)}
             </div>
             <div
@@ -224,11 +210,7 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
               {detail}
             </div>
           </div>
-          {pct !== null && (
-            <div className="relative shrink-0" style={{ filter: `drop-shadow(0 0 6px ${color}60)` }}>
-              <MiniRing pct={pct} color={color} />
-            </div>
-          )}
+          {pct !== null && <MiniRing pct={pct} color={color} />}
         </motion.div>
       ))}
     </div>
@@ -241,7 +223,6 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
   const isMobile = useIsMobile();
   const { user } = useContext(AuthenticatedUserContext);
   const navigate = useNavigate();
-  const headerTilt = useTilt(4);
 
   const fullName = dashboardData?.profileSummary?.fullName || user?.fullName || "";
   const profileTitle = dashboardData?.profileSummary?.title || "";
@@ -331,11 +312,8 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
       <motion.div
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
+        transition={{ duration: 0.3 }}
         className="mb-5"
-        onMouseMove={headerTilt.onMouseMove}
-        onMouseLeave={headerTilt.onMouseLeave}
-        style={{ rotateX: headerTilt.rotateX, rotateY: headerTilt.rotateY, transformPerspective: 900 }}
       >
         <Card hero>
           <div className="flex items-center justify-between">
@@ -346,10 +324,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                   fontSize: isMobile ? 19 : 23,
                   lineHeight: 1.2,
                   letterSpacing: "-0.02em",
-                  background: `linear-gradient(120deg, ${colors.neutral900} 0%, ${colors.primary600} 100%)`,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
+                  color: colors.neutral900,
                 }}
               >
                 {getGreeting()}, {firstName}.
@@ -378,11 +353,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
             </div>
 
             {fullName && (
-              <motion.div
-                className="ml-4 shrink-0 rounded-full"
-                animate={{ boxShadow: [`0 0 0 3px ${colors.primary400}50`, `0 0 0 10px ${colors.primary400}00`] }}
-                transition={{ duration: 1.9, repeat: Infinity, ease: "easeOut" }}
-              >
+              <div className="ml-4 shrink-0">
                 {profileImg ? (
                   <img
                     src={profileImg}
@@ -391,8 +362,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                     style={{
                       width: isMobile ? 40 : 48,
                       height: isMobile ? 40 : 48,
-                      border: `2px solid ${colors.primary300}`,
-                      boxShadow: `0 0 24px -1px ${colors.primary400}A0`,
+                      border: `1.5px solid ${colors.neutral300}`,
                     }}
                   />
                 ) : (
@@ -403,14 +373,13 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                       height: isMobile ? 40 : 48,
                       fontSize: isMobile ? 14 : 16,
                       ...avatarPalette(fullName, isDark),
-                      border: `2px solid ${colors.primary300}`,
-                      boxShadow: `0 0 24px -1px ${colors.primary400}A0`,
+                      border: `1.5px solid ${colors.neutral300}`,
                     }}
                   >
                     {getInitials(fullName)}
                   </div>
                 )}
-              </motion.div>
+              </div>
             )}
           </div>
         </Card>

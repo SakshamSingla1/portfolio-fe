@@ -61,39 +61,33 @@ export const useMagnetic = (strength = 0.25, max = 10) => {
   return { x: springX, y: springY, onMouseMove, onMouseLeave };
 };
 
-/* ─── Glass design system ────────────────────────────────────────────────
- * One shared surface language for the "premium glass + glow" dashboard
- * look: frosted, translucent panels floating over the AmbientAurora wash
- * below, with a soft colored glow instead of a flat drop shadow. Every
- * widget on the dashboard pulls from these same few primitives so the
- * whole page reads as one coherent design rather than each panel
- * reinventing its own blur/glow values. */
-
-/** Frosted-glass surface style: translucent gradient fill + backdrop blur +
- * a soft ambient glow in `accent` (defaults to the theme's primary hue).
- * Needs something colorful behind it (see AmbientAurora) to actually read
- * as "glass" rather than a plain tinted card. */
-export const useGlassSurface = (accent?: string): React.CSSProperties => {
+/* ─── Shared surface language ─────────────────────────────────────────────
+ * Previously a "premium glass + glow" look (frosted blur, saturated colored
+ * shadows, neon text) layered on top of AmbientAurora's colorful background
+ * wash -- replaced with the same restrained surface every other page in the
+ * portal already uses (see ListingShell.template.tsx's card: plain neutral
+ * background, a neutral border, a soft two-layer shadow with no color in
+ * it). Kept as a hook (not a plain style object) so every call site that
+ * already depends on it for its surface updates to the calmer look for
+ * free, with zero per-file changes -- this is the single source of truth
+ * for "what a dashboard card's surface looks like." */
+export const useGlassSurface = (_accent?: string): React.CSSProperties => {
   const colors = useColors();
   const { isDark } = useTheme();
-  const glow = accent ?? colors.primary500;
 
   return useMemo<React.CSSProperties>(() => ({
-    background: isDark
-      ? `linear-gradient(135deg, ${colors.neutral100}A8 0%, ${colors.neutral50}C4 100%)`
-      : `linear-gradient(135deg, rgba(255,255,255,0.46) 0%, rgba(250,251,255,0.30) 100%)`,
-    backdropFilter: "blur(28px) saturate(190%)",
-    WebkitBackdropFilter: "blur(28px) saturate(190%)",
-    border: isDark ? `1px solid ${glow}5A` : `1px solid ${glow}48`,
+    background: colors.neutral0,
+    border: `1.5px solid ${colors.neutral300}`,
     boxShadow: isDark
-      ? `0 1px 0 rgba(255,255,255,0.08) inset, 0 32px 64px -18px rgba(0,0,0,0.65), 0 0 72px -8px ${glow}90`
-      : `0 1px 0 rgba(255,255,255,0.95) inset, 0 28px 60px -16px ${glow}70, 0 0 44px -4px ${glow}45, 0 4px 14px rgba(15,23,42,0.07)`,
-  }), [isDark, glow, colors.neutral100, colors.neutral50]);
+      ? "0 2px 8px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.03) inset"
+      : "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.03)",
+  }), [isDark, colors.neutral0, colors.neutral300]);
 };
 
-/** Soft glow behind hero numbers/icons — pairs with useGlassSurface so a
- * KPI reads as luminous rather than flat black-on-white text. */
-export const glowTextShadow = (accent: string, isDark: boolean): string =>
-  isDark
-    ? `0 0 40px ${accent}D0, 0 0 18px ${accent}B0, 0 0 6px ${accent}90`
-    : `0 0 34px ${accent}90, 0 0 14px ${accent}70, 0 0 4px ${accent}50`;
+/** No-op (same (accent, isDark) signature, both args now ignored) kept only so
+ * call sites built around "a KPI number can carry a text shadow" don't need
+ * their own follow-up edit -- previously rendered a saturated neon glow
+ * behind hero numbers; the portal's actual design language (see
+ * ListingShell, every non-Dashboard page) never glows text, so this always
+ * returns "none" now. */
+export const glowTextShadow = (_accent?: string, _isDark?: boolean): string => "none";
