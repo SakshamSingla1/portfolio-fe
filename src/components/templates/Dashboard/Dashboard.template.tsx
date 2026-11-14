@@ -440,7 +440,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
               >
-                <Card hero>
+                <Card>
                   <SectionLabel count={dashboardData.recentMessages.length}>
                     Recent Messages
                   </SectionLabel>
@@ -453,7 +453,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.15 }}
               >
-                <Card hero>
+                <Card>
                   <SectionLabel>Quick Add</SectionLabel>
                   <QuickActionsTemplate missingSections={dashboardData.profileCompletion?.missingSections} />
                 </Card>
@@ -467,7 +467,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.12 }}
               >
-                <Card hero>
+                <Card>
                   <SectionLabel>Portfolio Score</SectionLabel>
                   <ProfileCompletionTemplate profileCompletion={dashboardData.profileCompletion} />
                 </Card>
@@ -478,7 +478,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({ dashboardData }) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.18 }}
               >
-                <Card hero>
+                <Card>
                   <SectionLabel count={dashboardData.recentActivities.length}>
                     Activity
                   </SectionLabel>

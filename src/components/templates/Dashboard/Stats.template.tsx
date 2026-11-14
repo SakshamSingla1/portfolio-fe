@@ -6,6 +6,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { useColors } from "../../../utils/types";
 import { useNavigate } from "react-router-dom";
 import { useGlassSurface } from "./shared/dashboardMotion";
+import { SECTION_COLORS } from "./shared/sectionColors";
 import { FiCode, FiZap, FiBriefcase, FiMail, FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 
 interface StatsProps {
@@ -32,18 +33,18 @@ const DeltaChip: React.FC<{ delta?: number }> = ({ delta }) => {
 };
 
 const HERO_STATS = [
-  { label: "Projects",   key: "totalProjects",   accent: "#8b5cf6", icon: FiCode,      route: "/projects" },
-  { label: "Skills",     key: "totalSkills",     accent: "#6366f1", icon: FiZap,       route: "/skills" },
-  { label: "Experience", key: "totalExperience", accent: "#10b981", icon: FiBriefcase, route: "/experience" },
-  { label: "Messages",   key: "totalMessages",   accent: "#a855f7", icon: FiMail,      route: "/messages" },
+  { label: "Projects",   key: "totalProjects",   accent: SECTION_COLORS.projects,   icon: FiCode,      route: "/projects" },
+  { label: "Skills",     key: "totalSkills",     accent: SECTION_COLORS.skills,     icon: FiZap,       route: "/skills" },
+  { label: "Experience", key: "totalExperience", accent: SECTION_COLORS.experience, icon: FiBriefcase, route: "/experience" },
+  { label: "Messages",   key: "totalMessages",   accent: SECTION_COLORS.messages,   icon: FiMail,      route: "/messages" },
 ] as const;
 
 const SECONDARY_STATS = [
-  { label: "Education",    key: "totalEducation",    accent: "#3b82f6", route: "/education" },
-  { label: "Achievements", key: "totalAchievements", accent: "#f59e0b", route: "/achievements" },
-  { label: "Testimonials", key: "totalTestimonials", accent: "#f43f5e", route: "/testimonials" },
-  { label: "Certs",        key: "totalCertification",accent: "#06b6d4", route: "/certifications" },
-  { label: "Social",       key: "totalSocialLinks",  accent: "#ec4899", route: "/social-links" },
+  { label: "Education",    key: "totalEducation",     accent: SECTION_COLORS.education,     route: "/education" },
+  { label: "Achievements", key: "totalAchievements",  accent: SECTION_COLORS.achievements,  route: "/achievements" },
+  { label: "Testimonials", key: "totalTestimonials",  accent: SECTION_COLORS.testimonials,  route: "/testimonials" },
+  { label: "Certs",        key: "totalCertification", accent: SECTION_COLORS.certifications, route: "/certifications" },
+  { label: "Social",       key: "totalSocialLinks",   accent: SECTION_COLORS.social,        route: "/social-links" },
 ] as const;
 
 /* ─── Hero stat cell ─────────────────────────────────────────── */

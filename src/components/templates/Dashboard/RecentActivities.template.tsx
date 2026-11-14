@@ -8,6 +8,7 @@ import {
   FiMessageSquare, FiStar, FiAward, FiTrendingUp,
 } from "react-icons/fi";
 import { EmptyState } from "./shared/DashboardUI";
+import { SECTION_COLORS } from "./shared/sectionColors";
 
 interface IActivity {
   type: string;
@@ -20,26 +21,30 @@ interface RecentActivitiesProps {
   activities: IActivity[];
 }
 
+// Colors pulled from the shared SECTION_COLORS map -- this previously had its
+// own ad hoc hex per category that didn't match Stats/QuickActions/ProfileCompletion
+// (e.g. "Projects" was blue here but violet everywhere else), so the same
+// content type read as a different color depending which widget you looked at.
 const TYPE_META: Record<string, {
   dot: string; label: string; route: string;
   icon: React.ComponentType<{ size?: number }>;
 }> = {
-  PROFILE:        { dot: "#0ea5e9", label: "Profile",     route: "/profile",        icon: FiUser },
-  EDUCATION:      { dot: "#6366f1", label: "Education",   route: "/education",      icon: FiBook },
-  EXPERIENCE:     { dot: "#f97316", label: "Experience",  route: "/experience",     icon: FiBriefcase },
-  SKILLS:         { dot: "#10b981", label: "Skills",      route: "/skills",         icon: FiZap },
-  SKILL:          { dot: "#10b981", label: "Skills",      route: "/skills",         icon: FiZap },
-  PROJECTS:       { dot: "#3b82f6", label: "Projects",    route: "/projects",       icon: FiCode },
-  PROJECT:        { dot: "#3b82f6", label: "Projects",    route: "/projects",       icon: FiCode },
-  CONTACT:        { dot: "#f43f5e", label: "Message",     route: "/messages",       icon: FiMessageSquare },
-  CONTACT_US:     { dot: "#f43f5e", label: "Message",     route: "/messages",       icon: FiMessageSquare },
-  MESSAGE:        { dot: "#f43f5e", label: "Message",     route: "/messages",       icon: FiMessageSquare },
-  TESTIMONIAL:    { dot: "#a855f7", label: "Testimonial", route: "/testimonials",   icon: FiStar },
-  TESTIMONIALS:   { dot: "#a855f7", label: "Testimonial", route: "/testimonials",   icon: FiStar },
-  CERTIFICATION:  { dot: "#06b6d4", label: "Cert",        route: "/certifications", icon: FiAward },
-  CERTIFICATIONS: { dot: "#06b6d4", label: "Cert",        route: "/certifications", icon: FiAward },
-  ACHIEVEMENT:    { dot: "#f59e0b", label: "Achievement", route: "/achievements",   icon: FiTrendingUp },
-  ACHIEVEMENTS:   { dot: "#f59e0b", label: "Achievement", route: "/achievements",   icon: FiTrendingUp },
+  PROFILE:        { dot: SECTION_COLORS.profile,       label: "Profile",     route: "/profile",        icon: FiUser },
+  EDUCATION:      { dot: SECTION_COLORS.education,     label: "Education",   route: "/education",      icon: FiBook },
+  EXPERIENCE:     { dot: SECTION_COLORS.experience,    label: "Experience",  route: "/experience",     icon: FiBriefcase },
+  SKILLS:         { dot: SECTION_COLORS.skills,        label: "Skills",      route: "/skills",         icon: FiZap },
+  SKILL:          { dot: SECTION_COLORS.skills,        label: "Skills",      route: "/skills",         icon: FiZap },
+  PROJECTS:       { dot: SECTION_COLORS.projects,      label: "Projects",    route: "/projects",       icon: FiCode },
+  PROJECT:        { dot: SECTION_COLORS.projects,      label: "Projects",    route: "/projects",       icon: FiCode },
+  CONTACT:        { dot: SECTION_COLORS.messages,      label: "Message",     route: "/messages",       icon: FiMessageSquare },
+  CONTACT_US:     { dot: SECTION_COLORS.messages,      label: "Message",     route: "/messages",       icon: FiMessageSquare },
+  MESSAGE:        { dot: SECTION_COLORS.messages,      label: "Message",     route: "/messages",       icon: FiMessageSquare },
+  TESTIMONIAL:    { dot: SECTION_COLORS.testimonials,  label: "Testimonial", route: "/testimonials",   icon: FiStar },
+  TESTIMONIALS:   { dot: SECTION_COLORS.testimonials,  label: "Testimonial", route: "/testimonials",   icon: FiStar },
+  CERTIFICATION:  { dot: SECTION_COLORS.certifications, label: "Cert",        route: "/certifications", icon: FiAward },
+  CERTIFICATIONS: { dot: SECTION_COLORS.certifications, label: "Cert",        route: "/certifications", icon: FiAward },
+  ACHIEVEMENT:    { dot: SECTION_COLORS.achievements,  label: "Achievement", route: "/achievements",   icon: FiTrendingUp },
+  ACHIEVEMENTS:   { dot: SECTION_COLORS.achievements,  label: "Achievement", route: "/achievements",   icon: FiTrendingUp },
 };
 
 const getTypeMeta = (type: string) =>

@@ -12,16 +12,17 @@ import { useColors } from "../../../utils/types";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { motion } from "framer-motion";
 import { useGlassSurface } from "./shared/dashboardMotion";
+import { SECTION_COLORS } from "./shared/sectionColors";
 
 const QUICK_ACTIONS = [
-  { label: "Project",       subLabel: "Add to portfolio",  icon: FaCode,          route: "/projects",       dot: "#8b5cf6", matchKey: "project" },
-  { label: "Skill",         subLabel: "Technical skills",  icon: FaDumbbell,      route: "/skills",         dot: "#6366f1", matchKey: "skill" },
-  { label: "Experience",    subLabel: "Work history",      icon: FaBriefcase,     route: "/experience",     dot: "#10b981", matchKey: "experience" },
-  { label: "Education",     subLabel: "Academic record",   icon: FaGraduationCap, route: "/education",      dot: "#3b82f6", matchKey: "education" },
-  { label: "Certification", subLabel: "Certificates",      icon: GrCertificate,   route: "/certifications", dot: "#06b6d4", matchKey: "certification" },
-  { label: "Achievement",   subLabel: "Milestones",        icon: GiAchievement,   route: "/achievements",   dot: "#f59e0b", matchKey: "achievement" },
-  { label: "Social Link",   subLabel: "Online presence",   icon: IoLinkSharp,     route: "/social-links",   dot: "#ec4899", matchKey: "social" },
-  { label: "Testimonial",   subLabel: "Recommendations",   icon: BsPersonVcard,   route: "/testimonials",   dot: "#f43f5e", matchKey: "testimonial" },
+  { label: "Project",       subLabel: "Add to portfolio",  icon: FaCode,          route: "/projects",       dot: SECTION_COLORS.projects,      matchKey: "project" },
+  { label: "Skill",         subLabel: "Technical skills",  icon: FaDumbbell,      route: "/skills",         dot: SECTION_COLORS.skills,        matchKey: "skill" },
+  { label: "Experience",    subLabel: "Work history",      icon: FaBriefcase,     route: "/experience",     dot: SECTION_COLORS.experience,    matchKey: "experience" },
+  { label: "Education",     subLabel: "Academic record",   icon: FaGraduationCap, route: "/education",      dot: SECTION_COLORS.education,     matchKey: "education" },
+  { label: "Certification", subLabel: "Certificates",      icon: GrCertificate,   route: "/certifications", dot: SECTION_COLORS.certifications, matchKey: "certification" },
+  { label: "Achievement",   subLabel: "Milestones",        icon: GiAchievement,   route: "/achievements",   dot: SECTION_COLORS.achievements,  matchKey: "achievement" },
+  { label: "Social Link",   subLabel: "Online presence",   icon: IoLinkSharp,     route: "/social-links",   dot: SECTION_COLORS.social,        matchKey: "social" },
+  { label: "Testimonial",   subLabel: "Recommendations",   icon: BsPersonVcard,   route: "/testimonials",   dot: SECTION_COLORS.testimonials,  matchKey: "testimonial" },
 ] as const;
 
 type QuickAction = (typeof QUICK_ACTIONS)[number];

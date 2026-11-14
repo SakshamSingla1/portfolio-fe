@@ -10,6 +10,7 @@ import { useProfileTemplateService } from "../../../services/useProfileTemplateS
 import { useCountUp } from "../../../hooks/useCountUp";
 import { FiCheck, FiMinus, FiArrowRight, FiArrowUpRight, FiTrendingUp } from "react-icons/fi";
 import { useGlassSurface } from "./shared/dashboardMotion";
+import { SECTION_COLORS } from "./shared/sectionColors";
 
 const SECTION_ROUTES: Record<string, string> = {
   "Profile Basics":  "/profile",
@@ -28,17 +29,22 @@ interface ProfileCompletionProps {
   profileCompletion: IProfileCompletion;
 }
 
+// Base hue per segment comes from the shared SECTION_COLORS map (second stop is
+// just a darker shade of the same hue for ring depth) -- this previously picked
+// its own hex per section independently of Stats/QuickActions/RecentActivities,
+// so e.g. "Education" was cyan here but blue everywhere else on the Dashboard.
 const COMPLETION_SECTIONS = [
-  { key: "Profile Basics",  weight: 9,  colors: ["#3b82f6", "#1d4ed8"] }, // Blue
-  { key: "Projects",        weight: 13, colors: ["#8b5cf6", "#6d28d9"] }, // Purple
-  { key: "Skills",          weight: 13, colors: ["#6366f1", "#4f46e5"] }, // Indigo
-  { key: "Experience",      weight: 14, colors: ["#10b981", "#047857"] }, // Emerald Green
-  { key: "Education",       weight: 9,  colors: ["#06b6d4", "#0891b2"] }, // Cyan
-  { key: "Testimonials",    weight: 9,  colors: ["#f43f5e", "#be123c"] }, // Rose
-  { key: "Certifications",  weight: 9,  colors: ["#ec4899", "#be185d"] }, // Pink
-  { key: "Achievements",    weight: 5,  colors: ["#f59e0b", "#b45309"] }, // Amber
-  { key: "Social Links",    weight: 9,  colors: ["#14b8a6", "#0f766e"] }, // Teal
-  { key: "Choose a Template", weight: 10, colors: ["#a855f7", "#7e22ce"] }, // Violet
+  { key: "Profile Basics",  weight: 9,  colors: [SECTION_COLORS.profile, "#0369a1"] },
+  { key: "Projects",        weight: 13, colors: [SECTION_COLORS.projects, "#6d28d9"] },
+  { key: "Skills",          weight: 13, colors: [SECTION_COLORS.skills, "#4f46e5"] },
+  { key: "Experience",      weight: 14, colors: [SECTION_COLORS.experience, "#047857"] },
+  { key: "Education",       weight: 9,  colors: [SECTION_COLORS.education, "#1d4ed8"] },
+  { key: "Testimonials",    weight: 9,  colors: [SECTION_COLORS.testimonials, "#be123c"] },
+  { key: "Certifications",  weight: 9,  colors: [SECTION_COLORS.certifications, "#0891b2"] },
+  { key: "Achievements",    weight: 5,  colors: [SECTION_COLORS.achievements, "#b45309"] },
+  { key: "Social Links",    weight: 9,  colors: [SECTION_COLORS.social, "#be185d"] },
+  // Not a real content category shared with other widgets, so it keeps its own hue.
+  { key: "Choose a Template", weight: 10, colors: ["#a855f7", "#7e22ce"] },
 ];
 
 const MSG = (pct: number): { label: string; sub: string } => {
