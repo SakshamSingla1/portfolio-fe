@@ -16,6 +16,7 @@ import RecentActivitiesTemplate from "./RecentActivities.template";
 import QuickActionsTemplate from "./QuickActions.template";
 import MilestoneCelebration from "./MilestoneCelebration";
 import { Card, SectionLabel, SkeletonBlock, AmbientAurora } from "./shared/DashboardUI";
+import { METRIC_COLORS } from "./shared/sectionColors";
 import LiveSiteControl from "../../molecules/LiveSiteControl/LiveSiteControl";
 
 interface DashboardTemplateProps {
@@ -171,13 +172,13 @@ const EngagementStrip: React.FC<{ viewStats: IViewStats; stats: IStats }> = ({
       label: "CV Download Rate",
       pct: rawPct(resumeDownloads),
       detail: `${resumeDownloads} download${resumeDownloads !== 1 ? "s" : ""} · ${totalViews.toLocaleString()} views`,
-      color: "#8b5cf6",
+      color: METRIC_COLORS.resumeDownloads,
     },
     {
       label: "Unique Rate",
       pct: rawPct(uniqueVisitors),
       detail: `${uniqueVisitors.toLocaleString()} unique · ${totalViews.toLocaleString()} total`,
-      color: "#10b981",
+      color: METRIC_COLORS.uniqueVisitors,
     },
   ];
 

@@ -8,6 +8,7 @@ import { Panel, MetricTile } from "./shared/AnalyticsSurface";
 import { FlatTrendChart, FlatDeviceBreakdown } from "./FlatCharts";
 import { DeviceDonutChart } from "../Dashboard/AnalyticsCharts";
 import { EmptyState } from "../Dashboard/shared/DashboardUI";
+import { METRIC_COLORS } from "../Dashboard/shared/sectionColors";
 
 interface OverviewPanelProps {
   overview: IAnalyticsOverview;
@@ -72,14 +73,14 @@ const OverviewPanel: React.FC<OverviewPanelProps> = ({ overview }) => {
             <MetricTile
               label="Unique Visitors"
               icon={<FiUsers size={16} />}
-              accent="#8b5cf6"
+              accent={METRIC_COLORS.uniqueVisitors}
               current={comparison.uniqueVisitors.current}
               percentChange={comparison.uniqueVisitors.percentChange}
             />
             <MetricTile
               label="CV Downloads"
               icon={<FiDownload size={16} />}
-              accent="#10b981"
+              accent={METRIC_COLORS.resumeDownloads}
               current={comparison.resumeDownloads.current}
               percentChange={comparison.resumeDownloads.percentChange}
             />

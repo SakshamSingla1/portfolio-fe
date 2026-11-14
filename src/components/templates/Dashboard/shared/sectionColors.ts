@@ -19,3 +19,16 @@ export const SECTION_COLORS = {
 } as const;
 
 export type SectionKey = keyof typeof SECTION_COLORS;
+
+/** Same idea, for the three portfolio-performance metrics that appear on both
+ * the Dashboard (EngagementStrip, the analytics card's hero) and the
+ * dedicated /analytics page (OverviewPanel's KPI tiles) -- without this they
+ * drifted independently too (Dashboard had CV Downloads as violet and Unique
+ * as emerald; Analytics had them the other way around). "Views" matches the
+ * brand primary color used for it throughout the Dashboard's own analytics
+ * widget, so it isn't listed as a separate hex here -- pass colors.primary600.
+ */
+export const METRIC_COLORS = {
+  uniqueVisitors: "#8b5cf6",
+  resumeDownloads: "#10b981",
+} as const;
